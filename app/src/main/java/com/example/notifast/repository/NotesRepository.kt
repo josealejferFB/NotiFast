@@ -1,16 +1,25 @@
 package com.example.notifast.repository
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import com.example.notifast.model.Note
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.snapshots
-import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.snapshots
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 class NotesRepository(
+    private val context: Context,
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
@@ -19,7 +28,7 @@ class NotesRepository(
         get() = auth.currentUser?.uid.orEmpty()
 
     fun getNotes(): Flow<List<Note>> {
-        return db.collection("notes")
+        return db.collectionGroup("notes")
             .whereEqualTo("userId", userId)
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .snapshots()
@@ -30,38 +39,121 @@ class NotesRepository(
             }
     }
 
-    suspend fun addNote(title: String, content: String): Result<Unit> {
+    fun getSubjects(): Flow<List<String>> {
+        return db.collection("users")
+            .document(userId)
+            .collection("subjects")
+            .snapshots()
+            .map { snapshot ->
+                snapshot.documents.map { it.id }
+            }
+    }
+
+    suspend fun addSubject(subjectName: String): Result<Unit> {
         return try {
-            val note = hashMapOf(
+            val data = mapOf(
+                "name" to subjectName,
+                "createdAt" to FieldValue.serverTimestamp()
+            )
+            db.collection("users").document(userId).collection("subjects").document(subjectName).set(data).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * ESTRATEGIA LOCAL: Guarda la imagen en la memoria interna del teléfono (GRATIS)
+     */
+    suspend fun uploadImage(uri: Uri): Result<String> {
+        return try {
+            val fileName = "note_img_${UUID.randomUUID()}.jpg"
+            val file = File(context.filesDir, fileName)
+            
+            // 1. Cargar y optimizar
+            val options = BitmapFactory.Options().apply { inSampleSize = 2 }
+            context.contentResolver.openInputStream(uri).use { input ->
+                val bitmap = BitmapFactory.decodeStream(input, null, options)
+                FileOutputStream(file).use { out ->
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, out)
+                }
+            }
+            
+            // Retornamos la ruta del archivo local
+            Result.success(file.absolutePath)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun addNote(subject: String, title: String, content: String, imageUrl: String? = null): Result<Unit> {
+        return try {
+            val noteMap = hashMapOf(
                 "userId" to userId,
+                "subject" to subject,
                 "title" to title,
                 "content" to content,
-                "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+                "imageUrl" to imageUrl, // Guardamos la ruta local en la DB
+                "timestamp" to FieldValue.serverTimestamp()
             )
-            db.collection("notes").add(note).await()
+
+            db.collection("users")
+                .document(userId)
+                .collection("subjects")
+                .document(subject)
+                .collection("notes")
+                .add(noteMap)
+                .await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun updateNote(noteId: String, title: String, content: String): Result<Unit> {
+    suspend fun updateNote(noteId: String, subject: String, title: String, content: String, imageUrl: String? = null): Result<Unit> {
         return try {
-            val updates = hashMapOf(
+            val updates = mutableMapOf<String, Any>(
                 "title" to title,
                 "content" to content,
-                "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp() // Actualizamos la fecha al editar
+                "timestamp" to FieldValue.serverTimestamp()
             )
-            db.collection("notes").document(noteId).update(updates as Map<String, Any>).await()
+            imageUrl?.let { updates["imageUrl"] = it }
+
+            db.collection("users")
+                .document(userId)
+                .collection("subjects")
+                .document(subject)
+                .collection("notes")
+                .document(noteId)
+                .update(updates)
+                .await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun deleteNote(noteId: String): Result<Unit> {
+    suspend fun deleteNote(note: Note): Result<Unit> {
         return try {
-            db.collection("notes").document(noteId).delete().await()
+            val subjectRef = db.collection("users")
+                .document(userId)
+                .collection("subjects")
+                .document(note.subject)
+            
+            val notesCollectionRef = subjectRef.collection("notes")
+            notesCollectionRef.document(note.id).delete().await()
+
+            // LIMPIEZA LOCAL: Borramos el archivo del teléfono
+            note.imageUrl?.let { path ->
+                val file = File(path)
+                if (file.exists()) file.delete()
+            }
+
+            val remainingNotes = notesCollectionRef.limit(1).get().await()
+            if (remainingNotes.isEmpty) {
+                subjectRef.delete().await()
+            }
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

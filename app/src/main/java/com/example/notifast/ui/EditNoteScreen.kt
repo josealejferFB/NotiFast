@@ -22,7 +22,7 @@ fun EditNoteScreen(
     onNoteUpdated: () -> Unit,
     onBack: () -> Unit
 ) {
-    // Inicializamos los campos con los valores actuales de la nota
+    var subject by remember { mutableStateOf(note.subject) }
     var title by remember { mutableStateOf(note.title) }
     var content by remember { mutableStateOf(note.content) }
 
@@ -36,6 +36,13 @@ fun EditNoteScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            TextField(
+                value = subject,
+                onValueChange = { subject = it },
+                label = { Text("Materia") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = title,
                 onValueChange = { title = it },
@@ -57,8 +64,10 @@ fun EditNoteScreen(
                 }
                 Button(
                     onClick = {
-                        viewModel.updateNote(note.id, title, content)
-                        onNoteUpdated()
+                        if (subject.isNotBlank() && title.isNotBlank()) {
+                            viewModel.updateNote(note.id, subject, title, content)
+                            onNoteUpdated()
+                        }
                     }
                 ) {
                     Text("Guardar Cambios")

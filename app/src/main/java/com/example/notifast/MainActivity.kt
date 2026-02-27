@@ -6,14 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.notifast.model.Note
-import com.example.notifast.ui.AddNoteScreen
-import com.example.notifast.ui.EditNoteScreen
-import com.example.notifast.ui.LoginScreen
-import com.example.notifast.ui.NotesScreen
+import com.example.notifast.ui.*
 import com.example.notifast.ui.theme.NotiFastTheme
 import com.example.notifast.viewmodel.AuthViewModel
 import com.example.notifast.viewmodel.NotesViewModel
@@ -28,7 +27,6 @@ class MainActivity : ComponentActivity() {
                 val authViewModel: AuthViewModel = viewModel()
                 val notesViewModel: NotesViewModel = viewModel()
                 
-                // Variable temporal para guardar la nota que vamos a editar
                 var selectedNote by remember { mutableStateOf<Note?>(null) }
 
                 NavHost(navController = navController, startDestination = "login") {
@@ -47,9 +45,13 @@ class MainActivity : ComponentActivity() {
                             notesViewModel = notesViewModel,
                             authViewModel = authViewModel,
                             onAddNote = { navController.navigate("add_note") },
+                            onAddSubject = { navController.navigate("add_subject") },
                             onEditNote = { note -> 
                                 selectedNote = note
                                 navController.navigate("edit_note")
+                            },
+                            onSubjectClick = { subjectName ->
+                                navController.navigate("subject_detail/$subjectName")
                             },
                             onLogout = {
                                 navController.navigate("login") {
@@ -64,6 +66,12 @@ class MainActivity : ComponentActivity() {
                             onNoteAdded = { navController.popBackStack() }
                         )
                     }
+                    composable("add_subject") {
+                        AddSubjectScreen(
+                            viewModel = notesViewModel,
+                            onSubjectAdded = { navController.popBackStack() }
+                        )
+                    }
                     composable("edit_note") {
                         selectedNote?.let { note ->
                             EditNoteScreen(
@@ -73,6 +81,21 @@ class MainActivity : ComponentActivity() {
                                 onBack = { navController.popBackStack() }
                             )
                         }
+                    }
+                    composable(
+                        route = "subject_detail/{subjectName}",
+                        arguments = listOf(navArgument("subjectName") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val subjectName = backStackEntry.arguments?.getString("subjectName") ?: ""
+                        SubjectDetailScreen(
+                            subjectName = subjectName,
+                            viewModel = notesViewModel,
+                            onEditNote = { note ->
+                                selectedNote = note
+                                navController.navigate("edit_note")
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                 }
             }
