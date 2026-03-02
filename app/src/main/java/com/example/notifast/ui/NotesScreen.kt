@@ -21,12 +21,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
+import com.example.notifast.R
 import com.example.notifast.model.Note
 import com.example.notifast.ui.theme.Aqua
 import com.example.notifast.ui.theme.Ruby
@@ -69,7 +71,7 @@ fun NotesScreen(
             snackbarHost = {
                 SnackbarHost(snackbarHostState) { data ->
                     Card(
-                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        modifier = Modifier.padding(16.dp).fillMaxWidth().animateContentSize(),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                     ) {
@@ -84,7 +86,8 @@ fun NotesScreen(
         ) { padding ->
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(bottom = 32.dp),
+                // Reducimos el margen inferior a 130dp para que no quede tan separado del borde
+                contentPadding = PaddingValues(bottom = 130.dp), 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // 1. HEADER
@@ -92,13 +95,16 @@ fun NotesScreen(
                     HeaderProfile(userProfile, userAuth, onEditProfile, onAddSubject, onAddNote, onLogout, authViewModel)
                 }
 
-                // 2. TÍTULO Y BÚSQUEDA (Sin logo, diseño original)
+                // 2. TÍTULO Y BÚSQUEDA
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Mis Notas", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = "Mis Notas", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
+                        }
+                        
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { notesViewModel.setSearchQuery(it) },
@@ -162,10 +168,10 @@ fun NotesScreen(
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             allSubjectsGrouped.forEach { (subjectName, notes) ->
-                                item(key = "subject_feat_$subjectName") {
+                                item(key = "featured_$subjectName") {
                                     SubjectFeaturedCard(
                                         subjectName = subjectName,
                                         notes = notes,
@@ -190,15 +196,18 @@ fun NotesScreen(
     }
 }
 
-// --- COMPONENTES APOYO (Restaurados a su estado estético) ---
-
 @Composable
 fun NoteDetailOverlay(note: Note, onClose: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)) {
         Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Box(modifier = Modifier.fillMaxWidth().height(350.dp)) {
                 if (note.imageUrl != null) {
-                    SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                    SubcomposeAsyncImage(
+                        model = note.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
                 } else {
                     Box(Modifier.fillMaxSize().background(Aqua.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
                         Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(80.dp), tint = Aqua)
@@ -244,12 +253,20 @@ fun SubjectFeaturedCard(subjectName: String, notes: List<Note>, onClick: () -> U
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column {
-                Row(modifier = Modifier.fillMaxWidth().height(120.dp).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(120.dp).padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                     repeat(3) { index ->
                         val note = notes.getOrNull(index)
                         Box(modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(12.dp)).background(Color.LightGray.copy(alpha = 0.2f))) {
                             if (note?.imageUrl != null) {
-                                SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                                SubcomposeAsyncImage(
+                                    model = note.imageUrl,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
                             } else {
                                 Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.align(Alignment.Center).size(20.dp), tint = Color.Gray)
                             }

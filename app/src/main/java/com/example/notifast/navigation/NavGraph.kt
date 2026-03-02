@@ -33,6 +33,8 @@ fun NavGraph(
                 }
             )
         }
+        
+        // --- PANTALLAS PRINCIPALES CON HOTBAR ---
         composable(Screen.Notes.route) {
             NotesScreen(
                 notesViewModel = notesViewModel,
@@ -56,6 +58,28 @@ fun NavGraph(
                 }
             )
         }
+        
+        composable(Screen.Schedules.route) {
+            SchedulesScreen()
+        }
+        
+        composable(Screen.Grades.route) {
+            GradesScreen()
+        }
+        
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                authViewModel = authViewModel,
+                onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Notes.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // --- PANTALLAS SECUNDARIAS ---
         composable(Screen.EditProfile.route) {
             EditProfileScreen(
                 viewModel = authViewModel,

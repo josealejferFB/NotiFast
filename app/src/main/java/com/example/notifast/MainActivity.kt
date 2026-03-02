@@ -5,20 +5,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.notifast.model.Note
-import com.example.notifast.ui.*
+import com.example.notifast.navigation.NavGraph
+import com.example.notifast.navigation.Screen
 import com.example.notifast.ui.theme.NotiFastTheme
 import com.example.notifast.ui.theme.Ruby
 import com.example.notifast.viewmodel.AuthViewModel
@@ -30,101 +33,96 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NotiFastTheme {
-                // DEGRADADO PROFESIONAL: Blanco -> Ruby suave
-                val backgroundGradient = Brush.verticalGradient(
-                    colors = listOf(
-                        Color.White,
-                        Ruby.copy(alpha = 0.15f) // Ruby con transparencia para elegancia
-                    )
-                )
+                MainContent()
+            }
+        }
+    }
+}
 
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(backgroundGradient)
+@Composable
+fun MainContent() {
+    val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
+    val notesViewModel: NotesViewModel = viewModel()
+    
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    
+    val showBottomBar = Screen.bottomNavItems.any { it.route == currentDestination?.route }
+
+    val backgroundGradient = Brush.verticalGradient(
+        colors = listOf(Color.White, Ruby.copy(alpha = 0.15f))
+    )
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(backgroundGradient)
+    ) {
+        NavGraph(
+            navController = navController,
+            authViewModel = authViewModel,
+            notesViewModel = notesViewModel
+        )
+
+        // HOTBAR FLOTANTE CENTRADA Y SEGURA
+        if (showBottomBar) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding() // Respeta la zona de botones del sistema
+                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp) // Margen de cápsula flotante
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(32.dp),
+                    color = Color.White.copy(alpha = 0.98f),
+                    shadowElevation = 12.dp,
+                    tonalElevation = 4.dp
                 ) {
-                    val navController = rememberNavController()
-                    val authViewModel: AuthViewModel = viewModel()
-                    val notesViewModel: NotesViewModel = viewModel()
-                    
-                    var selectedNote by remember { mutableStateOf<Note?>(null) }
-
-                    NavHost(navController = navController, startDestination = "login") {
-                        composable("login") {
-                            LoginScreen(
-                                viewModel = authViewModel,
-                                onLoginSuccess = {
-                                    navController.navigate("notes") {
-                                        popUpTo("login") { inclusive = true }
+                    NavigationBar(
+                        containerColor = Color.Transparent,
+                        // WindowInsets(0) es la clave para centrar verticalmente y evitar cortes
+                        windowInsets = WindowInsets(0, 0, 0, 0),
+                        modifier = Modifier.height(84.dp),
+                        tonalElevation = 0.dp
+                    ) {
+                        Screen.bottomNavItems.forEach { screen ->
+                            val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                }
-                            )
-                        }
-                        composable("notes") {
-                            NotesScreen(
-                                notesViewModel = notesViewModel,
-                                authViewModel = authViewModel,
-                                onAddNote = { navController.navigate("add_note") },
-                                onAddSubject = { navController.navigate("add_subject") },
-                                onEditNote = { note -> 
-                                    selectedNote = note
-                                    navController.navigate("edit_note")
                                 },
-                                onEditProfile = { 
-                                    navController.navigate("edit_profile")
+                                icon = { 
+                                    screen.icon?.let { 
+                                        Icon(
+                                            imageVector = it, 
+                                            contentDescription = screen.title,
+                                            modifier = Modifier.size(26.dp)
+                                        ) 
+                                    } 
                                 },
-                                onSubjectClick = { subjectName ->
-                                    navController.navigate("subject_detail/$subjectName")
+                                label = { 
+                                    Text(
+                                        text = screen.title ?: "", 
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                    )
                                 },
-                                onLogout = {
-                                    navController.navigate("login") {
-                                        popUpTo("notes") { inclusive = true }
-                                    }
-                                }
-                            )
-                        }
-                        composable("edit_profile") { 
-                            EditProfileScreen(
-                                viewModel = authViewModel,
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable("add_note") {
-                            AddNoteScreen(
-                                viewModel = notesViewModel,
-                                onNoteAdded = { navController.popBackStack() },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable("add_subject") {
-                            AddSubjectScreen(
-                                viewModel = notesViewModel,
-                                onSubjectAdded = { navController.popBackStack() },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable("edit_note") {
-                            selectedNote?.let { note ->
-                                EditNoteScreen(
-                                    note = note,
-                                    viewModel = notesViewModel,
-                                    onNoteUpdated = { navController.popBackStack() },
-                                    onBack = { navController.popBackStack() }
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = Ruby,
+                                    selectedTextColor = Ruby,
+                                    indicatorColor = Ruby.copy(alpha = 0.1f),
+                                    unselectedIconColor = Color.Gray,
+                                    unselectedTextColor = Color.Gray
                                 )
-                            }
-                        }
-                        composable(
-                            route = "subject_detail/{subjectName}",
-                            arguments = listOf(navArgument("subjectName") { type = NavType.StringType })
-                        ) { backStackEntry ->
-                            val subjectName = backStackEntry.arguments?.getString("subjectName") ?: ""
-                            SubjectDetailScreen(
-                                subjectName = subjectName,
-                                viewModel = notesViewModel,
-                                onEditNote = { note ->
-                                    selectedNote = note
-                                    navController.navigate("edit_note")
-                                },
-                                onBack = { navController.popBackStack() }
                             )
                         }
                     }
