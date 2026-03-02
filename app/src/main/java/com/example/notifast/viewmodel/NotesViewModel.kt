@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -25,21 +26,48 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = NotesRepository(application.applicationContext)
 
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
+    val allNotes = _notes.asStateFlow()
     
     private val _currentFilter = MutableStateFlow(NoteFilter.RECIENTES)
     val currentFilter = _currentFilter.asStateFlow()
 
-    val filteredNotes: StateFlow<Map<String, List<Note>>> = combine(_notes, _currentFilter) { notes, filter ->
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    /**
+     * LÓGICA DE FILTRADO PARA LA SECCIÓN "MIS NOTAS"
+     */
+    val filteredNotes: StateFlow<Map<String, List<Note>>> = combine(_notes, _currentFilter, _searchQuery) { notes, filter, query ->
         if (notes.isEmpty()) {
-            emptyMap<String, List<Note>>() // Aseguramos que devuelva un mapa vacío
+            emptyMap()
         } else {
-            when (filter) {
-                NoteFilter.RECIENTES -> mapOf("Recientes" to notes.sortedByDescending { it.timestamp })
-                NoteFilter.ANTIGUAS -> mapOf("Más Antiguas" to notes.sortedBy { it.timestamp })
-                NoteFilter.POR_MATERIA -> notes.groupBy { it.subject.ifBlank { "SIN MATERIA" } }
+            val searchedNotes = if (query.isBlank()) {
+                notes
+            } else {
+                notes.filter { 
+                    it.title.contains(query, ignoreCase = true) || 
+                    it.subject.contains(query, ignoreCase = true) 
+                }
+            }
+
+            if (searchedNotes.isEmpty() && query.isNotBlank()) {
+                emptyMap()
+            } else {
+                when (filter) {
+                    NoteFilter.RECIENTES -> mapOf("Recientes" to searchedNotes.sortedByDescending { it.timestamp })
+                    NoteFilter.ANTIGUAS -> mapOf("Más Antiguas" to searchedNotes.sortedBy { it.timestamp })
+                    NoteFilter.POR_MATERIA -> searchedNotes.groupBy { it.subject.ifBlank { "SIN MATERIA" } }
+                }
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
+
+    /**
+     * LÓGICA PARA LA SECCIÓN "MATERIAS" (Siempre agrupado)
+     */
+    val allNotesGroupedBySubject: StateFlow<Map<String, List<Note>>> = _notes
+        .map { list -> list.groupBy { it.subject.ifBlank { "SIN MATERIA" } } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
 
     private val _subjects = MutableStateFlow<List<String>>(emptyList())
     val subjects = _subjects.asStateFlow()
@@ -57,6 +85,10 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setFilter(filter: NoteFilter) {
         _currentFilter.value = filter
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
     }
 
     fun loadNotes() {

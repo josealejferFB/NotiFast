@@ -1,17 +1,30 @@
 package com.example.notifast.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Title
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.notifast.model.Note
+import com.example.notifast.ui.theme.Aqua
+import com.example.notifast.ui.theme.Ruby
 import com.example.notifast.viewmodel.NotesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,56 +35,154 @@ fun EditNoteScreen(
     onNoteUpdated: () -> Unit,
     onBack: () -> Unit
 ) {
-    var subject by remember { mutableStateOf(note.subject) }
+    val subjects by viewModel.subjects.collectAsState()
+    
+    var selectedSubject by remember { mutableStateOf(note.subject) }
     var title by remember { mutableStateOf(note.title) }
     var content by remember { mutableStateOf(note.content) }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? -> selectedImageUri = uri }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Editar Nota") }) }
+        containerColor = Color.Transparent,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Editar Apunte", fontWeight = FontWeight.ExtraBold) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextField(
-                value = subject,
-                onValueChange = { subject = it },
-                label = { Text("Materia") },
+            // SELECTOR DE MATERIA REFINADO (SIN CONTENEDOR RARO)
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
                 modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextField(
+            ) {
+                OutlinedTextField(
+                    value = selectedSubject,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Materia") },
+                    leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = Aqua) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    shape = RoundedCornerShape(28.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Aqua,
+                        focusedLabelColor = Aqua,
+                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+                        unfocusedContainerColor = Color.Transparent, // Soluciona el contenedor raro
+                        focusedContainerColor = Color.Transparent    // Soluciona el contenedor raro
+                    ),
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(Color.White, RoundedCornerShape(16.dp))
+                ) {
+                    subjects.forEach { subject ->
+                        DropdownMenuItem(
+                            text = { Text(subject, fontWeight = FontWeight.Medium) },
+                            onClick = {
+                                selectedSubject = subject
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Título") },
-                modifier = Modifier.fillMaxWidth()
+                leadingIcon = { Icon(Icons.Default.Title, contentDescription = null, tint = Ruby) },
+                shape = RoundedCornerShape(28.dp),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Ruby, 
+                    focusedLabelColor = Ruby,
+                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent
+                )
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextField(
+            
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ÁREA DE IMAGEN
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .background(Color.LightGray.copy(alpha = 0.1f), RoundedCornerShape(28.dp))
+                    .clip(RoundedCornerShape(28.dp))
+                    .clickable { galleryLauncher.launch("image/*") },
+                contentAlignment = Alignment.Center
+            ) {
+                if (selectedImageUri != null) {
+                    AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                } else if (note.imageUrl != null) {
+                    AsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.Image, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(32.dp))
+                        Text("Toca para cambiar foto", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
-                label = { Text("Contenido") },
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                label = { Text("Contenido del apunte") },
+                shape = RoundedCornerShape(28.dp),
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Ruby, 
+                    focusedLabelColor = Ruby,
+                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent
+                )
             )
-            Spacer(modifier = Modifier.height(16.dp))
             
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(onClick = onBack) {
-                    Text("Cancelar")
-                }
-                Button(
-                    onClick = {
-                        if (subject.isNotBlank() && title.isNotBlank()) {
-                            viewModel.updateNote(note.id, subject, title, content)
-                            onNoteUpdated()
-                        }
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Button(
+                onClick = {
+                    if (selectedSubject.isNotBlank() && title.isNotBlank()) {
+                        viewModel.updateNote(note.id, selectedSubject, title, content, selectedImageUri)
+                        onNoteUpdated()
                     }
-                ) {
-                    Text("Guardar Cambios")
-                }
+                },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(28.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Ruby),
+                enabled = title.isNotBlank()
+            ) {
+                Text("Guardar Cambios", fontWeight = FontWeight.Bold)
             }
         }
     }

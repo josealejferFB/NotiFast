@@ -1,5 +1,6 @@
 package com.example.notifast.ui
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -22,42 +23,63 @@ fun SubjectDetailScreen(
     onEditNote: (Note) -> Unit,
     onBack: () -> Unit
 ) {
-    val notesDisplay by viewModel.filteredNotes.collectAsState()
-    val notes = notesDisplay[subjectName] ?: emptyList<Note>()
+    // CORRECCIÓN: Usamos el flujo que siempre está agrupado por materias
+    val subjectsMap by viewModel.allNotesGroupedBySubject.collectAsState()
+    
+    // Obtenemos las notas de esta materia específica del mapa confiable
+    val notes = subjectsMap[subjectName] ?: emptyList<Note>()
+    
+    var expandedNote by remember { mutableStateOf<Note?>(null) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(subjectName.uppercase()) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text(subjectName.uppercase(), style = MaterialTheme.typography.titleLarge) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            if (notes.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(padding), 
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No hay notas en esta materia todavía.")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(bottom = 24.dp)
+                ) {
+                    itemsIndexed(notes, key = { _, note -> note.id }) { index, note ->
+                        NoteEstheticCard(
+                            note = note,
+                            index = index,
+                            onClick = { expandedNote = note },
+                            onEdit = { onEditNote(note) },
+                            onDelete = { viewModel.deleteNote(note) }
+                        )
                     }
                 }
-            )
-        }
-    ) { padding ->
-        if (notes.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding), 
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No hay notas en esta materia todavía.")
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                itemsIndexed(notes, key = { _, note -> note.id }) { index, note ->
-                    // USAMOS EL MISMO DISEÑO ESTÉTICO
-                    NoteEstheticCard(
-                        note = note,
-                        index = index,
-                        onEdit = { onEditNote(note) },
-                        onDelete = { viewModel.deleteNote(note) }
-                    )
-                }
+        }
+
+        AnimatedVisibility(
+            visible = expandedNote != null,
+            enter = fadeIn() + slideInVertically { it / 2 },
+            exit = fadeOut() + slideOutVertically { it / 2 }
+        ) {
+            expandedNote?.let { note ->
+                NoteDetailOverlay(
+                    note = note,
+                    onClose = { expandedNote = null }
+                )
             }
         }
     }

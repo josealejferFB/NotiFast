@@ -11,5 +11,5 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // COLORES CORPORATIVOS NOTIFAST (Diseño Figma)
-val ColorNotaNueva = Color(0xFFBF092F)
-val ColorMateriaNueva = Color(0xFF3B9797)
+val Ruby = Color(0xFFBF092F)
+val Aqua = Color(0xFF3B9797)

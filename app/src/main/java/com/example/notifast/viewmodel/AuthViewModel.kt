@@ -16,7 +16,6 @@ import kotlinx.coroutines.tasks.await
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
-    // Inicializamos el repositorio usando el contexto de la aplicación
     private val repository: AuthRepository = AuthRepository(application.applicationContext)
 
     private val _user = MutableStateFlow<FirebaseUser?>(repository.currentUser)
@@ -76,6 +75,21 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     _error.value = null
                 }
                 .onFailure { _error.value = it.message }
+            _isLoading.value = false
+        }
+    }
+
+    fun updateProfile(firstName: String, lastName: String, imageUri: Uri?, onComplete: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = repository.updateProfile(firstName, lastName, imageUri)
+            if (result.isSuccess) {
+                refreshProfile()
+                _error.value = null
+                onComplete()
+            } else {
+                _error.value = result.exceptionOrNull()?.message
+            }
             _isLoading.value = false
         }
     }
