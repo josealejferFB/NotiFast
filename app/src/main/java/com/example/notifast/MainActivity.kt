@@ -64,25 +64,23 @@ fun MainContent() {
             notesViewModel = notesViewModel
         )
 
-        // HOTBAR FLOTANTE CENTRADA Y SEGURA
         if (showBottomBar) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .navigationBarsPadding() // Respeta la zona de botones del sistema
-                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp) // Margen de cápsula flotante
+                    .navigationBarsPadding()
+                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
             ) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(32.dp),
                     color = Color.White.copy(alpha = 0.98f),
-                    shadowElevation = 12.dp,
-                    tonalElevation = 4.dp
+                    shadowElevation = 0.dp, // SOMBRA ELIMINADA
+                    tonalElevation = 0.dp   // TOTALMENTE PLANO
                 ) {
                     NavigationBar(
                         containerColor = Color.Transparent,
-                        // WindowInsets(0) es la clave para centrar verticalmente y evitar cortes
                         windowInsets = WindowInsets(0, 0, 0, 0),
                         modifier = Modifier.height(84.dp),
                         tonalElevation = 0.dp
