@@ -86,21 +86,13 @@ fun NotesScreen(
         ) { padding ->
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                // MARGEN AJUSTADO PARA EVITAR QUE LA HOTBAR TAPE LAS CARDS
                 contentPadding = PaddingValues(bottom = 140.dp), 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 1. HEADER
-                item {
-                    HeaderProfile(userProfile, userAuth, onEditProfile, onAddSubject, onAddNote, onLogout, authViewModel)
-                }
+                item { HeaderProfile(userProfile, userAuth, onEditProfile, onAddSubject, onAddNote, onLogout, authViewModel) }
 
-                // 2. TÍTULO Y BÚSQUEDA
                 item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "Mis Notas", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
                         OutlinedTextField(
                             value = searchQuery,
@@ -115,7 +107,6 @@ fun NotesScreen(
                     }
                 }
 
-                // 3. FILTROS
                 item {
                     LazyRow(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         item { FilterChip(selected = currentFilter == NoteFilter.RECIENTES, onClick = { notesViewModel.setFilter(NoteFilter.RECIENTES) }, label = "Recientes") }
@@ -124,24 +115,19 @@ fun NotesScreen(
                     }
                 }
 
-                // 4. LISTA DE NOTAS
                 if (notesDisplay.isEmpty()) {
                     item { EmptyStateView(searchQuery, onAddSubject) }
                 } else {
-                    var noteCounter = 0
                     notesDisplay.forEach { (header, notesList) ->
                         val listToShow = if (currentFilter == NoteFilter.RECIENTES) notesList.take(3) else notesList
-                        
                         if (currentFilter == NoteFilter.POR_MATERIA && listToShow.isNotEmpty()) {
                             item(key = "header_$header") {
                                 SubjectHeader(header) { onSubjectClick(header) }
                             }
                         }
-
                         itemsIndexed(listToShow, key = { _, note -> note.id }) { _, note ->
                             NoteEstheticCard(
                                 note = note, 
-                                index = noteCounter++, 
                                 onClick = { expandedNote = note },
                                 onEdit = { onEditNote(note) }, 
                                 onDelete = { notesViewModel.deleteNote(note) }
@@ -150,30 +136,13 @@ fun NotesScreen(
                     }
                 }
 
-                // 5. SECCIÓN MATERIAS (AL FINAL)
                 if (searchQuery.isEmpty() && allSubjectsGrouped.isNotEmpty()) {
+                    item { Text(text = "Materias", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 32.dp, end = 20.dp, bottom = 16.dp)) }
                     item {
-                        Text(
-                            text = "Materias",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.ExtraBold,
-                            modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 32.dp, end = 20.dp, bottom = 16.dp)
-                        )
-                    }
-                    
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
-                        ) {
+                        LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
                             allSubjectsGrouped.forEach { (subjectName, notes) ->
                                 item(key = "subject_feat_$subjectName") {
-                                    SubjectFeaturedCard(
-                                        subjectName = subjectName,
-                                        notes = notes,
-                                        onClick = { onSubjectClick(subjectName) }
-                                    )
+                                    SubjectFeaturedCard(subjectName = subjectName, notes = notes, onClick = { onSubjectClick(subjectName) })
                                 }
                             }
                         }
@@ -182,21 +151,37 @@ fun NotesScreen(
             }
         }
 
-        // OVERLAY DE DETALLE
+        // --- OVERLAY DE DETALLE CON EDITOR INTEGRADO ---
         AnimatedVisibility(
             visible = expandedNote != null,
             enter = fadeIn() + slideInVertically { it / 2 },
             exit = fadeOut() + slideOutVertically { it / 2 }
         ) {
-            expandedNote?.let { note -> NoteDetailOverlay(note = note, onClose = { expandedNote = null }) }
+            expandedNote?.let { note ->
+                NoteDetailOverlay(
+                    note = note,
+                    onSave = { updatedTitle, updatedContent ->
+                        notesViewModel.updateNote(note.id, note.subject, updatedTitle, updatedContent)
+                        expandedNote = null // Cerramos tras guardar para feedback visual
+                    },
+                    onClose = { expandedNote = null }
+                )
+            }
         }
     }
 }
 
-// --- COMPONENTES APOYO ---
-
 @Composable
-fun NoteDetailOverlay(note: Note, onClose: () -> Unit) {
+fun NoteDetailOverlay(
+    note: Note, 
+    onSave: (String, String) -> Unit, 
+    onClose: () -> Unit
+) {
+    // ESTADOS PARA EDICIÓN INMEDIATA
+    var isEditing by remember { mutableStateOf(false) }
+    var title by remember { mutableStateOf(note.title) }
+    var content by remember { mutableStateOf(note.content) }
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)) {
         Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Box(modifier = Modifier.fillMaxWidth().height(350.dp)) {
@@ -207,19 +192,75 @@ fun NoteDetailOverlay(note: Note, onClose: () -> Unit) {
                         Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(80.dp), tint = Aqua)
                     }
                 }
-                IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).background(Color.Black.copy(alpha = 0.3f), CircleShape)) {
-                    Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White)
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = onClose, modifier = Modifier.background(Color.Black.copy(alpha = 0.3f), CircleShape)) {
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White)
+                    }
+                    
+                    // BOTÓN DINÁMICO (EDITAR / GUARDAR)
+                    Surface(
+                        onClick = { 
+                            if (isEditing) onSave(title, content)
+                            isEditing = !isEditing
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isEditing) Aqua else Ruby,
+                        shadowElevation = 4.dp
+                    ) {
+                        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (isEditing) Icons.Default.Check else Icons.Default.Edit, 
+                                contentDescription = null, 
+                                tint = Color.White, 
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (isEditing) "Guardar" else "Editar", 
+                                color = Color.White, 
+                                fontWeight = FontWeight.Bold, 
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    }
                 }
+
                 Surface(modifier = Modifier.align(Alignment.BottomStart).padding(20.dp), shape = RoundedCornerShape(12.dp), color = Ruby) {
                     Text(note.subject.uppercase(), modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp), color = Color.White, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                 }
             }
+
+            // CONTENIDO EDITABLE O VISUALIZACIÓN
             Column(modifier = Modifier.padding(24.dp)) {
-                Text(text = note.title, style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = note.content, style = MaterialTheme.typography.bodyLarge, lineHeight = 28.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (isEditing) {
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text("Título") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Ruby)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = content,
+                        onValueChange = { content = it },
+                        label = { Text("Contenido") },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Ruby)
+                    )
+                } else {
+                    Text(text = note.title, style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = note.content, style = MaterialTheme.typography.bodyLarge, lineHeight = 28.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }
@@ -275,8 +316,8 @@ fun SubjectFeaturedCard(subjectName: String, notes: List<Note>, onClick: () -> U
 }
 
 @Composable
-fun NoteEstheticCard(note: Note, index: Int, onClick: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
-    val isEven = index % 2 == 0
+fun NoteEstheticCard(note: Note, onClick: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
+    val isEven = note.id.hashCode() % 2 == 0
     val baseColor = if (isEven) Ruby else Aqua
     val subjectColor = if (isEven) Aqua else Ruby
     Box(modifier = Modifier.width(373.dp).height(208.dp).padding(vertical = 8.dp).clickable { onClick() }) {

@@ -3,7 +3,7 @@ package com.example.notifast.ui
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -23,10 +23,7 @@ fun SubjectDetailScreen(
     onEditNote: (Note) -> Unit,
     onBack: () -> Unit
 ) {
-    // CORRECCIÓN: Usamos el flujo que siempre está agrupado por materias
     val subjectsMap by viewModel.allNotesGroupedBySubject.collectAsState()
-    
-    // Obtenemos las notas de esta materia específica del mapa confiable
     val notes = subjectsMap[subjectName] ?: emptyList<Note>()
     
     var expandedNote by remember { mutableStateOf<Note?>(null) }
@@ -57,10 +54,9 @@ fun SubjectDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(bottom = 24.dp)
                 ) {
-                    itemsIndexed(notes, key = { _, note -> note.id }) { index, note ->
+                    items(notes, key = { it.id }) { note ->
                         NoteEstheticCard(
                             note = note,
-                            index = index,
                             onClick = { expandedNote = note },
                             onEdit = { onEditNote(note) },
                             onDelete = { viewModel.deleteNote(note) }
@@ -70,6 +66,7 @@ fun SubjectDetailScreen(
             }
         }
 
+        // --- OVERLAY DE DETALLE CON EDITOR INTEGRADO ---
         AnimatedVisibility(
             visible = expandedNote != null,
             enter = fadeIn() + slideInVertically { it / 2 },
@@ -78,6 +75,10 @@ fun SubjectDetailScreen(
             expandedNote?.let { note ->
                 NoteDetailOverlay(
                     note = note,
+                    onSave = { updatedTitle, updatedContent ->
+                        viewModel.updateNote(note.id, note.subject, updatedTitle, updatedContent)
+                        expandedNote = null
+                    },
                     onClose = { expandedNote = null }
                 )
             }

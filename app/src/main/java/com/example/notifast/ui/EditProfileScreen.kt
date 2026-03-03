@@ -51,12 +51,13 @@ fun EditProfileScreen(
     ) { uri: Uri? -> selectedImageUri = uri }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Mi Perfil", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
@@ -75,7 +76,6 @@ fun EditProfileScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // FOTO DE PERFIL
                 Box(
                     modifier = Modifier
                         .size(140.dp)
@@ -98,7 +98,7 @@ fun EditProfileScreen(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // INPUTS EXPRESSIVE (AQUA)
+                // INPUTS EXPRESSIVE (28dp e Iconos)
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
@@ -109,7 +109,8 @@ fun EditProfileScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Aqua, 
                         focusedLabelColor = Aqua,
-                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent
                     )
                 )
 
@@ -125,7 +126,8 @@ fun EditProfileScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Aqua, 
                         focusedLabelColor = Aqua,
-                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent
                     )
                 )
 

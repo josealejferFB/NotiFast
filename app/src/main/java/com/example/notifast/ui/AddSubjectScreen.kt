@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ fun AddSubjectScreen(viewModel: NotesViewModel, onSubjectAdded: () -> Unit, onBa
     var name by remember { mutableStateOf("") }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Nueva Materia", fontWeight = FontWeight.ExtraBold) },
@@ -53,16 +55,20 @@ fun AddSubjectScreen(viewModel: NotesViewModel, onSubjectAdded: () -> Unit, onBa
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
+            // INPUT EXPRESSIVE (28dp e Icono)
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nombre de la materia") },
                 placeholder = { Text("Ej: Historia, Ciencias...") },
-                shape = RoundedCornerShape(16.dp),
+                leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null) },
+                shape = RoundedCornerShape(28.dp),
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Aqua,
-                    focusedLabelColor = Aqua
+                    focusedLabelColor = Aqua,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent
                 ),
                 singleLine = true
             )
@@ -79,7 +85,7 @@ fun AddSubjectScreen(viewModel: NotesViewModel, onSubjectAdded: () -> Unit, onBa
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Aqua),
                 enabled = name.isNotBlank()
             ) {
