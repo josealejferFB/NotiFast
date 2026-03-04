@@ -1,18 +1,27 @@
 package com.example.notifast.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.notifast.model.Note
+import com.example.notifast.ui.theme.Ruby
 import com.example.notifast.viewmodel.NotesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,60 +36,102 @@ fun SubjectDetailScreen(
     val notes = subjectsMap[subjectName] ?: emptyList<Note>()
     
     var expandedNote by remember { mutableStateOf<Note?>(null) }
+    val isHeaderVisible = expandedNote == null
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    // Soporte para botón atrás físico
+    BackHandler(enabled = expandedNote != null) {
+        expandedNote = null
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .safeDrawingPadding() // Unificamos a SafeDrawingPadding para todas las vistas
+    ) {
         Scaffold(
+            containerColor = Color.Transparent,
             topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text(subjectName.uppercase(), style = MaterialTheme.typography.titleLarge) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                        }
-                    }
-                )
+                AnimatedVisibility(
+                    visible = isHeaderVisible,
+                    enter = fadeIn(tween(300)) + expandVertically(spring(stiffness = Spring.StiffnessLow)),
+                    exit = fadeOut(tween(200)) + shrinkVertically(spring(stiffness = Spring.StiffnessLow))
+                ) {
+                    CenterAlignedTopAppBar(
+                        title = { Text(subjectName.uppercase(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold) },
+                        navigationIcon = {
+                            IconButton(onClick = onBack) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
+                    )
+                }
             }
         ) { padding ->
-            if (notes.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(padding), 
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay notas en esta materia todavía.")
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    contentPadding = PaddingValues(bottom = 24.dp)
-                ) {
-                    items(notes, key = { it.id }) { note ->
-                        NoteEstheticCard(
-                            note = note,
-                            onClick = { expandedNote = note },
-                            onEdit = { onEditNote(note) },
-                            onDelete = { viewModel.deleteNote(note) }
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                if (notes.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(), 
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No hay notas en esta materia todavía.", color = Color.Gray)
+                    }
+                } else {
+                    // LISTADO CON TRANSICIÓN SUAVE
+                    AnimatedVisibility(
+                        visible = isHeaderVisible,
+                        enter = fadeIn(tween(400)),
+                        exit = fadeOut(tween(200))
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            contentPadding = PaddingValues(bottom = 24.dp)
+                        ) {
+                            itemsIndexed(notes, key = { _, note -> note.id }) { index, note ->
+                                NoteEstheticCard(
+                                    note = note,
+                                    isEven = index % 2 == 0,
+                                    onClick = { expandedNote = note },
+                                    onEdit = { onEditNote(note) },
+                                    onDelete = { viewModel.deleteNote(note) }
+                                )
+                            }
+                        }
+                    }
+
+                    // VISTA EXPANDIDA CON ANIMACIÓN MEJORADA (SCALE + SPRING)
+                    AnimatedVisibility(
+                        visible = !isHeaderVisible,
+                        enter = fadeIn(tween(400)) + scaleIn(
+                            initialScale = 0.85f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ),
+                        exit = fadeOut(tween(250)) + scaleOut(
+                            targetScale = 0.85f,
+                            animationSpec = spring(stiffness = Spring.StiffnessMedium)
                         )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 24.dp, vertical = 24.dp), // Padding para que respire la sombra
+                            contentAlignment = Alignment.Center
+                        ) {
+                            expandedNote?.let { note ->
+                                NoteDetailExpandable(
+                                    note = note,
+                                    onSave = { t, c -> 
+                                        viewModel.updateNote(note.id, note.subject, t, c)
+                                    },
+                                    onClose = { expandedNote = null }
+                                )
+                            }
+                        }
                     }
                 }
-            }
-        }
-
-        // --- OVERLAY DE DETALLE CON EDITOR INTEGRADO ---
-        AnimatedVisibility(
-            visible = expandedNote != null,
-            enter = fadeIn() + slideInVertically { it / 2 },
-            exit = fadeOut() + slideOutVertically { it / 2 }
-        ) {
-            expandedNote?.let { note ->
-                NoteDetailOverlay(
-                    note = note,
-                    onSave = { updatedTitle, updatedContent ->
-                        viewModel.updateNote(note.id, note.subject, updatedTitle, updatedContent)
-                        expandedNote = null
-                    },
-                    onClose = { expandedNote = null }
-                )
             }
         }
     }

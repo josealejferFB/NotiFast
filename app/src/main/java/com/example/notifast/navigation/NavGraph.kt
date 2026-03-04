@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.notifast.model.Evaluation
 import com.example.notifast.model.Note
 import com.example.notifast.ui.*
 import com.example.notifast.viewmodel.AuthViewModel
@@ -18,6 +19,7 @@ fun NavGraph(
     notesViewModel: NotesViewModel
 ) {
     var selectedNote by remember { mutableStateOf<Note?>(null) }
+    var selectedEvaluation by remember { mutableStateOf<Evaluation?>(null) }
 
     NavHost(
         navController = navController,
@@ -59,6 +61,17 @@ fun NavGraph(
             )
         }
         
+        composable(Screen.Calendar.route) {
+            CalendarScreen(
+                viewModel = notesViewModel,
+                onAddEvaluation = { navController.navigate(Screen.AddEvaluation.route) },
+                onEditEvaluation = { eval ->
+                    selectedEvaluation = eval
+                    navController.navigate(Screen.EditEvaluation.route)
+                }
+            )
+        }
+        
         composable(Screen.Schedules.route) {
             SchedulesScreen()
         }
@@ -92,6 +105,23 @@ fun NavGraph(
                 onNoteAdded = { navController.popBackStack() },
                 onBack = { navController.popBackStack() }
             )
+        }
+        composable(Screen.AddEvaluation.route) {
+            AddEvaluationScreen(
+                viewModel = notesViewModel,
+                onEvaluationAdded = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.EditEvaluation.route) {
+            selectedEvaluation?.let { eval ->
+                EditEvaluationScreen(
+                    evaluation = eval,
+                    viewModel = notesViewModel,
+                    onEvaluationUpdated = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() }
+                )
+            }
         }
         composable(Screen.AddSubject.route) {
             AddSubjectScreen(

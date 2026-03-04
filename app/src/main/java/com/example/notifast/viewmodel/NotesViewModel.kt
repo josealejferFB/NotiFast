@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notifast.model.Evaluation
 import com.example.notifast.model.Note
 import com.example.notifast.repository.NotesRepository
 import kotlinx.coroutines.Job
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Date
 
 enum class NoteFilter {
     RECIENTES, ANTIGUAS, POR_MATERIA
@@ -28,6 +30,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
     val allNotes = _notes.asStateFlow()
     
+    private val _evaluations = MutableStateFlow<List<Evaluation>>(emptyList())
+    val evaluations = _evaluations.asStateFlow()
+
     private val _currentFilter = MutableStateFlow(NoteFilter.RECIENTES)
     val currentFilter = _currentFilter.asStateFlow()
 
@@ -77,10 +82,12 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
 
     private var notesJob: Job? = null
     private var subjectsJob: Job? = null
+    private var evaluationsJob: Job? = null
 
     init {
         loadNotes()
         loadSubjects()
+        loadEvaluations()
     }
 
     fun setFilter(filter: NoteFilter) {
@@ -109,6 +116,15 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun loadEvaluations() {
+        evaluationsJob?.cancel()
+        evaluationsJob = viewModelScope.launch {
+            repository.getEvaluations().collect { list ->
+                _evaluations.value = list
+            }
+        }
+    }
+
     fun addSubject(name: String) {
         viewModelScope.launch {
             _syncMessage.value = "Creando materia..."
@@ -129,6 +145,43 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
             }
             repository.addNote(subject, title, content, imageUrl)
             _syncMessage.value = "Nota guardada"
+            delay(1000)
+            _syncMessage.value = null
+        }
+    }
+
+    fun addEvaluation(
+        subjectName: String,
+        title: String,
+        description: String,
+        date: Date,
+        noteIds: List<String>,
+        quickTips: String,
+        imageUri: Uri? = null
+    ) {
+        viewModelScope.launch {
+            _syncMessage.value = "Guardando evaluación..."
+            var imageUrl: String? = null
+            imageUri?.let {
+                val uploadResult = repository.uploadImage(it)
+                imageUrl = uploadResult.getOrNull()
+            }
+            repository.addEvaluation(subjectName, title, description, date, noteIds, quickTips, imageUrl)
+            _syncMessage.value = "Evaluación guardada"
+            delay(1000)
+            _syncMessage.value = null
+        }
+    }
+
+    fun deleteEvaluation(eval: Evaluation) {
+        viewModelScope.launch {
+            _syncMessage.value = "Borrando evaluación..."
+            val result = repository.deleteEvaluation(eval.id, eval.imageUrl)
+            if (result.isSuccess) {
+                _syncMessage.value = "Eliminado"
+            } else {
+                _syncMessage.value = "Error al borrar"
+            }
             delay(1000)
             _syncMessage.value = null
         }

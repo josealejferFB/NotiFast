@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import com.example.notifast.model.Evaluation
 import com.example.notifast.model.Note
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Date
 import java.util.UUID
 
 class NotesRepository(
@@ -28,9 +30,11 @@ class NotesRepository(
     private val userId: String
         get() = auth.currentUser?.uid.orEmpty()
 
+    // --- SECCIÓN NOTAS ---
+
     fun getNotes(): Flow<List<Note>> {
         val uid = userId
-        if (uid.isEmpty()) return emptyFlow() // ESCUDO DE SEGURIDAD
+        if (uid.isEmpty()) return emptyFlow()
 
         return db.collectionGroup("notes")
             .whereEqualTo("userId", uid)
@@ -45,7 +49,7 @@ class NotesRepository(
 
     fun getSubjects(): Flow<List<String>> {
         val uid = userId
-        if (uid.isEmpty()) return emptyFlow() // ESCUDO DE SEGURIDAD: Evita el crash de ruta impar
+        if (uid.isEmpty()) return emptyFlow()
 
         return db.collection("users")
             .document(uid)
@@ -67,46 +71,6 @@ class NotesRepository(
             )
             db.collection("users").document(uid).collection("subjects").document(subjectName).set(data).await()
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun uploadImage(uri: Uri): Result<String> {
-        val uid = userId
-        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
-
-        return try {
-            val fileName = "note_img_${UUID.randomUUID()}.jpg"
-            val file = File(context.filesDir, fileName)
-            
-            val options = BitmapFactory.Options().apply { 
-                inJustDecodeBounds = true 
-            }
-            context.contentResolver.openInputStream(uri).use { 
-                BitmapFactory.decodeStream(it, null, options) 
-            }
-
-            var inSampleSize = 1
-            if (options.outHeight > 1024 || options.outWidth > 1024) {
-                val halfHeight = options.outHeight / 2
-                val halfWidth = options.outWidth / 2
-                while (halfHeight / inSampleSize >= 1024 && halfWidth / inSampleSize >= 1024) {
-                    inSampleSize *= 2
-                }
-            }
-
-            options.inJustDecodeBounds = false
-            options.inSampleSize = inSampleSize
-            
-            val bitmap = context.contentResolver.openInputStream(uri).use { 
-                BitmapFactory.decodeStream(it, null, options) 
-            }
-
-            FileOutputStream(file).use { out ->
-                bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, out)
-            }
-            Result.success(file.absolutePath)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -139,32 +103,6 @@ class NotesRepository(
         }
     }
 
-    suspend fun updateNote(noteId: String, subject: String, title: String, content: String, imageUrl: String? = null): Result<Unit> {
-        val uid = userId
-        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
-
-        return try {
-            val updates = mutableMapOf<String, Any>(
-                "title" to title,
-                "content" to content,
-                "timestamp" to FieldValue.serverTimestamp()
-            )
-            imageUrl?.let { updates["imageUrl"] = it }
-
-            db.collection("users")
-                .document(uid)
-                .collection("subjects")
-                .document(subject)
-                .collection("notes")
-                .document(noteId)
-                .update(updates)
-                .await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     suspend fun deleteNote(note: Note): Result<Unit> {
         val uid = userId
         if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
@@ -188,6 +126,148 @@ class NotesRepository(
                 subjectRef.delete().await()
             }
 
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // --- SECCIÓN EVALUACIONES ---
+
+    fun getEvaluations(): Flow<List<Evaluation>> {
+        val uid = userId
+        if (uid.isEmpty()) return emptyFlow()
+
+        return db.collection("users")
+            .document(uid)
+            .collection("evaluations")
+            .orderBy("date", Query.Direction.ASCENDING)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.documents.mapNotNull { doc ->
+                    doc.toObject<Evaluation>()?.copy(id = doc.id)
+                }
+            }
+    }
+
+    suspend fun addEvaluation(
+        subjectName: String,
+        title: String,
+        description: String,
+        date: Date,
+        noteIds: List<String>,
+        quickTips: String,
+        imageUrl: String? = null
+    ): Result<Unit> {
+        val uid = userId
+        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
+
+        return try {
+            val evaluation = Evaluation(
+                userId = uid,
+                subjectName = subjectName,
+                title = title,
+                description = description,
+                date = date,
+                noteIds = noteIds,
+                quickTips = quickTips,
+                imageUrl = imageUrl
+            )
+            
+            db.collection("users")
+                .document(uid)
+                .collection("evaluations")
+                .add(evaluation)
+                .await()
+            
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteEvaluation(evaluationId: String, imageUrl: String? = null): Result<Unit> {
+        val uid = userId
+        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
+
+        return try {
+            db.collection("users")
+                .document(uid)
+                .collection("evaluations")
+                .document(evaluationId)
+                .delete()
+                .await()
+
+            imageUrl?.let { path ->
+                val file = File(path)
+                if (file.exists()) file.delete()
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // --- UTILIDADES DE IMAGEN ---
+
+    suspend fun uploadImage(uri: Uri): Result<String> {
+        val uid = userId
+        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
+
+        return try {
+            val fileName = "img_${UUID.randomUUID()}.jpg"
+            val file = File(context.filesDir, fileName)
+            
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(uri).use { 
+                BitmapFactory.decodeStream(it, null, options) 
+            }
+
+            var inSampleSize = 1
+            if (options.outHeight > 1024 || options.outWidth > 1024) {
+                val halfHeight = options.outHeight / 2
+                val halfWidth = options.outWidth / 2
+                while (halfHeight / inSampleSize >= 1024 && halfWidth / inSampleSize >= 1024) {
+                    inSampleSize *= 2
+                }
+            }
+
+            options.inJustDecodeBounds = false
+            options.inSampleSize = inSampleSize
+            
+            val bitmap = context.contentResolver.openInputStream(uri).use { 
+                BitmapFactory.decodeStream(it, null, options) 
+            }
+
+            FileOutputStream(file).use { out ->
+                bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, out)
+            }
+            Result.success(file.absolutePath)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateNote(noteId: String, subject: String, title: String, content: String, imageUrl: String? = null): Result<Unit> {
+        val uid = userId
+        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
+
+        return try {
+            val updates = mutableMapOf<String, Any>(
+                "title" to title,
+                "content" to content,
+                "timestamp" to FieldValue.serverTimestamp()
+            )
+            imageUrl?.let { updates["imageUrl"] = it }
+
+            db.collection("users")
+                .document(uid)
+                .collection("subjects")
+                .document(subject)
+                .collection("notes")
+                .document(noteId)
+                .update(updates)
+                .await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

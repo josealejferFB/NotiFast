@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +14,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -30,6 +32,12 @@ import com.example.notifast.viewmodel.NotesViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Configuración para ocultar la interfaz del sistema (Status Bar y Navigation Bar)
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+        
         enableEdgeToEdge()
         setContent {
             NotiFastTheme {
@@ -54,78 +62,66 @@ fun MainContent() {
         colors = listOf(Color.White, Ruby.copy(alpha = 0.15f))
     )
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(backgroundGradient)
-    ) {
-        NavGraph(
-            navController = navController,
-            authViewModel = authViewModel,
-            notesViewModel = notesViewModel
-        )
-
-        if (showBottomBar) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(32.dp),
-                    color = Color.White.copy(alpha = 0.98f),
-                    shadowElevation = 0.dp, // SOMBRA ELIMINADA
-                    tonalElevation = 0.dp   // TOTALMENTE PLANO
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = Color.White,
+                    tonalElevation = 8.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    NavigationBar(
-                        containerColor = Color.Transparent,
-                        windowInsets = WindowInsets(0, 0, 0, 0),
-                        modifier = Modifier.height(84.dp),
-                        tonalElevation = 0.dp
-                    ) {
-                        Screen.bottomNavItems.forEach { screen ->
-                            val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                            NavigationBarItem(
-                                selected = selected,
-                                onClick = {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
+                    Screen.bottomNavItems.forEach { screen ->
+                        val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
                                     }
-                                },
-                                icon = { 
-                                    screen.icon?.let { 
-                                        Icon(
-                                            imageVector = it, 
-                                            contentDescription = screen.title,
-                                            modifier = Modifier.size(26.dp)
-                                        ) 
-                                    } 
-                                },
-                                label = { 
-                                    Text(
-                                        text = screen.title ?: "", 
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = Ruby,
-                                    selectedTextColor = Ruby,
-                                    indicatorColor = Ruby.copy(alpha = 0.1f),
-                                    unselectedIconColor = Color.Gray,
-                                    unselectedTextColor = Color.Gray
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = { 
+                                screen.icon?.let { 
+                                    Icon(
+                                        imageVector = it, 
+                                        contentDescription = screen.title,
+                                        modifier = Modifier.size(26.dp)
+                                    ) 
+                                } 
+                            },
+                            label = { 
+                                Text(
+                                    text = screen.title ?: "", 
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
                                 )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Ruby,
+                                selectedTextColor = Ruby,
+                                indicatorColor = Ruby.copy(alpha = 0.1f),
+                                unselectedIconColor = Color.Gray,
+                                unselectedTextColor = Color.Gray
                             )
-                        }
+                        )
                     }
                 }
             }
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(backgroundGradient)
+        ) {
+            NavGraph(
+                navController = navController,
+                authViewModel = authViewModel,
+                notesViewModel = notesViewModel
+            )
         }
     }
 }
