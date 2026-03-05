@@ -159,7 +159,6 @@ fun NotesScreen(
                         if (notesDisplay.isEmpty()) {
                             item { EmptyStateView(searchQuery, onAddSubject) }
                         } else {
-                            // CÁLCULO DE ÍNDICE GLOBAL PARA ZIG-ZAG PERPETUO
                             var notesOffset = 0
                             notesDisplay.forEach { (header, notesList) ->
                                 val listToShow = if (currentFilter == NoteFilter.RECIENTES) notesList.take(3) else notesList
@@ -187,7 +186,14 @@ fun NotesScreen(
                             item {
                                 LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
                                     allSubjectsGrouped.forEach { (subjectName, notes) ->
-                                        item(key = "subject_feat_$subjectName") { SubjectFeaturedCard(subjectName = subjectName, notes = notes, onClick = { onSubjectClick(subjectName) }) }
+                                        item(key = "subject_feat_$subjectName") {
+                                            SubjectFeaturedCard(
+                                                subjectName = subjectName, 
+                                                notes = notes, 
+                                                onNoteClick = { expandedNote = it },
+                                                onSubjectClick = { onSubjectClick(subjectName) }
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -291,28 +297,66 @@ fun SubjectHeader(header: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun SubjectFeaturedCard(subjectName: String, notes: List<Note>, onClick: () -> Unit) {
-    Card(modifier = Modifier.width(280.dp).height(220.dp), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(4.dp)) {
+fun SubjectFeaturedCard(
+    subjectName: String, 
+    notes: List<Note>, 
+    onNoteClick: (Note) -> Unit,
+    onSubjectClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.width(280.dp).height(220.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column {
                 Row(modifier = Modifier.fillMaxWidth().height(120.dp).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     repeat(3) { index ->
                         val note = notes.getOrNull(index)
-                        Box(modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(12.dp)).background(Color.LightGray.copy(alpha = 0.2f))) {
-                            if (note?.imageUrl != null) SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                            else Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.align(Alignment.Center).size(20.dp), tint = Color.Gray)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.LightGray.copy(alpha = 0.2f))
+                                .clickable { note?.let { onNoteClick(it) } }
+                        ) {
+                            if (note?.imageUrl != null) {
+                                SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                            } else {
+                                Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.align(Alignment.Center).size(20.dp), tint = Color.Gray)
+                            }
                         }
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
-                Text(text = subjectName, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Ruby)
+                Text(
+                    text = subjectName, 
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSubjectClick() }, 
+                    textAlign = TextAlign.Center, 
+                    style = MaterialTheme.typography.titleMedium, 
+                    fontWeight = FontWeight.Bold, 
+                    color = Ruby
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "${notes.size} notas", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                    Text(text = "ver todas", modifier = Modifier.clickable { onClick() }, style = MaterialTheme.typography.bodySmall, color = Ruby, fontWeight = FontWeight.Bold)
+                    Text(text = "ver todas", modifier = Modifier.clickable { onSubjectClick() }, style = MaterialTheme.typography.bodySmall, color = Ruby, fontWeight = FontWeight.Bold)
                 }
             }
-            Surface(modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp).size(56.dp), shape = CircleShape, color = Ruby, shadowElevation = 6.dp) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(y = (-10).dp)
+                    .size(56.dp)
+                    .clickable { onSubjectClick() }, 
+                shape = CircleShape, 
+                color = Ruby, 
+                shadowElevation = 6.dp
+            ) {
                 Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Default.Science, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp)) }
             }
         }

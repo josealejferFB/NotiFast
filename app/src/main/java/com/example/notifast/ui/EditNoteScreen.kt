@@ -4,9 +4,13 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Category
@@ -21,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.notifast.model.Note
 import com.example.notifast.ui.theme.Aqua
@@ -47,142 +52,165 @@ fun EditNoteScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? -> selectedImageUri = uri }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Editar Apunte", fontWeight = FontWeight.ExtraBold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // SELECTOR DE MATERIA REFINADO (SIN CONTENEDOR RARO)
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = selectedSubject,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Materia") },
-                    leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = Aqua) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    shape = RoundedCornerShape(28.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Aqua,
-                        focusedLabelColor = Aqua,
-                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                        unfocusedContainerColor = Color.Transparent, // Soluciona el contenedor raro
-                        focusedContainerColor = Color.Transparent    // Soluciona el contenedor raro
-                    ),
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+    Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Editar Apunte", fontWeight = FontWeight.ExtraBold) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Ruby,
+                        navigationIconContentColor = Ruby
+                    )
                 )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.background(Color.White, RoundedCornerShape(16.dp))
-                ) {
-                    subjects.forEach { subject ->
-                        DropdownMenuItem(
-                            text = { Text(subject, fontWeight = FontWeight.Medium) },
-                            onClick = {
-                                selectedSubject = subject
-                                expanded = false
-                            }
-                        )
-                    }
-                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Título") },
-                leadingIcon = { Icon(Icons.Default.Title, contentDescription = null, tint = Ruby) },
-                shape = RoundedCornerShape(28.dp),
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Ruby, 
-                    focusedLabelColor = Ruby,
-                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent
-                )
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // ÁREA DE IMAGEN
-            Box(
+        ) { padding ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp)
-                    .background(Color.LightGray.copy(alpha = 0.1f), RoundedCornerShape(28.dp))
-                    .clip(RoundedCornerShape(28.dp))
-                    .clickable { galleryLauncher.launch("image/*") },
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (selectedImageUri != null) {
-                    AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                } else if (note.imageUrl != null) {
-                    AsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                } else {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.Image, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(32.dp))
-                        Text("Toca para cambiar foto", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
+                // SELECTOR DE MATERIA REFINADO (ESTILO CÁPSULA)
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = selectedSubject,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Materia") },
+                        leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = Aqua) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = Aqua,
+                            focusedLabelColor = Aqua
+                        ),
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.background(Color.White, RoundedCornerShape(20.dp)).clip(RoundedCornerShape(20.dp))
+                    ) {
+                        subjects.forEach { subject ->
+                            DropdownMenuItem(
+                                text = { Text(subject, fontWeight = FontWeight.SemiBold) },
+                                onClick = {
+                                    selectedSubject = subject
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = content,
-                onValueChange = { content = it },
-                label = { Text("Contenido del apunte") },
-                shape = RoundedCornerShape(28.dp),
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Ruby, 
-                    focusedLabelColor = Ruby,
-                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                TextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Título del apunte", fontSize = 13.sp) },
+                    leadingIcon = { Icon(Icons.Default.Title, contentDescription = null, tint = Ruby) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp)),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = Ruby,
+                        focusedLabelColor = Ruby
+                    )
                 )
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Button(
-                onClick = {
-                    if (selectedSubject.isNotBlank() && title.isNotBlank()) {
-                        viewModel.updateNote(note.id, selectedSubject, title, content, selectedImageUri)
-                        onNoteUpdated()
+                
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // ÁREA DE IMAGEN REDISEÑADA
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(20.dp))
+                        .border(1.dp, Color.LightGray.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable { galleryLauncher.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (selectedImageUri != null || note.imageUrl != null) {
+                        AsyncImage(
+                            model = selectedImageUri ?: note.imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Surface(
+                                modifier = Modifier.size(50.dp),
+                                shape = CircleShape,
+                                color = Aqua.copy(alpha = 0.1f)
+                            ) {
+                                Icon(Icons.Default.Image, contentDescription = null, tint = Aqua, modifier = Modifier.padding(12.dp))
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Cambiar foto de referencia", color = Color.Gray, fontWeight = FontWeight.Medium)
+                        }
                     }
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Ruby),
-                enabled = title.isNotBlank()
-            ) {
-                Text("Guardar Cambios", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = content,
+                    onValueChange = { content = it },
+                    label = { Text("Detalle de tus apuntes...") },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = Ruby,
+                        focusedLabelColor = Ruby
+                    )
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Button(
+                    onClick = {
+                        if (selectedSubject.isNotBlank() && title.isNotBlank()) {
+                            viewModel.updateNote(note.id, selectedSubject, title, content, selectedImageUri)
+                            onNoteUpdated()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Ruby),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Text("ACTUALIZAR APUNTE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                }
             }
         }
     }
