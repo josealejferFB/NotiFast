@@ -173,6 +173,33 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateEvaluation(
+        evaluationId: String,
+        title: String,
+        description: String,
+        date: Date,
+        quickTips: String,
+        imageUri: Uri? = null,
+        existingImageUrl: String? = null
+    ) {
+        viewModelScope.launch {
+            _syncMessage.value = "Actualizando evaluación..."
+            var imageUrl = existingImageUrl
+            imageUri?.let {
+                val uploadResult = repository.uploadImage(it)
+                imageUrl = uploadResult.getOrNull()
+            }
+            val result = repository.updateEvaluation(evaluationId, title, description, date, quickTips, imageUrl)
+            if (result.isSuccess) {
+                _syncMessage.value = "Actualizado"
+            } else {
+                _syncMessage.value = "Error al actualizar"
+            }
+            delay(1000)
+            _syncMessage.value = null
+        }
+    }
+
     fun deleteEvaluation(eval: Evaluation) {
         viewModelScope.launch {
             _syncMessage.value = "Borrando evaluación..."

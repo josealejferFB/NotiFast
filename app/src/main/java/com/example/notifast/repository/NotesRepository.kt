@@ -186,6 +186,38 @@ class NotesRepository(
         }
     }
 
+    suspend fun updateEvaluation(
+        evaluationId: String,
+        title: String,
+        description: String,
+        date: Date,
+        quickTips: String,
+        imageUrl: String? = null
+    ): Result<Unit> {
+        val uid = userId
+        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
+
+        return try {
+            val updates = mutableMapOf<String, Any>(
+                "title" to title,
+                "description" to description,
+                "date" to date,
+                "quickTips" to quickTips
+            )
+            imageUrl?.let { updates["imageUrl"] = it }
+
+            db.collection("users")
+                .document(uid)
+                .collection("evaluations")
+                .document(evaluationId)
+                .update(updates)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun deleteEvaluation(evaluationId: String, imageUrl: String? = null): Result<Unit> {
         val uid = userId
         if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))

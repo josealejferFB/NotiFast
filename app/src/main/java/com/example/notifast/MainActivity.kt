@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -74,6 +76,7 @@ fun MainContent() {
                         val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                         NavigationBarItem(
                             selected = selected,
+                            alwaysShowLabel = true, // Asegura que el espacio esté reservado
                             onClick = {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
@@ -88,15 +91,21 @@ fun MainContent() {
                                     Icon(
                                         imageVector = it, 
                                         contentDescription = screen.title,
-                                        modifier = Modifier.size(26.dp)
+                                        modifier = Modifier.size(24.dp) // Reducido ligeramente de 26 a 24 para ganar espacio vertical
                                     ) 
                                 } 
                             },
                             label = { 
                                 Text(
                                     text = screen.title ?: "", 
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 9.sp, // Tamaño reducido para evitar el salto de línea
+                                        letterSpacing = (-0.3).sp // Espaciado entre letras negativo para compactar
+                                    ),
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Visible
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(

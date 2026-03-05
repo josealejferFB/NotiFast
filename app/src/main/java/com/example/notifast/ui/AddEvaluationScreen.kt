@@ -64,8 +64,20 @@ fun AddEvaluationScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        selectedDate = Date(it)
+                    datePickerState.selectedDateMillis?.let { utcMillis ->
+                        // Corregir desfase de zona horaria: 
+                        // DatePicker devuelve UTC medianoche, lo convertimos a mediodía local para evitar saltos de día
+                        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                        calendar.timeInMillis = utcMillis
+                        
+                        val localCalendar = Calendar.getInstance()
+                        localCalendar.set(
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH),
+                            12, 0, 0 // Forzamos mediodía para evitar errores de zona horaria
+                        )
+                        selectedDate = localCalendar.time
                     }
                     showDatePicker = false
                 }) { Text("OK") }
@@ -117,7 +129,7 @@ fun AddEvaluationScreen(
                         unfocusedContainerColor = Color.Transparent,
                         focusedContainerColor = Color.Transparent
                     ),
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                 )
 
                 ExposedDropdownMenu(

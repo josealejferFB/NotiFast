@@ -71,8 +71,18 @@ fun EditEvaluationScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        selectedDate = Date(it)
+                    datePickerState.selectedDateMillis?.let { utcMillis ->
+                        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                        calendar.timeInMillis = utcMillis
+                        
+                        val localCalendar = Calendar.getInstance()
+                        localCalendar.set(
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH),
+                            12, 0, 0
+                        )
+                        selectedDate = localCalendar.time
                     }
                     showDatePicker = false
                 }) { Text("OK") }
@@ -223,9 +233,18 @@ fun EditEvaluationScreen(
 
             Button(
                 onClick = {
-                    // Aquí llamaríamos a un updateEvaluation en el ViewModel
-                    // Por simplicidad en este paso, simulamos el éxito
-                    onEvaluationUpdated()
+                    if (title.isNotBlank()) {
+                        viewModel.updateEvaluation(
+                            evaluationId = evaluation.id,
+                            title = title,
+                            description = description,
+                            date = selectedDate,
+                            quickTips = quickTips,
+                            imageUri = selectedImageUri,
+                            existingImageUrl = existingImageUrl
+                        )
+                        onEvaluationUpdated()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(28.dp),
