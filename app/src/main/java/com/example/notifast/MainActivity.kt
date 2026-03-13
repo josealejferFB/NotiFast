@@ -21,19 +21,18 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.notifast.navigation.NavGraph
-import com.example.notifast.navigation.Screen
-import com.example.notifast.ui.StudyBackground
-import com.example.notifast.ui.theme.NotiFastTheme
-import com.example.notifast.ui.theme.Ruby
-import com.example.notifast.viewmodel.AuthViewModel
-import com.example.notifast.viewmodel.NotesViewModel
+import com.example.notifast.presentation.navigation.NavGraph
+import com.example.notifast.presentation.navigation.Screen
+import com.example.notifast.presentation.common.components.StudyBackground
+import com.example.notifast.presentation.theme.theme.NotiFastTheme
+import com.example.notifast.presentation.theme.color.Ruby
+import com.example.notifast.presentation.common.viewmodel.AuthViewModel
+import com.example.notifast.presentation.common.viewmodel.NotesViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Configuración para ocultar la interfaz del sistema
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
@@ -59,11 +58,10 @@ fun MainContent() {
     val showBottomBar = Screen.bottomNavItems.any { it.route == currentDestination?.route }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // FONDO ÉPICO CON ICONOS FLOTANTES (GLOBAL)
         StudyBackground()
 
         Scaffold(
-            containerColor = Color.Transparent, // IMPORTANTE: Scaffold transparente para ver el fondo
+            containerColor = Color.Transparent,
             bottomBar = {
                 if (showBottomBar) {
                     NavigationBar(

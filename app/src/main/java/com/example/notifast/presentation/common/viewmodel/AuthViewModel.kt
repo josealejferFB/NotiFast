@@ -1,0 +1,102 @@
+package com.example.notifast.presentation.common.viewmodel
+
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.notifast.data.model.User
+import com.example.notifast.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+
+class AuthViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository: AuthRepository = AuthRepository(application.applicationContext)
+
+    private val _user = MutableStateFlow<FirebaseUser?>(repository.currentUser)
+    val user = _user.asStateFlow()
+
+    private val _userProfile = MutableStateFlow<User?>(null)
+    val userProfile = _userProfile.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error = _error.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    init {
+        refreshProfile()
+    }
+
+    fun refreshProfile() {
+        _user.value?.let { fetchUserProfile(it.uid) }
+    }
+
+    private fun fetchUserProfile(uid: String) {
+        viewModelScope.launch {
+            try {
+                val document = FirebaseFirestore.getInstance().collection("users").document(uid).get().await()
+                if (document.exists()) {
+                    _userProfile.value = document.toObject<User>()
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al cargar perfil: ${e.message}"
+            }
+        }
+    }
+
+    fun login(email: String, pass: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            repository.login(email, pass)
+                .onSuccess { 
+                    _user.value = it 
+                    fetchUserProfile(it.uid)
+                    _error.value = null
+                }
+                .onFailure { _error.value = it.message }
+            _isLoading.value = false
+        }
+    }
+
+    fun signUp(email: String, pass: String, firstName: String, lastName: String, imageUri: Uri?) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            repository.signUp(email, pass, firstName, lastName, imageUri)
+                .onSuccess { 
+                    _user.value = it 
+                    fetchUserProfile(it.uid)
+                    _error.value = null
+                }
+                .onFailure { _error.value = it.message }
+            _isLoading.value = false
+        }
+    }
+
+    fun updateProfile(firstName: String, lastName: String, imageUri: Uri?, onComplete: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = repository.updateProfile(firstName, lastName, imageUri)
+            if (result.isSuccess) {
+                refreshProfile()
+                _error.value = null
+                onComplete()
+            } else {
+                _error.value = result.exceptionOrNull()?.message
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun logout() {
+        repository.logout()
+        _user.value = null
+        _userProfile.value = null
+    }
+}
