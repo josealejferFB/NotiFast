@@ -23,6 +23,10 @@ enum class NoteFilter {
     RECIENTES, ANTIGUAS, POR_MATERIA
 }
 
+enum class GradeCalculationMode {
+    SIMPLE, WEIGHTED
+}
+
 class NotesViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = NotesRepository(application.applicationContext)
@@ -38,6 +42,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
+
+    private val _calculationMode = MutableStateFlow(GradeCalculationMode.SIMPLE)
+    val calculationMode = _calculationMode.asStateFlow()
 
     /**
      * LÓGICA DE FILTRADO PARA LA SECCIÓN "MIS NOTAS"
@@ -74,6 +81,13 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
         .map { list -> list.groupBy { it.subject.ifBlank { "SIN MATERIA" } } }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
 
+    /**
+     * LÓGICA PARA LA SECCIÓN DE CALIFICACIONES (Agrupado por materia)
+     */
+    val evaluationsBySubject: StateFlow<Map<String, List<Evaluation>>> = _evaluations
+        .map { list -> list.groupBy { it.subjectName } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
+
     private val _subjects = MutableStateFlow<List<String>>(emptyList())
     val subjects = _subjects.asStateFlow()
 
@@ -96,6 +110,10 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun setCalculationMode(mode: GradeCalculationMode) {
+        _calculationMode.value = mode
     }
 
     fun loadNotes() {
@@ -157,7 +175,8 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
         date: Date,
         noteIds: List<String>,
         quickTips: String,
-        imageUri: Uri? = null
+        imageUri: Uri? = null,
+        weight: Double? = null
     ) {
         viewModelScope.launch {
             _syncMessage.value = "Guardando evaluación..."
@@ -166,7 +185,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
                 val uploadResult = repository.uploadImage(it)
                 imageUrl = uploadResult.getOrNull()
             }
-            repository.addEvaluation(subjectName, title, description, date, noteIds, quickTips, imageUrl)
+            repository.addEvaluation(subjectName, title, description, date, noteIds, quickTips, imageUrl, weight)
             _syncMessage.value = "Evaluación guardada"
             delay(1000)
             _syncMessage.value = null
@@ -180,7 +199,10 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
         date: Date,
         quickTips: String,
         imageUri: Uri? = null,
-        existingImageUrl: String? = null
+        existingImageUrl: String? = null,
+        grade: Double? = null,
+        weight: Double? = null,
+        isPresented: Boolean? = null
     ) {
         viewModelScope.launch {
             _syncMessage.value = "Actualizando evaluación..."
@@ -189,11 +211,25 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
                 val uploadResult = repository.uploadImage(it)
                 imageUrl = uploadResult.getOrNull()
             }
-            val result = repository.updateEvaluation(evaluationId, title, description, date, quickTips, imageUrl)
+            val result = repository.updateEvaluation(evaluationId, title, description, date, quickTips, imageUrl, grade, weight, isPresented)
             if (result.isSuccess) {
                 _syncMessage.value = "Actualizado"
             } else {
                 _syncMessage.value = "Error al actualizar"
+            }
+            delay(1000)
+            _syncMessage.value = null
+        }
+    }
+
+    fun updateEvaluationGradeAndWeight(evaluationId: String, grade: Double, weight: Double?, isPresented: Boolean) {
+        viewModelScope.launch {
+            _syncMessage.value = "Guardando nota..."
+            val result = repository.updateEvaluationGradeAndWeight(evaluationId, grade, weight, isPresented)
+            if (result.isSuccess) {
+                _syncMessage.value = "Nota guardada"
+            } else {
+                _syncMessage.value = "Error"
             }
             delay(1000)
             _syncMessage.value = null

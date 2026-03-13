@@ -157,7 +157,8 @@ class NotesRepository(
         date: Date,
         noteIds: List<String>,
         quickTips: String,
-        imageUrl: String? = null
+        imageUrl: String? = null,
+        weight: Double? = null
     ): Result<Unit> {
         val uid = userId
         if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
@@ -171,7 +172,10 @@ class NotesRepository(
                 date = date,
                 noteIds = noteIds,
                 quickTips = quickTips,
-                imageUrl = imageUrl
+                imageUrl = imageUrl,
+                grade = null,
+                weight = weight,
+                isPresented = false
             )
             
             db.collection("users")
@@ -192,7 +196,10 @@ class NotesRepository(
         description: String,
         date: Date,
         quickTips: String,
-        imageUrl: String? = null
+        imageUrl: String? = null,
+        grade: Double? = null,
+        weight: Double? = null,
+        isPresented: Boolean? = null
     ): Result<Unit> {
         val uid = userId
         if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
@@ -205,6 +212,37 @@ class NotesRepository(
                 "quickTips" to quickTips
             )
             imageUrl?.let { updates["imageUrl"] = it }
+            grade?.let { updates["grade"] = it }
+            weight?.let { updates["weight"] = it }
+            isPresented?.let { updates["isPresented"] = it }
+
+            db.collection("users")
+                .document(uid)
+                .collection("evaluations")
+                .document(evaluationId)
+                .update(updates)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateEvaluationGradeAndWeight(
+        evaluationId: String,
+        grade: Double,
+        weight: Double?,
+        isPresented: Boolean
+    ): Result<Unit> {
+        val uid = userId
+        if (uid.isEmpty()) return Result.failure(Exception("Usuario no autenticado"))
+
+        return try {
+            val updates = mutableMapOf<String, Any>(
+                "grade" to grade,
+                "isPresented" to isPresented
+            )
+            weight?.let { updates["weight"] = it }
 
             db.collection("users")
                 .document(uid)

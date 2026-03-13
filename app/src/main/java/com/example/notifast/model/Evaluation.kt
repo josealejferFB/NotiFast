@@ -13,6 +13,9 @@ data class Evaluation(
     val noteIds: List<String> = emptyList(),
     val imageUrl: String? = null,
     val quickTips: String = "",
+    val grade: Double? = null, // Calificación obtenida (0-100)
+    val weight: Double? = null, // Peso o porcentaje de la evaluación (0-100)
+    val isPresented: Boolean = false, // Si ya se realizó/presentó
     @ServerTimestamp
     val createdAt: Date? = null
 )

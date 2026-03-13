@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -49,6 +52,7 @@ fun AddEvaluationScreen(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var quickTips by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf(Date()) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var expanded by remember { mutableStateOf(false) }
@@ -113,7 +117,7 @@ fun AddEvaluationScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // SELECTOR DE MATERIA ESTILO CÁPSULA
+                // SELECTOR DE MATERIA
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
@@ -171,6 +175,27 @@ fun AddEvaluationScreen(
                         unfocusedIndicatorColor = Color.Transparent,
                         cursorColor = Ruby,
                         focusedLabelColor = Ruby
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // PESO / PORCENTAJE
+                TextField(
+                    value = weight,
+                    onValueChange = { if (it.isEmpty() || (it.toDoubleOrNull() != null && it.toDouble() in 0.0..100.0)) weight = it },
+                    label = { Text("Peso / Porcentaje (0-100%)", fontSize = 13.sp) },
+                    leadingIcon = { Icon(Icons.Default.Percent, contentDescription = null, tint = Aqua) },
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = Aqua,
+                        focusedLabelColor = Aqua
                     )
                 )
 
@@ -264,7 +289,16 @@ fun AddEvaluationScreen(
                 Button(
                     onClick = {
                         if (selectedSubject.isNotBlank() && title.isNotBlank()) {
-                            viewModel.addEvaluation(selectedSubject, title, description, selectedDate, emptyList(), quickTips, selectedImageUri)
+                            viewModel.addEvaluation(
+                                subjectName = selectedSubject,
+                                title = title,
+                                description = description,
+                                date = selectedDate,
+                                noteIds = emptyList(),
+                                quickTips = quickTips,
+                                imageUri = selectedImageUri,
+                                weight = weight.toDoubleOrNull()
+                            )
                             onEvaluationAdded()
                         }
                     },

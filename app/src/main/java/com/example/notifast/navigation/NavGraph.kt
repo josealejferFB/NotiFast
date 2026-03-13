@@ -77,7 +77,7 @@ fun NavGraph(
         }
         
         composable(Screen.Grades.route) {
-            GradesScreen()
+            GradesScreen(viewModel = notesViewModel)
         }
         
         composable(Screen.Settings.route) {

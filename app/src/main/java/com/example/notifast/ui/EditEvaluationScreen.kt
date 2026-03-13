@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,14 +12,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Percent
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -46,14 +53,15 @@ fun EditEvaluationScreen(
     onEvaluationUpdated: () -> Unit,
     onBack: () -> Unit
 ) {
-    val subjects by viewModel.subjects.collectAsState()
-    
     var title by remember { mutableStateOf(evaluation.title) }
     var description by remember { mutableStateOf(evaluation.description) }
     var quickTips by remember { mutableStateOf(evaluation.quickTips) }
     var selectedDate by remember { mutableStateOf(evaluation.date ?: Date()) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var existingImageUrl by remember { mutableStateOf(evaluation.imageUrl) }
+    var grade by remember { mutableStateOf(evaluation.grade?.toInt()?.toString() ?: "") }
+    var weight by remember { mutableStateOf(evaluation.weight?.toInt()?.toString() ?: "") }
+    var isPresented by remember { mutableStateOf(evaluation.isPresented) }
     
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -119,7 +127,7 @@ fun EditEvaluationScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Materia (Solo lectura con estilo cápsula)
+                // Materia
                 TextField(
                     value = evaluation.subjectName,
                     onValueChange = {},
@@ -155,6 +163,86 @@ fun EditEvaluationScreen(
                         focusedLabelColor = Ruby
                     )
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // PESO / PORCENTAJE
+                TextField(
+                    value = weight,
+                    onValueChange = { if (it.isEmpty() || (it.toDoubleOrNull() != null && it.toDouble() in 0.0..100.0)) weight = it },
+                    label = { Text("Peso / Porcentaje (0-100%)", fontSize = 13.sp) },
+                    leadingIcon = { Icon(Icons.Default.Percent, contentDescription = null, tint = Aqua) },
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = Aqua,
+                        focusedLabelColor = Aqua
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // CALIFICACIÓN (0-100) Y ESTADO
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    TextField(
+                        value = grade,
+                        onValueChange = { input ->
+                            if (input.isEmpty() || (input.toIntOrNull() != null && input.toInt() in 0..100)) {
+                                grade = input
+                            }
+                        },
+                        label = { Text("Nota (0-100)", fontSize = 13.sp) },
+                        leadingIcon = { Icon(Icons.Default.Grade, contentDescription = null, tint = Color(0xFFFFB300)) },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = Ruby,
+                            focusedLabelColor = Ruby
+                        )
+                    )
+
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { isPresented = !isPresented },
+                        color = if (isPresented) Aqua.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.7f),
+                        border = if (isPresented) BorderStroke(1.dp, Aqua) else null
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isPresented) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+                                contentDescription = null,
+                                tint = if (isPresented) Aqua else Color.Gray
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                if (isPresented) "Presentado" else "Pendiente",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isPresented) Aqua else Color.Gray
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -251,7 +339,18 @@ fun EditEvaluationScreen(
                 Button(
                     onClick = {
                         if (title.isNotBlank()) {
-                            viewModel.updateEvaluation(evaluation.id, title, description, selectedDate, quickTips, selectedImageUri, existingImageUrl)
+                            viewModel.updateEvaluation(
+                                evaluationId = evaluation.id,
+                                title = title,
+                                description = description,
+                                date = selectedDate,
+                                quickTips = quickTips,
+                                imageUri = selectedImageUri,
+                                existingImageUrl = existingImageUrl,
+                                grade = grade.toDoubleOrNull(),
+                                weight = weight.toDoubleOrNull(),
+                                isPresented = isPresented
+                            )
                             onEvaluationUpdated()
                         }
                     },
