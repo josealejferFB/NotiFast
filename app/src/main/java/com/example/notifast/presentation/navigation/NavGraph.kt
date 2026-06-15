@@ -1,6 +1,7 @@
 package com.example.notifast.presentation.navigation
 
 import androidx.compose.foundation.layout.padding
+import com.example.notifast.presentation.feature.auth.LoginScreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -62,7 +63,18 @@ fun MainContent() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Login.route) {
-                // Will be implemented in Task 8
+                LoginScreen(
+                    onLoginSuccess = {
+                        navController.navigate(Screen.Notes.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
+                    onSignUpSuccess = {
+                        navController.navigate(Screen.Notes.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                )
             }
             composable(Screen.Notes.route) {
                 // Will be implemented in Task 9
