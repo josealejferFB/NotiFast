@@ -2,6 +2,10 @@ package com.example.notifast.presentation.navigation
 
 import androidx.compose.foundation.layout.padding
 import com.example.notifast.presentation.feature.auth.LoginScreen
+import com.example.notifast.presentation.feature.notes.NotesScreen
+import com.example.notifast.presentation.feature.addnote.AddNoteScreen
+import com.example.notifast.presentation.feature.editnote.EditNoteScreen
+import com.example.notifast.presentation.feature.subjectdetail.SubjectDetailScreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -77,16 +81,26 @@ fun MainContent() {
                 )
             }
             composable(Screen.Notes.route) {
-                // Will be implemented in Task 9
+                NotesScreen(
+                    onNoteClick = { note -> navController.navigate(Screen.EditNote.createRoute(note.id)) },
+                    onAddNoteClick = { navController.navigate(Screen.AddNote.route) },
+                    onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) }
+                )
             }
             composable(Screen.AddNote.route) {
-                // Will be implemented in Task 10
+                AddNoteScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onNoteAdded = { navController.popBackStack() }
+                )
             }
             composable(
                 route = Screen.EditNote.route,
                 arguments = listOf(navArgument("noteId") { type = NavType.StringType })
             ) {
-                // Will be implemented in Task 11
+                EditNoteScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onNoteSaved = { navController.popBackStack() }
+                )
             }
             composable(Screen.AddSubject.route) {
                 // Will be implemented in Task 9
@@ -95,7 +109,9 @@ fun MainContent() {
                 route = Screen.SubjectDetail.route,
                 arguments = listOf(navArgument("subjectName") { type = NavType.StringType })
             ) {
-                // Will be implemented in Task 12
+                SubjectDetailScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
             }
             composable(Screen.Calendar.route) {
                 // Will be implemented in Task 13
