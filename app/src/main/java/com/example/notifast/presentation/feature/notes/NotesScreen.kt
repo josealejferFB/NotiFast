@@ -284,7 +284,7 @@ fun NotesScreen(
                                         info = info,
                                         isExpanded = uiState.expandedSubject == info.name,
                                         onToggle = { viewModel.onEvent(NotesEvent.ToggleSubject(info.name)) },
-                                        onAddNote = onAddNoteClick,
+                                        onAddNote = { onAddNoteClick() },
                                         onAddEvaluation = { subject -> onAddEvaluationClick(subject) }
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
