@@ -1,5 +1,6 @@
 package com.example.notifast.presentation.feature.auth
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notifast.domain.repository.AuthRepository
@@ -21,37 +22,37 @@ class LoginViewModel @Inject constructor(
 
     fun onEvent(event: LoginEvent) {
         when (event) {
-            is LoginEvent.EmailChanged -> _uiState.update { it.copy(email = event.value) }
-            is LoginEvent.PasswordChanged -> _uiState.update { it.copy(password = event.value) }
-            is LoginEvent.LoginClicked -> login()
-            is LoginEvent.SignUpClicked -> signUp()
-            is LoginEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            is LoginEvent.LoginWithEmail -> login(event.email, event.password)
+            is LoginEvent.SignUpWithDetails -> signUp(event.email, event.password, event.firstName, event.lastName, event.profileImageUri)
+            is LoginEvent.GoogleSignIn -> signInWithGoogle(event.idToken)
+            is LoginEvent.GoogleError -> _uiState.update { it.copy(error = event.message) }
         }
     }
 
-    private fun login() {
+    private fun login(email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val result = authRepository.login(
-                _uiState.value.email,
-                _uiState.value.password
-            )
-            result.fold(
+            authRepository.login(email, password).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isLoggedIn = true) } },
                 onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
             )
         }
     }
 
-    private fun signUp() {
+    private fun signUp(email: String, password: String, firstName: String, lastName: String, profileImageUri: Uri?) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val result = authRepository.signUp(
-                _uiState.value.email,
-                _uiState.value.password,
-                "", "", null
+            authRepository.signUp(email, password, firstName, lastName, profileImageUri).fold(
+                onSuccess = { _uiState.update { it.copy(isLoading = false, isLoggedIn = true) } },
+                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
             )
-            result.fold(
+        }
+    }
+
+    private fun signInWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            authRepository.signInWithGoogle(idToken).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isLoggedIn = true) } },
                 onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
             )

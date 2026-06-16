@@ -5,7 +5,11 @@ import com.example.notifast.data.model.User
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.ImageRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,6 +20,15 @@ class AuthRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore,
     private val imageRepository: ImageRepository
 ) : AuthRepository {
+
+    private val _authState = MutableStateFlow<Boolean?>(null)
+    override val authState: StateFlow<Boolean?> = _authState.asStateFlow()
+
+    init {
+        auth.addAuthStateListener { firebaseAuth ->
+            _authState.value = firebaseAuth.currentUser != null
+        }
+    }
 
     override suspend fun login(email: String, password: String): Result<String> {
         return try {
@@ -52,6 +65,32 @@ class AuthRepositoryImpl @Inject constructor(
                 "profilePictureUrl" to (profilePictureUrl ?: "")
             )
             db.collection("users").document(uid).set(userMap).await()
+            Result.success(uid)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun signInWithGoogle(idToken: String): Result<String> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = auth.signInWithCredential(credential).await()
+            val uid = result.user?.uid ?: return Result.failure(Exception("Google sign-in failed"))
+
+            val userDoc = db.collection("users").document(uid).get().await()
+            if (!userDoc.exists()) {
+                val nameParts = (result.user?.displayName ?: "").split(" ")
+                val firstName = nameParts.firstOrNull { it.isNotBlank() } ?: ""
+                val lastName = nameParts.drop(1).joinToString(" ")
+                val userMap = mapOf(
+                    "uid" to uid,
+                    "email" to (result.user?.email ?: ""),
+                    "firstName" to firstName,
+                    "lastName" to lastName,
+                    "profilePictureUrl" to (result.user?.photoUrl?.toString() ?: "")
+                )
+                db.collection("users").document(uid).set(userMap).await()
+            }
             Result.success(uid)
         } catch (e: Exception) {
             Result.failure(e)

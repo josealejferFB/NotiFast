@@ -7,6 +7,7 @@ import com.example.notifast.domain.repository.ImageRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -27,6 +28,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                     doc.toObject(Evaluation::class.java)?.copy(id = doc.id)
                 }
             }
+            .catch { emit(emptyList()) }
     }
 
     override suspend fun addEvaluation(

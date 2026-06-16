@@ -4,10 +4,12 @@ import com.example.notifast.data.repository.AuthRepositoryImpl
 import com.example.notifast.data.repository.EvaluationRepositoryImpl
 import com.example.notifast.data.repository.ImageRepositoryImpl
 import com.example.notifast.data.repository.NoteRepositoryImpl
+import com.example.notifast.data.repository.ScheduleRepositoryImpl
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.ImageRepository
 import com.example.notifast.domain.repository.NoteRepository
+import com.example.notifast.domain.repository.ScheduleRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -34,8 +36,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindImageRepository(impl: ImageRepositoryImpl): ImageRepository
 
-    // ScheduleRepository and ScheduleRepositoryImpl will be created in Task 14
-//    @Binds
-//    @Singleton
-//    abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepository
+    @Binds
+    @Singleton
+    abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepository
 }

@@ -16,7 +16,10 @@ sealed class Screen(
     data object Login : Screen("login")
 
     data object Notes : Screen("notes", "Apuntes", Icons.Default.MenuBook)
-    data object AddNote : Screen("add_note")
+    data object AddNote : Screen("add_note?subject={subject}") {
+        fun createRoute(subject: String? = null) =
+            if (subject != null) "add_note?subject=$subject" else "add_note"
+    }
     data object EditNote : Screen("edit_note/{noteId}") {
         fun createRoute(noteId: String) = "edit_note/$noteId"
     }
@@ -27,7 +30,10 @@ sealed class Screen(
     data object Grades : Screen("calificaciones", "Calificaciones", Icons.Default.Grade)
     data object Settings : Screen("settings", "Ajustes", Icons.Default.Settings)
 
-    data object AddEvaluation : Screen("add_evaluation")
+    data object AddEvaluation : Screen("add_evaluation?subject={subject}") {
+        fun createRoute(subject: String? = null) =
+            if (subject != null) "add_evaluation?subject=$subject" else "add_evaluation"
+    }
     data object EditEvaluation : Screen("edit_evaluation/{evalId}") {
         fun createRoute(evalId: String) = "edit_evaluation/$evalId"
     }

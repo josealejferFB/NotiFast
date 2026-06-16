@@ -67,6 +67,9 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Google Sign-In
+    implementation(libs.play.services.auth)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
