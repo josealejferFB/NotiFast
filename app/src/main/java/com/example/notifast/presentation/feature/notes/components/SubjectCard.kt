@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,8 +31,6 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,11 +45,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
 import com.example.notifast.data.model.Evaluation
 import com.example.notifast.data.model.Note
 import com.example.notifast.presentation.feature.notes.SubjectInfo
@@ -80,6 +76,7 @@ private fun urgencyColor(days: Long): Color {
     }
 }
 
+// Converts a grade from 0–10 scale to a 0–5 star rating
 private fun starRating(avg: Double, maxStars: Int = 5): String {
     val filled = (avg / 2.0).toInt().coerceIn(0, maxStars)
     val empty = maxStars - filled
@@ -315,7 +312,7 @@ private fun MiniNoteCard(note: Note, color: Color) {
         Column(modifier = Modifier.padding(8.dp)) {
             if (note.imageUrl != null) {
                 Box(modifier = Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(6.dp)).background(color.copy(alpha = 0.1f)), contentAlignment = Alignment.Center) {
-                    Image(painter = rememberAsyncImagePainter(model = note.imageUrl), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                    SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                 }
                 Spacer(Modifier.height(4.dp))
             }
