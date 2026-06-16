@@ -1,19 +1,17 @@
 package com.example.notifast.presentation.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import com.example.notifast.presentation.feature.auth.LoginScreen
-import com.example.notifast.presentation.feature.notes.NotesScreen
-import com.example.notifast.presentation.feature.addnote.AddNoteScreen
-import com.example.notifast.presentation.feature.editnote.EditNoteScreen
-import com.example.notifast.presentation.feature.subjectdetail.SubjectDetailScreen
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -22,12 +20,48 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.notifast.presentation.atoms.NotiFastBottomNav
+import com.example.notifast.presentation.atoms.NotiFastStudyBackground
+import com.example.notifast.presentation.feature.addnote.AddNoteScreen
+import com.example.notifast.presentation.feature.addsubject.AddSubjectScreen
+import com.example.notifast.presentation.feature.addevaluation.AddEvaluationScreen
+import com.example.notifast.presentation.feature.auth.LoginScreen
+import com.example.notifast.presentation.feature.calendar.CalendarScreen
+import com.example.notifast.presentation.feature.editnote.EditNoteScreen
+import com.example.notifast.presentation.feature.editevaluation.EditEvaluationScreen
+import com.example.notifast.presentation.feature.editprofile.EditProfileScreen
+import com.example.notifast.presentation.feature.grades.GradesScreen
+import com.example.notifast.presentation.feature.main.MainViewModel
+import com.example.notifast.presentation.feature.notes.NotesScreen
+import com.example.notifast.presentation.feature.schedules.SchedulesScreen
+import com.example.notifast.presentation.feature.settings.SettingsScreen
+import com.example.notifast.presentation.feature.subjectdetail.SubjectDetailScreen
+import com.example.notifast.presentation.theme.color.Ruby
 
 @Composable
 fun MainContent() {
+    val mainViewModel: MainViewModel = hiltViewModel()
+    val authState by mainViewModel.authState.collectAsStateWithLifecycle()
+
+    if (authState == null) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            NotiFastStudyBackground()
+            CircularProgressIndicator(color = Ruby, modifier = Modifier.align(Alignment.Center))
+        }
+        return
+    }
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    LaunchedEffect(authState) {
+        if (authState == true) {
+            navController.navigate(Screen.Notes.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     val showBottomBar = Screen.bottomNavItems.any { screen ->
         currentDestination?.hierarchy?.any { it.route == screen.route } == true
@@ -36,35 +70,25 @@ fun MainContent() {
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
-                    Screen.bottomNavItems.forEach { screen ->
-                        NavigationBarItem(
-                            icon = {
-                                screen.icon?.let {
-                                    Icon(it, contentDescription = screen.title)
-                                }
-                            },
-                            label = { Text(screen.title) },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                NotiFastBottomNav(
+                    items = Screen.bottomNavItems,
+                    currentRoute = currentDestination?.route,
+                    onItemClick = { screen ->
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
                             }
-                        )
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
-                }
+                )
             }
         }
-    ) { innerPadding ->
+    ) {
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = Screen.Login.route
         ) {
             composable(Screen.Login.route) {
                 LoginScreen(
@@ -82,13 +106,25 @@ fun MainContent() {
             }
             composable(Screen.Notes.route) {
                 NotesScreen(
-                    onNoteClick = { note -> navController.navigate(Screen.EditNote.createRoute(note.id)) },
-                    onAddNoteClick = { navController.navigate(Screen.AddNote.route) },
-                    onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) }
+                    onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute()) },
+                    onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
+                    onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
+                    onAddEvaluationClick = { subject -> navController.navigate(Screen.AddEvaluation.createRoute(subject)) },
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                    onLogout = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
                 )
             }
-            composable(Screen.AddNote.route) {
+            composable(
+                route = Screen.AddNote.route,
+                arguments = listOf(navArgument("subject") { type = NavType.StringType; defaultValue = "" })
+            ) { backStackEntry ->
+                val subject = backStackEntry.arguments?.getString("subject") ?: ""
                 AddNoteScreen(
+                    subject = subject,
                     onBackClick = { navController.popBackStack() },
                     onNoteAdded = { navController.popBackStack() }
                 )
@@ -103,39 +139,70 @@ fun MainContent() {
                 )
             }
             composable(Screen.AddSubject.route) {
-                // Will be implemented in Task 9
+                AddSubjectScreen(
+                    onSubjectCreated = { name ->
+                        navController.navigate(Screen.SubjectDetail.createRoute(name)) {
+                            popUpTo(Screen.Notes.route)
+                        }
+                    },
+                    onBackClick = { navController.popBackStack() }
+                )
             }
             composable(
                 route = Screen.SubjectDetail.route,
                 arguments = listOf(navArgument("subjectName") { type = NavType.StringType })
-            ) {
+            ) { backStackEntry ->
+                val subjectName = backStackEntry.arguments?.getString("subjectName") ?: ""
                 SubjectDetailScreen(
+                    onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute(subjectName)) },
+                    onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute(subjectName)) },
                     onBackClick = { navController.popBackStack() }
                 )
             }
             composable(Screen.Calendar.route) {
-                // Will be implemented in Task 13
+                CalendarScreen(
+                    onAddEvaluation = { navController.navigate(Screen.AddEvaluation.createRoute()) },
+                    onEditEvaluation = { eval -> navController.navigate(Screen.EditEvaluation.createRoute(eval.id)) }
+                )
             }
             composable(Screen.Schedules.route) {
-                // Will be implemented in Task 14
+                SchedulesScreen()
             }
             composable(Screen.Grades.route) {
-                // Will be implemented in Task 15
+                GradesScreen()
             }
             composable(Screen.Settings.route) {
-                // Will be implemented in Task 16
+                SettingsScreen(
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                    onLogout = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
             composable(Screen.EditProfile.route) {
-                // Will be implemented in Task 17
+                EditProfileScreen(onBack = { navController.popBackStack() })
             }
-            composable(Screen.AddEvaluation.route) {
-                // Will be implemented in Task 18
+            composable(
+                route = Screen.AddEvaluation.route,
+                arguments = listOf(navArgument("subject") { type = NavType.StringType; defaultValue = "" })
+            ) { backStackEntry ->
+                val subject = backStackEntry.arguments?.getString("subject") ?: ""
+                AddEvaluationScreen(
+                    subject = subject,
+                    onEvaluationAdded = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() }
+                )
             }
             composable(
                 route = Screen.EditEvaluation.route,
                 arguments = listOf(navArgument("evalId") { type = NavType.StringType })
             ) {
-                // Will be implemented in Task 18
+                EditEvaluationScreen(
+                    onEvaluationUpdated = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() }
+                )
             }
         }
     }
