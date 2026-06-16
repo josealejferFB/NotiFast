@@ -2,13 +2,17 @@ package com.example.notifast.presentation.feature.notes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notifast.data.model.Evaluation
 import com.example.notifast.data.model.Note
+import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.AuthRepository
+import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val evaluationRepository: EvaluationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -26,21 +31,92 @@ class NotesViewModel @Inject constructor(
     private val _currentFilter = MutableStateFlow(NoteFilter.RECIENTES)
     private val _searchQuery = MutableStateFlow("")
 
-    init { loadNotes() }
+    init {
+        loadNotes()
+        loadUserProfile()
+    }
+
+    private fun loadUserProfile() {
+        viewModelScope.launch {
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            authRepository.getUserProfile(uid).onSuccess { user ->
+                _uiState.update { it.copy(
+                    userFirstName = user.firstName,
+                    userLastName = user.lastName,
+                    userEmail = user.email,
+                    userProfilePictureUrl = user.profilePictureUrl
+                ) }
+            }
+        }
+    }
 
     private fun loadNotes() {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
             combine(
                 noteRepository.getNotes(userId),
                 noteRepository.getSubjects(userId),
+                evaluationRepository.getEvaluations(userId),
                 _currentFilter,
                 _searchQuery
-            ) { notes, subjects, filter, query ->
+            ) { notes, subjects, evaluations, filter, query ->
                 val filtered = filterNotes(notes, filter, query)
-                NotesUiState(notes = filtered, subjects = subjects, currentFilter = filter, searchQuery = query)
-            }.collect { state -> _uiState.value = state }
+                val subjectInfos = computeSubjectInfos(notes, subjects, evaluations)
+                val subjectNames = subjects.map { it.name }
+                _uiState.value to NotesUiState(
+                    notes = filtered,
+                    rawNotes = notes,
+                    subjects = subjectNames,
+                    subjectInfos = subjectInfos,
+                    currentFilter = filter,
+                    searchQuery = query
+                )
+            }.catch { e ->
+                val current = _uiState.value
+                emit(current to current.copy(error = e.message ?: "Error al cargar notas", isLoading = false))
+            }.collect { (_, newState) ->
+                _uiState.update { it.copy(
+                    notes = newState.notes,
+                    rawNotes = newState.rawNotes,
+                    subjects = newState.subjects,
+                    subjectInfos = newState.subjectInfos,
+                    currentFilter = newState.currentFilter,
+                    searchQuery = newState.searchQuery,
+                    isLoading = false,
+                    error = newState.error
+                ) }
+            }
+        }
+    }
+
+    private fun computeSubjectInfos(
+        notes: List<Note>,
+        subjects: List<SubjectData>,
+        evaluations: List<Evaluation>
+    ): List<SubjectInfo> {
+        return subjects.map { subject ->
+            val subjectNotes = notes.filter { it.subject == subject.name }
+            val subjectEvals = evaluations.filter { it.subjectName == subject.name }
+            val graded = subjectEvals.filter { it.grade != null && it.isPresented }
+            val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (it.weight ?: 1.0) }
+            val totalWeight = graded.sumOf { it.weight ?: 1.0 }
+            val avg = if (totalWeight > 0.0) weightedSum / totalWeight else null
+            val upcoming = subjectEvals
+                .filter { !it.isPresented && it.date != null }
+                .sortedBy { it.date }
+                .take(3)
+
+            SubjectInfo(
+                name = subject.name,
+                icon = subject.icon,
+                notes = subjectNotes,
+                evaluations = subjectEvals,
+                averageGrade = avg?.let { kotlin.math.round(it * 10) / 10.0 },
+                completedEvalCount = subjectEvals.count { it.isPresented },
+                pendingEvalCount = subjectEvals.count { !it.isPresented },
+                upcomingEvaluations = upcoming
+            )
         }
     }
 
@@ -65,6 +141,18 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.Search -> _searchQuery.value = event.query
             is NotesEvent.ClearSyncMessage -> _uiState.update { it.copy(syncMessage = null) }
             is NotesEvent.DeleteNote -> deleteNote(event.note)
+            is NotesEvent.UpdateNote -> updateNote(event.note, event.title, event.content)
+            is NotesEvent.ToggleSubject -> {
+                val current = _uiState.value.expandedSubject
+                _uiState.update { it.copy(expandedSubject = if (current == event.subjectName) null else event.subjectName) }
+            }
+        }
+    }
+
+    private fun updateNote(note: Note, title: String, content: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            noteRepository.updateNote(userId, note.copy(title = title, content = content), null)
         }
     }
 
