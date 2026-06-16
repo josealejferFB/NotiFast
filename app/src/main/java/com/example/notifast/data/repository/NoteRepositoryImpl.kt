@@ -2,16 +2,24 @@ package com.example.notifast.data.repository
 
 import android.net.Uri
 import com.example.notifast.data.model.Note
+import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.ImageRepository
 import com.example.notifast.domain.repository.NoteRepository
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class NoteRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore,
@@ -19,22 +27,41 @@ class NoteRepositoryImpl @Inject constructor(
 ) : NoteRepository {
 
     override fun getNotes(userId: String): Flow<List<Note>> {
-        return db.collectionGroup("notes")
-            .whereEqualTo("userId", userId)
+        return db.collection("users").document(userId)
+            .collection("subjects")
             .snapshots()
-            .map { snapshot ->
-                snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(Note::class.java)?.copy(id = doc.id)
+            .flatMapLatest { snapshot ->
+                val subjects = snapshot.documents.map { it.getString("name") ?: it.id }
+                if (subjects.isEmpty()) {
+                    flowOf<List<Note>>(emptyList())
+                } else {
+                    val noteFlows: List<Flow<List<Note>>> = subjects.map { subject ->
+                        db.collection("users").document(userId)
+                            .collection("subjects").document(subject)
+                            .collection("notes")
+                            .snapshots()
+                            .map { noteSnapshot ->
+                                noteSnapshot.documents.mapNotNull { doc ->
+                                    doc.toObject(Note::class.java)?.copy(id = doc.id)
+                                }
+                            }
+                    }
+                    combine(noteFlows) { arrays: Array<List<Note>> -> arrays.flatMap { it } }
                 }
             }
     }
 
-    override fun getSubjects(userId: String): Flow<List<String>> {
+    override fun getSubjects(userId: String): Flow<List<SubjectData>> {
         return db.collection("users").document(userId)
             .collection("subjects")
             .snapshots()
             .map { snapshot ->
-                snapshot.documents.mapNotNull { it.getString("name") }
+                snapshot.documents.map { doc ->
+                    SubjectData(
+                        name = doc.getString("name") ?: doc.id,
+                        icon = doc.getString("icon") ?: "📚"
+                    )
+                }
             }
     }
 
@@ -56,7 +83,8 @@ class NoteRepositoryImpl @Inject constructor(
                 "subject" to subject,
                 "title" to title,
                 "content" to content,
-                "imageUrl" to (imageUrl ?: "")
+                "imageUrl" to (imageUrl ?: ""),
+                "timestamp" to FieldValue.serverTimestamp()
             )
             db.collection("users").document(userId)
                 .collection("subjects").document(subject)
@@ -67,11 +95,11 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addSubject(userId: String, subjectName: String): Result<Unit> {
+    override suspend fun addSubject(userId: String, subjectName: String, icon: String): Result<Unit> {
         return try {
             db.collection("users").document(userId)
                 .collection("subjects").document(subjectName)
-                .set(mapOf("name" to subjectName, "createdAt" to com.google.firebase.Timestamp.now()))
+                .set(mapOf("name" to subjectName, "icon" to icon, "createdAt" to com.google.firebase.Timestamp.now()))
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -131,5 +159,6 @@ class NoteRepositoryImpl @Inject constructor(
                     doc.toObject(Note::class.java)?.copy(id = doc.id)
                 }
             }
+            .catch { emit(emptyList()) }
     }
 }
