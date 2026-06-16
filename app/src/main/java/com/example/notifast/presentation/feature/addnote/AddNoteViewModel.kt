@@ -2,6 +2,7 @@ package com.example.notifast.presentation.feature.addnote
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,21 @@ class AddNoteViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddNoteUiState())
     val uiState: StateFlow<AddNoteUiState> = _uiState.asStateFlow()
 
+    init { loadSubjects() }
+
+    fun setInitialSubject(subject: String) {
+        if (subject.isNotBlank()) _uiState.update { it.copy(subject = subject) }
+    }
+
+    private fun loadSubjects() {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            noteRepository.getSubjects(userId).collect { subjectDataList ->
+                _uiState.update { it.copy(subjects = subjectDataList) }
+            }
+        }
+    }
+
     fun onEvent(event: AddNoteEvent) {
         when (event) {
             is AddNoteEvent.SubjectChanged -> _uiState.update { it.copy(subject = event.value) }
@@ -29,11 +45,16 @@ class AddNoteViewModel @Inject constructor(
             is AddNoteEvent.ImageSelected -> _uiState.update { it.copy(imageUri = event.uri) }
             is AddNoteEvent.SaveClicked -> saveNote()
             is AddNoteEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            is AddNoteEvent.SetSubjects -> _uiState.update { it.copy(subjects = event.subjects) }
         }
     }
 
     private fun saveNote() {
         val state = _uiState.value
+        if (state.subjects.isEmpty()) {
+            _uiState.update { it.copy(error = "Crea una materia primero") }
+            return
+        }
         if (state.subject.isBlank() || state.title.isBlank()) {
             _uiState.update { it.copy(error = "Materia y título son obligatorios") }
             return

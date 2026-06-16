@@ -1,9 +1,11 @@
 package com.example.notifast.presentation.feature.addnote
 
 import android.net.Uri
+import com.example.notifast.data.model.SubjectData
 
 data class AddNoteUiState(
     val subject: String = "",
+    val subjects: List<SubjectData> = emptyList(),
     val title: String = "",
     val content: String = "",
     val imageUri: Uri? = null,
@@ -19,4 +21,5 @@ sealed interface AddNoteEvent {
     data class ImageSelected(val uri: Uri?) : AddNoteEvent
     data object SaveClicked : AddNoteEvent
     data object ClearError : AddNoteEvent
+    data class SetSubjects(val subjects: List<SubjectData>) : AddNoteEvent
 }
