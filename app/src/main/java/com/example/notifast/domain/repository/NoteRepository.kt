@@ -25,4 +25,5 @@ interface NoteRepository {
     suspend fun updateNote(userId: String, note: Note, imageUri: Uri?): Result<Unit>
     suspend fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>>
     suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit>
+    suspend fun getNoteById(userId: String, subject: String, noteId: String): Result<Note>
 }

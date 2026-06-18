@@ -51,7 +51,8 @@ fun SubjectDetailHero(
                         color,
                         color.copy(alpha = 0.7f),
                         color.copy(alpha = 0.2f),
-                        Color.White
+                        color.copy(alpha = 0.2f),
+                        MaterialTheme.colorScheme.background
                     )
                 )
             )
@@ -61,7 +62,7 @@ fun SubjectDetailHero(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White),
+                modifier = Modifier.size(80.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -76,13 +77,13 @@ fun SubjectDetailHero(
                 text = subjectName,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "$noteCount apuntes · $evalCount evaluaciones",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

@@ -7,6 +7,7 @@ import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.NoteRepository
+import com.example.notifast.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class GradesViewModel @Inject constructor(
     private val evaluationRepository: EvaluationRepository,
     private val noteRepository: NoteRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GradesUiState())
@@ -36,9 +38,21 @@ class GradesViewModel @Inject constructor(
                 evaluationRepository.getEvaluations(userId),
                 noteRepository.getSubjects(userId)
             ) { evaluations, subjects ->
+                val evalsBySubject = evaluations.groupBy { it.subjectName }
+                val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
+                val subjectGrades = evalsBySubject.map { (subject, evals) ->
+                    SubjectGradeInfo(
+                        subject = subject,
+                        evaluations = evals,
+                        average = calculateWeightedAverageUseCase(evals) ?: 0.0
+                    )
+                }.sortedBy { it.subject }
+                
                 GradesUiState(
-                    evaluationsBySubject = evaluations.groupBy { it.subjectName },
-                    subjects = subjects
+                    evaluationsBySubject = evalsBySubject,
+                    subjects = subjects,
+                    globalAverage = globalAverage,
+                    subjectGrades = subjectGrades
                 )
             }.collect { state -> _uiState.value = state }
         }

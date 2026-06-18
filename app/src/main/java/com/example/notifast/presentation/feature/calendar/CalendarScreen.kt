@@ -46,6 +46,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +63,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.example.notifast.data.model.Evaluation
 import com.example.notifast.data.model.Note
@@ -92,6 +95,14 @@ fun CalendarScreen(
     var showDeleteDialog by remember { mutableStateOf<Evaluation?>(null) }
 
     val isHeaderVisible = expandedEvalId == null && expandedNoteId == null
+
+    val context = LocalContext.current
+    LaunchedEffect(uiState.error) {
+        if (uiState.error != null) {
+            Toast.makeText(context, uiState.error, Toast.LENGTH_LONG).show()
+            viewModel.onEvent(CalendarEvent.ClearError)
+        }
+    }
 
     BackHandler(enabled = !isHeaderVisible) {
         expandedEvalId = null
@@ -125,6 +136,7 @@ fun CalendarScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    .safeDrawingPadding()
                     .padding(horizontal = 16.dp)
             ) {
 
@@ -197,13 +209,13 @@ fun CalendarScreen(
             Box(modifier = Modifier.weight(1f)) {
                 if (relevantNotes.isEmpty() && dailyEvals.isEmpty()) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay actividades para este día", color = Color.Gray)
+                        Text("No hay actividades para este día", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 16.dp)
+                        contentPadding = PaddingValues(bottom = 100.dp) // Safe area para BottomNav y FAB
                     ) {
                         items(dailyEvals) { eval ->
                             if (expandedNoteId == null) {
@@ -254,10 +266,10 @@ fun NoteExpandableItem(note: Note, isExpanded: Boolean, isHighlighted: Boolean =
     val interactionSource = remember { MutableInteractionSource() }
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(
             width = if (isHighlighted) 2.dp else 1.dp,
-            color = if (isHighlighted) Ruby else Color.LightGray.copy(alpha = 0.3f)
+            color = if (isHighlighted) Ruby else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isHighlighted || isExpanded) 10.dp else 0.dp),
         modifier = Modifier.fillMaxWidth().clickable(interactionSource = interactionSource, indication = null) { onToggle() }
@@ -281,7 +293,7 @@ fun NoteExpandableItem(note: Note, isExpanded: Boolean, isHighlighted: Boolean =
                             }
                         }
                     }
-                    Text(note.subject, fontSize = 13.sp, color = if (isHighlighted) Ruby else Color.Gray)
+                    Text(note.subject, fontSize = 13.sp, color = if (isHighlighted) Ruby else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             AnimatedVisibility(visible = isExpanded, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
@@ -295,9 +307,9 @@ fun NoteExpandableItem(note: Note, isExpanded: Boolean, isHighlighted: Boolean =
                     Text(text = note.content, style = MaterialTheme.typography.bodyLarge, lineHeight = 24.sp)
                     Spacer(modifier = Modifier.height(20.dp))
                     TextButton(onClick = onToggle, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Gray)
+                        Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Cerrar detalle", color = Color.Gray)
+                        Text("Cerrar detalle", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -310,8 +322,8 @@ fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: ()
     val interactionSource = remember { MutableInteractionSource() }
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isExpanded) 10.dp else 0.dp),
         modifier = Modifier.fillMaxWidth().clickable(interactionSource = interactionSource, indication = null) { onToggle() }
     ) {
@@ -323,7 +335,7 @@ fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: ()
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(eval.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(eval.subjectName, fontSize = 13.sp, color = Color.Gray)
+                    Text(eval.subjectName, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             AnimatedVisibility(visible = isExpanded, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
@@ -340,9 +352,9 @@ fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: ()
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         TextButton(onClick = onToggle) {
-                            Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Gray)
+                            Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Cerrar", color = Color.Gray)
+                            Text("Cerrar", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Row {
                             FilledTonalIconButton(onClick = onEdit, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Aqua.copy(alpha = 0.1f), contentColor = Aqua), modifier = Modifier.size(40.dp)) { Icon(Icons.Default.Edit, contentDescription = "Editar", modifier = Modifier.size(18.dp)) }
@@ -376,7 +388,7 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
     Column {
         Row(Modifier.fillMaxWidth()) {
             listOf("D", "L", "M", "X", "J", "V", "S").forEach { day ->
-                Text(text = day, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = Color.Gray, fontSize = 12.sp)
+                Text(text = day, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             }
         }
         val totalCells = paddingDays + days
@@ -394,7 +406,7 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
                                 when {
                                     hasEvals -> Ruby
                                     isSelected -> Ruby.copy(alpha = 0.15f)
-                                    isToday -> Color.LightGray.copy(alpha = 0.15f)
+                                    isToday -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                                     else -> Color.Transparent
                                 }
                             )
@@ -405,7 +417,7 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
                                 Text(
                                     text = day.toString(),
                                     fontWeight = if (hasEvals || isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (hasEvals) Color.White else if (isSelected) Ruby else if (isToday) Color.DarkGray else MaterialTheme.colorScheme.onSurface
+                                    color = if (hasEvals) Color.White else if (isSelected) Ruby else if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                 )
                                 if (hasNotes) {
                                     Box(modifier = Modifier.padding(top = 2.dp).size(width = 12.dp, height = 2.dp).background(if (hasEvals) Color.White.copy(alpha = 0.7f) else Aqua, CircleShape))

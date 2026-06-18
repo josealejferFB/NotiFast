@@ -8,6 +8,7 @@ import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.NoteRepository
+import com.example.notifast.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class NotesViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val authRepository: AuthRepository,
-    private val evaluationRepository: EvaluationRepository
+    private val evaluationRepository: EvaluationRepository,
+    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -98,10 +100,7 @@ class NotesViewModel @Inject constructor(
         return subjects.map { subject ->
             val subjectNotes = notes.filter { it.subject == subject.name }
             val subjectEvals = evaluations.filter { it.subjectName == subject.name }
-            val graded = subjectEvals.filter { it.grade != null }
-            val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
-            val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
-            val avg = if (totalWeight > 0.0) weightedSum / totalWeight else null
+            val avg = calculateWeightedAverageUseCase(subjectEvals)
             val upcoming = subjectEvals
                 .filter { !it.isPresented && it.date != null }
                 .sortedBy { it.date }

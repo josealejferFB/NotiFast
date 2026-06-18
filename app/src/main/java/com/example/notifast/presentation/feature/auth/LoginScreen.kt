@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
-private const val WEB_CLIENT_ID = "972069019951-kpd69bj1oik7kq9r4sg47rggcvohcdi8.apps.googleusercontent.com"
+import com.example.notifast.BuildConfig
+
 
 @Composable
 fun LoginScreen(
@@ -49,10 +51,13 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (uiState.isLoggedIn) {
-        onLoginSuccess()
-        return
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (uiState.isLoggedIn) {
+            onLoginSuccess()
+        }
     }
+
+    if (uiState.isLoggedIn) return
 
     var isSignUp by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
@@ -64,7 +69,7 @@ fun LoginScreen(
     val context = LocalContext.current
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(WEB_CLIENT_ID)
+            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
             .requestEmail()
             .build()
     }
@@ -106,7 +111,7 @@ fun LoginScreen(
             )
 
             Text(
-                text = "NotiFast",
+                text = stringResource(R.string.login_title),
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Black,
                 color = Ruby,
@@ -114,7 +119,7 @@ fun LoginScreen(
             )
 
             Text(
-                text = "Tu aprendizaje, a la velocidad de tus ideas.",
+                text = stringResource(R.string.login_subtitle),
                 fontSize = 14.sp,
                 color = Color.Gray.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
@@ -204,7 +209,7 @@ fun LoginScreen(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
                 ) {
                     Text(
-                        text = if (isSignUp) "CREAR CUENTA" else "ENTRAR",
+                        text = if (isSignUp) stringResource(R.string.signup_button).uppercase() else stringResource(R.string.login_button).uppercase(),
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 1.sp
                     )
@@ -218,7 +223,7 @@ fun LoginScreen(
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
                 ) {
-                    Text("Continuar con Google")
+                    Text(stringResource(R.string.google_button))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

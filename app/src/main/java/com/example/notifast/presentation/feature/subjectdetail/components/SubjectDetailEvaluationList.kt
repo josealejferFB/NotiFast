@@ -63,7 +63,7 @@ fun SubjectDetailEvaluationList(
     val color = parseSubjectColor(subjectColorHex)
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         Spacer(Modifier.height(16.dp))
         Text("Todas las evaluaciones", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
@@ -75,7 +75,7 @@ fun SubjectDetailEvaluationList(
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Row(
@@ -105,12 +105,12 @@ fun SubjectDetailEvaluationList(
                                     )
                                 }
                             } else {
-                                Text("Pendiente", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                                Text("Pendiente", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             val weight = eval.weight ?: 0.0
                             if (weight > 0.0) {
                                 Spacer(Modifier.width(6.dp))
-                                Text("${(weight * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                                Text("${(weight * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }

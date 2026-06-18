@@ -77,7 +77,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
+import com.example.notifast.R
 import com.example.notifast.data.model.Note
+import androidx.compose.ui.res.stringResource
 import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
@@ -102,13 +104,14 @@ fun NotesScreen(
 
     var expandedNote by remember { mutableStateOf<Note?>(null) }
     var subjectToDelete by remember { mutableStateOf<String?>(null) }
+    var noteToDelete by remember { mutableStateOf<Note?>(null) }
     val isHeaderVisible = expandedNote == null
 
     BackHandler(enabled = !isHeaderVisible) { expandedNote = null }
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
-        Scaffold(containerColor = Color.Transparent, topBar = { NotiFastCenterAlignedTopBar(title = "Mis Notas") }) { padding ->
+        Scaffold(containerColor = Color.Transparent) { padding ->
             Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 AnimatedVisibility(
                     visible = isHeaderVisible,
@@ -117,7 +120,7 @@ fun NotesScreen(
                 ) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 16.dp),
+                        contentPadding = PaddingValues(bottom = 100.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
@@ -146,7 +149,7 @@ fun NotesScreen(
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Box(modifier = Modifier.weight(1f)) {
                                         if (uiState.searchQuery.isEmpty()) {
-                                            Text("Buscar apuntes o materias...", style = MaterialTheme.typography.bodyMedium, color = Color.Gray.copy(alpha = 0.6f))
+                                            Text(stringResource(R.string.notes_search_placeholder), style = MaterialTheme.typography.bodyMedium, color = Color.Gray.copy(alpha = 0.6f))
                                         }
                                         BasicTextField(
                                             value = uiState.searchQuery,
@@ -197,7 +200,7 @@ fun NotesScreen(
                             item {
                                 Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Error al cargar", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.error)
+                                        Text(stringResource(R.string.general_error), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.error)
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Text(
                                             text = uiState.error ?: "",
@@ -219,9 +222,9 @@ fun NotesScreen(
                             item {
                                 Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Aún no tienes notas", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.Gray)
+                                        Text(stringResource(R.string.notes_empty_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.Gray)
                                         Spacer(modifier = Modifier.height(8.dp))
-                                        Text("Crea tu primera materia para comenzar", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                                        Text(stringResource(R.string.notes_empty_message), style = MaterialTheme.typography.bodyMedium, color = Color.Gray, textAlign = TextAlign.Center)
                                         Spacer(modifier = Modifier.height(24.dp))
                                         Button(onClick = onAddSubjectClick, colors = ButtonDefaults.buttonColors(containerColor = Aqua)) {
                                             Text("+ Nueva Materia")
@@ -265,7 +268,7 @@ fun NotesScreen(
                                             isEven = (currentOffset + index) % 2 == 0,
                                             onClick = { expandedNote = note },
                                             onEdit = { expandedNote = note },
-                                            onDelete = { viewModel.onEvent(NotesEvent.DeleteNote(note)) },
+                                            onDelete = { noteToDelete = note },
                                             subjectColorHex = subjectColor
                                         )
                                     }
@@ -282,7 +285,7 @@ fun NotesScreen(
                                             text = "Materias",
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.ExtraBold,
-                                            color = Color.DarkGray
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -343,6 +346,26 @@ fun NotesScreen(
                 }
             )
         }
+
+        noteToDelete?.let { note ->
+            AlertDialog(
+                onDismissRequest = { noteToDelete = null },
+                title = { Text(stringResource(R.string.delete_note_title)) },
+                text = { Text("¿Estás seguro de eliminar el apunte '${note.title}'?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(NotesEvent.DeleteNote(note))
+                            noteToDelete = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Ruby)
+                    ) { Text(stringResource(R.string.delete_note_confirm), color = Color.White) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { noteToDelete = null }) { Text(stringResource(R.string.delete_note_cancel)) }
+                }
+            )
+        }
     }
 }
 
@@ -360,8 +383,8 @@ private fun NoteDetailExpandable(note: Note, subjectColorHex: String, onSave: (S
     Card(
         modifier = Modifier.fillMaxWidth().heightIn(max = 600.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.2f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
@@ -371,9 +394,9 @@ private fun NoteDetailExpandable(note: Note, subjectColorHex: String, onSave: (S
                     Surface(
                         modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
                         onClick = { if (isEditing) { onSave(title, content) }; isEditing = !isEditing },
-                        shape = CircleShape, color = if (isEditing) accentColor else Color.White
+                        shape = CircleShape, color = if (isEditing) accentColor else MaterialTheme.colorScheme.surface
                     ) {
-                        Icon(imageVector = if (isEditing) Icons.Default.Check else Icons.Default.Edit, contentDescription = null, tint = if(isEditing) Color.White else Color.Gray, modifier = Modifier.padding(8.dp).size(20.dp))
+                        Icon(imageVector = if (isEditing) Icons.Default.Check else Icons.Default.Edit, contentDescription = null, tint = if(isEditing) Color.White else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp).size(20.dp))
                     }
                 }
             } else {
@@ -400,14 +423,14 @@ private fun NoteDetailExpandable(note: Note, subjectColorHex: String, onSave: (S
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = note.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = note.content, style = MaterialTheme.typography.bodyMedium, lineHeight = 24.sp, color = Color.DarkGray)
+                    Text(text = note.content, style = MaterialTheme.typography.bodyMedium, lineHeight = 24.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
                     onClick = onClose,
                     modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray.copy(alpha = 0.2f), contentColor = Color.DarkGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f), contentColor = MaterialTheme.colorScheme.onSurface)
                 ) {
                     Text("Cerrar", fontWeight = FontWeight.Bold)
                 }
@@ -437,7 +460,7 @@ private fun HeaderProfile(firstName: String, lastName: String, email: String, pr
                 Column {
                     Text(text = "Hola, $displayName", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     TextButton(onClick = onLogout, contentPadding = PaddingValues(0.dp), modifier = Modifier.height(20.dp)) {
-                        Text("Cerrar sesión", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text("Cerrar sesión", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

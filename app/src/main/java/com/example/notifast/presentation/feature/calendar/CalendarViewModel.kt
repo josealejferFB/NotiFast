@@ -44,13 +44,16 @@ class CalendarViewModel @Inject constructor(
         when (event) {
             is CalendarEvent.LoadData -> loadData()
             is CalendarEvent.DeleteEvaluation -> deleteEvaluation(event.evaluation)
+            is CalendarEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
     private fun deleteEvaluation(evaluation: Evaluation) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            evaluationRepository.deleteEvaluation(userId, evaluation)
+            evaluationRepository.deleteEvaluation(userId, evaluation).onFailure { e ->
+                _uiState.update { it.copy(error = e.message ?: "Error al eliminar") }
+            }
         }
     }
 }

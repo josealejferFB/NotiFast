@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">NotiFast</string>
+    <!-- Login -->
+    <string name="login_title">NotiFast</string>
+    <string name="login_subtitle">Tu aprendizaje, a la velocidad de tus ideas.</string>
+    <string name="login_button">Entrar</string>
+    <string name="signup_button">Crear Cuenta</string>
+    <string name="google_button">Continuar con Google</string>
+    <string name="login_error">Error al iniciar sesión</string>
+    
+    <!-- Notes -->
+    <string name="notes_title">Mis Apuntes</string>
+    <string name="notes_search_placeholder">Buscar apuntes o materias…</string>
+    <string name="notes_empty_title">Sin apuntes</string>
+    <string name="notes_empty_message">Aún no tienes materias o apuntes registrados.</string>
+    <string name="notes_add_button">Nuevo Apunte</string>
+    <string name="delete_note_title">¿Eliminar apunte?</string>
+    <string name="delete_note_confirm">Eliminar</string>
+    <string name="delete_note_cancel">Cancelar</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Mi Calendario</string>
+    <string name="calendar_empty_title">Sin eventos</string>
+    <string name="calendar_empty_message">No hay evaluaciones programadas para este día.</string>
+
+    <!-- Schedules -->
+    <string name="schedules_title">Mis Horarios</string>
+    <string name="schedules_empty_title">Sin horarios</string>
+    <string name="schedules_empty_message">No tienes horarios registrados para este día.</string>
+    
+    <!-- General -->
+    <string name="general_error">Ocurrió un error</string>
 </resources>

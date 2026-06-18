@@ -67,7 +67,7 @@ fun SubjectDetailStats(
                             )
                         }
                         Spacer(Modifier.height(6.dp))
-                        Text("Promedio", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text("Promedio", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 accentColor = color
@@ -82,7 +82,7 @@ fun SubjectDetailStats(
                     content = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("Evaluaciones", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                                Text("Evaluaciones", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Spacer(Modifier.height(4.dp))
                                 Text("$completedEvalCount/$totalEvalCount", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                             }
@@ -98,7 +98,7 @@ fun SubjectDetailStats(
                     content = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("Pendientes", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+                                Text("Pendientes", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Spacer(Modifier.height(4.dp))
                                 Text("$pendingEvalCount", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                             }
@@ -125,7 +125,7 @@ private fun StatCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth().padding(start = 4.dp)) {

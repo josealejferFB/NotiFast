@@ -65,7 +65,7 @@ fun SubjectDetailCalendarRow(
     val color = parseSubjectColor(subjectColorHex)
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         Spacer(Modifier.height(16.dp))
         Text("Calendario", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
@@ -99,7 +99,7 @@ private fun CalendarSquare(
     Card(
         modifier = Modifier.size(width = 120.dp, height = 175.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {

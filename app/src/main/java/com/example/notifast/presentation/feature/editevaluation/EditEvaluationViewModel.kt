@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,22 +34,21 @@ class EditEvaluationViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            evaluationRepository.getEvaluations(userId).collect { evaluations ->
-                val eval = evaluations.find { it.id == evalId } ?: return@collect
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        evalId = eval.id,
-                        subjectName = eval.subjectName,
-                        title = eval.title,
-                        description = eval.description,
-                        quickTips = eval.quickTips,
-                        grade = eval.grade?.toInt()?.toString() ?: "",
-                        isPresented = eval.isPresented,
-                        existingImageUrl = eval.imageUrl,
-                        date = eval.date
-                    )
-                }
+            val evaluations = evaluationRepository.getEvaluations(userId).first()
+            val eval = evaluations.find { it.id == evalId } ?: return@launch
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    evalId = eval.id,
+                    subjectName = eval.subjectName,
+                    title = eval.title,
+                    description = eval.description,
+                    quickTips = eval.quickTips,
+                    grade = eval.grade?.toInt()?.toString() ?: "",
+                    isPresented = eval.isPresented,
+                    existingImageUrl = eval.imageUrl,
+                    date = eval.date
+                )
             }
         }
     }

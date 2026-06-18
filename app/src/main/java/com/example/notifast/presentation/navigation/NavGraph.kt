@@ -1,5 +1,6 @@
 package com.example.notifast.presentation.navigation
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,7 @@ import com.example.notifast.presentation.feature.notes.NotesScreen
 import com.example.notifast.presentation.feature.schedules.SchedulesScreen
 import com.example.notifast.presentation.feature.settings.SettingsScreen
 import com.example.notifast.presentation.feature.subjectdetail.SubjectDetailScreen
+import com.example.notifast.presentation.feature.addschedule.AddScheduleScreen
 import com.example.notifast.presentation.theme.color.Ruby
 
 @Composable
@@ -123,7 +125,7 @@ fun MainContent() {
                 route = Screen.AddNote.route,
                 arguments = listOf(navArgument("subject") { type = NavType.StringType; defaultValue = "" })
             ) { backStackEntry ->
-                val subject = backStackEntry.arguments?.getString("subject") ?: ""
+                val subject = Uri.decode(backStackEntry.arguments?.getString("subject") ?: "")
                 AddNoteScreen(
                     subject = subject,
                     onBackClick = { navController.popBackStack() },
@@ -153,7 +155,7 @@ fun MainContent() {
                 route = Screen.SubjectDetail.route,
                 arguments = listOf(navArgument("subjectName") { type = NavType.StringType })
             ) { backStackEntry ->
-                val subjectName = backStackEntry.arguments?.getString("subjectName") ?: ""
+                val subjectName = Uri.decode(backStackEntry.arguments?.getString("subjectName") ?: "")
                 SubjectDetailScreen(
                     onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute(subjectName)) },
                     onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute(subjectName)) },
@@ -167,7 +169,15 @@ fun MainContent() {
                 )
             }
             composable(Screen.Schedules.route) {
-                SchedulesScreen()
+                SchedulesScreen(
+                    onAddScheduleClick = { navController.navigate(Screen.AddSchedule.route) }
+                )
+            }
+            composable(Screen.AddSchedule.route) {
+                AddScheduleScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onScheduleAdded = { navController.popBackStack() }
+                )
             }
             composable(Screen.Grades.route) {
                 GradesScreen()
@@ -189,7 +199,7 @@ fun MainContent() {
                 route = Screen.AddEvaluation.route,
                 arguments = listOf(navArgument("subject") { type = NavType.StringType; defaultValue = "" })
             ) { backStackEntry ->
-                val subject = backStackEntry.arguments?.getString("subject") ?: ""
+                val subject = Uri.decode(backStackEntry.arguments?.getString("subject") ?: "")
                 AddEvaluationScreen(
                     subject = subject,
                     onEvaluationAdded = { navController.popBackStack() },

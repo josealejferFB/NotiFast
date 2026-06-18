@@ -51,12 +51,12 @@ fun SubjectDetailProgress(
     val pendingCount = totalCount - completedCount
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         Spacer(Modifier.height(16.dp))
         Text("Progreso general", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(16.dp))
         Box(
-            modifier = Modifier.fillMaxWidth().height(20.dp).clip(RoundedCornerShape(10.dp)).background(Color.LightGray.copy(alpha = 0.2f))
+            modifier = Modifier.fillMaxWidth().height(20.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth(animatedProgress).fillMaxHeight().clip(RoundedCornerShape(10.dp)).background(color)
@@ -70,7 +70,7 @@ fun SubjectDetailProgress(
         ) {
             Column {
                 Text("${(progressPercent * 100).toInt()}%", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, color = color)
-                Text(if (progressPercent >= 1f) "\u00A1Completaste todo!" else "Has completado el ${(progressPercent * 100).toInt()}% de tus evaluaciones", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text(if (progressPercent >= 1f) "¡Completaste todo!" else "Has completado el ${(progressPercent * 100).toInt()}% de tus evaluaciones", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Column(horizontalAlignment = Alignment.End) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -80,9 +80,9 @@ fun SubjectDetailProgress(
                 }
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(10.dp).clip(RoundedCornerShape(2.dp)).background(Color.LightGray))
+                    Box(modifier = Modifier.size(10.dp).clip(RoundedCornerShape(2.dp)).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)))
                     Spacer(Modifier.width(6.dp))
-                    Text("$pendingCount pendientes", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    Text("$pendingCount pendientes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }

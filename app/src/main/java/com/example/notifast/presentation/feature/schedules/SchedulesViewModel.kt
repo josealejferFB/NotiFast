@@ -41,13 +41,16 @@ class SchedulesViewModel @Inject constructor(
         when (event) {
             is SchedulesEvent.LoadData -> loadData()
             is SchedulesEvent.DeleteSchedule -> deleteSchedule(event.schedule)
+            is SchedulesEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
     private fun deleteSchedule(schedule: Schedule) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            scheduleRepository.deleteSchedule(userId, schedule)
+            scheduleRepository.deleteSchedule(userId, schedule).onFailure { e ->
+                _uiState.update { it.copy(error = e.message ?: "Error al eliminar") }
+            }
         }
     }
 }

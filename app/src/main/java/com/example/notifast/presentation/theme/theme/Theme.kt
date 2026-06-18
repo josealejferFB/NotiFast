@@ -13,21 +13,23 @@ import com.example.notifast.presentation.theme.color.*
 import com.example.notifast.presentation.theme.type.Typography
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = RubyDark,
+    secondary = AquaDark,
+    surface = SurfaceDark,
+    onSurface = OnSurfaceDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = RubyLight,
+    secondary = AquaLight,
+    surface = SurfaceLight,
+    onSurface = OnSurfaceLight
 )
 
 @Composable
 fun NotiFastTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Changed to false to enforce corporate branding
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -29,6 +30,7 @@ import com.example.notifast.presentation.theme.color.Ruby
 @Composable
 fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "floating")
+    val isDark = isSystemInDarkTheme()
 
     val studyIcons = listOf(
         Icons.AutoMirrored.Filled.MenuBook,
@@ -52,8 +54,12 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
         Icons.Default.AutoGraph
     )
 
+    val bgColor1 = if (isDark) Color(0xFF132B2B) else Color.White
+    val bgColor2 = if (isDark) Color(0xFF1C3D3D) else Color(0xFFF8F9FA)
+    val iconAlpha = if (isDark) 0.08f else 0.04f
+
     Box(modifier = modifier.fillMaxSize().background(
-        Brush.verticalGradient(listOf(Color.White, Color(0xFFF8F9FA)))
+        Brush.verticalGradient(listOf(bgColor1, bgColor2))
     )) {
         studyIcons.forEachIndexed { index, icon ->
             val duration = 4000 + (index * 600)
@@ -88,7 +94,7 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
                     .offset(x = (xPos.dp * 4), y = (yPos.dp * 10) + yOffset.dp)
                     .graphicsLayer(rotationZ = rotation)
                     .size(44.dp)
-                    .alpha(0.04f),
+                    .alpha(iconAlpha),
                 tint = if (index % 2 == 0) Ruby else Aqua
             )
         }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,7 +76,7 @@ fun SubjectDetailTimeline(
     onDeleteEval: (Evaluation) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         Spacer(Modifier.height(16.dp))
         Text("Próximas evaluaciones", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
@@ -84,14 +85,14 @@ fun SubjectDetailTimeline(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFE8F5E9)
+                color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF43A047)), contentAlignment = Alignment.Center) {
-                        Text("\u2713", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Box(modifier = Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
+                        Text("\u2713", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                     Spacer(Modifier.width(12.dp))
-                    Text("\u00A1Todo al d\u00EDa!", fontWeight = FontWeight.Medium, color = Color(0xFF2E7D32))
+                    Text("\u00A1Todo al d\u00EDa!", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -100,7 +101,7 @@ fun SubjectDetailTimeline(
                 upcomingEvaluations.forEachIndexed { index, eval ->
                     val days = eval.date?.let { daysUntil(it) } ?: 999
                     val chipColor = urgencyColor(days)
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(24.dp)) {
                             Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(chipColor))
                             if (index < upcomingEvaluations.lastIndex) {
@@ -116,7 +117,7 @@ fun SubjectDetailTimeline(
                                     onLongClick = { showMenu = true }
                                 ),
                                 shape = RoundedCornerShape(12.dp),
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.surface,
                                 shadowElevation = 1.dp
                             ) {
                                 Row(
@@ -126,10 +127,10 @@ fun SubjectDetailTimeline(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(eval.title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(eval.date?.let { formatDate(it) } ?: "Sin fecha", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                                            Text(eval.date?.let { formatDate(it) } ?: "Sin fecha", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             val weight = eval.weight ?: 0.0
                                             if (weight > 0.0) {
-                                                Text(" · ${(weight * 100).toInt()}%", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                                                Text(" · ${(weight * 100).toInt()}%", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
                                         }
                                     }

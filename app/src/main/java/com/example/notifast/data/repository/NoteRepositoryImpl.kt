@@ -49,6 +49,7 @@ class NoteRepositoryImpl @Inject constructor(
                     combine(noteFlows) { arrays: Array<List<Note>> -> arrays.flatMap { it } }
                 }
             }
+            .catch { emit(emptyList()) }
     }
 
     override fun getSubjects(userId: String): Flow<List<SubjectData>> {
@@ -171,6 +172,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit> {
         return try {
+            val batch = db.batch()
             val notesSnapshot = db.collection("users").document(userId)
                 .collection("subjects").document(subjectName)
                 .collection("notes")
@@ -181,13 +183,32 @@ class NoteRepositoryImpl @Inject constructor(
                 if (!imageUrl.isNullOrEmpty()) {
                     try { imageRepository.deleteImage(imageUrl) } catch(e: Exception) {}
                 }
-                doc.reference.delete().await()
+                batch.delete(doc.reference)
             }
-            db.collection("users").document(userId)
-                .collection("subjects").document(subjectName)
-                .delete()
-                .await()
+            batch.delete(
+                db.collection("users").document(userId)
+                    .collection("subjects").document(subjectName)
+            )
+            batch.commit().await()
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    override suspend fun getNoteById(userId: String, subject: String, noteId: String): Result<Note> {
+        return try {
+            val doc = db.collection("users").document(userId)
+                .collection("subjects").document(subject)
+                .collection("notes").document(noteId)
+                .get()
+                .await()
+            val note = doc.toObject(Note::class.java)?.copy(id = doc.id)
+            if (note != null) {
+                Result.success(note)
+            } else {
+                Result.failure(Exception("Note not found"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

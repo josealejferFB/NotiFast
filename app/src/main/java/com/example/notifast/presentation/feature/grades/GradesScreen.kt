@@ -99,18 +99,17 @@ fun GradesScreen(
                 contentPadding = PaddingValues(top = 16.dp, bottom = 40.dp)
             ) {
                 item {
-                    MainAverageDashboard(uiState.evaluationsBySubject)
+                    MainAverageDashboard(uiState.globalAverage)
                 }
 
-                if (allSubjects.isEmpty()) {
+                if (uiState.subjectGrades.isEmpty()) {
                     item {
                         EmptyGradesState()
                     }
                 } else {
-                    items(allSubjects) { subject ->
+                    items(uiState.subjectGrades) { subjectGrade ->
                         SubjectRevampCard(
-                            subject = subject,
-                            evaluations = uiState.evaluationsBySubject[subject] ?: emptyList(),
+                            subjectGrade = subjectGrade,
                             onUpdateGrade = { id, g, p ->
                                 viewModel.onEvent(GradesEvent.UpdateGrade(id, g, p))
                             }
@@ -124,22 +123,12 @@ fun GradesScreen(
 }
 
 @Composable
-fun MainAverageDashboard(evaluationsBySubject: Map<String, List<Evaluation>>) {
-    val subjectAverages = evaluationsBySubject.values.mapNotNull { evaluations ->
-        val graded = evaluations.filter { it.grade != null }
-        if (graded.isNotEmpty()) {
-            val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
-            val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
-            if (totalWeight > 0.0) weightedSum / totalWeight else null
-        } else null
-    }
-
-    val generalAverage = if (subjectAverages.isNotEmpty()) subjectAverages.average() else 0.0
+fun MainAverageDashboard(generalAverage: Double) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(
@@ -202,25 +191,20 @@ fun MainAverageDashboard(evaluationsBySubject: Map<String, List<Evaluation>>) {
 
 @Composable
 fun SubjectRevampCard(
-    subject: String,
-    evaluations: List<Evaluation>,
+    subjectGrade: SubjectGradeInfo,
     onUpdateGrade: (String, Double, Boolean) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
-    val graded = evaluations.filter { it.grade != null && it.isPresented }
-    val subjectAverage = if (graded.isNotEmpty()) {
-        val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
-        val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
-        if (totalWeight > 0.0) weightedSum / totalWeight else 0.0
-    } else 0.0
+    val subject = subjectGrade.subject
+    val evaluations = subjectGrade.evaluations
+    val subjectAverage = subjectGrade.average
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = !expanded },
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         border = BorderStroke(1.dp, if (expanded) Ruby.copy(alpha = 0.2f) else Color.Transparent)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -239,8 +223,8 @@ fun SubjectRevampCard(
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text(subject, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, maxLines = 1)
-                        Text("${evaluations.size} evaluaciones", fontSize = 12.sp, color = Color.Gray)
+                        Text(subject, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
+                        Text("${evaluations.size} evaluaciones", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 
@@ -280,25 +264,25 @@ fun EvaluationDetailRow(evaluation: Evaluation, onUpdateGrade: (String, Double, 
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(evaluation.title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(evaluation.title, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     if (evaluation.isPresented) Icons.Rounded.CheckCircle else Icons.Rounded.Pending,
                     null,
-                    tint = if (evaluation.isPresented) Aqua else Color.Gray,
+                    tint = if (evaluation.isPresented) Aqua else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(12.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = if (evaluation.isPresented) "Completada" else "Pendiente",
                     fontSize = 11.sp,
-                    color = if (evaluation.isPresented) Aqua else Color.Gray
+                    color = if (evaluation.isPresented) Aqua else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
         Surface(
-            color = if (evaluation.grade != null) Ruby.copy(alpha = 0.1f) else Color.LightGray.copy(alpha = 0.2f),
+            color = if (evaluation.grade != null) Ruby.copy(alpha = 0.1f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
             shape = RoundedCornerShape(12.dp)
         ) {
             val gradeStr = evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "—"
@@ -306,7 +290,7 @@ fun EvaluationDetailRow(evaluation: Evaluation, onUpdateGrade: (String, Double, 
                 text = gradeStr,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 fontWeight = FontWeight.Bold,
-                color = if (evaluation.grade != null) Ruby else Color.Gray
+                color = if (evaluation.grade != null) Ruby else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -329,11 +313,11 @@ fun GradeRevampDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(32.dp),
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         title = { Text("Registrar Resultado", fontWeight = FontWeight.Black, color = Ruby) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(evaluation.title, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Text(evaluation.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                 OutlinedTextField(
                     value = grade,
@@ -365,7 +349,7 @@ fun GradeRevampDialog(
                         onCheckedChange = { isPresented = it },
                         colors = CheckboxDefaults.colors(checkedColor = Aqua)
                     )
-                    Text("Marcar como presentada", fontWeight = FontWeight.Medium)
+                    Text("Marcar como presentada", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         },
@@ -400,12 +384,12 @@ fun EmptyGradesState() {
             .padding(vertical = 60.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(Icons.Rounded.Info, null, tint = Color.LightGray, modifier = Modifier.size(64.dp))
+        Icon(Icons.Rounded.Info, null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(64.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             "Aún no tienes evaluaciones\nregistradas.",
             textAlign = TextAlign.Center,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyLarge
         )
     }

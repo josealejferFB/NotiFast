@@ -97,6 +97,9 @@ class EvaluationRepositoryImpl @Inject constructor(
 
     override suspend fun deleteEvaluation(userId: String, evaluation: Evaluation): Result<Unit> {
         return try {
+            if (!evaluation.imageUrl.isNullOrEmpty()) {
+                try { imageRepository.deleteImage(evaluation.imageUrl) } catch(e: Exception) {}
+            }
             db.collection("users").document(userId)
                 .collection("evaluations").document(evaluation.id)
                 .delete().await()

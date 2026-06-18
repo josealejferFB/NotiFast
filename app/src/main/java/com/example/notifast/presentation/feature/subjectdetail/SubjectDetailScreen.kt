@@ -321,7 +321,7 @@ private fun SubjectDetailNoteDetail(
     Card(
         modifier = Modifier.fillMaxWidth().heightIn(max = 600.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
@@ -330,9 +330,9 @@ private fun SubjectDetailNoteDetail(
                     SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp), contentScale = ContentScale.Crop)
                     IconButton(
                         onClick = onClose,
-                        modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(32.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.9f))
+                        modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(32.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.DarkGray, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                     }
                 }
             } else {
@@ -351,13 +351,13 @@ private fun SubjectDetailNoteDetail(
                 Spacer(Modifier.height(4.dp))
                 Text(note.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(Modifier.height(16.dp))
-                Text(note.content, style = MaterialTheme.typography.bodyMedium, lineHeight = 24.sp, color = Color.DarkGray)
+                Text(note.content, style = MaterialTheme.typography.bodyMedium, lineHeight = 24.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(32.dp))
                 Button(
                     onClick = onClose,
                     modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray.copy(alpha = 0.2f), contentColor = Color.DarkGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f), contentColor = MaterialTheme.colorScheme.onSurface)
                 ) {
                     Text("Cerrar", fontWeight = FontWeight.Bold)
                 }
