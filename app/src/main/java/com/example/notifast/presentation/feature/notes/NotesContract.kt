@@ -42,4 +42,5 @@ sealed interface NotesEvent {
     data class UpdateNote(val note: Note, val title: String, val content: String) : NotesEvent
     data object ClearSyncMessage : NotesEvent
     data class ToggleSubject(val subjectName: String) : NotesEvent
+    data class DeleteSubject(val subjectName: String) : NotesEvent
 }
