@@ -147,6 +147,7 @@ class NotesViewModel @Inject constructor(
                 val current = _uiState.value.expandedSubject
                 _uiState.update { it.copy(expandedSubject = if (current == event.subjectName) null else event.subjectName) }
             }
+            is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
         }
     }
 
@@ -164,6 +165,17 @@ class NotesViewModel @Inject constructor(
             noteRepository.deleteNote(userId, note).fold(
                 onSuccess = { _uiState.update { it.copy(syncMessage = null) } },
                 onFailure = { _uiState.update { it.copy(syncMessage = "Error al eliminar") } }
+            )
+        }
+    }
+
+    private fun deleteSubject(subjectName: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            _uiState.update { it.copy(syncMessage = "Eliminando materia...") }
+            noteRepository.deleteSubject(userId, subjectName).fold(
+                onSuccess = { _uiState.update { it.copy(syncMessage = null) } },
+                onFailure = { _uiState.update { it.copy(syncMessage = "Error al eliminar materia") } }
             )
         }
     }
