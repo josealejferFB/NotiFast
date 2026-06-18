@@ -51,10 +51,10 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "noteIds" to evaluation.noteIds,
                 "imageUrl" to (imageUrl ?: ""),
                 "quickTips" to evaluation.quickTips,
-                "grade" to (evaluation.grade ?: 0.0),
                 "isPresented" to evaluation.isPresented,
                 "createdAt" to com.google.firebase.Timestamp.now()
             )
+            if (evaluation.grade != null) evalMap["grade"] = evaluation.grade
             if (evaluation.weight != null) evalMap["weight"] = evaluation.weight
             db.collection("users").document(userId)
                 .collection("evaluations").add(evalMap).await()
@@ -81,10 +81,10 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "subjectName" to evaluation.subjectName,
                 "date" to (evaluation.date ?: ""),
                 "quickTips" to evaluation.quickTips,
-                "grade" to (evaluation.grade ?: 0.0),
                 "isPresented" to evaluation.isPresented
             )
             if (imageUrl != null) updates["imageUrl"] = imageUrl
+            if (evaluation.grade != null) updates["grade"] = evaluation.grade
             if (evaluation.weight != null) updates["weight"] = evaluation.weight
             db.collection("users").document(userId)
                 .collection("evaluations").document(evaluation.id)

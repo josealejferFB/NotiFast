@@ -126,7 +126,7 @@ fun GradesScreen(
 @Composable
 fun MainAverageDashboard(evaluationsBySubject: Map<String, List<Evaluation>>) {
     val subjectAverages = evaluationsBySubject.values.mapNotNull { evaluations ->
-        val graded = evaluations.filter { it.grade != null && it.isPresented }
+        val graded = evaluations.filter { it.grade != null }
         if (graded.isNotEmpty()) {
             val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
             val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
@@ -324,6 +324,7 @@ fun GradeRevampDialog(
 ) {
     var grade by remember { mutableStateOf(evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "") }
     var isPresented by remember { mutableStateOf(evaluation.isPresented) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -337,14 +338,17 @@ fun GradeRevampDialog(
                 OutlinedTextField(
                     value = grade,
                     onValueChange = {
+                        grade = it
+                        error = null
                         val parsed = it.toDoubleOrNull()
-                        if (it.isEmpty() || (parsed != null && parsed in 0.0..10.0)) {
-                            grade = it
-                            if (it.isNotEmpty()) isPresented = true
+                        if (it.isNotEmpty() && parsed != null && parsed in 0.0..10.0) {
+                            isPresented = true
                         }
                     },
                     label = { Text("Nota (0-10)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    isError = error != null,
+                    supportingText = error?.let { { Text(it, color = Ruby) } },
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -368,8 +372,16 @@ fun GradeRevampDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onSave(evaluation.id, grade.toDoubleOrNull() ?: 0.0, isPresented)
-                    onDismiss()
+                    val g = grade.toDoubleOrNull()
+                    when {
+                        grade.isBlank() -> error = "Ingresa una nota"
+                        g == null -> error = "Nota inv\u00E1lida"
+                        g < 0.0 || g > 10.0 -> error = "La nota debe estar entre 0.0 y 10.0"
+                        else -> {
+                            onSave(evaluation.id, g, isPresented)
+                            onDismiss()
+                        }
+                    }
                 },
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Ruby)

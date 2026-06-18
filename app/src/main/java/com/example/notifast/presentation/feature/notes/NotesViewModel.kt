@@ -98,7 +98,7 @@ class NotesViewModel @Inject constructor(
         return subjects.map { subject ->
             val subjectNotes = notes.filter { it.subject == subject.name }
             val subjectEvals = evaluations.filter { it.subjectName == subject.name }
-            val graded = subjectEvals.filter { it.grade != null && it.isPresented }
+            val graded = subjectEvals.filter { it.grade != null }
             val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
             val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
             val avg = if (totalWeight > 0.0) weightedSum / totalWeight else null
