@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -99,6 +100,7 @@ fun NotesScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var expandedNote by remember { mutableStateOf<Note?>(null) }
+    var subjectToDelete by remember { mutableStateOf<String?>(null) }
     val isHeaderVisible = expandedNote == null
 
     BackHandler(enabled = !isHeaderVisible) { expandedNote = null }
@@ -291,7 +293,8 @@ fun NotesScreen(
                                             onToggle = { viewModel.onEvent(NotesEvent.ToggleSubject(info.name)) },
                                             onAddNote = { onAddNoteClick() },
                                             onAddEvaluation = { subject -> onAddEvaluationClick(subject) },
-                                            onNoteClick = { note -> expandedNote = note }
+                                            onNoteClick = { note -> expandedNote = note },
+                                            onDeleteSubject = { subjectToDelete = info.name }
                                         )
                                     }
                                 }
@@ -317,6 +320,26 @@ fun NotesScreen(
                     }
                 }
             }
+        }
+
+        subjectToDelete?.let { name ->
+            AlertDialog(
+                onDismissRequest = { subjectToDelete = null },
+                title = { Text("Eliminar materia") },
+                text = { Text("¿Estás seguro de eliminar $name? También se borrarán todos los apuntes asociados.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(NotesEvent.DeleteSubject(name))
+                            subjectToDelete = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Ruby)
+                    ) { Text("Eliminar", color = Color.White) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { subjectToDelete = null }) { Text("Cancelar") }
+                }
+            )
         }
     }
 }
