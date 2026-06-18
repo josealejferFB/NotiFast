@@ -8,7 +8,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,8 +68,6 @@ import com.example.notifast.presentation.feature.subjectdetail.components.Subjec
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -135,7 +132,7 @@ fun SubjectDetailScreen(
             ) { padding ->
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 140.dp)
+                    contentPadding = PaddingValues(bottom = 140.dp + padding.calculateBottomPadding())
                 ) {
                     item(key = "hero") {
                         SubjectDetailHero(
@@ -356,11 +353,11 @@ private fun SubjectDetailNoteDetail(
                 Spacer(Modifier.height(16.dp))
                 Text(note.content, style = MaterialTheme.typography.bodyMedium, lineHeight = 24.sp, color = Color.DarkGray)
                 Spacer(Modifier.height(32.dp))
-                androidx.compose.material3.Button(
+                Button(
                     onClick = onClose,
                     modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color.LightGray.copy(alpha = 0.2f), contentColor = Color.DarkGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray.copy(alpha = 0.2f), contentColor = Color.DarkGray)
                 ) {
                     Text("Cerrar", fontWeight = FontWeight.Bold)
                 }
