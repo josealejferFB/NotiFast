@@ -42,7 +42,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 val uploadResult = imageRepository.uploadNoteImage(userId, imageUri)
                 if (uploadResult.isSuccess) imageUrl = uploadResult.getOrNull()
             }
-            val evalMap = mapOf(
+            val evalMap = mutableMapOf<String, Any>(
                 "userId" to evaluation.userId,
                 "subjectName" to evaluation.subjectName,
                 "title" to evaluation.title,
@@ -52,10 +52,10 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "imageUrl" to (imageUrl ?: ""),
                 "quickTips" to evaluation.quickTips,
                 "grade" to (evaluation.grade ?: 0.0),
-                "weight" to (evaluation.weight ?: 0.0),
                 "isPresented" to evaluation.isPresented,
                 "createdAt" to com.google.firebase.Timestamp.now()
             )
+            if (evaluation.weight != null) evalMap["weight"] = evaluation.weight
             db.collection("users").document(userId)
                 .collection("evaluations").add(evalMap).await()
             Result.success(Unit)
@@ -82,10 +82,10 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "date" to (evaluation.date ?: ""),
                 "quickTips" to evaluation.quickTips,
                 "grade" to (evaluation.grade ?: 0.0),
-                "weight" to (evaluation.weight ?: 0.0),
                 "isPresented" to evaluation.isPresented
             )
             if (imageUrl != null) updates["imageUrl"] = imageUrl
+            if (evaluation.weight != null) updates["weight"] = evaluation.weight
             db.collection("users").document(userId)
                 .collection("evaluations").document(evaluation.id)
                 .update(updates).await()

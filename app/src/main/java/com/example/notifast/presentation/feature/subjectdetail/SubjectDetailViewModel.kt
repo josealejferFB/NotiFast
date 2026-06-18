@@ -43,8 +43,8 @@ class SubjectDetailViewModel @Inject constructor(
                 val subjectData = subjects.find { it.name == subjectName } ?: SubjectData(name = subjectName)
 
                 val graded = subjectEvals.filter { it.grade != null && it.isPresented }
-                val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (it.weight ?: 1.0) }
-                val totalWeight = graded.sumOf { it.weight ?: 1.0 }
+                val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
+                val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
                 val avg = if (totalWeight > 0.0) weightedSum / totalWeight else null
 
                 val upcoming = subjectEvals

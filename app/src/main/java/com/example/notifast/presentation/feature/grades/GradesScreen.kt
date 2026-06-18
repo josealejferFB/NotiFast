@@ -128,8 +128,8 @@ fun MainAverageDashboard(evaluationsBySubject: Map<String, List<Evaluation>>) {
     val subjectAverages = evaluationsBySubject.values.mapNotNull { evaluations ->
         val graded = evaluations.filter { it.grade != null && it.isPresented }
         if (graded.isNotEmpty()) {
-            val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (it.weight ?: 1.0) }
-            val totalWeight = graded.sumOf { it.weight ?: 1.0 }
+            val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
+            val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
             if (totalWeight > 0.0) weightedSum / totalWeight else null
         } else null
     }
@@ -210,8 +210,8 @@ fun SubjectRevampCard(
 
     val graded = evaluations.filter { it.grade != null && it.isPresented }
     val subjectAverage = if (graded.isNotEmpty()) {
-        val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (it.weight ?: 1.0) }
-        val totalWeight = graded.sumOf { it.weight ?: 1.0 }
+        val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
+        val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
         if (totalWeight > 0.0) weightedSum / totalWeight else 0.0
     } else 0.0
 
