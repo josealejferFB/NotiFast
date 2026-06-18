@@ -25,6 +25,7 @@ class AddSubjectViewModel @Inject constructor(
         when (event) {
             is AddSubjectEvent.NameChanged -> _uiState.update { it.copy(subjectName = event.name) }
             is AddSubjectEvent.IconSelected -> _uiState.update { it.copy(selectedIcon = event.icon) }
+            is AddSubjectEvent.ColorSelected -> _uiState.update { it.copy(selectedColor = event.colorHex) }
             is AddSubjectEvent.SaveClicked -> saveSubject()
         }
     }
@@ -42,7 +43,7 @@ class AddSubjectViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }
                 return@launch
             }
-            noteRepository.addSubject(userId, state.subjectName, state.selectedIcon).fold(
+            noteRepository.addSubject(userId, state.subjectName, state.selectedIcon, state.selectedColor).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true) } },
                 onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error") } }
             )

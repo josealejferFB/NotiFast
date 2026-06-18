@@ -34,6 +34,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,10 +57,25 @@ import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
 import java.util.Date
 
-private fun subjectColor(name: String): Color {
-    val hash = name.hashCode()
-    val hue = ((hash and 0xFF).toFloat() / 255f * 360f)
-    return Color.hsl(hue, 0.7f, 0.55f)
+private fun getSubjectColor(info: SubjectInfo): Color {
+    return try {
+        if (info.colorHex.isNotBlank()) Color(android.graphics.Color.parseColor(info.colorHex))
+        else {
+            val hash = info.name.hashCode()
+            val hue = ((hash and 0xFF).toFloat() / 255f * 360f)
+            Color.hsl(hue, 0.7f, 0.55f)
+        }
+    } catch (e: Exception) {
+        Aqua
+    }
+}
+
+private fun getInitials(name: String): String {
+    return name.trim().split(" ")
+        .mapNotNull { it.firstOrNull()?.toString() }
+        .take(2)
+        .joinToString("")
+        .uppercase()
 }
 
 private fun daysUntil(date: Date): Long {
@@ -76,22 +92,17 @@ private fun urgencyColor(days: Long): Color {
     }
 }
 
-// Converts a grade from 0–10 scale to a 0–5 star rating
-private fun starRating(avg: Double, maxStars: Int = 5): String {
-    val filled = (avg / 2.0).toInt().coerceIn(0, maxStars)
-    val empty = maxStars - filled
-    return "★".repeat(filled) + "☆".repeat(empty)
-}
-
 @Composable
 fun SubjectCard(
     info: SubjectInfo,
     isExpanded: Boolean,
     onToggle: () -> Unit,
     onAddNote: (String) -> Unit,
-    onAddEvaluation: (String) -> Unit
+    onAddEvaluation: (String) -> Unit,
+    onNoteClick: (Note) -> Unit
 ) {
-    val color = subjectColor(info.name)
+    val color = getSubjectColor(info)
+    val initials = getInitials(info.name)
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f),
@@ -100,41 +111,62 @@ fun SubjectCard(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         color = Color.White,
-        shadowElevation = 4.dp
+        shadowElevation = 2.dp,
+        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.2f))
     ) {
         Column {
             // Compact header (always visible)
             Row(
-                modifier = Modifier.fillMaxWidth().clickable { onToggle() }.padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onToggle() }
+                    .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Colored left bar logic incorporated into padding if desired, or here as a colored box
                 Box(
-                    modifier = Modifier.size(48.dp).clip(CircleShape).background(color),
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(color),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(info.icon, fontSize = 22.sp)
+                    Icon(
+                        imageVector = SubjectIconMapper.getIcon(info.icon),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(info.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(2.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("📝 ${info.notes.size}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                        Text(" · ", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                        Text("📅 ${info.evaluations.size}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                        if (info.pendingEvalCount > 0) {
-                            Text(" · ", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                            Text("⏳ ${info.pendingEvalCount}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                        }
-                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "${info.notes.size} apuntes · ${info.evaluations.size} evaluaciones" + if(info.pendingEvalCount > 0) " · ${info.pendingEvalCount} pdts" else "",
+                        style = MaterialTheme.typography.bodySmall, 
+                        color = Color.Gray
+                    )
                 }
                 if (info.averageGrade != null) {
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(starRating(info.averageGrade), color = Color(0xFFFFB300), fontSize = 14.sp)
-                        Text(String.format("%.1f", info.averageGrade), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = color)
+                        Surface(
+                            color = color.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = String.format("%.1f", info.averageGrade), 
+                                style = MaterialTheme.typography.titleMedium, 
+                                fontWeight = FontWeight.ExtraBold, 
+                                color = color,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
+                } else {
+                    Spacer(Modifier.width(8.dp))
                 }
                 Spacer(Modifier.width(8.dp))
                 Icon(
@@ -152,88 +184,74 @@ fun SubjectCard(
                 exit = shrinkVertically(animationSpec = spring(dampingRatio = 0.6f, stiffness = 280f)) + fadeOut(animationSpec = spring(dampingRatio = 0.6f, stiffness = 280f))
             ) {
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                    Spacer(Modifier.height(16.dp))
+
                     // Upcoming evaluations
                     if (info.upcomingEvaluations.isNotEmpty()) {
-                        Text("📅 Próximas evaluaciones", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                        Text("Próximas evaluaciones", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.Gray)
                         Spacer(Modifier.height(8.dp))
                         info.upcomingEvaluations.forEach { eval ->
                             val days = eval.date?.let { daysUntil(it) } ?: 999
                             UrgencyCard(eval = eval, days = days, color = color)
-                            Spacer(Modifier.height(6.dp))
+                            Spacer(Modifier.height(8.dp))
                         }
+                        Spacer(Modifier.height(8.dp))
                     }
-
-                    Spacer(Modifier.height(12.dp))
-                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-                    Spacer(Modifier.height(12.dp))
 
                     // Dashboard: average + stats
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Circular score
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Estadísticas", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.Gray)
+                            Spacer(Modifier.height(8.dp))
+                            Text("${info.evaluations.size} totales", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Text("${info.completedEvalCount} completadas", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Text("${info.pendingEvalCount} pendientes", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                        }
                         Box(
-                            modifier = Modifier.size(72.dp).clip(CircleShape).background(color.copy(alpha = 0.1f)),
+                            modifier = Modifier.size(64.dp).clip(CircleShape).background(color.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = info.averageGrade?.let { String.format("%.1f", it) } ?: "—",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = color
-                            )
-                        }
-                        Spacer(Modifier.width(16.dp))
-                        Column {
-                            Text("Promedio", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                            Text("📝 ${info.evaluations.size} evaluaciones", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                            Text("✅ ${info.completedEvalCount} completadas", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                            Text("⏳ ${info.pendingEvalCount} pendientes", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = info.averageGrade?.let { String.format("%.1f", it) } ?: "—",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = color
+                                )
+                                Text("Promedio", style = MaterialTheme.typography.labelSmall, color = color.copy(alpha = 0.8f))
+                            }
                         }
                     }
 
                     Spacer(Modifier.height(16.dp))
-                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-                    Spacer(Modifier.height(12.dp))
 
                     // Recent notes mini cards
                     if (info.notes.isNotEmpty()) {
-                        Text("📝 Últimos apuntes", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                        Text("Últimos apuntes", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.Gray)
                         Spacer(Modifier.height(8.dp))
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(info.notes.take(3)) { note ->
-                                MiniNoteCard(note = note, color = color)
-                            }
-                            if (info.notes.size > 3) {
-                                item {
-                                    Surface(
-                                        modifier = Modifier.size(width = 100.dp, height = 80.dp),
-                                        shape = RoundedCornerShape(12.dp),
-                                        color = color.copy(alpha = 0.05f),
-                                        border = BorderStroke(1.dp, color.copy(alpha = 0.2f))
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Text("+${info.notes.size - 3}", fontWeight = FontWeight.Bold, color = color)
-                                        }
-                                    }
-                                }
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            info.notes.take(3).forEach { note ->
+                                MiniNoteCard(note = note, color = color, onClick = { onNoteClick(note) })
                             }
                         }
+                        Spacer(Modifier.height(16.dp))
                     }
-
-                    Spacer(Modifier.height(16.dp))
 
                     // Quick actions
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Button(
+                        OutlinedButton(
                             onClick = { onAddNote(info.name) },
                             modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Ruby)
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, color),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(6.dp))
@@ -242,8 +260,8 @@ fun SubjectCard(
                         Button(
                             onClick = { onAddEvaluation(info.name) },
                             modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Aqua)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = color)
                         ) {
                             Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(6.dp))
@@ -260,63 +278,90 @@ fun SubjectCard(
 private fun UrgencyCard(eval: Evaluation, days: Long, color: Color) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(10.dp),
         color = Color.White,
-        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.2f))
+        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val chipColor = urgencyColor(days)
+            Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(chipColor))
+            Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(eval.title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                Text(eval.title, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(Modifier.height(2.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val weight = eval.weight ?: 0.0
                     if (weight > 0.0) {
-                        Text("🏷️ ${(weight * 100).toInt()}%", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                        Text(" · ", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                        Text("${(weight * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text(" · ", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                     }
-                    Text("📆 ${eval.date?.let { formatDate(it) } ?: "Sin fecha"}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    Text(eval.date?.let { formatDate(it) } ?: "Sin fecha", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                 }
             }
-            val chipColor = urgencyColor(days)
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = chipColor.copy(alpha = 0.15f)
-            ) {
-                Text(
-                    text = when {
-                        days < 0 -> "Vencida"
-                        days == 0L -> "Hoy"
-                        days == 1L -> "Mañana"
-                        else -> "en ${days}días"
-                    },
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = chipColor
-                )
-            }
+            Text(
+                text = when {
+                    days < 0 -> "Vencida"
+                    days == 0L -> "Hoy"
+                    days == 1L -> "Mañana"
+                    else -> "${days}d"
+                },
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = chipColor
+            )
         }
     }
 }
 
 @Composable
-private fun MiniNoteCard(note: Note, color: Color) {
+private fun MiniNoteCard(note: Note, color: Color, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier.size(width = 100.dp, height = 80.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, color.copy(alpha = 0.3f))
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(8.dp),
+        color = color.copy(alpha = 0.15f)
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(color)
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = note.title,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             if (note.imageUrl != null) {
-                Box(modifier = Modifier.fillMaxWidth().height(32.dp).clip(RoundedCornerShape(6.dp)).background(color.copy(alpha = 0.1f)), contentAlignment = Alignment.Center) {
-                    SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.White.copy(alpha = 0.4f))
+                ) {
+                    SubcomposeAsyncImage(
+                        model = note.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
                 }
-                Spacer(Modifier.height(4.dp))
             }
-            Text(note.title, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }

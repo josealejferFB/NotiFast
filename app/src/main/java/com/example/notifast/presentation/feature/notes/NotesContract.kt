@@ -8,6 +8,7 @@ enum class NoteFilter { RECIENTES, ANTIGUAS, POR_MATERIA }
 data class SubjectInfo(
     val name: String,
     val icon: String,
+    val colorHex: String,
     val notes: List<Note>,
     val evaluations: List<Evaluation>,
     val averageGrade: Double?,

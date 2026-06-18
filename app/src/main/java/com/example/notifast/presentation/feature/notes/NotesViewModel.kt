@@ -110,6 +110,7 @@ class NotesViewModel @Inject constructor(
             SubjectInfo(
                 name = subject.name,
                 icon = subject.icon,
+                colorHex = subject.colorHex,
                 notes = subjectNotes,
                 evaluations = subjectEvals,
                 averageGrade = avg?.let { kotlin.math.round(it * 10) / 10.0 },

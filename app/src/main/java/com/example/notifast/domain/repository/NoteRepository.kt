@@ -18,9 +18,11 @@ interface NoteRepository {
     suspend fun addSubject(
         userId: String,
         subjectName: String,
-        icon: String = "📚"
+        icon: String = "📚",
+        colorHex: String = ""
     ): Result<Unit>
     suspend fun deleteNote(userId: String, note: Note): Result<Unit>
     suspend fun updateNote(userId: String, note: Note, imageUri: Uri?): Result<Unit>
     suspend fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>>
+    suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit>
 }

@@ -59,7 +59,8 @@ class NoteRepositoryImpl @Inject constructor(
                 snapshot.documents.map { doc ->
                     SubjectData(
                         name = doc.getString("name") ?: doc.id,
-                        icon = doc.getString("icon") ?: "📚"
+                        icon = doc.getString("icon") ?: "📚",
+                        colorHex = doc.getString("colorHex") ?: ""
                     )
                 }
             }
@@ -95,11 +96,17 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addSubject(userId: String, subjectName: String, icon: String): Result<Unit> {
+    override suspend fun addSubject(userId: String, subjectName: String, icon: String, colorHex: String): Result<Unit> {
         return try {
+            val data = mutableMapOf<String, Any>(
+                "name" to subjectName,
+                "icon" to icon,
+                "createdAt" to com.google.firebase.Timestamp.now()
+            )
+            if (colorHex.isNotBlank()) data["colorHex"] = colorHex
             db.collection("users").document(userId)
                 .collection("subjects").document(subjectName)
-                .set(mapOf("name" to subjectName, "icon" to icon, "createdAt" to com.google.firebase.Timestamp.now()))
+                .set(data)
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -160,5 +167,29 @@ class NoteRepositoryImpl @Inject constructor(
                 }
             }
             .catch { emit(emptyList()) }
+    }
+
+    override suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit> {
+        return try {
+            val notesSnapshot = db.collection("users").document(userId)
+                .collection("subjects").document(subjectName)
+                .collection("notes")
+                .get()
+                .await()
+            for (doc in notesSnapshot.documents) {
+                val imageUrl = doc.getString("imageUrl")
+                if (!imageUrl.isNullOrEmpty()) {
+                    try { imageRepository.deleteImage(imageUrl) } catch(e: Exception) {}
+                }
+                doc.reference.delete().await()
+            }
+            db.collection("users").document(userId)
+                .collection("subjects").document(subjectName)
+                .delete()
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
