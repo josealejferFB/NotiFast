@@ -126,9 +126,11 @@ fun GradesScreen(
 @Composable
 fun MainAverageDashboard(evaluationsBySubject: Map<String, List<Evaluation>>) {
     val subjectAverages = evaluationsBySubject.values.mapNotNull { evaluations ->
-        val graded = evaluations.filter { it.grade != null }
+        val graded = evaluations.filter { it.grade != null && it.isPresented }
         if (graded.isNotEmpty()) {
-            graded.map { it.grade!! }.average()
+            val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (it.weight ?: 1.0) }
+            val totalWeight = graded.sumOf { it.weight ?: 1.0 }
+            if (totalWeight > 0.0) weightedSum / totalWeight else null
         } else null
     }
 
@@ -206,8 +208,12 @@ fun SubjectRevampCard(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val graded = evaluations.filter { it.grade != null }
-    val subjectAverage = if (graded.isNotEmpty()) graded.map { it.grade!! }.average() else 0.0
+    val graded = evaluations.filter { it.grade != null && it.isPresented }
+    val subjectAverage = if (graded.isNotEmpty()) {
+        val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (it.weight ?: 1.0) }
+        val totalWeight = graded.sumOf { it.weight ?: 1.0 }
+        if (totalWeight > 0.0) weightedSum / totalWeight else 0.0
+    } else 0.0
 
     Card(
         modifier = Modifier
@@ -337,7 +343,7 @@ fun GradeRevampDialog(
                             if (it.isNotEmpty()) isPresented = true
                         }
                     },
-                    label = { Text("Nota (1-10)") },
+                    label = { Text("Nota (0-10)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
