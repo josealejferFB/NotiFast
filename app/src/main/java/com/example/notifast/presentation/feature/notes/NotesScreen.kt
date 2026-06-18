@@ -94,6 +94,7 @@ fun NotesScreen(
     onAddSubjectClick: () -> Unit,
     onSubjectClick: (String) -> Unit,
     onAddEvaluationClick: (String) -> Unit,
+    onSubjectDetailClick: (String) -> Unit = {},
     onEditProfile: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -294,7 +295,8 @@ fun NotesScreen(
                                             onAddNote = { onAddNoteClick() },
                                             onAddEvaluation = { subject -> onAddEvaluationClick(subject) },
                                             onNoteClick = { note -> expandedNote = note },
-                                            onDeleteSubject = { subjectToDelete = info.name }
+                                            onDeleteSubject = { subjectToDelete = info.name },
+                                            onSubjectDetail = { onSubjectDetailClick(info.name) }
                                         )
                                     }
                                 }

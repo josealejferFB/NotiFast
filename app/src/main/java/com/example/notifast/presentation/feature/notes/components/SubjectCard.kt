@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -109,7 +110,8 @@ fun SubjectCard(
     onAddNote: (String) -> Unit,
     onAddEvaluation: (String) -> Unit,
     onNoteClick: (Note) -> Unit,
-    onDeleteSubject: () -> Unit
+    onDeleteSubject: () -> Unit,
+    onSubjectDetail: () -> Unit = {}
 ) {
     val color = getSubjectColor(info)
     val initials = getInitials(info.name)
@@ -297,6 +299,18 @@ fun SubjectCard(
                             Spacer(Modifier.width(6.dp))
                             Text("Evaluación", fontWeight = FontWeight.Bold)
                         }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onSubjectDetail,
+                        modifier = Modifier.fillMaxWidth().height(44.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, color),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Más detalles", fontWeight = FontWeight.Bold)
                     }
                 }
             }

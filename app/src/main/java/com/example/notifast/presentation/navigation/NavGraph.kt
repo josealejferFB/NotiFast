@@ -110,6 +110,7 @@ fun MainContent() {
                     onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
                     onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
                     onAddEvaluationClick = { subject -> navController.navigate(Screen.AddEvaluation.createRoute(subject)) },
+                    onSubjectDetailClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
