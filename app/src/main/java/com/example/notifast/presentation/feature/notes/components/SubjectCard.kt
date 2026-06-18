@@ -9,7 +9,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,9 +29,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +43,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -92,6 +98,7 @@ private fun urgencyColor(days: Long): Color {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SubjectCard(
     info: SubjectInfo,
@@ -99,10 +106,12 @@ fun SubjectCard(
     onToggle: () -> Unit,
     onAddNote: (String) -> Unit,
     onAddEvaluation: (String) -> Unit,
-    onNoteClick: (Note) -> Unit
+    onNoteClick: (Note) -> Unit,
+    onDeleteSubject: () -> Unit
 ) {
     val color = getSubjectColor(info)
     val initials = getInitials(info.name)
+    var showMenu by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f),
@@ -121,7 +130,10 @@ fun SubjectCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onToggle() }
+                    .combinedClickable(
+                        onClick = { onToggle() },
+                        onLongClick = { showMenu = true }
+                    )
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -174,6 +186,22 @@ fun SubjectCard(
                     contentDescription = null,
                     modifier = Modifier.size(24.dp).graphicsLayer { rotationZ = rotation },
                     tint = Color.Gray
+                )
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Eliminar materia", color = Color(0xFFE53935)) },
+                    onClick = {
+                        showMenu = false
+                        onDeleteSubject()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFE53935))
+                    }
                 )
             }
 
