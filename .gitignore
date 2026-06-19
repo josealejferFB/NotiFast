@@ -16,3 +16,4 @@ local.properties
 
 # Firebase credentials
 app/google-services.json
+.worktrees/
