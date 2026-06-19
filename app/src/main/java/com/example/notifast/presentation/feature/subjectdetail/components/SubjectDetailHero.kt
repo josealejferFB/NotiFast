@@ -1,13 +1,9 @@
 package com.example.notifast.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,14 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.notifast.presentation.feature.notes.components.SubjectIconMapper
-import com.example.notifast.presentation.theme.color.Aqua
-
-private fun parseSubjectColor(hex: String): Color {
-    return try {
-        if (hex.isNotBlank()) Color(android.graphics.Color.parseColor(hex))
-        else Aqua
-    } catch (e: Exception) { Aqua }
-}
+import com.example.notifast.presentation.theme.ThemeUtils
 
 @Composable
 fun SubjectDetailHero(
@@ -39,37 +28,47 @@ fun SubjectDetailHero(
     evalCount: Int,
     onBackClick: () -> Unit
 ) {
-    val color = parseSubjectColor(subjectColorHex)
+    val isDark = isSystemInDarkTheme()
+    val color = ThemeUtils.getAccessibleColor(subjectColorHex, isDark)
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(260.dp)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        color,
-                        color.copy(alpha = 0.7f),
-                        color.copy(alpha = 0.2f),
-                        color.copy(alpha = 0.2f),
-                        MaterialTheme.colorScheme.background
+            .background(Color.Transparent)
+    ) {
+        // Radial Glow
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .align(Alignment.TopCenter)
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(color.copy(alpha = 0.2f), Color.Transparent),
+                        radius = 400f
                     )
                 )
-            )
-    ) {
+        )
+
         Column(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Glassmorphism Icon Container
             Box(
-                modifier = Modifier.size(80.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface),
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = 0.1f))
+                    .border(1.dp, color.copy(alpha = 0.2f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = SubjectIconMapper.getIcon(subjectIcon),
                     contentDescription = null,
                     tint = color,
-                    modifier = Modifier.size(44.dp)
+                    modifier = Modifier.size(40.dp)
                 )
             }
             Spacer(Modifier.height(12.dp))

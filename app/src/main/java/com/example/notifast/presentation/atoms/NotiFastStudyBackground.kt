@@ -54,8 +54,8 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
         Icons.Default.AutoGraph
     )
 
-    val bgColor1 = if (isDark) Color(0xFF132B2B) else Color.White
-    val bgColor2 = if (isDark) Color(0xFF1C3D3D) else Color(0xFFF8F9FA)
+    val bgColor1 = if (isDark) Color(0xFF1B262C) else Color.White
+    val bgColor2 = if (isDark) Color(0xFF223038) else Color(0xFFF8F9FA)
     val iconAlpha = if (isDark) 0.08f else 0.04f
 
     Box(modifier = modifier.fillMaxSize().background(
