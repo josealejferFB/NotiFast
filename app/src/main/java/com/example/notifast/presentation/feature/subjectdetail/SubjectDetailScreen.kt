@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -30,6 +32,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -83,6 +87,7 @@ fun SubjectDetailScreen(
     viewModel: SubjectDetailViewModel = hiltViewModel(),
     onAddNoteClick: (String) -> Unit = {},
     onAddEvaluationClick: (String) -> Unit = {},
+    onAddScheduleClick: (String) -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -110,22 +115,66 @@ fun SubjectDetailScreen(
                     }
                 },
                 floatingActionButton = {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        FloatingActionButton(
-                            onClick = { onAddNoteClick(uiState.subjectName) },
-                            containerColor = Ruby,
-                            contentColor = Color.White,
-                            shape = RoundedCornerShape(16.dp)
+                    var isSpeedDialOpen by remember { mutableStateOf(false) }
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        AnimatedVisibility(
+                            visible = isSpeedDialOpen,
+                            enter = fadeIn() + scaleIn(initialScale = 0.8f),
+                            exit = fadeOut() + scaleOut(targetScale = 0.8f)
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Agregar apunte", modifier = Modifier.size(24.dp))
+                            Column(
+                                horizontalAlignment = Alignment.End,
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 2.dp) {
+                                        Text("Nuevo Horario", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium)
+                                    }
+                                    Spacer(Modifier.width(12.dp))
+                                    FloatingActionButton(
+                                        onClick = { isSpeedDialOpen = false; onAddScheduleClick(uiState.subjectName) },
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.size(48.dp)
+                                    ) { Icon(Icons.Default.Schedule, contentDescription = null, tint = Aqua) }
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 2.dp) {
+                                        Text("Nueva Evaluación", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium)
+                                    }
+                                    Spacer(Modifier.width(12.dp))
+                                    FloatingActionButton(
+                                        onClick = { isSpeedDialOpen = false; onAddEvaluationClick(uiState.subjectName) },
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.size(48.dp)
+                                    ) { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Aqua) }
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 2.dp) {
+                                        Text("Nuevo Apunte", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium)
+                                    }
+                                    Spacer(Modifier.width(12.dp))
+                                    FloatingActionButton(
+                                        onClick = { isSpeedDialOpen = false; onAddNoteClick(uiState.subjectName) },
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.size(48.dp)
+                                    ) { Icon(Icons.Default.Edit, contentDescription = null, tint = Aqua) }
+                                }
+                            }
                         }
                         FloatingActionButton(
-                            onClick = { onAddEvaluationClick(uiState.subjectName) },
-                            containerColor = Aqua,
+                            onClick = { isSpeedDialOpen = !isSpeedDialOpen },
+                            containerColor = Ruby,
                             contentColor = Color.White,
-                            shape = RoundedCornerShape(16.dp)
+                            shape = CircleShape
                         ) {
-                            Icon(Icons.Default.CalendarMonth, contentDescription = "Agregar evaluación", modifier = Modifier.size(24.dp))
+                            Icon(
+                                if (isSpeedDialOpen) Icons.Default.Close else Icons.Default.Add,
+                                contentDescription = "Opciones",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     }
                 }
