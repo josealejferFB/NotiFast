@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Grade
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -16,7 +16,7 @@ sealed class Screen(
 ) {
     data object Login : Screen("login")
 
-    data object Notes : Screen("notes", "Apuntes", Icons.Default.MenuBook)
+    data object Notes : Screen("notes", "Apuntes", Icons.AutoMirrored.Filled.MenuBook)
     data object AddNote : Screen("add_note?subject={subject}") {
         fun createRoute(subject: String? = null) =
             if (subject != null) "add_note?subject=${Uri.encode(subject)}" else "add_note"

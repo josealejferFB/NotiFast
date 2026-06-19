@@ -306,7 +306,7 @@ fun DetailRow(icon: ImageVector, label: String, content: String, color: Color = 
 fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, evaluations: List<Evaluation>) {
     val daysInMonth = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
     val firstDayOfWeek = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK) - 1
-    val days = (1..daysInMonth).toList(); val paddingDays = (0 until firstDayOfWeek).toList()
+    val days = (1..daysInMonth).toList(); val paddingDays = (0 until firstDayOfWeek).map { "" }
     Column {
         Row(Modifier.fillMaxWidth()) {
             listOf("D", "L", "M", "X", "J", "V", "S").forEach { day ->
