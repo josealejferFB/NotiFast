@@ -13,7 +13,7 @@ val SurfaceLight = Color(0xFFFAFAFA)
 val OnSurfaceLight = Color(0xFF1C1B1F)
 
 // Dark
-val RubyDark = Color(0xFFFF6B7A)
-val AquaDark = Color(0xFF6DD3D3)
-val SurfaceDark = Color(0xFF1C1B1F)
+val RubyDark = Color(0xFFCC5A68) // Muted Ruby
+val AquaDark = Color(0xFF4A9696) // Muted Aqua
+val SurfaceDark = Color(0xFF1B262C) // Slate
 val OnSurfaceDark = Color(0xFFE6E1E5)
