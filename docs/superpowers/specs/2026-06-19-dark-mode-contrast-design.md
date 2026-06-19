@@ -1,28 +1,30 @@
-# Dark Mode Contrast Re-design
+# Educational Hub & Contrast Design
 
 ## Goal
-Improve the user experience in Dark Mode by resolving the high-contrast issue between very dark backgrounds and highly saturated card colors. This issue currently causes visual fatigue on screens like the main hub, subjects list, and creation forms.
+Improve the user experience across both Dark and Light modes by ensuring optimal color contrast, and elevate the overall UI to feel like a modern "Educational Hub" rather than a generic notes app.
 
-## Architectural & Visual Approach
-We will use a combined approach of **Softening the Background (Elevated Dark)** and **Desaturating the Cards (Muted Accents)**:
+## 1. Intelligent Contrast (Color Accessibility)
+- Introduce a utility (`ThemeUtils.getAccessibleColor`) that dynamically adjusts the user's custom `subjectColorHex`:
+  - **Dark Mode:** Desaturate and slightly darken overly bright colors (e.g. Neon Yellow -> Olive).
+  - **Light Mode:** Darken overly pale colors so they don't blend into the white background.
+- Soften the extreme blacks of the Dark Mode background (`#132B2B` -> slate/blue-gray) to reduce eye strain.
 
-1. **Background Elevation:**
-   - Change the dark mode surface and background colors from near-black/dark green (`#1C1B1F`, `#132B2B`) to a softer slate/blue-gray tone.
-   - Proposed Base Dark Background: `linear-gradient(#1B262C, #223038)` or solid `#1B262C` for standard surfaces.
+## 2. Hero Redesign (Subject Detail)
+- **Current:** Harsh linear gradient that clashes with bright custom colors.
+- **New (Glassmorphism):** Remove the linear gradient. Use a solid slate background with a subtle radial "glow" behind the icon. The subject icon will be housed inside a frosted glass (Glassmorphism) circle.
 
-2. **Card Accent Desaturation:**
-   - The primary corporate colors (`Ruby` and `Aqua`) are too bright for large solid blocks in dark mode.
-   - We will introduce muted/pastel variants specifically for dark mode cards.
-   - `RubyDark` changes from `#FF6B7A` to a muted version like `#CC5A68`.
-   - `AquaDark` changes from `#6DD3D3` to a muted version like `#4A9696`.
+## 3. Section Hierarchy (Pills)
+- Replace plain text headers ("Apuntes", "Calendario") with pill-shaped badges (rounded corners, 10% opacity background of the subject color, accompanied by an emoji/icon).
 
-3. **Subtle Elevation / Shadows:**
-   - Instead of relying entirely on extreme color contrast for separation, cards will use a subtle drop shadow or lighter border to stand out against the softened background.
+## 4. Calendar Cards (Physical Aesthetic)
+- Retain the square/rigid look of a physical wall calendar for the `SubjectDetailCalendarCard.kt` (8dp or 12dp radius, high contrast header for the month, large bold day number).
+
+## 5. Unified Speed Dial FAB
+- Replace the two stacked Floating Action Buttons ("Add Note", "Add Evaluation") with a single primary FAB that expands into a Speed Dial menu, decluttering the screen.
 
 ## Affected Components
-- `Color.kt`: Update `RubyDark`, `AquaDark`, `SurfaceDark`, and `OnSurfaceDark` values.
-- `NotiFastBackground.kt` & `NotiFastStudyBackground.kt`: Adjust gradient stops and particle base colors for dark mode to match the new softer palette.
-- `NoteEstheticCard.kt` / `NotiFastCard.kt`: Ensure they properly utilize the new theme colors and have the correct elevation/shadows applied.
-
-## Rollout Strategy
-The changes are isolated to the presentation layer (theme definitions and atomic background components). All feature screens utilizing `MaterialTheme.colorScheme` and the atomic backgrounds will automatically inherit the improvements without requiring manual updates in each screen file.
+- `presentation/theme/color/Color.kt`
+- `presentation/atoms/NotiFastStudyBackground.kt`
+- `presentation/feature/subjectdetail/components/SubjectDetailHero.kt`
+- `presentation/feature/subjectdetail/components/SubjectDetailCalendarCard.kt`
+- `presentation/feature/subjectdetail/SubjectDetailScreen.kt` (FAB and Section Headers)
