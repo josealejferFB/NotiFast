@@ -129,7 +129,7 @@ private fun StatCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth().padding(start = 4.dp)) {
-            Box(modifier = Modifier.fillMaxWidth().height(4.dp).width(0.dp).background(accentColor))
+            Box(modifier = Modifier.fillMaxWidth().height(4.dp).background(accentColor))
             Box(modifier = Modifier.padding(16.dp)) { content() }
         }
     }

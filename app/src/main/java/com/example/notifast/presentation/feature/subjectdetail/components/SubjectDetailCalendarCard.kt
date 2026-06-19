@@ -67,7 +67,18 @@ fun SubjectDetailCalendarRow(
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
         HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         Spacer(Modifier.height(16.dp))
-        Text("Calendario", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+        androidx.compose.material3.Surface(
+            shape = androidx.compose.foundation.shape.CircleShape,
+            color = color.copy(alpha = 0.15f)
+        ) {
+            Text(
+                text = "Calendario",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = color,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
         Spacer(Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(evaluations.take(6)) { eval ->
@@ -97,10 +108,10 @@ private fun CalendarSquare(
     weight: Double?
 ) {
     Card(
-        modifier = Modifier.size(width = 120.dp, height = 175.dp),
-        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.size(120.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(

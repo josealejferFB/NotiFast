@@ -53,7 +53,18 @@ fun SubjectDetailProgress(
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
         HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
         Spacer(Modifier.height(16.dp))
-        Text("Progreso general", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+        androidx.compose.material3.Surface(
+            shape = androidx.compose.foundation.shape.CircleShape,
+            color = color.copy(alpha = 0.15f)
+        ) {
+            Text(
+                text = "Progreso general",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = color,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
         Spacer(Modifier.height(16.dp))
         Box(
             modifier = Modifier.fillMaxWidth().height(20.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
