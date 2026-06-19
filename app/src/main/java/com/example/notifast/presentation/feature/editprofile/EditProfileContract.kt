@@ -5,6 +5,7 @@ import com.example.notifast.data.model.User
 data class EditProfileUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
+    val isSaved: Boolean = false,
     val userProfile: User? = null,
     val firstName: String = "",
     val lastName: String = ""

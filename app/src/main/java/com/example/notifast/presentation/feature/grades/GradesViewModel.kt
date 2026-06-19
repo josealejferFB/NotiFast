@@ -62,15 +62,18 @@ class GradesViewModel @Inject constructor(
         when (event) {
             is GradesEvent.LoadData -> loadData()
             is GradesEvent.UpdateGrade -> updateGrade(event.evaluationId, event.grade, event.isPresented)
+            is GradesEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
-    private fun updateGrade(evaluationId: String, grade: Double, isPresented: Boolean) {
+    private fun updateGrade(evaluationId: String, grade: Double?, isPresented: Boolean) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val current = _uiState.value.evaluationsBySubject.values.flatten().find { it.id == evaluationId } ?: return@launch
             val updated = current.copy(grade = grade, isPresented = isPresented)
-            evaluationRepository.updateEvaluation(userId, updated, null)
+            evaluationRepository.updateEvaluation(userId, updated, null).onFailure { e ->
+                _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") }
+            }
         }
     }
 }

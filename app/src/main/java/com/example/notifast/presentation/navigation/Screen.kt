@@ -44,6 +44,9 @@ sealed class Screen(
     }
 
     data object AddSchedule : Screen("add_schedule")
+    data object EditSchedule : Screen("edit_schedule/{scheduleId}") {
+        fun createRoute(scheduleId: String) = "edit_schedule/${Uri.encode(scheduleId)}"
+    }
 
     data object EditProfile : Screen("edit_profile")
 

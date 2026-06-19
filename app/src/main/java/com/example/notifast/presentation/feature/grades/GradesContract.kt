@@ -14,10 +14,12 @@ data class GradesUiState(
     val evaluationsBySubject: Map<String, List<Evaluation>> = emptyMap(),
     val subjects: List<SubjectData> = emptyList(),
     val globalAverage: Double = 0.0,
-    val subjectGrades: List<SubjectGradeInfo> = emptyList()
+    val subjectGrades: List<SubjectGradeInfo> = emptyList(),
+    val error: String? = null
 )
 
 sealed interface GradesEvent {
     data object LoadData : GradesEvent
-    data class UpdateGrade(val evaluationId: String, val grade: Double, val isPresented: Boolean) : GradesEvent
+    data class UpdateGrade(val evaluationId: String, val grade: Double?, val isPresented: Boolean) : GradesEvent
+    data object ClearError : GradesEvent
 }

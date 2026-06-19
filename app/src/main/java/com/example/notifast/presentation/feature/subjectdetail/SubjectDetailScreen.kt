@@ -8,6 +8,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,6 +72,7 @@ import com.example.notifast.presentation.feature.subjectdetail.components.Subjec
 import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailTimeline
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
+import com.example.notifast.domain.util.GradeConstants
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -274,8 +276,8 @@ fun SubjectDetailScreen(
         gradeDialogEval?.let { eval ->
             GradeDialog(
                 evaluation = eval,
-                onSave = { grade ->
-                    viewModel.onEvent(SubjectDetailEvent.SaveGrade(eval.id, grade, isPresented = true))
+                onSave = { grade, isPresented ->
+                    viewModel.onEvent(SubjectDetailEvent.SaveGrade(eval.id, grade, isPresented = isPresented))
                     gradeDialogEval = null
                 },
                 onDismiss = { gradeDialogEval = null }
@@ -308,15 +310,16 @@ fun SubjectDetailScreen(
 @Composable
 private fun GradeDialog(
     evaluation: Evaluation,
-    onSave: (Double) -> Unit,
+    onSave: (Double?, Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var gradeText by remember { mutableStateOf("") }
+    var gradeText by remember { mutableStateOf(evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "") }
+    var isPresented by remember { mutableStateOf(evaluation.isPresented) }
     var error by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Calificar evaluaci\u00F3n") },
+        title = { Text("Calificar evaluación") },
         text = {
             Column {
                 Text(evaluation.title, fontWeight = FontWeight.Bold)
@@ -326,25 +329,46 @@ private fun GradeDialog(
                     onValueChange = {
                         gradeText = it
                         error = null
+                        val parsed = it.toDoubleOrNull()
+                        if (it.isNotEmpty() && parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE) {
+                            isPresented = true
+                        }
                     },
-                    label = { Text("Nota (0.0 - 10.0)") },
+                    label = { Text("Nota (${GradeConstants.MIN_GRADE} - ${GradeConstants.MAX_GRADE})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = error != null,
                     supportingText = error?.let { { Text(it, color = Ruby) } },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { isPresented = !isPresented }
+                        .padding(vertical = 8.dp)
+                ) {
+                    androidx.compose.material3.Checkbox(
+                        checked = isPresented,
+                        onCheckedChange = { isPresented = it },
+                        colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = Aqua)
+                    )
+                    Text("Marcar como presentada", fontWeight = FontWeight.Medium)
+                }
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    val grade = gradeText.toDoubleOrNull()
-                    when {
-                        gradeText.isBlank() -> error = "Ingresa una nota"
-                        grade == null -> error = "Nota inv\u00E1lida"
-                        grade < 0.0 || grade > 10.0 -> error = "La nota debe estar entre 0.0 y 10.0"
-                        else -> onSave(grade)
+                    if (gradeText.isBlank()) {
+                        onSave(null, false)
+                    } else {
+                        val grade = gradeText.toDoubleOrNull()
+                        when {
+                            grade == null -> error = "Nota inválida"
+                            grade < GradeConstants.MIN_GRADE || grade > GradeConstants.MAX_GRADE -> error = "La nota debe estar entre ${GradeConstants.MIN_GRADE} y ${GradeConstants.MAX_GRADE}"
+                            else -> onSave(grade, isPresented)
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Ruby)

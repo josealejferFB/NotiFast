@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,9 +26,6 @@ class AddEvaluationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddEvaluationUiState())
     val uiState: StateFlow<AddEvaluationUiState> = _uiState.asStateFlow()
 
-    private val _saved = MutableStateFlow(false)
-    val saved: StateFlow<Boolean> = _saved.asStateFlow()
-
     init { loadSubjects() }
 
     fun setInitialSubject(subject: String) {
@@ -38,9 +36,8 @@ class AddEvaluationViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            noteRepository.getSubjects(userId).collect { subjects ->
-                _uiState.update { it.copy(subjects = subjects, isLoading = false) }
-            }
+            val subjects = noteRepository.getSubjects(userId).first()
+            _uiState.update { it.copy(subjects = subjects, isLoading = false) }
         }
     }
 
@@ -51,6 +48,13 @@ class AddEvaluationViewModel @Inject constructor(
             is AddEvaluationEvent.UpdateTitle -> _uiState.update { it.copy(title = event.value) }
             is AddEvaluationEvent.UpdateDescription -> _uiState.update { it.copy(description = event.value) }
             is AddEvaluationEvent.UpdateQuickTips -> _uiState.update { it.copy(quickTips = event.value) }
+            is AddEvaluationEvent.UpdateWeight -> {
+                // Allow empty string or valid non-negative number
+                val v = event.value
+                if (v.isEmpty() || (v.toDoubleOrNull() != null && v.toDouble() >= 0.0)) {
+                    _uiState.update { it.copy(weight = v) }
+                }
+            }
             is AddEvaluationEvent.Save -> save(event.date, event.imageUri)
         }
     }
@@ -59,16 +63,18 @@ class AddEvaluationViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isSaving = true) }
+            val state = _uiState.value
             val evaluation = Evaluation(
                 userId = userId,
-                subjectName = _uiState.value.selectedSubject,
-                title = _uiState.value.title,
-                description = _uiState.value.description,
+                subjectName = state.selectedSubject,
+                title = state.title,
+                description = state.description,
                 date = date,
-                quickTips = _uiState.value.quickTips
+                quickTips = state.quickTips,
+                weight = state.weight.toDoubleOrNull()
             )
             evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess {
-                _saved.value = true
+                _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure {
                 _uiState.update { it.copy(isSaving = false) }
             }

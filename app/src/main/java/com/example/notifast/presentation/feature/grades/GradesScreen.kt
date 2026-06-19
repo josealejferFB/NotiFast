@@ -47,7 +47,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notifast.data.model.Evaluation
+import com.example.notifast.domain.util.GradeConstants
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
 import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
@@ -164,7 +164,7 @@ fun MainAverageDashboard(generalAverage: Double) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val maxScale = 10f
+                val maxScale = GradeConstants.MAX_GRADE.toFloat()
                 LinearProgressIndicator(
                     progress = { (generalAverage.toFloat() / maxScale).coerceIn(0f, 1f) },
                     modifier = Modifier
@@ -177,7 +177,7 @@ fun MainAverageDashboard(generalAverage: Double) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                val threshold = 6.0
+                val threshold = GradeConstants.PASSING_THRESHOLD
                 Text(
                     text = if (generalAverage >= threshold) "¡Excelente trabajo!" else "¡Sigue esforzándote!",
                     color = Color.White,
@@ -192,7 +192,7 @@ fun MainAverageDashboard(generalAverage: Double) {
 @Composable
 fun SubjectRevampCard(
     subjectGrade: SubjectGradeInfo,
-    onUpdateGrade: (String, Double, Boolean) -> Unit
+    onUpdateGrade: (String, Double?, Boolean) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val subject = subjectGrade.subject
@@ -229,7 +229,7 @@ fun SubjectRevampCard(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    val threshold = 6.0
+                    val threshold = GradeConstants.PASSING_THRESHOLD
                     Text(
                         text = String.format(Locale.getDefault(), "%.1f", subjectAverage),
                         fontWeight = FontWeight.Black,
@@ -253,7 +253,7 @@ fun SubjectRevampCard(
 }
 
 @Composable
-fun EvaluationDetailRow(evaluation: Evaluation, onUpdateGrade: (String, Double, Boolean) -> Unit) {
+fun EvaluationDetailRow(evaluation: Evaluation, onUpdateGrade: (String, Double?, Boolean) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
 
     Row(
@@ -304,7 +304,7 @@ fun EvaluationDetailRow(evaluation: Evaluation, onUpdateGrade: (String, Double, 
 fun GradeRevampDialog(
     evaluation: Evaluation,
     onDismiss: () -> Unit,
-    onSave: (String, Double, Boolean) -> Unit
+    onSave: (String, Double?, Boolean) -> Unit
 ) {
     var grade by remember { mutableStateOf(evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "") }
     var isPresented by remember { mutableStateOf(evaluation.isPresented) }
@@ -325,11 +325,11 @@ fun GradeRevampDialog(
                         grade = it
                         error = null
                         val parsed = it.toDoubleOrNull()
-                        if (it.isNotEmpty() && parsed != null && parsed in 0.0..10.0) {
+                        if (it.isNotEmpty() && parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE) {
                             isPresented = true
                         }
                     },
-                    label = { Text("Nota (0-10)") },
+                    label = { Text("Nota (${GradeConstants.MIN_GRADE} - ${GradeConstants.MAX_GRADE})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = error != null,
                     supportingText = error?.let { { Text(it, color = Ruby) } },
@@ -356,14 +356,18 @@ fun GradeRevampDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val g = grade.toDoubleOrNull()
-                    when {
-                        grade.isBlank() -> error = "Ingresa una nota"
-                        g == null -> error = "Nota inv\u00E1lida"
-                        g < 0.0 || g > 10.0 -> error = "La nota debe estar entre 0.0 y 10.0"
-                        else -> {
-                            onSave(evaluation.id, g, isPresented)
-                            onDismiss()
+                    if (grade.isBlank()) {
+                        onSave(evaluation.id, null, false)
+                        onDismiss()
+                    } else {
+                        val g = grade.toDoubleOrNull()
+                        when {
+                            g == null -> error = "Nota inválida"
+                            g < GradeConstants.MIN_GRADE || g > GradeConstants.MAX_GRADE -> error = "La nota debe estar entre ${GradeConstants.MIN_GRADE} y ${GradeConstants.MAX_GRADE}"
+                            else -> {
+                                onSave(evaluation.id, g, isPresented)
+                                onDismiss()
+                            }
                         }
                     }
                 },

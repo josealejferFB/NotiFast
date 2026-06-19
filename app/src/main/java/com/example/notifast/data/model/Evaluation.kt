@@ -17,5 +17,7 @@ data class Evaluation(
     val weight: Double? = null,
     val isPresented: Boolean = false,
     @ServerTimestamp
-    val createdAt: Date? = null
+    val createdAt: Date? = null,
+    @ServerTimestamp
+    val updatedAt: Date? = null
 )

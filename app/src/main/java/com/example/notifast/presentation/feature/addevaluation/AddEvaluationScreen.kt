@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,6 +51,8 @@ import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,9 +64,8 @@ fun AddEvaluationScreen(
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val saved by viewModel.saved.collectAsStateWithLifecycle()
 
-    LaunchedEffect(saved) { if (saved) onEvaluationAdded() }
+    LaunchedEffect(uiState.isSaved) { if (uiState.isSaved) onEvaluationAdded() }
 
     LaunchedEffect(subject) { viewModel.setInitialSubject(subject) }
 
@@ -167,6 +169,17 @@ fun AddEvaluationScreen(
                     label = "Tips / Apuntes Rápidos",
                     leadingIcon = Icons.Default.Lightbulb,
                     cursorColor = Color(0xFFFBC02D)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                NotiFastFormField(
+                    value = uiState.weight,
+                    onValueChange = { viewModel.onEvent(AddEvaluationEvent.UpdateWeight(it)) },
+                    label = "Peso / Porcentaje (opcional)",
+                    leadingIcon = Icons.Default.Scale,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    cursorColor = Aqua
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))

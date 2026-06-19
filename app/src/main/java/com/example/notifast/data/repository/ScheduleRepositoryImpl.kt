@@ -30,17 +30,22 @@ class ScheduleRepositoryImpl @Inject constructor(
 
     override suspend fun addSchedule(userId: String, schedule: Schedule): Result<Unit> {
         return try {
-            val scheduleMap = mapOf(
+            val scheduleMap = mutableMapOf<String, Any>(
                 "userId" to schedule.userId,
                 "subjectName" to schedule.subjectName,
+                "modality" to schedule.modality,
                 "dayOfWeek" to schedule.dayOfWeek,
                 "startTime" to schedule.startTime,
                 "endTime" to schedule.endTime,
                 "classroom" to schedule.classroom,
                 "teacher" to schedule.teacher,
                 "color" to schedule.color,
-                "createdAt" to com.google.firebase.Timestamp.now()
+                "createdAt" to com.google.firebase.Timestamp.now(),
+                "updatedAt" to com.google.firebase.Timestamp.now()
             )
+            if (!schedule.meetingUrl.isNullOrBlank()) {
+                scheduleMap["meetingUrl"] = schedule.meetingUrl
+            }
             db.collection("users").document(userId)
                 .collection("schedules").add(scheduleMap).await()
             Result.success(Unit)
@@ -51,15 +56,20 @@ class ScheduleRepositoryImpl @Inject constructor(
 
     override suspend fun updateSchedule(userId: String, schedule: Schedule): Result<Unit> {
         return try {
-            val updates = mapOf<String, Any>(
+            val updates = mutableMapOf<String, Any>(
                 "subjectName" to schedule.subjectName,
+                "modality" to schedule.modality,
                 "dayOfWeek" to schedule.dayOfWeek,
                 "startTime" to schedule.startTime,
                 "endTime" to schedule.endTime,
                 "classroom" to schedule.classroom,
                 "teacher" to schedule.teacher,
-                "color" to schedule.color
+                "color" to schedule.color,
+                "updatedAt" to com.google.firebase.Timestamp.now()
             )
+            if (!schedule.meetingUrl.isNullOrBlank()) {
+                updates["meetingUrl"] = schedule.meetingUrl
+            }
             db.collection("users").document(userId)
                 .collection("schedules").document(schedule.id)
                 .update(updates).await()

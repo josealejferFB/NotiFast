@@ -56,12 +56,11 @@ fun EditProfileScreen(
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val saved by viewModel.saved.collectAsStateWithLifecycle()
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    LaunchedEffect(saved) {
-        if (saved) onBack()
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onBack()
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(

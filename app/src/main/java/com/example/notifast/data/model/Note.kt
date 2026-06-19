@@ -11,5 +11,7 @@ data class Note(
     val content: String = "",
     val imageUrl: String? = null,
     @ServerTimestamp
-    val timestamp: Date? = null
+    val timestamp: Date? = null,
+    @ServerTimestamp
+    val updatedAt: Date? = null
 )

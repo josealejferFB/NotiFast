@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.notifast.domain.util.GradeConstants
 
 @HiltViewModel
 class EditEvaluationViewModel @Inject constructor(
@@ -24,9 +25,6 @@ class EditEvaluationViewModel @Inject constructor(
     private val evalId: String = checkNotNull(savedStateHandle["evalId"])
     private val _uiState = MutableStateFlow(EditEvaluationUiState())
     val uiState: StateFlow<EditEvaluationUiState> = _uiState.asStateFlow()
-
-    private val _saved = MutableStateFlow(false)
-    val saved: StateFlow<Boolean> = _saved.asStateFlow()
 
     init { loadEvaluation() }
 
@@ -44,7 +42,8 @@ class EditEvaluationViewModel @Inject constructor(
                     title = eval.title,
                     description = eval.description,
                     quickTips = eval.quickTips,
-                    grade = eval.grade?.toInt()?.toString() ?: "",
+                    grade = eval.grade?.toString() ?: "",
+                    weight = eval.weight?.toString() ?: "",
                     isPresented = eval.isPresented,
                     existingImageUrl = eval.imageUrl,
                     date = eval.date
@@ -61,8 +60,14 @@ class EditEvaluationViewModel @Inject constructor(
             is EditEvaluationEvent.UpdateQuickTips -> _uiState.update { it.copy(quickTips = event.value) }
             is EditEvaluationEvent.UpdateGrade -> {
                 val parsed = event.value.toDoubleOrNull()
-                if (event.value.isEmpty() || (parsed != null && parsed in 0.0..10.0)) {
+                if (event.value.isEmpty() || (parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE)) {
                     _uiState.update { it.copy(grade = event.value) }
+                }
+            }
+            is EditEvaluationEvent.UpdateWeight -> {
+                val v = event.value
+                if (v.isEmpty() || (v.toDoubleOrNull() != null && v.toDouble() >= 0.0)) {
+                    _uiState.update { it.copy(weight = v) }
                 }
             }
             is EditEvaluationEvent.TogglePresented -> _uiState.update { it.copy(isPresented = !it.isPresented) }
@@ -85,10 +90,11 @@ class EditEvaluationViewModel @Inject constructor(
                 imageUrl = if (imageUri != null) null else state.existingImageUrl,
                 quickTips = state.quickTips,
                 grade = state.grade.toDoubleOrNull(),
+                weight = state.weight.toDoubleOrNull(),
                 isPresented = state.isPresented
             )
             evaluationRepository.updateEvaluation(userId, updatedEval, imageUri).onSuccess {
-                _saved.value = true
+                _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure {
                 _uiState.update { it.copy(isSaving = false) }
             }

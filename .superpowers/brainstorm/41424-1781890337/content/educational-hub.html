@@ -1,0 +1,57 @@
+<h2>Visión "Educational Hub"</h2>
+<p class="subtitle">NotiFast no debe verse como un simple bloc de notas, sino como tu centro de control académico. Propongo estas 3 evoluciones de diseño para refinar el resto de la pantalla de Materias:</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="1" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Acciones Unificadas (Speed Dial FAB)</h3>
+      <p>En lugar de tener dos botones flotantes apilados (Apunte y Evaluación) que ensucian la pantalla y tapan contenido, tendremos un único botón <strong>+</strong> centralizado o en la esquina que despliegue las opciones de manera elegante.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="2" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Tarjetas Orgánicas</h3>
+      <p>Pasaremos de cajas genéricas a tarjetas más orgánicas (esquinas de 24dp), bordes ultra finos y sombras más amplias pero muy difusas. El calendario y las evaluaciones parecerán "flotar".</p>
+    </div>
+  </div>
+  <div class="option" data-choice="3" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>Jerarquía de Secciones (Pills)</h3>
+      <p>Los separadores de texto simple ("Apuntes", "Calendario") se verán aburridos. Los cambiaremos por pequeños contenedores en forma de píldora con un 10% del color de la materia, lo que guía visualmente al estudiante.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="background: #FAFAFA; border: 1px solid #ddd; margin-top: 24px;">
+  <div class="mockup-header" style="color: #333; border-bottom: 1px solid rgba(0,0,0,0.1);">
+    Preview Rápido (Modo Claro)
+  </div>
+  <div style="padding: 20px;">
+    <!-- Section Header Preview -->
+    <div style="display: inline-flex; align-items: center; background: rgba(59, 151, 151, 0.1); padding: 6px 16px; border-radius: 20px; color: #3B9797; font-weight: bold; margin-bottom: 16px; font-size: 14px;">
+      <span style="margin-right: 8px;">📅</span> Próximas Evaluaciones
+    </div>
+    
+    <!-- Organic Card Preview -->
+    <div style="background: white; border-radius: 24px; padding: 16px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 12px 32px rgba(0,0,0,0.04); display: flex; align-items: center;">
+      <div style="width: 52px; height: 52px; background: rgba(191, 9, 47, 0.08); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #BF092F;">
+        15
+      </div>
+      <div style="margin-left: 16px; flex: 1;">
+        <div style="font-weight: bold; color: #1C1B1F; font-size: 16px;">Examen Parcial</div>
+        <div style="color: #777; font-size: 13px; margin-top: 2px;">En 5 días • Vale 20%</div>
+      </div>
+      <div style="color: #BF092F; font-weight: bold; font-size: 20px;">⋮</div>
+    </div>
+    
+    <!-- Unified FAB Preview -->
+    <div style="text-align: right; margin-top: 24px;">
+      <div style="display: inline-flex; width: 64px; height: 64px; background: #3B9797; border-radius: 32px; align-items: center; justify-content: center; color: white; font-size: 28px; box-shadow: 0 12px 24px rgba(59, 151, 151, 0.3);">
+        +
+      </div>
+    </div>
+  </div>
+</div>

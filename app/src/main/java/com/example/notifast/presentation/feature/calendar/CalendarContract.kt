@@ -5,7 +5,6 @@ import com.example.notifast.data.model.Note
 
 data class CalendarUiState(
     val isLoading: Boolean = false,
-    val notes: List<Note> = emptyList(),
     val evaluations: List<Evaluation> = emptyList(),
     val error: String? = null
 )

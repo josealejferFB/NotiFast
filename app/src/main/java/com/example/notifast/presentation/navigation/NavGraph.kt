@@ -38,6 +38,7 @@ import com.example.notifast.presentation.feature.schedules.SchedulesScreen
 import com.example.notifast.presentation.feature.settings.SettingsScreen
 import com.example.notifast.presentation.feature.subjectdetail.SubjectDetailScreen
 import com.example.notifast.presentation.feature.addschedule.AddScheduleScreen
+import com.example.notifast.presentation.feature.editschedule.EditScheduleScreen
 import com.example.notifast.presentation.theme.color.Ruby
 
 @Composable
@@ -175,6 +176,15 @@ fun MainContent() {
             }
             composable(Screen.AddSchedule.route) {
                 AddScheduleScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onScheduleAdded = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.EditSchedule.route,
+                arguments = listOf(navArgument("scheduleId") { type = NavType.StringType })
+            ) {
+                EditScheduleScreen(
                     onBackClick = { navController.popBackStack() },
                     onScheduleAdded = { navController.popBackStack() }
                 )

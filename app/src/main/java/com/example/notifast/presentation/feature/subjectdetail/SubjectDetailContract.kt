@@ -14,11 +14,13 @@ data class SubjectDetailUiState(
     val completedEvalCount: Int = 0,
     val pendingEvalCount: Int = 0,
     val upcomingEvaluations: List<Evaluation> = emptyList(),
-    val progressPercent: Float = 0f
+    val progressPercent: Float = 0f,
+    val error: String? = null
 )
 
 sealed interface SubjectDetailEvent {
     data object LoadData : SubjectDetailEvent
-    data class SaveGrade(val evaluationId: String, val grade: Double, val isPresented: Boolean) : SubjectDetailEvent
+    data class SaveGrade(val evaluationId: String, val grade: Double?, val isPresented: Boolean) : SubjectDetailEvent
     data class DeleteEvaluation(val evaluationId: String) : SubjectDetailEvent
+    data object ClearError : SubjectDetailEvent
 }

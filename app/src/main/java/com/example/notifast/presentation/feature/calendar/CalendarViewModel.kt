@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
-    private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -31,12 +30,9 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isLoading = true) }
-            combine(
-                noteRepository.getNotes(userId),
-                evaluationRepository.getEvaluations(userId)
-            ) { notes, evaluations ->
-                CalendarUiState(notes = notes, evaluations = evaluations)
-            }.collect { state -> _uiState.value = state }
+            evaluationRepository.getEvaluations(userId).collect { evaluations ->
+                _uiState.value = CalendarUiState(evaluations = evaluations)
+            }
         }
     }
 

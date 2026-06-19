@@ -57,14 +57,10 @@ class EditProfileViewModel @Inject constructor(
                 lastName = _uiState.value.lastName,
                 profileImageUri = imageUri
             ).onSuccess {
-                _uiState.update { it.copy(isSaving = false) }
-                _saved.value = true
+                _uiState.update { it.copy(isSaving = false, isSaved = true) }
             }.onFailure {
                 _uiState.update { it.copy(isSaving = false) }
             }
         }
     }
-
-    private val _saved = MutableStateFlow(false)
-    val saved: StateFlow<Boolean> = _saved.asStateFlow()
 }

@@ -1,9 +1,11 @@
 package com.example.notifast.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.example.notifast.data.model.Evaluation
 import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.ImageRepository
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.flow.Flow
@@ -47,13 +49,15 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "subjectName" to evaluation.subjectName,
                 "title" to evaluation.title,
                 "description" to evaluation.description,
-                "date" to (evaluation.date ?: ""),
                 "noteIds" to evaluation.noteIds,
-                "imageUrl" to (imageUrl ?: ""),
                 "quickTips" to evaluation.quickTips,
                 "isPresented" to evaluation.isPresented,
-                "createdAt" to com.google.firebase.Timestamp.now()
+                "createdAt" to FieldValue.serverTimestamp(),
+                "updatedAt" to FieldValue.serverTimestamp()
             )
+            // Only include date if present — storing null as "" causes Firestore type mismatch
+            evaluation.date?.let { evalMap["date"] = it }
+            if (!imageUrl.isNullOrEmpty()) evalMap["imageUrl"] = imageUrl
             if (evaluation.grade != null) evalMap["grade"] = evaluation.grade
             if (evaluation.weight != null) evalMap["weight"] = evaluation.weight
             db.collection("users").document(userId)
@@ -79,13 +83,26 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "title" to evaluation.title,
                 "description" to evaluation.description,
                 "subjectName" to evaluation.subjectName,
-                "date" to (evaluation.date ?: ""),
                 "quickTips" to evaluation.quickTips,
-                "isPresented" to evaluation.isPresented
+                "isPresented" to evaluation.isPresented,
+                "updatedAt" to FieldValue.serverTimestamp()
             )
-            if (imageUrl != null) updates["imageUrl"] = imageUrl
-            if (evaluation.grade != null) updates["grade"] = evaluation.grade
-            if (evaluation.weight != null) updates["weight"] = evaluation.weight
+            // Update date: only set if present, do not store empty string
+            evaluation.date?.let { updates["date"] = it }
+            // Update imageUrl only if present
+            if (!imageUrl.isNullOrEmpty()) updates["imageUrl"] = imageUrl
+            // Explicitly delete weight/grade from Firestore if they are now null,
+            // so stale values don't persist after the user clears them.
+            if (evaluation.grade != null) {
+                updates["grade"] = evaluation.grade
+            } else {
+                updates["grade"] = FieldValue.delete()
+            }
+            if (evaluation.weight != null) {
+                updates["weight"] = evaluation.weight
+            } else {
+                updates["weight"] = FieldValue.delete()
+            }
             db.collection("users").document(userId)
                 .collection("evaluations").document(evaluation.id)
                 .update(updates).await()
@@ -98,7 +115,11 @@ class EvaluationRepositoryImpl @Inject constructor(
     override suspend fun deleteEvaluation(userId: String, evaluation: Evaluation): Result<Unit> {
         return try {
             if (!evaluation.imageUrl.isNullOrEmpty()) {
-                try { imageRepository.deleteImage(evaluation.imageUrl) } catch(e: Exception) {}
+                try {
+                    imageRepository.deleteImage(evaluation.imageUrl)
+                } catch (e: Exception) {
+                    Log.w("EvaluationRepository", "Failed to delete evaluation image: ${evaluation.imageUrl}", e)
+                }
             }
             db.collection("users").document(userId)
                 .collection("evaluations").document(evaluation.id)

@@ -67,7 +67,6 @@ import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.example.notifast.data.model.Evaluation
-import com.example.notifast.data.model.Note
 import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
 import com.example.notifast.presentation.atoms.NotiFastDialog
@@ -91,10 +90,9 @@ fun CalendarScreen(
     var currentMonth by remember { mutableStateOf(Calendar.getInstance()) }
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var expandedEvalId by remember { mutableStateOf<String?>(null) }
-    var expandedNoteId by remember { mutableStateOf<String?>(null) }
     var showDeleteDialog by remember { mutableStateOf<Evaluation?>(null) }
 
-    val isHeaderVisible = expandedEvalId == null && expandedNoteId == null
+    val isHeaderVisible = expandedEvalId == null
 
     val context = LocalContext.current
     LaunchedEffect(uiState.error) {
@@ -106,7 +104,6 @@ fun CalendarScreen(
 
     BackHandler(enabled = !isHeaderVisible) {
         expandedEvalId = null
-        expandedNoteId = null
     }
 
     if (showDeleteDialog != null) {
@@ -180,9 +177,7 @@ fun CalendarScreen(
                         onDateSelected = {
                             selectedDate = it
                             expandedEvalId = null
-                            expandedNoteId = null
                         },
-                        notes = uiState.notes,
                         evaluations = uiState.evaluations
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -191,10 +186,6 @@ fun CalendarScreen(
 
             val dailyEvals = uiState.evaluations.filter { isSameDay(it.date, selectedDate.time) }
             val subjectsWithEval = dailyEvals.map { it.subjectName }.toSet()
-
-            val relevantNotes = uiState.notes.filter {
-                isSameDay(it.timestamp, selectedDate.time) || subjectsWithEval.contains(it.subject)
-            }.distinctBy { it.id }
 
             Text(
                 text = if (isHeaderVisible) {
@@ -207,7 +198,7 @@ fun CalendarScreen(
             )
 
             Box(modifier = Modifier.weight(1f)) {
-                if (relevantNotes.isEmpty() && dailyEvals.isEmpty()) {
+                if (dailyEvals.isEmpty()) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("No hay actividades para este día", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
@@ -218,27 +209,13 @@ fun CalendarScreen(
                         contentPadding = PaddingValues(bottom = 100.dp) // Safe area para BottomNav y FAB
                     ) {
                         items(dailyEvals) { eval ->
-                            if (expandedNoteId == null) {
-                                EvaluationExpandableItem(
-                                    eval = eval,
-                                    isExpanded = expandedEvalId == eval.id,
-                                    onToggle = { expandedEvalId = if (expandedEvalId == eval.id) null else eval.id },
-                                    onEdit = { onEditEvaluation(eval) },
-                                    onDelete = { showDeleteDialog = eval }
-                                )
-                            }
-                        }
-
-                        items(relevantNotes) { note ->
-                            if (expandedEvalId == null) {
-                                val isFromEvalSubject = subjectsWithEval.contains(note.subject)
-                                NoteExpandableItem(
-                                    note = note,
-                                    isExpanded = expandedNoteId == note.id,
-                                    isHighlighted = isFromEvalSubject,
-                                    onToggle = { expandedNoteId = if (expandedNoteId == note.id) null else note.id }
-                                )
-                            }
+                            EvaluationExpandableItem(
+                                eval = eval,
+                                isExpanded = expandedEvalId == eval.id,
+                                onToggle = { expandedEvalId = if (expandedEvalId == eval.id) null else eval.id },
+                                onEdit = { onEditEvaluation(eval) },
+                                onDelete = { showDeleteDialog = eval }
+                            )
                         }
                     }
                 }
@@ -261,61 +238,6 @@ fun CalendarScreen(
     }
 }
 
-@Composable
-fun NoteExpandableItem(note: Note, isExpanded: Boolean, isHighlighted: Boolean = false, onToggle: () -> Unit) {
-    val interactionSource = remember { MutableInteractionSource() }
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(
-            width = if (isHighlighted) 2.dp else 1.dp,
-            color = if (isHighlighted) Ruby else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isHighlighted || isExpanded) 10.dp else 0.dp),
-        modifier = Modifier.fillMaxWidth().clickable(interactionSource = interactionSource, indication = null) { onToggle() }
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier.size(40.dp).background(if (isHighlighted) Ruby.copy(alpha = 0.1f) else Aqua.copy(alpha = 0.08f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(if (isHighlighted) Icons.Default.School else Icons.AutoMirrored.Filled.Note, contentDescription = null, tint = if (isHighlighted) Ruby else Aqua)
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(note.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        if (isHighlighted) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Surface(color = Ruby, shape = RoundedCornerShape(8.dp)) {
-                                Text("ESTUDIAR", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-                            }
-                        }
-                    }
-                    Text(note.subject, fontSize = 13.sp, color = if (isHighlighted) Ruby else MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            AnimatedVisibility(visible = isExpanded, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-                Column(modifier = Modifier.padding(top = 16.dp)) {
-                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    if (!note.imageUrl.isNullOrBlank()) {
-                        AsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxWidth().wrapContentHeight().clip(RoundedCornerShape(16.dp)), contentScale = ContentScale.FillWidth)
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                    Text(text = note.content, style = MaterialTheme.typography.bodyLarge, lineHeight = 24.sp)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    TextButton(onClick = onToggle, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Cerrar detalle", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
@@ -381,7 +303,7 @@ fun DetailRow(icon: ImageVector, label: String, content: String, color: Color = 
 }
 
 @Composable
-fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, notes: List<Note>, evaluations: List<Evaluation>) {
+fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, evaluations: List<Evaluation>) {
     val daysInMonth = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
     val firstDayOfWeek = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK) - 1
     val days = (1..daysInMonth).toList(); val paddingDays = (0 until firstDayOfWeek).toList()
@@ -398,7 +320,6 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
                     if (day is Int) {
                         val date = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, day) }
                         val isSelected = isSameDay(date.time, selectedDate.time)
-                        val hasNotes = notes.any { isSameDay(it.timestamp, date.time) }
                         val hasEvals = evaluations.any { isSameDay(it.date, date.time) }
                         val isToday = isSameDay(Date(), date.time)
                         Box(modifier = Modifier.weight(1f).aspectRatio(1f).clip(RoundedCornerShape(12.dp))
@@ -419,9 +340,6 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
                                     fontWeight = if (hasEvals || isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
                                     color = if (hasEvals) Color.White else if (isSelected) Ruby else if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                 )
-                                if (hasNotes) {
-                                    Box(modifier = Modifier.padding(top = 2.dp).size(width = 12.dp, height = 2.dp).background(if (hasEvals) Color.White.copy(alpha = 0.7f) else Aqua, CircleShape))
-                                }
                             }
                         }
                     } else Spacer(modifier = Modifier.weight(1f))

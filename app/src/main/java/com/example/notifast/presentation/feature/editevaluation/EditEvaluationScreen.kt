@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -55,6 +56,8 @@ import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,9 +68,8 @@ fun EditEvaluationScreen(
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val saved by viewModel.saved.collectAsStateWithLifecycle()
 
-    LaunchedEffect(saved) { if (saved) onEvaluationUpdated() }
+    LaunchedEffect(uiState.isSaved) { if (uiState.isSaved) onEvaluationUpdated() }
 
     var selectedImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var selectedDate by remember { mutableStateOf(uiState.date ?: Date()) }
@@ -190,6 +192,17 @@ fun EditEvaluationScreen(
                     label = "Tips / Apuntes Rápidos",
                     leadingIcon = Icons.Default.Lightbulb,
                     cursorColor = Color(0xFFFBC02D)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                NotiFastFormField(
+                    value = uiState.weight,
+                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateWeight(it)) },
+                    label = "Peso / Porcentaje (opcional)",
+                    leadingIcon = Icons.Default.Scale,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    cursorColor = Aqua
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

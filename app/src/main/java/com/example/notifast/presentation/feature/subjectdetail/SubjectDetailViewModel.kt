@@ -7,6 +7,7 @@ import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.NoteRepository
+import com.example.notifast.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,8 @@ class SubjectDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
 ) : ViewModel() {
 
     private val subjectName: String = checkNotNull(savedStateHandle["subjectName"])
@@ -42,10 +44,7 @@ class SubjectDetailViewModel @Inject constructor(
                 val subjectEvals = evaluations.filter { it.subjectName == subjectName }
                 val subjectData = subjects.find { it.name == subjectName } ?: SubjectData(name = subjectName)
 
-                val graded = subjectEvals.filter { it.grade != null }
-                val weightedSum = graded.sumOf { (it.grade ?: 0.0) * (if (it.weight == null || it.weight == 0.0) 1.0 else it.weight) }
-                val totalWeight = graded.sumOf { if (it.weight == null || it.weight == 0.0) 1.0 else it.weight }
-                val avg = if (totalWeight > 0.0) weightedSum / totalWeight else null
+                val avg = calculateWeightedAverageUseCase(subjectEvals)
 
                 val upcoming = subjectEvals
                     .filter { !it.isPresented && it.date != null }
@@ -78,15 +77,18 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.LoadData -> loadData()
             is SubjectDetailEvent.SaveGrade -> saveGrade(event.evaluationId, event.grade, event.isPresented)
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
+            is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
-    private fun saveGrade(evalId: String, grade: Double, isPresented: Boolean) {
+    private fun saveGrade(evalId: String, grade: Double?, isPresented: Boolean) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val eval = _uiState.value.evaluations.find { it.id == evalId } ?: return@launch
             val updated = eval.copy(grade = grade, isPresented = isPresented)
-            evaluationRepository.updateEvaluation(userId, updated, null)
+            evaluationRepository.updateEvaluation(userId, updated, null).onFailure { e ->
+                _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") }
+            }
         }
     }
 
@@ -94,7 +96,9 @@ class SubjectDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val eval = _uiState.value.evaluations.find { it.id == evalId } ?: return@launch
-            evaluationRepository.deleteEvaluation(userId, eval)
+            evaluationRepository.deleteEvaluation(userId, eval).onFailure { e ->
+                _uiState.update { it.copy(error = e.message ?: "Error al eliminar evaluación") }
+            }
         }
     }
 }

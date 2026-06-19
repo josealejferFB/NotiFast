@@ -1,0 +1,53 @@
+<h2>Contraste Inteligente (Claro y Oscuro)</h2>
+<p class="subtitle">Los colores personalizados no solo fallan en oscuro, también pueden fallar en claro (ej. amarillo sobre blanco). Proponemos una utilidad de contraste dinámico.</p>
+
+<div class="split">
+  <!-- MODO CLARO -->
+  <div class="mockup" style="background: #FAFAFA; border: 1px solid #ddd;">
+    <div class="mockup-header" style="color: #333; border-bottom: 1px solid rgba(0,0,0,0.1);">
+      Modo Claro (Fondo Blanco)
+    </div>
+    <div style="padding: 20px;">
+      <!-- Sin corrección -->
+      <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #eee;">
+        <div style="color: #FFFF00; font-weight: bold; margin-bottom: 4px; text-shadow: 0 0 1px #ccc;">Sin corregir (Ilegible)</div>
+        <div style="height: 4px; background: #FFFF00; width: 100%; border-radius: 2px;"></div>
+      </div>
+      
+      <!-- Con corrección -->
+      <div style="background: white; padding: 16px; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div style="color: #C0A800; font-weight: bold; margin-bottom: 4px;">Corregido (Oscurecido)</div>
+        <div style="height: 4px; background: #C0A800; width: 100%; border-radius: 2px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODO OSCURO -->
+  <div class="mockup" style="background: #1B262C; border: 1px solid #444;">
+    <div class="mockup-header" style="color: white; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      Modo Oscuro (Fondo Pizarra)
+    </div>
+    <div style="padding: 20px;">
+      <!-- Sin corrección -->
+      <div style="background: #2A363E; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+        <div style="color: #00FF00; font-weight: bold; margin-bottom: 4px;">Sin corregir (Quema la vista)</div>
+        <div style="height: 4px; background: #00FF00; width: 100%; border-radius: 2px;"></div>
+      </div>
+      
+      <!-- Con corrección -->
+      <div style="background: #2A363E; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        <div style="color: #4CAF50; font-weight: bold; margin-bottom: 4px;">Corregido (Desaturado)</div>
+        <div style="height: 4px; background: #4CAF50; width: 100%; border-radius: 2px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 30px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+  <h3>Otros detalles importantes encontrados en la pantalla:</h3>
+  <ul style="line-height: 1.6;">
+    <li><strong>Bug de UI en Estadísticas:</strong> En <code>SubjectDetailStats.kt</code>, las líneas de color superior tienen un parámetro <code>width(0.dp)</code>, lo que las hace invisibles en la app actualmente. Hay que corregirlo.</li>
+    <li><strong>Alpha del 10% en íconos:</strong> Algunos contenedores usan <code>color.copy(alpha = 0.1f)</code>. Con nuestro ajuste algorítmico, esto se verá muy estético y natural tanto en claro como en oscuro.</li>
+    <li><strong>Solución Técnica:</strong> Crearemos una función <code>ThemeUtils.getAccessibleColor(hex, isDarkTheme)</code> que calculará el brillo relativo del color y lo ajustará (oscurecer si es muy claro en modo claro, y desaturar si es muy brillante en modo oscuro).</li>
+  </ul>
+</div>

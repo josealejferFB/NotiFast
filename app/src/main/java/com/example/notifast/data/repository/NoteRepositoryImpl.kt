@@ -1,6 +1,7 @@
 package com.example.notifast.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.example.notifast.data.model.Note
 import com.example.notifast.data.model.SubjectData
 import com.example.notifast.domain.repository.ImageRepository
@@ -80,14 +81,17 @@ class NoteRepositoryImpl @Inject constructor(
                 val uploadResult = imageRepository.uploadNoteImage(userId, imageUri)
                 if (uploadResult.isSuccess) imageUrl = uploadResult.getOrNull()
             }
-            val noteMap = mapOf(
+            val noteMap = mutableMapOf<String, Any>(
                 "userId" to userId,
                 "subject" to subject,
                 "title" to title,
                 "content" to content,
-                "imageUrl" to (imageUrl ?: ""),
-                "timestamp" to FieldValue.serverTimestamp()
+                "timestamp" to FieldValue.serverTimestamp(),
+                "updatedAt" to FieldValue.serverTimestamp()
             )
+            if (!imageUrl.isNullOrEmpty()) {
+                noteMap["imageUrl"] = imageUrl
+            }
             db.collection("users").document(userId)
                 .collection("subjects").document(subject)
                 .collection("notes").add(noteMap).await()
@@ -99,16 +103,20 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun addSubject(userId: String, subjectName: String, icon: String, colorHex: String): Result<Unit> {
         return try {
+            val docRef = db.collection("users").document(userId)
+                .collection("subjects").document(subjectName)
+            val existing = docRef.get().await()
+            if (existing.exists()) {
+                return Result.failure(Exception("La materia ya existe"))
+            }
+
             val data = mutableMapOf<String, Any>(
                 "name" to subjectName,
                 "icon" to icon,
                 "createdAt" to com.google.firebase.Timestamp.now()
             )
             if (colorHex.isNotBlank()) data["colorHex"] = colorHex
-            db.collection("users").document(userId)
-                .collection("subjects").document(subjectName)
-                .set(data)
-                .await()
+            docRef.set(data).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -118,7 +126,11 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun deleteNote(userId: String, note: Note): Result<Unit> {
         return try {
             if (!note.imageUrl.isNullOrEmpty()) {
-                imageRepository.deleteImage(note.imageUrl)
+                try {
+                    imageRepository.deleteImage(note.imageUrl)
+                } catch (e: Exception) {
+                    Log.w("NoteRepository", "Failed to delete note image: ${note.imageUrl}", e)
+                }
             }
             db.collection("users").document(userId)
                 .collection("subjects").document(note.subject)
@@ -144,9 +156,14 @@ class NoteRepositoryImpl @Inject constructor(
             val updates = mutableMapOf<String, Any>(
                 "title" to note.title,
                 "content" to note.content,
-                "subject" to note.subject
+                "subject" to note.subject,
+                "updatedAt" to FieldValue.serverTimestamp()
             )
-            if (imageUrl != null) updates["imageUrl"] = imageUrl
+            if (!imageUrl.isNullOrEmpty()) {
+                updates["imageUrl"] = imageUrl
+            } else {
+                updates["imageUrl"] = FieldValue.delete()
+            }
             db.collection("users").document(userId)
                 .collection("subjects").document(note.subject)
                 .collection("notes").document(note.id)
@@ -172,7 +189,12 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit> {
         return try {
+            // NOTE: Firestore WriteBatch has a 500-operation limit.
+            // In normal usage (notes + evaluations + schedules per subject), this is unlikely
+            // to be reached, but should be monitored if subjects grow very large.
             val batch = db.batch()
+
+            // 1. Delete all notes under this subject and their local images
             val notesSnapshot = db.collection("users").document(userId)
                 .collection("subjects").document(subjectName)
                 .collection("notes")
@@ -181,14 +203,49 @@ class NoteRepositoryImpl @Inject constructor(
             for (doc in notesSnapshot.documents) {
                 val imageUrl = doc.getString("imageUrl")
                 if (!imageUrl.isNullOrEmpty()) {
-                    try { imageRepository.deleteImage(imageUrl) } catch(e: Exception) {}
+                    try {
+                        imageRepository.deleteImage(imageUrl)
+                    } catch (e: Exception) {
+                        Log.w("NoteRepository", "Failed to delete note image: $imageUrl", e)
+                    }
                 }
                 batch.delete(doc.reference)
             }
+
+            // 2. Delete all evaluations linked to this subject
+            val evaluationsSnapshot = db.collection("users").document(userId)
+                .collection("evaluations")
+                .whereEqualTo("subjectName", subjectName)
+                .get()
+                .await()
+            for (doc in evaluationsSnapshot.documents) {
+                val imageUrl = doc.getString("imageUrl")
+                if (!imageUrl.isNullOrEmpty()) {
+                    try {
+                        imageRepository.deleteImage(imageUrl)
+                    } catch (e: Exception) {
+                        Log.w("NoteRepository", "Failed to delete evaluation image: $imageUrl", e)
+                    }
+                }
+                batch.delete(doc.reference)
+            }
+
+            // 3. Delete all schedules linked to this subject
+            val schedulesSnapshot = db.collection("users").document(userId)
+                .collection("schedules")
+                .whereEqualTo("subjectName", subjectName)
+                .get()
+                .await()
+            for (doc in schedulesSnapshot.documents) {
+                batch.delete(doc.reference)
+            }
+
+            // 4. Delete the subject document itself
             batch.delete(
                 db.collection("users").document(userId)
                     .collection("subjects").document(subjectName)
             )
+
             batch.commit().await()
             Result.success(Unit)
         } catch (e: Exception) {

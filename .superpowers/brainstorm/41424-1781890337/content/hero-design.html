@@ -1,0 +1,45 @@
+<h2>Rediseño del Hero y Colores Personalizados</h2>
+<p class="subtitle">El degradado actual se ve muy brusco y los colores personalizados brillantes (ej. amarillo neón) desentonan en modo oscuro. Esta es la propuesta de rediseño:</p>
+
+<div class="split">
+  <!-- ACTUAL -->
+  <div class="mockup" style="background: #1C1B1F; border: 1px solid #333;">
+    <div class="mockup-header" style="color: white; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      Actual (Degradado Lineal Duro)
+    </div>
+    
+    <div style="height: 250px; background: linear-gradient(#DFFF00, rgba(223,255,0,0.7), rgba(223,255,0,0.2), #1C1B1F); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 30px;">
+      <div style="width: 80px; height: 80px; border-radius: 40px; background: #1C1B1F; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+        <span style="color: #DFFF00; font-size: 32px;">🔬</span>
+      </div>
+      <div style="color: white; font-weight: bold; font-size: 24px;">Física Cuántica</div>
+    </div>
+  </div>
+
+  <!-- PROPUESTA -->
+  <div class="mockup" style="background: #1B262C; border: 1px solid #444; position: relative; overflow: hidden;">
+    <div class="mockup-header" style="color: white; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 10;">
+      Propuesta (Glow Radial + Icono Glass)
+    </div>
+    
+    <!-- Soft glowing orb / radial gradient -->
+    <div style="position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 400px; height: 250px; background: radial-gradient(circle, rgba(162, 184, 51, 0.2) 0%, rgba(162, 184, 51, 0) 70%); border-radius: 50%; z-index: 1;"></div>
+    
+    <div style="height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 30px; position: relative; z-index: 10;">
+      <!-- Glassmorphism Icon Container -->
+      <div style="width: 80px; height: 80px; border-radius: 40px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);">
+        <span style="color: #A2B833; font-size: 32px;">🔬</span>
+      </div>
+      <div style="color: white; font-weight: bold; font-size: 24px;">Física Cuántica</div>
+      <div style="color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 6px;">4 apuntes · 2 evaluaciones</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 30px; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+  <h3>El Plan para la Estética:</h3>
+  <ul style="line-height: 1.6;">
+    <li><strong>Desaturación Automática:</strong> Crearemos una función que tome el <code>colorHex</code> de la materia y, si el usuario está en modo oscuro, reduzca su luminosidad y saturación automáticamente. Un "amarillo chillón" pasará a ser un verde oliva/dorado apagado que no lastima la vista.</li>
+    <li><strong>Hero Glassmorphism:</strong> Cambiaremos el fondo por el mismo Pizarra Suave (`#1B262C`), agregaremos un "glow" o destello radial sutil en la parte superior usando el color desaturado, y meteremos el ícono de la materia dentro de un contenedor esmerilado (borde semi-transparente).</li>
+  </ul>
+</div>
