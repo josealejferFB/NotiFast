@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fondo interactivo con iconos flotantes para NotiFast">
+    <title>Fondo Flotante - NotiFast</title>
+    
+    <!-- Google Fonts para Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Colores de NotiFast */
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-light-bg: #ffffff;
+            --color-light-surface: #f4f5f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Fondo elegante y premium con gradiente radial */
+            background: radial-gradient(circle at 50% 50%, var(--color-light-bg) 0%, var(--color-light-surface) 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Contenedor del fondo animado */
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+        }
+
+        /* Estilo base para los iconos */
+        .icon {
+            position: absolute;
+            user-select: none;
+            /* Animación base de flotación */
+            animation: float var(--float-duration, 10s) infinite ease-in-out alternate;
+            /* Transición suave para el hover (micro-interacciones) */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        /* Evitar que la animación pise el transform del hover */
+        .icon-wrapper {
+            position: absolute;
+            animation: float var(--float-duration, 10s) infinite ease-in-out;
+        }
+
+        /* Variaciones de colores (Sin brillos) */
+        .icon.ruby {
+            color: var(--color-ruby);
+        }
+        
+        .icon.aqua {
+            color: var(--color-aqua);
+        }
+        
+        .icon.light {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Efecto al pasar el cursor (Dynamic Design) */
+        .icon-wrapper:hover .icon {
+            transform: scale(1.3) rotate(5deg);
+            z-index: 10;
+        }
+
+        .icon-wrapper:hover .icon.ruby {
+            color: #ff2e5b;
+        }
+
+        .icon-wrapper:hover .icon.aqua {
+            color: #5cebeb;
+        }
+
+        .icon-wrapper:hover .icon.light {
+            color: #111111;
+        }
+
+        /* Keyframes para una flotación fluida en varias direcciones */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(calc(var(--float-x, 15px) * 1), calc(var(--float-y, -25px) * 1)) rotate(calc(var(--float-rot, 5deg) * 1));
+            }
+            66% {
+                transform: translate(calc(var(--float-x, 15px) * -0.5), calc(var(--float-y, -25px) * -0.5)) rotate(calc(var(--float-rot, 5deg) * -1));
+            }
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        /* Posicionamiento y configuración específica de cada icono */
+        
+        /* Arriba izquierda */
+        .pos-1 { top: 15%; left: 15%; --float-duration: 18s; --float-x: 20px; --float-y: -30px; --float-rot: 10deg; }
+        .pos-1 .icon { font-size: 80px; font-variation-settings: 'FILL' 1; }
+
+        /* Abajo izquierda */
+        .pos-2 { top: 75%; left: 12%; --float-duration: 22s; --float-x: -15px; --float-y: -20px; --float-rot: -15deg; }
+        .pos-2 .icon { font-size: 65px; font-variation-settings: 'FILL' 1; }
+
+        /* Centro derecha */
+        .pos-3 { top: 40%; left: 82%; --float-duration: 15s; --float-x: 30px; --float-y: 20px; --float-rot: 12deg; animation-delay: -5s; }
+        .pos-3 .icon { font-size: 90px; font-variation-settings: 'FILL' 1; }
+
+        /* Arriba centro */
+        .pos-4 { top: 20%; left: 55%; --float-duration: 19s; --float-x: -25px; --float-y: 15px; --float-rot: -8deg; animation-delay: -2s; }
+        .pos-4 .icon { font-size: 50px; font-variation-settings: 'FILL' 1; }
+
+        /* Abajo centro */
+        .pos-5 { top: 80%; left: 45%; --float-duration: 25s; --float-x: 20px; --float-y: -40px; --float-rot: 20deg; animation-delay: -7s; }
+        .pos-5 .icon { font-size: 75px; font-variation-settings: 'FILL' 1; }
+
+        /* Centro izquierda */
+        .pos-6 { top: 50%; left: 28%; --float-duration: 17s; --float-x: 10px; --float-y: 25px; --float-rot: -10deg; animation-delay: -10s; }
+        .pos-6 .icon { font-size: 55px; font-variation-settings: 'FILL' 0; } /* Sin relleno para variar */
+
+        /* Arriba derecha */
+        .pos-7 { top: 12%; left: 78%; --float-duration: 21s; --float-x: -20px; --float-y: -15px; --float-rot: 15deg; animation-delay: -4s; }
+        .pos-7 .icon { font-size: 60px; font-variation-settings: 'FILL' 1; }
+
+        /* Abajo derecha */
+        .pos-8 { top: 85%; left: 75%; --float-duration: 16s; --float-x: 25px; --float-y: -25px; --float-rot: -12deg; animation-delay: -8s; }
+        .pos-8 .icon { font-size: 70px; font-variation-settings: 'FILL' 0; }
+
+        /* Partículas de fondo (estrellas/puntos sutiles) */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+                radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 50px 50px, 100px 100px;
+            background-position: 0 0, 25px 25px;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles"></div>
+    <div class="background-container">
+        <!-- Utilizamos Material Symbols correspondientes al dominio educativo de NotiFast -->
+        
+        <div class="icon-wrapper pos-1">
+            <span class="material-symbols-rounded icon ruby" title="Evaluaciones">grade</span>
+        </div>
+        
+        <div class="icon-wrapper pos-2">
+            <span class="material-symbols-rounded icon aqua" title="Apuntes">menu_book</span>
+        </div>
+        
+        <div class="icon-wrapper pos-3">
+            <span class="material-symbols-rounded icon light" title="Educación">school</span>
+        </div>
+        
+        <div class="icon-wrapper pos-4">
+            <span class="material-symbols-rounded icon ruby" title="Calendario">event_note</span>
+        </div>
+        
+        <div class="icon-wrapper pos-5">
+            <span class="material-symbols-rounded icon aqua" title="Horarios">schedule</span>
+        </div>
+        
+        <div class="icon-wrapper pos-6">
+            <span class="material-symbols-rounded icon light" title="Notificaciones">notifications</span>
+        </div>
+        
+        <div class="icon-wrapper pos-7">
+            <span class="material-symbols-rounded icon aqua" title="Rendimiento">bar_chart</span>
+        </div>
+        
+        <div class="icon-wrapper pos-8">
+            <span class="material-symbols-rounded icon ruby" title="Metas">rocket_launch</span>
+        </div>
+    </div>
+</body>
+</html>

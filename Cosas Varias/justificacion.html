@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Justificación - NotiFast</title>
+    
+    <!-- Tipografía moderna y estilizada -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Paleta de colores NotiFast */
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-navy: #1f2833; /* Color oscuro del splash screen para contraste */
+            --color-bg: #f4f6f9;
+            --color-text: #1a202c;
+            --color-text-light: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--color-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Lienzo de proporción 16:9 */
+        .presentation-canvas {
+            width: 1280px;
+            height: 720px;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        }
+
+        /* Estructura de tarjeta con marco doble */
+        .card-wrapper {
+            width: 350px;
+            height: 580px;
+            background: #ffffff;
+            border-radius: 40px;
+            padding: 14px; /* Grosor del borde blanco exterior */
+            /* Sombra ultra suave para efecto de flotación minimalista */
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.06), 0 10px 25px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-inner {
+            border-radius: 30px;
+            border: 2.5px solid var(--theme-color);
+            height: 100%;
+            padding: 45px 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Asignación de temas de color */
+        .aqua-theme { --theme-color: var(--color-aqua); }
+        .ruby-theme { --theme-color: var(--color-ruby); }
+        .navy-theme { --theme-color: var(--color-navy); }
+
+        .card-icon {
+            font-size: 85px;
+            color: var(--theme-color);
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--color-text);
+            text-align: center;
+            line-height: 1.25;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-list {
+            list-style: none;
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .card-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: var(--color-text-light);
+            font-weight: 500;
+        }
+
+        .card-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Viñetas coloreadas */
+        .card-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 7px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--theme-color);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="presentation-canvas">
+
+        <!-- Tarjeta 1: Perspectiva Tecnológica -->
+        <div class="card-wrapper aqua-theme">
+            <div class="card-inner">
+                <span class="material-symbols-rounded card-icon">memory</span>
+                <h2 class="card-title">Perspectiva<br>Tecnológica</h2>
+                <ul class="card-list">
+                    <li>Implementación de persistencia de datos híbrida en dispositivos de recursos limitados.</li>
+                    <li>Categorización estructurada de contenido heterogéneo (texto e imágenes).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Tarjeta 2: Perspectiva Práctica -->
+        <div class="card-wrapper ruby-theme">
+            <div class="card-inner">
+                <span class="material-symbols-rounded card-icon">calendar_clock</span>
+                <h2 class="card-title">Perspectiva<br>Práctica</h2>
+                <ul class="card-list">
+                    <li>Sincronización contextual: vinculación automática de apuntes con evaluaciones futuras.</li>
+                    <li>Eliminación de la dependencia de múltiples aplicaciones desconectadas.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Tarjeta 3: Perspectiva Social -->
+        <div class="card-wrapper navy-theme">
+            <div class="card-inner">
+                <span class="material-symbols-rounded card-icon">groups</span>
+                <h2 class="card-title">Perspectiva<br>Social</h2>
+                <ul class="card-list">
+                    <li>Reducción de la carga cognitiva y mitigación de la ansiedad académica.</li>
+                    <li>Innovación tecnológica nativa desarrollada para empoderar a la comunidad UNERG.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

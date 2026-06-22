@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Motor Offline-First - NotiFast</title>
+    
+    <!-- Tipografía estilizada -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Paleta Oficial NotiFast */
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-navy: #1f2833;
+            --color-bg: #f4f6f9;
+            --color-text: #1a202c;
+            --color-text-light: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Lienzo 16:9 */
+        .presentation-canvas {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .main-title {
+            position: absolute;
+            left: 90px;
+            top: 260px;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--color-navy);
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+        }
+
+        .main-title .highlight {
+            color: var(--color-ruby);
+        }
+
+        /* Mockup minimalista del Teléfono */
+        .phone-mockup {
+            width: 170px;
+            height: 350px;
+            background: #0b0c10;
+            border-radius: 35px;
+            border: 8px solid #2a2a35;
+            position: absolute;
+            left: 450px;
+            top: 185px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Pantalla con los colores de la app */
+        .phone-screen-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-aqua), #1f2833);
+            opacity: 0.15;
+        }
+
+        .phone-logo {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .phone-logo img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
+
+        /* Nodos flotantes (Nube y BD) */
+        .node-box {
+            background: #ffffff;
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.03);
+            position: absolute;
+            z-index: 10;
+            border: 2.5px solid var(--theme-color);
+        }
+
+        .cloud-node {
+            --theme-color: var(--color-navy);
+            top: 130px;
+            left: 820px;
+        }
+
+        .db-node {
+            --theme-color: var(--color-aqua);
+            top: 480px;
+            left: 820px;
+        }
+
+        .node-icon {
+            font-size: 50px;
+            color: var(--theme-color);
+        }
+
+        .node-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .node-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--color-text);
+            margin-bottom: 2px;
+            letter-spacing: -0.2px;
+        }
+
+        .node-subtitle {
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+            font-weight: 600;
+        }
+
+        /* Textos explicativos de las flechas */
+        .arrow-text {
+            position: absolute;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--color-text-light);
+            line-height: 1.35;
+            letter-spacing: -0.2px;
+        }
+
+        .offline-text {
+            top: 435px;
+            left: 140px;
+            text-align: left;
+        }
+
+        .sync-text {
+            top: 310px;
+            left: 690px;
+            text-align: left;
+        }
+
+        /* Lienzo SVG para dibujar las flechas */
+        .arrows-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="presentation-canvas">
+
+        <div class="main-title">Motor<br><span class="highlight">Offline-First</span></div>
+
+        <div class="arrow-text offline-text">Acceso Inmediato<br>(Offline)</div>
+        <div class="arrow-text sync-text">Sincronización en<br>Segundo Plano</div>
+
+        <!-- Mockup del Teléfono -->
+        <div class="phone-mockup">
+            <div class="phone-screen-bg"></div>
+            <div class="phone-logo">
+                <img src="../app/src/main/res/drawable/logo.png" alt="NotiFast Logo">
+            </div>
+        </div>
+
+        <!-- Nodo de la Nube -->
+        <div class="node-box cloud-node">
+            <span class="material-symbols-rounded node-icon">cloud_sync</span>
+            <div class="node-text">
+                <div class="node-title">Firebase</div>
+                <div class="node-subtitle">Cloud Firestore</div>
+            </div>
+        </div>
+
+        <!-- Nodo de la Base de Datos Local -->
+        <div class="node-box db-node">
+            <span class="material-symbols-rounded node-icon">database</span>
+            <div class="node-text">
+                <div class="node-title">Persistencia Local</div>
+                <div class="node-subtitle">Caché Nativo</div>
+            </div>
+        </div>
+
+        <!-- Trazado de flechas SVG -->
+        <svg class="arrows-svg" viewBox="0 0 1280 720">
+            <defs>
+                <!-- Punta de flecha para la línea gruesa (Aqua) -->
+                <marker id="arrow-thick" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+                    <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--color-aqua)" />
+                </marker>
+                
+                <!-- Punta de flecha para la línea punteada (Navy) -->
+                <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                    <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--color-navy)" />
+                </marker>
+            </defs>
+
+            <!-- Flecha Gruesa: Teléfono -> Base de Datos (Acceso Offline) -->
+            <!-- Sale del lado izquierdo del teléfono, baja y va a la derecha hacia la BD -->
+            <path d="M 450, 440 L 370, 440 Q 340, 440 340, 470 L 340, 500 Q 340, 530 370, 530 L 780, 530" 
+                  fill="none" stroke="var(--color-aqua)" stroke-width="12" marker-end="url(#arrow-thick)" stroke-linejoin="round" />
+
+            <!-- Flechas Punteadas: Teléfono <-> Nube (Sincronización en Segundo Plano) -->
+            <!-- Flecha de Subida (Sube hacia la nube) -->
+            <path d="M 535, 175 C 535, 80 730, 100 800, 155" 
+                  fill="none" stroke="var(--color-navy)" stroke-width="4.5" stroke-dasharray="10, 10" marker-end="url(#arrow-dashed)" />
+            
+            <!-- Flecha de Bajada (Baja hacia el teléfono) -->
+            <path d="M 940, 225 C 940, 340 750, 340 645, 340" 
+                  fill="none" stroke="var(--color-navy)" stroke-width="4.5" stroke-dasharray="10, 10" marker-end="url(#arrow-dashed)" />
+        </svg>
+
+    </div>
+</body>
+</html>

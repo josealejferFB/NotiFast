@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Gracias - Constelación Oscura</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0"
+        rel="stylesheet" />
+
+    <style>
+        :root {
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-navy: #1f2833;
+            --color-dark: #07090f;
+            /* Azul noche profundísimo */
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #000;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+        }
+
+        .canvas {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            background: radial-gradient(circle at center, #111a24 0%, var(--color-dark) 100%);
+            overflow: hidden;
+        }
+
+        .title {
+            position: absolute;
+            top: 70px;
+            width: 100%;
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 40px rgba(59, 151, 151, 0.4);
+            z-index: 20;
+            letter-spacing: -1.5px;
+        }
+
+        .title span {
+            background: linear-gradient(90deg, var(--color-aqua), #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Logo Central Brillante */
+        .center-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -40%);
+            width: 160px;
+            height: 160px;
+            background: #ffffff;
+            border-radius: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            box-shadow: 0 0 60px rgba(191, 9, 47, 0.35), 0 0 20px rgba(59, 151, 151, 0.5), inset 0 0 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .center-logo img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        /* SVG Red Neuronal / Constelación */
+        .lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        /* Nodos/Orbes de Materias */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            box-shadow: 0 0 25px var(--glow-color), inset 0 0 10px rgba(255, 255, 255, 0.05);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .orb:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .orb .material-symbols-rounded {
+            font-size: 38px;
+            filter: drop-shadow(0 0 10px var(--glow-color));
+            color: var(--icon-color);
+        }
+
+        /* Posiciones de los 12 Iconos alrededor del centro (640, 403 debido al translate -40%) */
+        .o1 {
+            top: 180px;
+            left: 350px;
+            width: 90px;
+            height: 90px;
+            --glow-color: rgba(59, 151, 151, 0.5);
+            --icon-color: #64b5f6;
+        }
+
+        /* Mates */
+        .o2 {
+            top: 220px;
+            left: 820px;
+            width: 80px;
+            height: 80px;
+            --glow-color: rgba(191, 9, 47, 0.5);
+            --icon-color: #ffb74d;
+        }
+
+        /* Historia */
+        .o3 {
+            top: 380px;
+            left: 220px;
+            width: 100px;
+            height: 100px;
+            --glow-color: rgba(59, 151, 151, 0.5);
+            --icon-color: #ba68c8;
+        }
+
+        /* Quimica */
+        .o4 {
+            top: 350px;
+            left: 950px;
+            width: 95px;
+            height: 95px;
+            --glow-color: rgba(191, 9, 47, 0.5);
+            --icon-color: #81c784;
+        }
+
+        /* Prog */
+        .o5 {
+            top: 560px;
+            left: 350px;
+            width: 85px;
+            height: 85px;
+            --glow-color: rgba(59, 151, 151, 0.5);
+            --icon-color: #f06292;
+        }
+
+        /* Arte */
+        .o6 {
+            top: 540px;
+            left: 820px;
+            width: 90px;
+            height: 90px;
+            --glow-color: rgba(191, 9, 47, 0.5);
+            --icon-color: #4dd0e1;
+        }
+
+        /* Fisica */
+        .o7 {
+            top: 120px;
+            left: 600px;
+            width: 65px;
+            height: 65px;
+            --glow-color: rgba(255, 255, 255, 0.3);
+            --icon-color: #aed581;
+        }
+
+        /* Bio */
+        .o8 {
+            top: 620px;
+            left: 600px;
+            width: 70px;
+            height: 70px;
+            --glow-color: rgba(255, 255, 255, 0.3);
+            --icon-color: #e04b6b;
+        }
+
+        /* Lit */
+        .o9 {
+            top: 250px;
+            left: 960px;
+            width: 65px;
+            height: 65px;
+            --glow-color: rgba(59, 151, 151, 0.4);
+            --icon-color: #6bc0c0;
+        }
+
+        /* Ing */
+        .o10 {
+            top: 500px;
+            left: 200px;
+            width: 75px;
+            height: 75px;
+            --glow-color: rgba(191, 9, 47, 0.4);
+            --icon-color: #e57373;
+        }
+
+        /* Dep */
+        .o11 {
+            top: 280px;
+            left: 250px;
+            width: 70px;
+            height: 70px;
+            --glow-color: rgba(255, 255, 255, 0.3);
+            --icon-color: #a1887f;
+        }
+
+        /* Geo */
+        .o12 {
+            top: 480px;
+            left: 980px;
+            width: 80px;
+            height: 80px;
+            --glow-color: rgba(59, 151, 151, 0.4);
+            --icon-color: #9575cd;
+        }
+
+        /* Mus */
+
+        /* Animación de Levitación Constelación */
+        @keyframes floatDark {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(3deg);
+            }
+        }
+
+        .orb {
+            animation: floatDark 5s ease-in-out infinite;
+        }
+
+        .o1 {
+            animation-delay: 0s;
+        }
+
+        .o2 {
+            animation-delay: 0.8s;
+        }
+
+        .o3 {
+            animation-delay: 1.5s;
+        }
+
+        .o4 {
+            animation-delay: 0.3s;
+        }
+
+        .o5 {
+            animation-delay: 2s;
+        }
+
+        .o6 {
+            animation-delay: 0.7s;
+        }
+
+        .o7 {
+            animation-delay: 1.2s;
+        }
+
+        .o8 {
+            animation-delay: 2.5s;
+        }
+
+        .o9 {
+            animation-delay: 0.4s;
+        }
+
+        .o10 {
+            animation-delay: 1.8s;
+        }
+
+        .o11 {
+            animation-delay: 0.9s;
+        }
+
+        .o12 {
+            animation-delay: 2.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="canvas">
+        <svg class="lines" viewBox="0 0 1280 720">
+            <g stroke-width="2.5" fill="none" stroke-linecap="round">
+                <!-- Conexiones del Logo Central (640, 403) a los nodos -->
+                <line x1="640" y1="403" x2="395" y2="225" stroke="rgba(59,151,151,0.4)" stroke-dasharray="4,8" />
+                <line x1="640" y1="403" x2="860" y2="260" stroke="rgba(191,9,47,0.4)" stroke-dasharray="4,8" />
+                <line x1="640" y1="403" x2="270" y2="430" stroke="rgba(59,151,151,0.4)" />
+                <line x1="640" y1="403" x2="997" y2="397" stroke="rgba(191,9,47,0.4)" />
+                <line x1="640" y1="403" x2="392" y2="602" stroke="rgba(59,151,151,0.4)" stroke-dasharray="4,8" />
+                <line x1="640" y1="403" x2="865" y2="585" stroke="rgba(191,9,47,0.4)" stroke-dasharray="4,8" />
+                <line x1="640" y1="403" x2="632" y2="152" stroke="rgba(255,255,255,0.2)" />
+                <line x1="640" y1="403" x2="635" y2="655" stroke="rgba(255,255,255,0.2)" />
+
+                <!-- Conexiones secundarias formando la red -->
+                <line x1="395" y1="225" x2="270" y2="430" stroke="rgba(59,151,151,0.25)" />
+                <line x1="860" y1="260" x2="997" y2="397" stroke="rgba(191,9,47,0.25)" />
+                <line x1="392" y1="602" x2="237" y2="537" stroke="rgba(191,9,47,0.25)" />
+                <line x1="865" y1="585" x2="1020" y2="520" stroke="rgba(59,151,151,0.25)" />
+                <line x1="285" y1="315" x2="395" y2="225" stroke="rgba(255,255,255,0.15)" />
+            </g>
+        </svg>
+
+        <h1 class="title">¡Gracias por su <span>Atención!</span></h1>
+
+        <div class="center-logo">
+            <img src="../app/src/main/res/drawable/logo.png" alt="NotiFast">
+        </div>
+
+        <!-- 12 Materias -->
+        <div class="orb o1"><span class="material-symbols-rounded">calculate</span></div>
+        <div class="orb o2"><span class="material-symbols-rounded">history_edu</span></div>
+        <div class="orb o3"><span class="material-symbols-rounded">science</span></div>
+        <div class="orb o4"><span class="material-symbols-rounded">terminal</span></div>
+        <div class="orb o5"><span class="material-symbols-rounded">palette</span></div>
+        <div class="orb o6"><span class="material-symbols-rounded">architecture</span></div>
+        <div class="orb o7"><span class="material-symbols-rounded">biotech</span></div>
+        <div class="orb o8"><span class="material-symbols-rounded">menu_book</span></div>
+        <div class="orb o9"><span class="material-symbols-rounded">language</span></div>
+        <div class="orb o10"><span class="material-symbols-rounded">sports_basketball</span></div>
+        <div class="orb o11"><span class="material-symbols-rounded">public</span></div>
+        <div class="orb o12"><span class="material-symbols-rounded">music_note</span></div>
+    </div>
+</body>
+
+</html>

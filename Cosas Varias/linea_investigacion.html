@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Línea de Investigación - NotiFast</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Paleta Oficial NotiFast */
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-navy: #1f2833;
+            --color-bg: #f4f6f9;
+            --color-text: #1a202c;
+            --color-text-light: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .presentation-canvas {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Lado Izquierdo: Tarjetas de Información */
+        .left-content {
+            width: 680px;
+            height: 100%;
+            padding-left: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 10;
+        }
+
+
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .research-card {
+            width: 580px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            /* Sombra leve */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.015);
+            border: 1px solid #f1f5f9;
+            border-left: 6px solid var(--theme-color);
+            position: relative;
+            left: var(--indent);
+        }
+
+        .theme-aqua { --theme-color: var(--color-aqua); --bg-soft: rgba(59, 151, 151, 0.08); }
+        .theme-ruby { --theme-color: var(--color-ruby); --bg-soft: rgba(191, 9, 47, 0.08); }
+        .theme-navy { --theme-color: var(--color-navy); --bg-soft: rgba(31, 40, 51, 0.08); }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: var(--bg-soft);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .card-icon .material-symbols-rounded {
+            font-size: 28px;
+            color: var(--theme-color);
+        }
+
+        .card-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--theme-color);
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-text);
+            line-height: 1.35;
+        }
+
+        /* Lado Derecho: Explosión de Iconos */
+        .explosion-container {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 600px;
+            height: 720px;
+            background: radial-gradient(circle at center, rgba(59, 151, 151, 0.03) 0%, transparent 70%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* SVG para las líneas de expansión (rayos) */
+        .explosion-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .explosion-center {
+            width: 140px;
+            height: 140px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.04), 0 0 0 10px rgba(255,255,255,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            border: 3px solid #f1f5f9;
+        }
+
+        .explosion-center img {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+        }
+
+        /* Orbes Flotantes */
+        .icon-orb {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+            z-index: 15;
+            border: 2px solid #f8fafc;
+        }
+
+        .icon-orb .material-symbols-rounded {
+            font-size: 32px;
+        }
+
+        .icon-orb.aqua { color: var(--color-aqua); }
+        .icon-orb.ruby { color: var(--color-ruby); }
+        .icon-orb.navy { color: var(--color-navy); }
+
+        /* Animación suave de flotación */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .orb-1 { top: 120px; left: 140px; width: 70px; height: 70px; animation: float 5s ease-in-out infinite; }
+        .orb-2 { top: 100px; left: 420px; width: 80px; height: 80px; animation: float 6s ease-in-out infinite 1s; }
+        .orb-3 { top: 320px; left: 520px; width: 60px; height: 60px; animation: float 4.5s ease-in-out infinite 0.5s; }
+        .orb-4 { top: 540px; left: 400px; width: 90px; height: 90px; animation: float 7s ease-in-out infinite 1.5s; }
+        .orb-5 { top: 570px; left: 150px; width: 75px; height: 75px; animation: float 5.5s ease-in-out infinite 0.2s; }
+        .orb-6 { top: 350px; left: 50px; width: 65px; height: 65px; animation: float 6.5s ease-in-out infinite 2s; }
+        .orb-7 { top: 210px; left: 280px; width: 50px; height: 50px; animation: float 4s ease-in-out infinite; }
+        .orb-8 { top: 480px; left: 300px; width: 55px; height: 55px; animation: float 5s ease-in-out infinite 1s; }
+
+    </style>
+</head>
+<body>
+    <div class="presentation-canvas">
+
+        <!-- Lado Izquierdo: Textos y Cajas -->
+        <div class="left-content">
+            
+            <div class="cards-container">
+                <!-- Tarjeta 1 -->
+                <div class="research-card theme-aqua" style="--indent: 0px;">
+                    <div class="card-icon"><span class="material-symbols-rounded">terminal</span></div>
+                    <div class="card-text">
+                        <div class="card-title">Línea de investigación</div>
+                        <div class="card-desc">Desarrollo de software.</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="research-card theme-ruby" style="--indent: 20px;">
+                    <div class="card-icon"><span class="material-symbols-rounded">task_alt</span></div>
+                    <div class="card-text">
+                        <div class="card-title">Modalidad</div>
+                        <div class="card-desc">Proyecto Factible.</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="research-card theme-navy" style="--indent: 40px;">
+                    <div class="card-icon"><span class="material-symbols-rounded">memory</span></div>
+                    <div class="card-text">
+                        <div class="card-title">Tipo de Investigación</div>
+                        <div class="card-desc">Estudio de carácter tecnológico y aplicado.</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div class="research-card theme-aqua" style="--indent: 20px;">
+                    <div class="card-icon"><span class="material-symbols-rounded">find_in_page</span></div>
+                    <div class="card-text">
+                        <div class="card-title">Nivel de la Investigación</div>
+                        <div class="card-desc">Descriptivo.</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 5 -->
+                <div class="research-card theme-ruby" style="--indent: 0px;">
+                    <div class="card-icon"><span class="material-symbols-rounded">architecture</span></div>
+                    <div class="card-text">
+                        <div class="card-title">Diseño de la Investigación</div>
+                        <div class="card-desc">Modalidad mixta (entrelaza diseño de campo con tecnológico y desarrollo de software).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lado Derecho: Explosión Dinámica de Iconos -->
+        <div class="explosion-container">
+            
+            <!-- Líneas SVG Conectoras de la explosión -->
+            <svg class="explosion-lines" viewBox="0 0 600 720">
+                <!-- El centro del logo está en 300, 360 -->
+                <g stroke="#cbd5e1" stroke-width="2.5" stroke-dasharray="6,8" fill="none" stroke-linecap="round">
+                    <line x1="300" y1="360" x2="175" y2="155" /> <!-- Hacia orb-1 -->
+                    <line x1="300" y1="360" x2="460" y2="140" /> <!-- Hacia orb-2 -->
+                    <line x1="300" y1="360" x2="550" y2="350" /> <!-- Hacia orb-3 -->
+                    <line x1="300" y1="360" x2="445" y2="585" /> <!-- Hacia orb-4 -->
+                    <line x1="300" y1="360" x2="187" y2="607" /> <!-- Hacia orb-5 -->
+                    <line x1="300" y1="360" x2="82" y2="382" />  <!-- Hacia orb-6 -->
+                    <line x1="300" y1="360" x2="305" y2="235" /> <!-- Hacia orb-7 -->
+                    <line x1="300" y1="360" x2="327" y2="507" /> <!-- Hacia orb-8 -->
+                </g>
+            </svg>
+
+            <!-- Centro de la Explosión -->
+            <div class="explosion-center">
+                <img src="../app/src/main/res/drawable/logo.png" alt="NotiFast Logo">
+            </div>
+
+            <!-- Nodos/Orbes flotantes -->
+            <div class="icon-orb aqua orb-1"><span class="material-symbols-rounded" style="font-size:36px;">school</span></div>
+            <div class="icon-orb ruby orb-2"><span class="material-symbols-rounded" style="font-size:42px;">menu_book</span></div>
+            <div class="icon-orb navy orb-3"><span class="material-symbols-rounded" style="font-size:32px;">science</span></div>
+            <div class="icon-orb aqua orb-4"><span class="material-symbols-rounded" style="font-size:48px;">bar_chart</span></div>
+            <div class="icon-orb ruby orb-5"><span class="material-symbols-rounded" style="font-size:38px;">psychology</span></div>
+            <div class="icon-orb aqua orb-6"><span class="material-symbols-rounded" style="font-size:34px;">schedule</span></div>
+            <div class="icon-orb ruby orb-7"><span class="material-symbols-rounded" style="font-size:26px;">notifications</span></div>
+            <div class="icon-orb navy orb-8"><span class="material-symbols-rounded" style="font-size:30px;">lightbulb</span></div>
+            
+        </div>
+
+    </div>
+</body>
+</html>

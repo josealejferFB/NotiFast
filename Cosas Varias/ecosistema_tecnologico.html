@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Ecosistema Tecnológico - NotiFast</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Paleta Oficial */
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-navy: #1f2833;
+            --color-bg: #f4f6f9;
+            --color-text: #1a202c;
+            --color-text-light: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--color-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .presentation-canvas {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .main-title {
+            position: absolute;
+            top: 50px;
+            left: 60px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--color-navy);
+            letter-spacing: -0.5px;
+        }
+
+        /* Títulos de las columnas alineados a cada grupo de tarjetas */
+        .column-header {
+            position: absolute;
+            width: 330px;
+            text-align: center;
+            top: 140px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-light);
+        }
+
+        .col-1-header { left: 60px; }
+        .col-2-header { left: 475px; }
+        .col-3-header { left: 890px; }
+
+        /* Estructura de Tarjetas - Adoptando el "doble marco" de Justificación */
+        .tech-pill-wrapper {
+            width: 330px;
+            height: 120px;
+            background: #ffffff;
+            border-radius: 30px;
+            padding: 10px; /* Borde exterior blanco (doble marco) */
+            /* Sombra mucho más leve según solicitud */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.025), 0 4px 10px rgba(0, 0, 0, 0.015);
+            position: absolute;
+            z-index: 10;
+        }
+
+        .tech-pill-inner {
+            border-radius: 20px;
+            border: 2.5px solid var(--theme-color);
+            height: 100%;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        /* Temas extraídos de la justificación */
+        .aqua-theme { --theme-color: var(--color-aqua); }
+        .ruby-theme { --theme-color: var(--color-ruby); }
+        .navy-theme { --theme-color: var(--color-navy); }
+
+        .tech-icon {
+            font-size: 45px;
+            color: var(--theme-color);
+            margin-right: 18px;
+            flex-shrink: 0;
+        }
+
+        .tech-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tech-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--color-text);
+            margin-bottom: 5px;
+            letter-spacing: -0.2px;
+        }
+
+        .tech-desc {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            line-height: 1.35;
+            font-weight: 500;
+        }
+
+        /* Posiciones Y */
+        #pill-1-1, #pill-2-1, #pill-3-1 { top: 200px; }
+        #pill-1-2, #pill-2-2, #pill-3-2 { top: 360px; }
+        #pill-1-3, #pill-2-3, #pill-3-3 { top: 520px; }
+
+        /* Posiciones X */
+        #pill-1-1, #pill-1-2, #pill-1-3 { left: 60px; }
+        #pill-2-1, #pill-2-2, #pill-2-3 { left: 475px; }
+        #pill-3-1, #pill-3-2, #pill-3-3 { left: 890px; }
+
+        /* Conectores SVG minimalistas (estilo circuito suave) */
+        .connectors {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="presentation-canvas">
+        
+        <h1 class="main-title">Arquitectura y Ecosistema</h1>
+
+        <!-- Encabezados de columnas -->
+        <div class="column-header col-1-header">Frontend & UI</div>
+        <div class="column-header col-2-header">Lógica & Patrones</div>
+        <div class="column-header col-3-header">Backend & Infraestructura</div>
+
+        <!-- Líneas Conectoras SVG (Simples y minimalistas) -->
+        <svg class="connectors" viewBox="0 0 1280 720">
+            <g stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="8, 10">
+                <!-- Conexiones de Frontend (Aqua) a Lógica -->
+                <path d="M 390, 260 L 475, 260" stroke="var(--color-aqua)" />
+                <path d="M 390, 420 L 475, 420" stroke="var(--color-aqua)" />
+                <path d="M 390, 580 L 475, 580" stroke="var(--color-aqua)" />
+
+                <!-- Conexiones de Lógica (Ruby) a Backend -->
+                <path d="M 805, 260 L 890, 260" stroke="var(--color-ruby)" />
+                <path d="M 805, 420 L 890, 420" stroke="var(--color-ruby)" />
+                <path d="M 805, 580 L 890, 580" stroke="var(--color-ruby)" />
+            </g>
+        </svg>
+
+        <!-- Columna 1: Frontend & UI (Aqua Theme) -->
+        <div class="tech-pill-wrapper aqua-theme" id="pill-1-1">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">code</span>
+                <div class="tech-text">
+                    <div class="tech-title">Kotlin</div>
+                    <div class="tech-desc">Lenguaje nativo principal del proyecto.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-pill-wrapper aqua-theme" id="pill-1-2">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">layers</span>
+                <div class="tech-text">
+                    <div class="tech-title">Jetpack Compose</div>
+                    <div class="tech-desc">Diseño declarativo UI con Material 3.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-pill-wrapper aqua-theme" id="pill-1-3">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">image</span>
+                <div class="tech-text">
+                    <div class="tech-title">Coil</div>
+                    <div class="tech-desc">Gestión y carga asíncrona de imágenes.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna 2: Lógica & Patrones (Ruby Theme) -->
+        <div class="tech-pill-wrapper ruby-theme" id="pill-2-1">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">account_tree</span>
+                <div class="tech-text">
+                    <div class="tech-title">Clean Architecture</div>
+                    <div class="tech-desc">Separación en Data, Domain y Presentation.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-pill-wrapper ruby-theme" id="pill-2-2">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">schema</span>
+                <div class="tech-text">
+                    <div class="tech-title">MVVM + MVI Contract</div>
+                    <div class="tech-desc">Gestión de estado unidireccional por feature.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-pill-wrapper ruby-theme" id="pill-2-3">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">sync_alt</span>
+                <div class="tech-text">
+                    <div class="tech-title">Coroutines & Flow</div>
+                    <div class="tech-desc">Manejo de programación reactiva y asíncrona.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna 3: Backend & Infraestructura (Navy Theme) -->
+        <div class="tech-pill-wrapper navy-theme" id="pill-3-1">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">local_fire_department</span>
+                <div class="tech-text">
+                    <div class="tech-title">Firebase</div>
+                    <div class="tech-desc">Firestore, Authentication y Cloud Storage.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-pill-wrapper navy-theme" id="pill-3-2">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">hub</span>
+                <div class="tech-text">
+                    <div class="tech-title">Hilt (Dagger)</div>
+                    <div class="tech-desc">Inyección de dependencias escalable.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-pill-wrapper navy-theme" id="pill-3-3">
+            <div class="tech-pill-inner">
+                <span class="material-symbols-rounded tech-icon">route</span>
+                <div class="tech-text">
+                    <div class="tech-title">Navigation Compose</div>
+                    <div class="tech-desc">Flujo de rutas y navegación nativa.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

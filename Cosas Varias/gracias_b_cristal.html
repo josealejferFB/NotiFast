@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Gracias - Big Bang Cristalino</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --color-ruby: #BF092F;
+            --color-aqua: #3B9797;
+            --color-navy: #1f2833;
+        }
+
+        body { 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow: hidden; 
+        }
+
+        .canvas { 
+            position: relative; 
+            width: 1280px; 
+            height: 720px; 
+            background: #ffffff; 
+            overflow: hidden; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        /* Líneas de Velocidad tipo explosión central */
+        .speed-lines { 
+            position: absolute; 
+            width: 2000px; 
+            height: 2000px; 
+            background: conic-gradient(
+                from 0deg, 
+                transparent 0deg, rgba(59,151,151,0.03) 15deg, 
+                transparent 30deg, rgba(191,9,47,0.03) 45deg, 
+                transparent 60deg, rgba(59,151,151,0.03) 75deg, 
+                transparent 90deg, rgba(191,9,47,0.03) 105deg,
+                transparent 120deg, rgba(31,40,51,0.02) 135deg,
+                transparent 150deg, rgba(59,151,151,0.03) 165deg,
+                transparent 180deg, rgba(191,9,47,0.03) 195deg,
+                transparent 210deg, rgba(59,151,151,0.03) 225deg,
+                transparent 240deg, rgba(191,9,47,0.03) 255deg,
+                transparent 270deg, rgba(31,40,51,0.02) 285deg,
+                transparent 300deg, rgba(59,151,151,0.03) 315deg,
+                transparent 330deg, rgba(191,9,47,0.03) 345deg,
+                transparent 360deg
+            ); 
+            animation: spin 90s linear infinite; 
+            z-index: 1; 
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Texto Central Gigante */
+        .huge-text { 
+            position: absolute; 
+            text-align: center; 
+            font-size: 6.5rem; 
+            font-weight: 900; 
+            line-height: 1.05; 
+            z-index: 30; 
+            letter-spacing: -2.5px; 
+            pointer-events: none; 
+        }
+
+        .huge-text span { 
+            background: linear-gradient(135deg, var(--color-navy), var(--color-ruby)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.05)); 
+        }
+
+        .huge-text .aqua-tint { 
+            background: linear-gradient(135deg, var(--color-aqua), var(--color-navy)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        /* Logo de la app de fondo gigante (marca de agua) */
+        .logo-bg { 
+            position: absolute; 
+            opacity: 0.03; 
+            transform: scale(4.5); 
+            z-index: 2; 
+        }
+        
+        /* Burbujas Glassmorphism para las materias */
+        .bubble { 
+            position: absolute; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.9); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05), inset 0 0 0 3px rgba(255,255,255,0.8); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 20; 
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+
+        .bubble:hover { 
+            transform: scale(1.25) translateY(-10px); 
+            background: #ffffff; 
+            box-shadow: 0 25px 45px rgba(59,151,151,0.15), inset 0 0 0 3px var(--color-aqua); 
+            z-index: 40;
+        }
+
+        .bubble .material-symbols-rounded { 
+            font-size: 42px; 
+            color: var(--icon-color);
+            transition: transform 0.3s;
+        }
+
+        .bubble:hover .material-symbols-rounded {
+            transform: rotate(10deg);
+        }
+
+        /* Posiciones Explosivas rodeando el texto */
+        .b1 { top: 80px; left: 180px; width: 100px; height: 100px; --icon-color:#64b5f6; }
+        .b2 { top: 100px; left: 880px; width: 110px; height: 110px; --icon-color:#ffb74d; }
+        .b3 { top: 520px; left: 140px; width: 120px; height: 120px; --icon-color:#ba68c8; }
+        .b4 { top: 480px; left: 980px; width: 105px; height: 105px; --icon-color:#81c784; }
+        .b5 { top: 280px; left: 60px; width: 85px; height: 85px; --icon-color:#f06292; }
+        .b6 { top: 260px; left: 1120px; width: 95px; height: 95px; --icon-color:#4dd0e1; }
+        .b7 { top: 60px; left: 580px; width: 80px; height: 80px; --icon-color:#aed581; }
+        .b8 { top: 600px; left: 600px; width: 90px; height: 90px; --icon-color:var(--color-ruby); }
+        .b9 { top: 180px; left: 400px; width: 70px; height: 70px; --icon-color:var(--color-aqua); }
+        .b10 { top: 420px; left: 820px; width: 75px; height: 75px; --icon-color:#e57373; }
+        .b11 { top: 420px; left: 320px; width: 80px; height: 80px; --icon-color:#a1887f; }
+        .b12 { top: 150px; left: 1050px; width: 85px; height: 85px; --icon-color:#9575cd; }
+        
+        /* Animación de Deriva Continua */
+        @keyframes driftLight { 
+            0%, 100% { transform: translate(0, 0) rotate(0deg); } 
+            50% { transform: translate(12px, -15px) rotate(5deg); } 
+        }
+        .bubble { animation: driftLight 6s ease-in-out infinite; }
+        .b1 { animation-delay: 0s; } .b2 { animation-delay: 1.2s; } .b3 { animation-delay: 0.5s; } .b4 { animation-delay: 1.8s; }
+        .b5 { animation-delay: 2.5s; } .b6 { animation-delay: 0.3s; } .b7 { animation-delay: 1s; } .b8 { animation-delay: 2.1s; }
+        .b9 { animation-delay: 0.7s; } .b10 { animation-delay: 1.5s; } .b11 { animation-delay: 0.2s; } .b12 { animation-delay: 2.8s; }
+
+    </style>
+</head>
+<body>
+    <div class="canvas">
+        <!-- Efecto de Velocidad Explosivo -->
+        <div class="speed-lines"></div>
+        
+        <!-- Marca de Agua Central -->
+        <img class="logo-bg" src="../app/src/main/res/drawable/logo.png" alt="Logo Watermark">
+        
+        <!-- Título Épico -->
+        <h1 class="huge-text">
+            <span class="aqua-tint">¡Gracias</span><br>
+            <span>por su atención!</span>
+        </h1>
+
+        <!-- 12 Burbujas de Materias -->
+        <div class="bubble b1"><span class="material-symbols-rounded">calculate</span></div>
+        <div class="bubble b2"><span class="material-symbols-rounded">history_edu</span></div>
+        <div class="bubble b3"><span class="material-symbols-rounded">science</span></div>
+        <div class="bubble b4"><span class="material-symbols-rounded">terminal</span></div>
+        <div class="bubble b5"><span class="material-symbols-rounded">palette</span></div>
+        <div class="bubble b6"><span class="material-symbols-rounded">architecture</span></div>
+        <div class="bubble b7"><span class="material-symbols-rounded">biotech</span></div>
+        <div class="bubble b8"><span class="material-symbols-rounded">menu_book</span></div>
+        <div class="bubble b9"><span class="material-symbols-rounded">language</span></div>
+        <div class="bubble b10"><span class="material-symbols-rounded">sports_basketball</span></div>
+        <div class="bubble b11"><span class="material-symbols-rounded">public</span></div>
+        <div class="bubble b12"><span class="material-symbols-rounded">music_note</span></div>
+    </div>
+</body>
+</html>
