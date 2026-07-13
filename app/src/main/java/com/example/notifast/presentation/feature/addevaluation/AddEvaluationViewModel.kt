@@ -55,6 +55,7 @@ class AddEvaluationViewModel @Inject constructor(
                     _uiState.update { it.copy(weight = v) }
                 }
             }
+            is AddEvaluationEvent.SelectType -> _uiState.update { it.copy(selectedType = event.type) }
             is AddEvaluationEvent.Save -> save(event.date, event.imageUri)
         }
     }
@@ -71,7 +72,8 @@ class AddEvaluationViewModel @Inject constructor(
                 description = state.description,
                 date = date,
                 quickTips = state.quickTips,
-                weight = state.weight.toDoubleOrNull()
+                type = state.selectedType.name,
+                weight = if (state.selectedType.showWeight) state.weight.toDoubleOrNull() else null
             )
             evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess {
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }

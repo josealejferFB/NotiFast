@@ -18,6 +18,10 @@ import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -42,8 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.size
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.notifast.data.model.EvaluationType
 import com.example.notifast.presentation.atoms.NotiFastDatePickerField
 import com.example.notifast.presentation.atoms.NotiFastFormField
 import com.example.notifast.presentation.atoms.NotiFastImagePickerField
@@ -77,7 +83,7 @@ fun AddEvaluationScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { NotiFastCenterAlignedTopBar(title = "Nueva Evaluación") }
+            topBar = { NotiFastCenterAlignedTopBar(title = "Añadir ${uiState.selectedType.label}") }
         ) { padding ->
             Column(
                 modifier = Modifier
@@ -130,6 +136,34 @@ fun AddEvaluationScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    EvaluationType.entries.forEach { type ->
+                        FilterChip(
+                            selected = uiState.selectedType == type,
+                            onClick = { viewModel.onEvent(AddEvaluationEvent.SelectType(type)) },
+                            label = { Text(type.label, fontSize = 12.sp) },
+                            leadingIcon = {
+                                Icon(type.icon, contentDescription = null, modifier = Modifier.size(16.dp))
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = type.color.copy(alpha = 0.15f),
+                                selectedLabelColor = type.color,
+                                selectedLeadingIconColor = type.color
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = uiState.selectedType == type,
+                                selectedBorderColor = type.color
+                            )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 NotiFastFormField(
                     value = uiState.title,
                     onValueChange = { viewModel.onEvent(AddEvaluationEvent.UpdateTitle(it)) },
@@ -171,16 +205,18 @@ fun AddEvaluationScreen(
                     cursorColor = Color(0xFFFBC02D)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                if (uiState.selectedType.showWeight) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                NotiFastFormField(
-                    value = uiState.weight,
-                    onValueChange = { viewModel.onEvent(AddEvaluationEvent.UpdateWeight(it)) },
-                    label = "Peso / Porcentaje (opcional)",
-                    leadingIcon = Icons.Default.Scale,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    cursorColor = Aqua
-                )
+                    NotiFastFormField(
+                        value = uiState.weight,
+                        onValueChange = { viewModel.onEvent(AddEvaluationEvent.UpdateWeight(it)) },
+                        label = "Peso / Porcentaje (opcional)",
+                        leadingIcon = Icons.Default.Scale,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        cursorColor = Aqua
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -196,7 +232,7 @@ fun AddEvaluationScreen(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     enabled = uiState.selectedSubject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isSaving
                 ) {
-                    Text("GUARDAR EVALUACIÓN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                    Text("GUARDAR ${uiState.selectedType.label.uppercase()}", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }
