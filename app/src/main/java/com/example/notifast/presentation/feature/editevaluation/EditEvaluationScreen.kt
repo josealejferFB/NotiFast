@@ -26,6 +26,8 @@ import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.notifast.data.model.EvaluationType
 import com.example.notifast.presentation.atoms.NotiFastDatePickerField
 import com.example.notifast.presentation.atoms.NotiFastFormField
 import com.example.notifast.presentation.atoms.NotiFastImagePickerField
@@ -74,11 +77,13 @@ fun EditEvaluationScreen(
     var selectedImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var selectedDate by remember { mutableStateOf(uiState.date ?: Date()) }
 
+    val evaluationType = EvaluationType.fromName(uiState.type)
+
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { NotiFastCenterAlignedTopBar(title = "Editar Evaluación") }
+            topBar = { NotiFastCenterAlignedTopBar(title = "Editar ${evaluationType.label}") }
         ) { padding ->
             Column(
                 modifier = Modifier
@@ -114,47 +119,49 @@ fun EditEvaluationScreen(
                     leadingIcon = Icons.Default.Title
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                if (evaluationType.showGrade) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    NotiFastFormField(
-                        value = uiState.grade,
-                        onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateGrade(it)) },
-                        label = "Nota (1-10)",
-                        leadingIcon = Icons.Default.Grade,
-                        cursorColor = Color(0xFFFFB300),
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable { viewModel.onEvent(EditEvaluationEvent.TogglePresented) },
-                        color = if (uiState.isPresented) Aqua.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.7f),
-                        border = if (uiState.isPresented) BorderStroke(1.dp, Aqua) else null
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                        NotiFastFormField(
+                            value = uiState.grade,
+                            onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateGrade(it)) },
+                            label = "Nota (1-10)",
+                            leadingIcon = Icons.Default.Grade,
+                            cursorColor = Color(0xFFFFB300),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .clickable { viewModel.onEvent(EditEvaluationEvent.TogglePresented) },
+                            color = if (uiState.isPresented) Aqua.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.7f),
+                            border = if (uiState.isPresented) BorderStroke(1.dp, Aqua) else null
                         ) {
-                            Icon(
-                                imageVector = if (uiState.isPresented) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
-                                contentDescription = null,
-                                tint = if (uiState.isPresented) Aqua else Color.Gray
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                if (uiState.isPresented) "Presentado" else "Pendiente",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (uiState.isPresented) Aqua else Color.Gray
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (uiState.isPresented) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+                                    contentDescription = null,
+                                    tint = if (uiState.isPresented) Aqua else Color.Gray
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    if (uiState.isPresented) "Presentado" else "Pendiente",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (uiState.isPresented) Aqua else Color.Gray
+                                )
+                            }
                         }
                     }
                 }
@@ -194,16 +201,18 @@ fun EditEvaluationScreen(
                     cursorColor = Color(0xFFFBC02D)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                if (evaluationType.showWeight) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                NotiFastFormField(
-                    value = uiState.weight,
-                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateWeight(it)) },
-                    label = "Peso / Porcentaje (opcional)",
-                    leadingIcon = Icons.Default.Scale,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    cursorColor = Aqua
-                )
+                    NotiFastFormField(
+                        value = uiState.weight,
+                        onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateWeight(it)) },
+                        label = "Peso / Porcentaje (opcional)",
+                        leadingIcon = Icons.Default.Scale,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        cursorColor = Aqua
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -219,7 +228,7 @@ fun EditEvaluationScreen(
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                     enabled = uiState.title.isNotBlank() && !uiState.isSaving
                 ) {
-                    Text("ACTUALIZAR EVALUACIÓN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                    Text("ACTUALIZAR ${evaluationType.label.uppercase()}", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }

@@ -38,6 +38,7 @@ class EditEvaluationViewModel @Inject constructor(
                 it.copy(
                     isLoading = false,
                     evalId = eval.id,
+                    type = eval.type,
                     subjectName = eval.subjectName,
                     title = eval.title,
                     description = eval.description,
@@ -88,6 +89,7 @@ class EditEvaluationViewModel @Inject constructor(
                 description = state.description,
                 date = date,
                 imageUrl = if (imageUri != null) null else state.existingImageUrl,
+                type = state.type,
                 quickTips = state.quickTips,
                 grade = state.grade.toDoubleOrNull(),
                 weight = state.weight.toDoubleOrNull(),

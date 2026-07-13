@@ -1,10 +1,13 @@
 package com.example.notifast.presentation.feature.editevaluation
 
+import com.example.notifast.data.model.EvaluationType
+
 data class EditEvaluationUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val evalId: String = "",
+    val type: String = EvaluationType.EXAM.name,
     val subjectName: String = "",
     val title: String = "",
     val description: String = "",
