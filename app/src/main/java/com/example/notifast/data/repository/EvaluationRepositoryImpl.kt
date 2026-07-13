@@ -52,6 +52,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "noteIds" to evaluation.noteIds,
                 "quickTips" to evaluation.quickTips,
                 "isPresented" to evaluation.isPresented,
+                "type" to evaluation.type,
                 "createdAt" to FieldValue.serverTimestamp(),
                 "updatedAt" to FieldValue.serverTimestamp()
             )
@@ -85,6 +86,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 "subjectName" to evaluation.subjectName,
                 "quickTips" to evaluation.quickTips,
                 "isPresented" to evaluation.isPresented,
+                "type" to evaluation.type,
                 "updatedAt" to FieldValue.serverTimestamp()
             )
             // Update date: only set if present, do not store empty string
