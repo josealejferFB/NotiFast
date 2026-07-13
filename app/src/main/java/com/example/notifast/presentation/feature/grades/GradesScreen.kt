@@ -67,7 +67,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notifast.data.model.Evaluation
 import com.example.notifast.domain.util.GradeConstants
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
@@ -89,7 +88,14 @@ fun GradesScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
-        Scaffold(containerColor = Color.Transparent, topBar = { NotiFastCenterAlignedTopBar(title = "Rendimiento") }) { innerPadding ->
+        Scaffold(containerColor = Color.Transparent, topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Calificaciones",
+                        onBackClick = { }
+                    )
+                )
+            }) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding).safeDrawingPadding()) {
             LazyColumn(
                 modifier = Modifier

@@ -69,8 +69,7 @@ fun NotiFastBottomNav(
                         label = "scale"
                     )
                     IconButton(
-                        onClick = { onItemClick(screen) },
-                        modifier = Modifier.size(40.dp)
+                        onClick = { onItemClick(screen) }
                     ) {
                         screen.icon?.let {
                             Icon(

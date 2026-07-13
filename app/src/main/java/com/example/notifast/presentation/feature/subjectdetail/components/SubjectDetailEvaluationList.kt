@@ -1,5 +1,6 @@
 package com.example.notifast.presentation.feature.subjectdetail.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -34,19 +35,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.notifast.data.model.Evaluation
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
+import java.util.Calendar
+import java.util.Date
 
 private fun parseSubjectColor(hex: String): Color {
     return try {
         if (hex.isNotBlank()) Color(android.graphics.Color.parseColor(hex))
         else Aqua
     } catch (e: Exception) { Aqua }
+}
+
+private fun getMonthNameShort(date: Date?): String {
+    if (date == null) return "S/F"
+    val cal = Calendar.getInstance().apply { time = date }
+    val months = arrayOf("ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC")
+    return months[cal.get(Calendar.MONTH)]
+}
+
+private fun getDay(date: Date?): String {
+    if (date == null) return "-"
+    val cal = Calendar.getInstance().apply { time = date }
+    return cal.get(Calendar.DAY_OF_MONTH).toString()
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -62,70 +78,102 @@ fun SubjectDetailEvaluationList(
 
     val color = parseSubjectColor(subjectColorHex)
 
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
-        Spacer(Modifier.height(16.dp))
-        Surface(
-            shape = CircleShape,
-            color = color.copy(alpha = 0.15f)
-        ) {
-            Text(
-                text = "Todas las evaluaciones",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = color,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
-        Spacer(Modifier.height(12.dp))
-
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
         evaluations.forEach { eval ->
             var showMenu by remember { mutableStateOf(false) }
             val isCompleted = eval.isPresented
 
             Card(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().combinedClickable(
                         onClick = {},
                         onLongClick = { showMenu = true }
-                    ).padding(12.dp),
+                    ).padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier.size(10.dp).clip(CircleShape).background(
-                            if (isCompleted) Color(0xFF43A047) else color.copy(alpha = 0.3f)
-                        )
-                    )
-                    Spacer(Modifier.width(12.dp))
+                    // Calendar Sheet Aesthetic
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        border = BorderStroke(1.dp, color.copy(alpha = 0.2f)),
+                        modifier = Modifier.width(64.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(color)
+                                    .padding(vertical = 4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = getMonthNameShort(eval.date),
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Text(
+                                text = getDay(eval.date),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(vertical = 6.dp)
+                            )
+                        }
+                    }
+                    
+                    Spacer(Modifier.width(16.dp))
+                    
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(eval.title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = eval.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(Modifier.height(4.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (isCompleted) {
-                                Surface(shape = RoundedCornerShape(6.dp), color = Aqua.copy(alpha = 0.1f)) {
+                                Surface(shape = RoundedCornerShape(6.dp), color = color.copy(alpha = 0.15f)) {
                                     Text(
                                         text = eval.grade?.let { String.format("%.1f", it) } ?: "\u2014",
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                        style = MaterialTheme.typography.labelSmall,
+                                        style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = Aqua
+                                        color = color
                                     )
                                 }
                             } else {
-                                Text("Pendiente", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Surface(shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+                                    Text(
+                                        text = "Pendiente",
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                             val weight = eval.weight ?: 0.0
                             if (weight > 0.0) {
-                                Spacer(Modifier.width(6.dp))
-                                Text("${(weight * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = "${(weight * 100).toInt()}% peso",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         }
                     }
                 }
+                
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }

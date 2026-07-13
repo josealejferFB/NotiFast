@@ -24,7 +24,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notifast.presentation.atoms.NotiFastButton
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
 import com.example.notifast.presentation.atoms.NotiFastTextField
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,10 +42,17 @@ fun EditNoteScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
-        Scaffold(containerColor = Color.Transparent, topBar = { NotiFastCenterAlignedTopBar(title = "Editar Apunte") }) { innerPadding ->
+        Scaffold(containerColor = Color.Transparent,            topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Editar Apunte",
+                        onBackClick = onBackClick
+                    )
+                )
+            }) { innerPadding ->
         if (uiState.note == null) { NotiFastCircularLoading(); return@Scaffold }
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp)) {
-            NotiFastTextField(value = uiState.subject, onValueChange = { viewModel.onEvent(EditNoteEvent.SubjectChanged(it)) }, label = "Materia", modifier = Modifier.fillMaxWidth())
+            NotiFastTextField(value = uiState.note?.subject ?: "", onValueChange = {}, label = "Materia", modifier = Modifier.fillMaxWidth(), readOnly = true)
             Spacer(Modifier.height(12.dp))
             NotiFastTextField(value = uiState.title, onValueChange = { viewModel.onEvent(EditNoteEvent.TitleChanged(it)) }, label = "Título", modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp))

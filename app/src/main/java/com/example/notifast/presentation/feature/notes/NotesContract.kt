@@ -39,7 +39,6 @@ sealed interface NotesEvent {
     data class SetFilter(val filter: NoteFilter) : NotesEvent
     data class Search(val query: String) : NotesEvent
     data class DeleteNote(val note: Note) : NotesEvent
-    data class UpdateNote(val note: Note, val title: String, val content: String) : NotesEvent
     data object ClearSyncMessage : NotesEvent
     data class ToggleSubject(val subjectName: String) : NotesEvent
     data class DeleteSubject(val subjectName: String) : NotesEvent

@@ -44,9 +44,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,6 +69,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
+import com.example.notifast.presentation.atoms.NotiFastExpandableFab
+import com.example.notifast.presentation.atoms.FabAction
 import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailCalendarRow
 import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailHero
 import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailNotesMosaic
@@ -80,6 +87,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import com.example.notifast.data.model.Evaluation
 import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailEvaluationList
 
@@ -97,9 +105,9 @@ fun SubjectDetailScreen(
     var gradeDialogEval by remember { mutableStateOf<Evaluation?>(null) }
     var deleteEvalId by remember { mutableStateOf<String?>(null) }
     val isHeaderVisible = expandedNote == null
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        NotiFastStudyBackground()
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         if (uiState.isLoading) { NotiFastCircularLoading(); return@Box }
 
         AnimatedVisibility(
@@ -109,149 +117,121 @@ fun SubjectDetailScreen(
         ) {
             Scaffold(
                 containerColor = Color.Transparent,
-                topBar = {
-                    Box(modifier = Modifier.fillMaxWidth().statusBarsPadding()) {
-                        IconButton(onClick = onBackClick) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
-                        }
-                    }
-                },
                 floatingActionButton = {
-                    var isSpeedDialOpen by remember { mutableStateOf(false) }
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    NotiFastExpandableFab(
+                        actions = listOf(
+                            FabAction("Nuevo Horario", Icons.Default.Schedule, { onAddScheduleClick(uiState.subjectName) }, "Añadir Horario", Aqua),
+                            FabAction("Nueva Evaluación", Icons.Default.CalendarMonth, { onAddEvaluationClick(uiState.subjectName) }, "Añadir Evaluación", Aqua),
+                            FabAction("Nuevo Apunte", Icons.Default.Edit, { onAddNoteClick(uiState.subjectName) }, "Añadir Apunte", Aqua)
+                        )
+                    )
+                }
+            ) { padding ->
+                Column(modifier = Modifier.fillMaxSize().padding(bottom = padding.calculateBottomPadding())) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 140.dp)
                     ) {
-                        AnimatedVisibility(
-                            visible = isSpeedDialOpen,
-                            enter = fadeIn() + scaleIn(initialScale = 0.8f),
-                            exit = fadeOut() + scaleOut(targetScale = 0.8f)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.End,
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                        item(key = "hero") {
+                            SubjectDetailHero(
+                                subjectName = uiState.subjectName,
+                                subjectIcon = uiState.subjectIcon,
+                                subjectColorHex = uiState.subjectColorHex,
+                                noteCount = uiState.notes.size,
+                                evalCount = uiState.evaluations.size,
+                                onBackClick = onBackClick
+                            )
+                        }
+
+                        @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+                        stickyHeader(key = "tabs") {
+                            androidx.compose.material3.Surface(
+                                color = MaterialTheme.colorScheme.background,
+                                shadowElevation = 2.dp
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 2.dp) {
-                                        Text("Nuevo Horario", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium)
+                                TabRow(
+                                    selectedTabIndex = selectedTabIndex,
+                                    containerColor = Color.Transparent,
+                                    contentColor = Ruby,
+                                    indicator = { tabPositions ->
+                                        TabRowDefaults.SecondaryIndicator(
+                                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                                            color = Ruby
+                                        )
                                     }
-                                    Spacer(Modifier.width(12.dp))
-                                    FloatingActionButton(
-                                        onClick = { isSpeedDialOpen = false; onAddScheduleClick(uiState.subjectName) },
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        modifier = Modifier.size(48.dp)
-                                    ) { Icon(Icons.Default.Schedule, contentDescription = null, tint = Aqua) }
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 2.dp) {
-                                        Text("Nueva Evaluación", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium)
-                                    }
-                                    Spacer(Modifier.width(12.dp))
-                                    FloatingActionButton(
-                                        onClick = { isSpeedDialOpen = false; onAddEvaluationClick(uiState.subjectName) },
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        modifier = Modifier.size(48.dp)
-                                    ) { Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Aqua) }
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    androidx.compose.material3.Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 2.dp) {
-                                        Text("Nuevo Apunte", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium)
-                                    }
-                                    Spacer(Modifier.width(12.dp))
-                                    FloatingActionButton(
-                                        onClick = { isSpeedDialOpen = false; onAddNoteClick(uiState.subjectName) },
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        modifier = Modifier.size(48.dp)
-                                    ) { Icon(Icons.Default.Edit, contentDescription = null, tint = Aqua) }
+                                ) {
+                                    Tab(
+                                        selected = selectedTabIndex == 0,
+                                        onClick = { selectedTabIndex = 0 },
+                                        text = { Text("Resumen", fontWeight = if (selectedTabIndex == 0) FontWeight.Bold else FontWeight.Medium) }
+                                    )
+                                    Tab(
+                                        selected = selectedTabIndex == 1,
+                                        onClick = { selectedTabIndex = 1 },
+                                        text = { Text("Evaluaciones", fontWeight = if (selectedTabIndex == 1) FontWeight.Bold else FontWeight.Medium) }
+                                    )
+                                    Tab(
+                                        selected = selectedTabIndex == 2,
+                                        onClick = { selectedTabIndex = 2 },
+                                        text = { Text("Apuntes", fontWeight = if (selectedTabIndex == 2) FontWeight.Bold else FontWeight.Medium) }
+                                    )
                                 }
                             }
                         }
-                        FloatingActionButton(
-                            onClick = { isSpeedDialOpen = !isSpeedDialOpen },
-                            containerColor = Ruby,
-                            contentColor = Color.White,
-                            shape = CircleShape
-                        ) {
-                            Icon(
-                                if (isSpeedDialOpen) Icons.Default.Close else Icons.Default.Add,
-                                contentDescription = "Opciones",
-                                modifier = Modifier.size(24.dp)
-                            )
+
+                        when (selectedTabIndex) {
+                            0 -> {
+                                item(key = "stats") {
+                                    SubjectDetailStats(
+                                        averageGrade = uiState.averageGrade,
+                                        completedEvalCount = uiState.completedEvalCount,
+                                        pendingEvalCount = uiState.pendingEvalCount,
+                                        totalEvalCount = uiState.evaluations.size,
+                                        noteCount = uiState.notes.size,
+                                        subjectColorHex = uiState.subjectColorHex
+                                    )
+                                }
+                                item(key = "progress") {
+                                    SubjectDetailProgress(
+                                        progressPercent = uiState.progressPercent,
+                                        completedCount = uiState.completedEvalCount,
+                                        totalCount = uiState.evaluations.size,
+                                        subjectColorHex = uiState.subjectColorHex
+                                    )
+                                }
+                            }
+                            1 -> {
+                                item(key = "timeline") {
+                                    SubjectDetailTimeline(
+                                        upcomingEvaluations = uiState.upcomingEvaluations,
+                                        subjectColorHex = uiState.subjectColorHex,
+                                        onMarkComplete = { gradeDialogEval = it },
+                                        onDeleteEval = { deleteEvalId = it.id }
+                                    )
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                                item(key = "all-evaluations") {
+                                    SubjectDetailEvaluationList(
+                                        evaluations = uiState.evaluations,
+                                        subjectColorHex = uiState.subjectColorHex,
+                                        onMarkComplete = { gradeDialogEval = it },
+                                        onEditGrade = { gradeDialogEval = it },
+                                        onDeleteEval = { deleteEvalId = it.id }
+                                    )
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
+                            2 -> {
+                                item(key = "notes") {
+                                    SubjectDetailNotesMosaic(
+                                        notes = uiState.notes,
+                                        subjectColorHex = uiState.subjectColorHex,
+                                        onNoteClick = { expandedNote = it }
+                                    )
+                                    Spacer(Modifier.height(24.dp))
+                                }
+                            }
                         }
-                    }
-                }
-            ) { padding ->
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 140.dp + padding.calculateBottomPadding())
-                ) {
-                    item(key = "hero") {
-                        SubjectDetailHero(
-                            subjectName = uiState.subjectName,
-                            subjectIcon = uiState.subjectIcon,
-                            subjectColorHex = uiState.subjectColorHex,
-                            noteCount = uiState.notes.size,
-                            evalCount = uiState.evaluations.size,
-                            onBackClick = onBackClick
-                        )
-                    }
-
-                    item(key = "stats") {
-                        SubjectDetailStats(
-                            averageGrade = uiState.averageGrade,
-                            completedEvalCount = uiState.completedEvalCount,
-                            pendingEvalCount = uiState.pendingEvalCount,
-                            totalEvalCount = uiState.evaluations.size,
-                            noteCount = uiState.notes.size,
-                            subjectColorHex = uiState.subjectColorHex
-                        )
-                    }
-
-                    item(key = "timeline") {
-                        SubjectDetailTimeline(
-                            upcomingEvaluations = uiState.upcomingEvaluations,
-                            subjectColorHex = uiState.subjectColorHex,
-                            onMarkComplete = { gradeDialogEval = it },
-                            onDeleteEval = { deleteEvalId = it.id }
-                        )
-                        Spacer(Modifier.height(24.dp))
-                    }
-
-                    item(key = "calendar") {
-                        SubjectDetailCalendarRow(
-                            evaluations = uiState.evaluations.filter { it.date != null },
-                            subjectColorHex = uiState.subjectColorHex
-                        )
-                        Spacer(Modifier.height(24.dp))
-                    }
-
-                    item(key = "all-evaluations") {
-                        SubjectDetailEvaluationList(
-                            evaluations = uiState.evaluations,
-                            subjectColorHex = uiState.subjectColorHex,
-                            onMarkComplete = { gradeDialogEval = it },
-                            onEditGrade = { gradeDialogEval = it },
-                            onDeleteEval = { deleteEvalId = it.id }
-                        )
-                        Spacer(Modifier.height(24.dp))
-                    }
-
-                    item(key = "notes") {
-                        SubjectDetailNotesMosaic(
-                            notes = uiState.notes,
-                            subjectColorHex = uiState.subjectColorHex,
-                            onNoteClick = { expandedNote = it }
-                        )
-                        Spacer(Modifier.height(24.dp))
-                    }
-
-                    item(key = "progress") {
-                        SubjectDetailProgress(
-                            progressPercent = uiState.progressPercent,
-                            completedCount = uiState.completedEvalCount,
-                            totalCount = uiState.evaluations.size,
-                            subjectColorHex = uiState.subjectColorHex
-                        )
                     }
                 }
             }
@@ -335,7 +315,7 @@ private fun GradeDialog(
                         }
                     },
                     label = { Text("Nota (${GradeConstants.MIN_GRADE} - ${GradeConstants.MAX_GRADE})") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                     isError = error != null,
                     supportingText = error?.let { { Text(it, color = Ruby) } },
                     singleLine = true,
@@ -403,9 +383,9 @@ private fun SubjectDetailNoteDetail(
                     SubcomposeAsyncImage(model = note.imageUrl, contentDescription = null, modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp), contentScale = ContentScale.Crop)
                     IconButton(
                         onClick = onClose,
-                        modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(32.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
+                        modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(24.dp))
                     }
                 }
             } else {

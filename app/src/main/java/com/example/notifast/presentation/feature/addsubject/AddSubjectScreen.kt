@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.atoms.NotiFastTextField
 import com.example.notifast.presentation.feature.notes.components.SubjectIconMapper
@@ -90,7 +89,14 @@ fun AddSubjectScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { NotiFastCenterAlignedTopBar(title = "Nueva Materia") }
+            topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Nueva Materia",
+                        onBackClick = onBackClick
+                    )
+                )
+            }
         ) { padding ->
             Column(
                 modifier = Modifier

@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.theme.color.Ruby
 
@@ -55,7 +54,14 @@ fun SettingsScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { NotiFastCenterAlignedTopBar(title = "Ajustes") }
+            topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Configuración",
+                        onBackClick = { }
+                    )
+                )
+            }
         ) { padding ->
         Column(
             modifier = Modifier

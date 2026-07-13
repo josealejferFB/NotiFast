@@ -44,8 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.foundation.layout.width
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
 
@@ -53,7 +54,8 @@ import com.example.notifast.presentation.theme.color.Ruby
 @Composable
 fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onLogout: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -71,7 +73,14 @@ fun EditProfileScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { NotiFastCenterAlignedTopBar(title = "Mi Perfil") }
+            topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Mi Perfil",
+                        onBackClick = onBack
+                    )
+                )
+            }
         ) { padding ->
         if (uiState.isLoading || uiState.userProfile == null) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -153,6 +162,20 @@ fun EditProfileScreen(
                     } else {
                         Text("Actualizar Perfil", fontWeight = FontWeight.Bold, color = Color.White)
                     }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onLogout,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                ) {
+                    Icon(Icons.Default.ExitToApp, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Cerrar sesión", fontWeight = FontWeight.Bold)
                 }
             }
         }

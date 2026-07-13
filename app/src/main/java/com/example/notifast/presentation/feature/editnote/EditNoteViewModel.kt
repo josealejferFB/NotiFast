@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.notifast.domain.repository.AuthRepository
 import com.example.notifast.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +27,8 @@ class EditNoteViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EditNoteUiState())
     val uiState: StateFlow<EditNoteUiState> = _uiState.asStateFlow()
 
+    private var saveJob: Job? = null
+
     init { loadNote() }
 
     private fun loadNote() {
@@ -32,30 +36,51 @@ class EditNoteViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val notes = noteRepository.getNotes(userId).first()
             val note = notes.find { it.id == noteId }
-            if (note != null) _uiState.update { it.copy(note = note, subject = note.subject, title = note.title, content = note.content) }
+            if (note != null) {
+                val subjects = noteRepository.getSubjects(userId).first()
+                val colorHex = subjects.find { it.name == note.subject }?.colorHex ?: ""
+                _uiState.update { it.copy(note = note, subjectColorHex = colorHex, title = note.title, content = note.content) }
+            }
         }
     }
 
     fun onEvent(event: EditNoteEvent) {
         when (event) {
-            is EditNoteEvent.SubjectChanged -> _uiState.update { it.copy(subject = event.value) }
-            is EditNoteEvent.TitleChanged -> _uiState.update { it.copy(title = event.value) }
-            is EditNoteEvent.ContentChanged -> _uiState.update { it.copy(content = event.value) }
-            is EditNoteEvent.ImageSelected -> _uiState.update { it.copy(imageUri = event.uri) }
-            is EditNoteEvent.SaveClicked -> saveNote()
+            is EditNoteEvent.TitleChanged -> {
+                _uiState.update { it.copy(title = event.value, syncStatus = "Guardando...") }
+                scheduleAutoSave()
+            }
+            is EditNoteEvent.ContentChanged -> {
+                _uiState.update { it.copy(content = event.value, syncStatus = "Guardando...") }
+                scheduleAutoSave()
+            }
+            is EditNoteEvent.ImageSelected -> {
+                _uiState.update { it.copy(imageUri = event.uri, syncStatus = "Guardando...") }
+                scheduleAutoSave()
+            }
+            is EditNoteEvent.SaveClicked -> saveNote(exitAfter = true)
             is EditNoteEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            else -> {}
         }
     }
 
-    private fun saveNote() {
+    private fun scheduleAutoSave() {
+        saveJob?.cancel()
+        saveJob = viewModelScope.launch {
+            delay(1000)
+            saveNote(exitAfter = false)
+        }
+    }
+
+    private fun saveNote(exitAfter: Boolean = false) {
         val state = _uiState.value; val note = state.note ?: return
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
             val userId = authRepository.getCurrentUserId()
-            if (userId == null) { _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }; return@launch }
-            noteRepository.updateNote(userId, note.copy(subject = state.subject, title = state.title, content = state.content), state.imageUri).fold(
-                onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true) } },
-                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al guardar") } }
+            if (userId == null) { _uiState.update { it.copy(error = "Usuario no autenticado", syncStatus = "Error") }; return@launch }
+            
+            noteRepository.updateNote(userId, note.copy(title = state.title, content = state.content), state.imageUri).fold(
+                onSuccess = { _uiState.update { it.copy(syncStatus = "Guardado", isSaved = exitAfter) } },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al guardar", syncStatus = "Error") } }
             )
         }
     }

@@ -112,14 +112,10 @@ fun MainContent() {
                     onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute()) },
                     onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
                     onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
+                    onNoteClick = { noteId -> navController.navigate(Screen.EditNote.createRoute(noteId)) },
                     onAddEvaluationClick = { subject -> navController.navigate(Screen.AddEvaluation.createRoute(subject)) },
                     onSubjectDetailClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
-                    onEditProfile = { navController.navigate(Screen.EditProfile.route) },
-                    onLogout = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
                 )
             }
             composable(
@@ -135,7 +131,19 @@ fun MainContent() {
             }
             composable(
                 route = Screen.EditNote.route,
-                arguments = listOf(navArgument("noteId") { type = NavType.StringType })
+                arguments = listOf(navArgument("noteId") { type = NavType.StringType }),
+                enterTransition = {
+                    androidx.compose.animation.slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 400f)
+                    ) + androidx.compose.animation.fadeIn()
+                },
+                exitTransition = {
+                    androidx.compose.animation.slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 400f)
+                    ) + androidx.compose.animation.fadeOut()
+                }
             ) {
                 EditNoteScreen(
                     onBackClick = { navController.popBackStack() },
@@ -203,7 +211,14 @@ fun MainContent() {
                 )
             }
             composable(Screen.EditProfile.route) {
-                EditProfileScreen(onBack = { navController.popBackStack() })
+                EditProfileScreen(
+                    onBack = { navController.popBackStack() },
+                    onLogout = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
             composable(
                 route = Screen.AddEvaluation.route,

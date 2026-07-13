@@ -5,12 +5,13 @@ import com.example.notifast.data.model.Note
 
 data class EditNoteUiState(
     val note: Note? = null,
-    val subject: String = "",
+    val subjectColorHex: String = "",
     val title: String = "",
     val content: String = "",
     val imageUri: Uri? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
+    val syncStatus: String? = null,
     val isSaved: Boolean = false
 )
 

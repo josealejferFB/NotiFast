@@ -141,19 +141,11 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.Search -> _searchQuery.value = event.query
             is NotesEvent.ClearSyncMessage -> _uiState.update { it.copy(syncMessage = null) }
             is NotesEvent.DeleteNote -> deleteNote(event.note)
-            is NotesEvent.UpdateNote -> updateNote(event.note, event.title, event.content)
             is NotesEvent.ToggleSubject -> {
                 val current = _uiState.value.expandedSubject
                 _uiState.update { it.copy(expandedSubject = if (current == event.subjectName) null else event.subjectName) }
             }
             is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
-        }
-    }
-
-    private fun updateNote(note: Note, title: String, content: String) {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            noteRepository.updateNote(userId, note.copy(title = title, content = content), null)
         }
     }
 

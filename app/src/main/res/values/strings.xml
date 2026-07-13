@@ -17,6 +17,10 @@
     <string name="delete_note_title">¿Eliminar apunte?</string>
     <string name="delete_note_confirm">Eliminar</string>
     <string name="delete_note_cancel">Cancelar</string>
+    
+    <!-- FAB -->
+    <string name="fab_add_subject">Nueva Materia</string>
+    <string name="fab_add_note">Nuevo Apunte</string>
 
     <!-- Calendar -->
     <string name="calendar_title">Mi Calendario</string>

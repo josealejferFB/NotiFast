@@ -53,7 +53,6 @@ import com.example.notifast.data.model.EvaluationType
 import com.example.notifast.presentation.atoms.NotiFastDatePickerField
 import com.example.notifast.presentation.atoms.NotiFastFormField
 import com.example.notifast.presentation.atoms.NotiFastImagePickerField
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
@@ -83,7 +82,14 @@ fun AddEvaluationScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = { NotiFastCenterAlignedTopBar(title = "Añadir ${uiState.selectedType.label}") }
+            topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Añadir ${uiState.selectedType.label}",
+                        onBackClick = onBack
+                    )
+                )
+            }
         ) { padding ->
             Column(
                 modifier = Modifier

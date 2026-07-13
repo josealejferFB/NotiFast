@@ -17,3 +17,11 @@ val RubyDark = Color(0xFFCC5A68) // Muted Ruby
 val AquaDark = Color(0xFF4A9696) // Muted Aqua
 val SurfaceDark = Color(0xFF1B262C) // Slate
 val OnSurfaceDark = Color(0xFFE6E1E5)
+
+fun String.toColorOrAqua(): Color {
+    return try {
+        if (this.isNotBlank()) Color(android.graphics.Color.parseColor(this)) else Aqua
+    } catch (e: Exception) {
+        Aqua
+    }
+}

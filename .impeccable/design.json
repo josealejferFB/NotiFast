@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-13T12:15:00Z",
+  "title": "Design System: NotiFast",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Rojo Dinámico", "canonical": "#BF092F", "tonalRamp": ["#33020C", "#590416", "#80061F", "#A60828", "#BF092F", "#D93657", "#E6738B", "#F2B3C1"] },
+      "secondary": { "role": "secondary", "displayName": "Aqua Calma", "canonical": "#3B9797", "tonalRamp": ["#0E2828", "#184545", "#216262", "#2B7E7E", "#3B9797", "#5DB3B3", "#8ED0D0", "#C8EAEA"] }
+    },
+    "typographyMeta": {
+      "body": { "displayName": "Body", "purpose": "Contenido principal, lectura de apuntes sin distracción." }
+    }
+  },
+  "components": [
+    {
+      "name": "NotiFast Button",
+      "kind": "button",
+      "refersTo": "notifast-button",
+      "description": "Botón primario táctil y amigable.",
+      "html": "<button class=\"ds-notifast-button\">AGREGAR NOTA</button>",
+      "css": ".ds-notifast-button { background: #BF092F; color: #FFFFFF; padding: 16px 24px; border-radius: 16px; border: none; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; } .ds-notifast-button:active { opacity: 0.8; }"
+    },
+    {
+      "name": "NotiFast Card",
+      "kind": "card",
+      "refersTo": "notifast-card",
+      "description": "Contenedor base para agrupar contenido académico usando superficies tonales.",
+      "html": "<div class=\"ds-notifast-card\"><h3>Matemáticas</h3><p>Evaluación 1: 90/100</p></div>",
+      "css": ".ds-notifast-card { background: #FAFAFA; padding: 16px; border-radius: 16px; font-family: sans-serif; color: #1C1B1F; border: 1px solid #E6E1E5; } .ds-notifast-card h3 { margin-top: 0; margin-bottom: 8px; font-size: 18px; } .ds-notifast-card p { margin: 0; font-size: 14px; opacity: 0.8; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Cuaderno Inteligente",
+    "overview": "NotiFast es un sistema visual diseñado para sentirse como una herramienta académica indispensable: estructurada, clara y táctil. Su estética combina la familiaridad nativa de Android (Material 3) con un enfoque puro en la productividad del estudiante. La interfaz busca reducir la ansiedad académica manteniendo el orden, ofreciendo información jerarquizada y reduciendo la carga visual innecesaria.",
+    "keyCharacteristics": [
+      "Claridad Estructural: Espacios limpios y superficies tonales para evitar la saturación visual.",
+      "Familiaridad Nativa: Uso profundo de Material 3 y Jetpack Compose.",
+      "Amigable y Táctil: Componentes redondeados y accesibles que invitan a interactuar."
+    ],
+    "rules": [
+      { "name": "The Tonal Surface Rule", "body": "Las agrupaciones y jerarquías se diferencian mediante ligeros cambios en el color de fondo (superficies tonales), no mediante líneas fuertes o sombras pesadas.", "section": "colors" },
+      { "name": "The Legibility Rule", "body": "Nunca sacrificar el contraste ni el tamaño del texto por estética. El texto es el núcleo del cuaderno académico.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Las superficies descansan planas. La separación visual entre un NotiFastCard y el fondo principal se da por el contraste de color tonal, no por sombras.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar los componentes atómicos definidos en `presentation/atoms/` (como `NotiFastButton`, `NotiFastCard`) antes de crear componentes custom de un solo uso.",
+      "Do utilizar el sistema de elevación tonal para separar capas de información, manteniendo el diseño plano y limpio.",
+      "Do garantizar que las pantallas ofrezcan calma visual y organización frente al caos académico."
+    ],
+    "donts": [
+      "Don't hacer que la aplicación parezca un sistema escolar antiguo y aburrido como Moodle clásico.",
+      "Don't usar interfaces de gestión corporativa o tablas de datos pesadas en pantallas móviles.",
+      "Don't saturar una pantalla de información; priorizar la claridad sobre la densidad.",
+      "Don't aplicar elevaciones (sombras) exageradas en tarjetas y contenedores de listas."
+    ]
+  }
+}

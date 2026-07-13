@@ -47,7 +47,6 @@ import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import com.example.notifast.data.model.Schedule
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
@@ -70,7 +69,14 @@ fun SchedulesScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
-        Scaffold(containerColor = Color.Transparent, topBar = { NotiFastCenterAlignedTopBar(title = "Horarios") }) { innerPadding ->
+        Scaffold(containerColor = Color.Transparent, topBar = {
+                com.example.notifast.presentation.atoms.NotiFastTopBar(
+                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                        title = "Horarios",
+                        onBackClick = { }
+                    )
+                )
+            }) { innerPadding ->
         if (uiState.isLoading) {
             NotiFastCircularLoading()
             return@Scaffold
@@ -112,7 +118,7 @@ fun SchedulesScreen(
         }
 
         Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).safeDrawingPadding().padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(innerPadding).safeDrawingPadding().padding(end = 16.dp, bottom = 88.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
             FloatingActionButton(
