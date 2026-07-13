@@ -93,8 +93,6 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var currentMonth by remember { mutableStateOf(Calendar.getInstance()) }
-    var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
     var selectedEvaluation by remember { mutableStateOf<Evaluation?>(null) }
     var showDeleteDialog by remember { mutableStateOf<Evaluation?>(null) }
 
@@ -152,50 +150,36 @@ fun CalendarScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = {
-                        val newMonth = currentMonth.clone() as Calendar
-                        newMonth.add(Calendar.MONTH, -1)
-                        currentMonth = newMonth
-                    }) {
+                    IconButton(onClick = { viewModel.onEvent(CalendarEvent.ChangeMonth(-1)) }) {
                         Icon(Icons.Default.ChevronLeft, contentDescription = null)
                     }
 
                     Text(
-                        text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(currentMonth.time).replaceFirstChar { it.uppercase() },
+                        text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(uiState.currentMonth.time).replaceFirstChar { it.uppercase() },
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         // Botón de "Hoy"
-                        IconButton(onClick = {
-                            val today = Calendar.getInstance()
-                            currentMonth = today.clone() as Calendar
-                            selectedDate = today.clone() as Calendar
-                        }) {
+                        IconButton(onClick = { viewModel.onEvent(CalendarEvent.GoToToday) }) {
                             Icon(Icons.Default.Today, contentDescription = "Ir a hoy", tint = Ruby)
                         }
-                        IconButton(onClick = {
-                            val newMonth = currentMonth.clone() as Calendar
-                            newMonth.add(Calendar.MONTH, 1)
-                            currentMonth = newMonth
-                        }) {
+                        IconButton(onClick = { viewModel.onEvent(CalendarEvent.ChangeMonth(1)) }) {
                             Icon(Icons.Default.ChevronRight, contentDescription = null)
                         }
                     }
                 }
 
                 CalendarGrid(
-                    currentMonth = currentMonth,
-                    selectedDate = selectedDate,
-                    onDateSelected = {
-                        selectedDate = it
-                    },
-                    evaluations = uiState.evaluations
+                    currentMonth = uiState.currentMonth,
+                    selectedDate = uiState.selectedDate,
+                    onDateSelected = { viewModel.onEvent(CalendarEvent.SelectDate(it)) },
+                    evaluationsByDate = uiState.evaluationsByDate
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                val dailyEvals = uiState.evaluations.filter { isSameDay(it.date, selectedDate.time) }
+                val dailyEvals = uiState.dailyEvaluations
                 val subjectsWithEval = dailyEvals.map { it.subjectName }.toSet()
 
                 Text(
@@ -274,6 +258,8 @@ fun CalendarScreen(
 @Composable
 fun EvaluationListItem(eval: Evaluation, onClick: () -> Unit) {
     val evaluationType = EvaluationType.fromName(eval.type)
+    val statusColor = if (eval.isPresented) Aqua else Ruby
+    
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -295,7 +281,11 @@ fun EvaluationListItem(eval: Evaluation, onClick: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(eval.title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(eval.subjectName, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(statusColor))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(eval.subjectName, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
     }
@@ -378,10 +368,14 @@ fun DetailRow(icon: ImageVector, label: String, content: String, color: Color = 
 }
 
 @Composable
-fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, evaluations: List<Evaluation>) {
+fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, evaluationsByDate: Map<String, List<Evaluation>>) {
     val daysInMonth = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
     val firstDayOfWeek = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK) - 1
     val days = (1..daysInMonth).toList(); val paddingDays = (0 until firstDayOfWeek).map { "" }
+    val format = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()) }
+    val selectedDateStr = format.format(selectedDate.time)
+    val todayStr = format.format(Date())
+    
     Column {
         Row(Modifier.fillMaxWidth()) {
             listOf("D", "L", "M", "X", "J", "V", "S").forEach { day ->
@@ -395,9 +389,13 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
                 week.forEach { day ->
                     if (day is Int) {
                         val date = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, day) }
-                        val isSelected = isSameDay(date.time, selectedDate.time)
-                        val hasEvals = evaluations.any { isSameDay(it.date, date.time) }
-                        val isToday = isSameDay(Date(), date.time)
+                        val dateStr = format.format(date.time)
+                        val isSelected = dateStr == selectedDateStr
+                        val dayEvals = evaluationsByDate[dateStr] ?: emptyList()
+                        val hasEvals = dayEvals.isNotEmpty()
+                        val allPresented = hasEvals && dayEvals.all { it.isPresented }
+                        val dotColor = if (allPresented) Aqua else Ruby
+                        val isToday = dateStr == todayStr
                         
                         Box(
                             modifier = Modifier
@@ -417,7 +415,7 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
                                 // Dot for events
                                 if (hasEvals) {
                                     Spacer(modifier = Modifier.height(2.dp))
-                                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(if (isSelected) Ruby else Aqua))
+                                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(if (isSelected) Ruby else dotColor))
                                 } else {
                                     Spacer(modifier = Modifier.height(6.dp)) // To keep height consistent
                                 }
@@ -429,10 +427,4 @@ fun CalendarGrid(currentMonth: Calendar, selectedDate: Calendar, onDateSelected:
             }
         }
     }
-}
-
-fun isSameDay(date1: Date?, date2: Date): Boolean {
-    if (date1 == null) return false
-    val cal1 = Calendar.getInstance().apply { time = date1 }; val cal2 = Calendar.getInstance().apply { time = date2 }
-    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }

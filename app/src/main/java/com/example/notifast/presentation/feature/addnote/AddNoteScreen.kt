@@ -8,6 +8,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +23,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -28,10 +36,10 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,10 +52,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
+import com.example.notifast.presentation.atoms.NotiFastCard
+import com.example.notifast.presentation.atoms.NotiFastFormField
+import com.example.notifast.presentation.atoms.NotiFastImagePickerField
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
+import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.example.notifast.presentation.atoms.TopBarType
 import com.example.notifast.presentation.feature.notes.components.SubjectIconMapper
 import com.example.notifast.presentation.theme.color.Ruby
 
@@ -69,6 +82,7 @@ fun AddNoteScreen(
     }
 
     var expanded by remember { mutableStateOf(false) }
+    var expandedStep by remember { mutableStateOf(1) }
     var animateEntrance by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -82,8 +96,8 @@ fun AddNoteScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                com.example.notifast.presentation.atoms.NotiFastTopBar(
-                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                NotiFastTopBar(
+                    type = TopBarType.Detail(
                         title = "Nuevo Apunte",
                         onBackClick = onBackClick
                     )
@@ -100,9 +114,10 @@ fun AddNoteScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     if (uiState.subjects.isEmpty()) {
                         Text(
@@ -111,134 +126,189 @@ fun AddNoteScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
-                        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-                            OutlinedTextField(
-                                value = uiState.subject,
-                                onValueChange = { viewModel.onEvent(AddNoteEvent.SubjectChanged(it)) },
-                                label = { Text("Materia") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                                shape = RoundedCornerShape(20.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Ruby,
-                                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
-                                ),
-                                leadingIcon = selectedSubjectData?.let { data ->
-                                    {
-                                        val subjectColor = try {
-                                            if (data.colorHex.isNotBlank()) Color(android.graphics.Color.parseColor(data.colorHex))
-                                            else Ruby
-                                        } catch (e: Exception) { Ruby }
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(start = 6.dp)
-                                                .size(28.dp)
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .background(subjectColor),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = SubjectIconMapper.getIcon(data.icon),
-                                                contentDescription = null,
-                                                tint = Color.White,
-                                                modifier = Modifier.size(16.dp)
-                                            )
+                        // --- PASO 1 ---
+                        NotiFastCard(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { expandedStep = 1 },
+                            contentPadding = 0.dp
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                                Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth()) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                                        Icon(Icons.Default.Category, contentDescription = null, tint = Color.White)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("1. Materia", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        if (uiState.subject.isNotBlank() && expandedStep != 1) {
+                                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
                                         }
                                     }
-                                },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-                            )
-                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                uiState.subjects.forEach { subjectData ->
-                                    val subjectColor = try {
-                                        if (subjectData.colorHex.isNotBlank()) Color(android.graphics.Color.parseColor(subjectData.colorHex))
-                                        else Ruby
-                                    } catch (e: Exception) { Ruby }
-                                    DropdownMenuItem(
-                                        text = {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .size(28.dp)
-                                                        .clip(RoundedCornerShape(8.dp))
-                                                        .background(subjectColor),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Icon(
-                                                        imageVector = SubjectIconMapper.getIcon(subjectData.icon),
-                                                        contentDescription = null,
-                                                        tint = Color.White,
-                                                        modifier = Modifier.size(16.dp)
+                                }
+
+                                AnimatedVisibility(visible = expandedStep == 1) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(16.dp)) {
+                                        ExposedDropdownMenuBox(
+                                            expanded = expanded,
+                                            onExpandedChange = { expanded = !expanded },
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            TextField(
+                                                value = uiState.subject,
+                                                onValueChange = {},
+                                                readOnly = true,
+                                                label = { Text("Seleccionar Materia") },
+                                                leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+                                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                                shape = RoundedCornerShape(20.dp),
+                                                colors = ExposedDropdownMenuDefaults.textFieldColors(
+                                                    focusedContainerColor = Color(0xFFF5F5F5),
+                                                    unfocusedContainerColor = Color(0xFFF5F5F5),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                                            )
+
+                                            ExposedDropdownMenu(
+                                                expanded = expanded,
+                                                onDismissRequest = { expanded = false },
+                                                modifier = Modifier.background(Color.White, RoundedCornerShape(20.dp)).clip(RoundedCornerShape(20.dp))
+                                            ) {
+                                                uiState.subjects.forEach { subjectData ->
+                                                    val subjectColor = try {
+                                                        if (subjectData.colorHex.isNotBlank()) Color(android.graphics.Color.parseColor(subjectData.colorHex))
+                                                        else Ruby
+                                                    } catch (e: Exception) { Ruby }
+                                                    DropdownMenuItem(
+                                                        text = {
+                                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                                Box(
+                                                                    modifier = Modifier
+                                                                        .size(28.dp)
+                                                                        .clip(RoundedCornerShape(8.dp))
+                                                                        .background(subjectColor),
+                                                                    contentAlignment = Alignment.Center
+                                                                ) {
+                                                                    Icon(
+                                                                        imageVector = SubjectIconMapper.getIcon(subjectData.icon),
+                                                                        contentDescription = null,
+                                                                        tint = Color.White,
+                                                                        modifier = Modifier.size(16.dp)
+                                                                    )
+                                                                }
+                                                                Spacer(Modifier.width(12.dp))
+                                                                Text(subjectData.name, fontWeight = FontWeight.Medium)
+                                                            }
+                                                        },
+                                                        onClick = {
+                                                            viewModel.onEvent(AddNoteEvent.SubjectChanged(subjectData.name))
+                                                            expanded = false
+                                                        }
                                                     )
                                                 }
-                                                Spacer(Modifier.width(12.dp))
-                                                Text(subjectData.name, fontWeight = FontWeight.Medium)
                                             }
-                                        },
-                                        onClick = {
-                                            viewModel.onEvent(AddNoteEvent.SubjectChanged(subjectData.name))
-                                            expanded = false
                                         }
+
+                                        Button(
+                                            onClick = { expandedStep = 2 },
+                                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                                            enabled = uiState.subject.isNotBlank(),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                                disabledContentColor = Color.LightGray
+                                            )
+                                        ) {
+                                            Text("Siguiente", fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+
+                                AnimatedVisibility(visible = expandedStep != 1) {
+                                    Text(
+                                        text = uiState.subject.ifBlank { "Sin seleccionar" },
+                                        color = Color.Gray,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        // --- PASO 2 ---
+                        NotiFastCard(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { expandedStep = 2 },
+                            contentPadding = 0.dp
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                                Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth()) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                                        Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("2. Contenido del Apunte", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
+                                    }
+                                }
+
+                                AnimatedVisibility(visible = expandedStep == 2) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(16.dp)) {
+                                        NotiFastFormField(
+                                            value = uiState.title,
+                                            onValueChange = { viewModel.onEvent(AddNoteEvent.TitleChanged(it)) },
+                                            label = "Título del Apunte"
+                                        )
+
+                                        NotiFastFormField(
+                                            value = uiState.content,
+                                            onValueChange = { viewModel.onEvent(AddNoteEvent.ContentChanged(it)) },
+                                            label = "Escribe tus notas aquí...",
+                                            height = 180.dp,
+                                            singleLine = false
+                                        )
+
+                                        NotiFastImagePickerField(
+                                            placeholderText = if (uiState.imageUri == null) "Añadir foto de referencia" else "Cambiar foto adjuntada",
+                                            onImageSelected = { viewModel.onEvent(AddNoteEvent.ImageSelected(it)) }
+                                        )
+
+                                        uiState.error?.let {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colorScheme.error,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                modifier = Modifier.padding(bottom = 12.dp)
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        Button(
+                                            onClick = { viewModel.onEvent(AddNoteEvent.SaveClicked) },
+                                            modifier = Modifier.fillMaxWidth().height(60.dp),
+                                            shape = RoundedCornerShape(20.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                                disabledContentColor = Color.LightGray
+                                            ),
+                                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                                            enabled = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading
+                                        ) {
+                                            Text("GUARDAR APUNTE", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                                        }
+                                    }
+                                }
+                                
+                                AnimatedVisibility(visible = expandedStep != 2) {
+                                    Text(
+                                        text = if (uiState.title.isNotBlank()) uiState.title else "Sin título",
+                                        color = Color.Gray,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                                     )
                                 }
                             }
                         }
                     }
-                    
-                    Spacer(Modifier.height(16.dp))
-                    
-                    OutlinedTextField(
-                        value = uiState.title,
-                        onValueChange = { viewModel.onEvent(AddNoteEvent.TitleChanged(it)) },
-                        label = { Text("Título del Apunte") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Ruby,
-                            unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
-                        )
-                    )
-                    
-                    Spacer(Modifier.height(16.dp))
-                    
-                    OutlinedTextField(
-                        value = uiState.content,
-                        onValueChange = { viewModel.onEvent(AddNoteEvent.ContentChanged(it)) },
-                        label = { Text("Escribe tus notas aquí...") },
-                        modifier = Modifier.fillMaxWidth().height(180.dp),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Ruby,
-                            unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
-                        ),
-                        singleLine = false
-                    )
-                    
-                    Spacer(Modifier.height(20.dp))
-                    
-                    NotiFastButton(
-                        text = if (uiState.imageUri == null) "ADJUNTAR IMAGEN (OPCIONAL)" else "CAMBIAR IMAGEN ADJUNTADA",
-                        onClick = { imagePickerLauncher.launch("image/*") }
-                    )
-                    
-                    Spacer(Modifier.height(24.dp))
-                    
-                    uiState.error?.let {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                    }
-                    
-                    NotiFastButton(
-                        text = "GUARDAR APUNTE",
-                        onClick = { viewModel.onEvent(AddNoteEvent.SaveClicked) },
-                        isLoading = uiState.isLoading,
-                        enabled = uiState.subjects.isNotEmpty()
-                    )
+
                     Spacer(Modifier.height(32.dp))
                 }
             }

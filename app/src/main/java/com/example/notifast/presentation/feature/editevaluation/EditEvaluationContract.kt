@@ -1,9 +1,11 @@
 package com.example.notifast.presentation.feature.editevaluation
 
 import com.example.notifast.data.model.EvaluationType
+import com.example.notifast.data.model.SubjectData
 
 data class EditEvaluationUiState(
     val isLoading: Boolean = false,
+    val isLoadingSubjects: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val evalId: String = "",
@@ -16,11 +18,13 @@ data class EditEvaluationUiState(
     val weight: String = "",
     val isPresented: Boolean = false,
     val existingImageUrl: String? = null,
-    val date: java.util.Date? = null
+    val date: java.util.Date? = null,
+    val subjects: List<SubjectData> = emptyList()
 )
 
 sealed interface EditEvaluationEvent {
     data object LoadEvaluation : EditEvaluationEvent
+    data class SelectSubject(val subject: String) : EditEvaluationEvent
     data class UpdateTitle(val value: String) : EditEvaluationEvent
     data class UpdateDescription(val value: String) : EditEvaluationEvent
     data class UpdateQuickTips(val value: String) : EditEvaluationEvent

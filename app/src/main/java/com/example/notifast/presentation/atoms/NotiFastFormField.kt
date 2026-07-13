@@ -29,7 +29,9 @@ fun NotiFastFormField(
     minLines: Int = 1,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     height: Dp? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null
 ) {
     TextField(
         value = value,
@@ -47,13 +49,16 @@ fun NotiFastFormField(
         minLines = minLines,
         maxLines = maxLines,
         keyboardOptions = keyboardOptions,
+        isError = isError,
+        supportingText = supportingText,
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+            focusedContainerColor = Color(0xFFF5F5F5),
+            unfocusedContainerColor = Color(0xFFF5F5F5),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             cursorColor = cursorColor,
-            focusedLabelColor = cursorColor
+            focusedLabelColor = cursorColor,
+            errorContainerColor = Color(0xFFFFEBEE)
         )
     )
 }

@@ -31,9 +31,26 @@ class CalendarViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isLoading = true) }
             evaluationRepository.getEvaluations(userId).collect { evaluations ->
-                _uiState.value = CalendarUiState(evaluations = evaluations)
+                val grouped = groupEvaluationsByDate(evaluations)
+                _uiState.update { state -> 
+                    state.copy(
+                        evaluationsByDate = grouped,
+                        dailyEvaluations = filterEvaluationsByDate(grouped, state.selectedDate.time),
+                        isLoading = false
+                    )
+                }
             }
         }
+    }
+
+    private fun groupEvaluationsByDate(evaluations: List<Evaluation>): Map<String, List<Evaluation>> {
+        val format = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        return evaluations.filter { it.date != null }.groupBy { format.format(it.date!!) }
+    }
+
+    private fun filterEvaluationsByDate(evaluationsByDate: Map<String, List<Evaluation>>, date: java.util.Date): List<Evaluation> {
+        val format = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        return evaluationsByDate[format.format(date)] ?: emptyList()
     }
 
     fun onEvent(event: CalendarEvent) {
@@ -41,6 +58,31 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.LoadData -> loadData()
             is CalendarEvent.DeleteEvaluation -> deleteEvaluation(event.evaluation)
             is CalendarEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            is CalendarEvent.SelectDate -> {
+                _uiState.update { state ->
+                    state.copy(
+                        selectedDate = event.date,
+                        dailyEvaluations = filterEvaluationsByDate(state.evaluationsByDate, event.date.time)
+                    )
+                }
+            }
+            is CalendarEvent.ChangeMonth -> {
+                _uiState.update { state ->
+                    val newMonth = state.currentMonth.clone() as java.util.Calendar
+                    newMonth.add(java.util.Calendar.MONTH, event.amount)
+                    state.copy(currentMonth = newMonth)
+                }
+            }
+            is CalendarEvent.GoToToday -> {
+                val today = java.util.Calendar.getInstance()
+                _uiState.update { state ->
+                    state.copy(
+                        currentMonth = today.clone() as java.util.Calendar,
+                        selectedDate = today.clone() as java.util.Calendar,
+                        dailyEvaluations = filterEvaluationsByDate(state.evaluationsByDate, today.time)
+                    )
+                }
+            }
         }
     }
 

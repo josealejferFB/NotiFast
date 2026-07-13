@@ -15,9 +15,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.notifast.domain.util.GradeConstants
 
+import com.example.notifast.domain.repository.NoteRepository
+
 @HiltViewModel
 class EditEvaluationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -26,14 +29,25 @@ class EditEvaluationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EditEvaluationUiState())
     val uiState: StateFlow<EditEvaluationUiState> = _uiState.asStateFlow()
 
-    init { loadEvaluation() }
+    init {
+        loadEvaluation()
+        loadSubjects()
+    }
+
+    private fun loadSubjects() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingSubjects = true) }
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val subjects = noteRepository.getSubjects(userId).first()
+            _uiState.update { it.copy(subjects = subjects, isLoadingSubjects = false) }
+        }
+    }
 
     private fun loadEvaluation() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            val evaluations = evaluationRepository.getEvaluations(userId).first()
-            val eval = evaluations.find { it.id == evalId } ?: return@launch
+            val eval = evaluationRepository.getEvaluation(userId, evalId).first() ?: return@launch
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -56,18 +70,20 @@ class EditEvaluationViewModel @Inject constructor(
     fun onEvent(event: EditEvaluationEvent) {
         when (event) {
             is EditEvaluationEvent.LoadEvaluation -> loadEvaluation()
+            is EditEvaluationEvent.SelectSubject -> _uiState.update { it.copy(subjectName = event.subject) }
             is EditEvaluationEvent.UpdateTitle -> _uiState.update { it.copy(title = event.value) }
             is EditEvaluationEvent.UpdateDescription -> _uiState.update { it.copy(description = event.value) }
             is EditEvaluationEvent.UpdateQuickTips -> _uiState.update { it.copy(quickTips = event.value) }
             is EditEvaluationEvent.UpdateGrade -> {
-                val parsed = event.value.toDoubleOrNull()
-                if (event.value.isEmpty() || (parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE)) {
-                    _uiState.update { it.copy(grade = event.value) }
+                val v = event.value
+                val parsed = v.toDoubleOrNull()
+                if (v.isEmpty() || v == "." || (parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE) || v.matches(Regex("^\\d+\\.$"))) {
+                    _uiState.update { it.copy(grade = v) }
                 }
             }
             is EditEvaluationEvent.UpdateWeight -> {
                 val v = event.value
-                if (v.isEmpty() || (v.toDoubleOrNull() != null && v.toDouble() >= 0.0)) {
+                if (v.isEmpty() || v == "." || (v.toDoubleOrNull() != null && v.toDouble() >= 0.0) || v.matches(Regex("^\\d+\\.$"))) {
                     _uiState.update { it.copy(weight = v) }
                 }
             }

@@ -33,6 +33,17 @@ class EvaluationRepositoryImpl @Inject constructor(
             .catch { emit(emptyList()) }
     }
 
+    override fun getEvaluation(userId: String, evaluationId: String): Flow<Evaluation?> {
+        return db.collection("users").document(userId)
+            .collection("evaluations")
+            .document(evaluationId)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObject(Evaluation::class.java)?.copy(id = snapshot.id)
+            }
+            .catch { emit(null) }
+    }
+
     override suspend fun addEvaluation(
         userId: String,
         evaluation: Evaluation,

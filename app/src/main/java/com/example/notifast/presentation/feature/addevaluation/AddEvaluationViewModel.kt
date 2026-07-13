@@ -49,9 +49,9 @@ class AddEvaluationViewModel @Inject constructor(
             is AddEvaluationEvent.UpdateDescription -> _uiState.update { it.copy(description = event.value) }
             is AddEvaluationEvent.UpdateQuickTips -> _uiState.update { it.copy(quickTips = event.value) }
             is AddEvaluationEvent.UpdateWeight -> {
-                // Allow empty string or valid non-negative number
                 val v = event.value
-                if (v.isEmpty() || (v.toDoubleOrNull() != null && v.toDouble() >= 0.0)) {
+                // Allow empty, just a dot, or a valid non-negative number (including trailing dots like "9.")
+                if (v.isEmpty() || v == "." || (v.toDoubleOrNull() != null && v.toDouble() >= 0.0) || v.matches(Regex("^\\d+\\.$"))) {
                     _uiState.update { it.copy(weight = v) }
                 }
             }

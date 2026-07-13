@@ -274,14 +274,14 @@ private fun NotesTabContent(
     ) {
         item {
             val borderColor by animateColorAsState(
-                targetValue = if (uiState.searchQuery.isEmpty()) Color.Transparent else Aqua.copy(alpha = 0.5f),
+                targetValue = if (uiState.searchQuery.isEmpty()) Aqua.copy(alpha = 0.4f) else Aqua,
                 label = "search_border"
             )
             Surface(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
                 shape = RoundedCornerShape(24.dp),
                 color = Color.White,
-                border = BorderStroke(1.dp, borderColor)
+                border = BorderStroke(if (uiState.searchQuery.isEmpty()) 1.dp else 2.dp, borderColor)
             ) {
                 Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Search, contentDescription = null, tint = Aqua, modifier = Modifier.size(20.dp))

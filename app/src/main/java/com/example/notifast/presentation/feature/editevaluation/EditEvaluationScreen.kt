@@ -1,6 +1,7 @@
 package com.example.notifast.presentation.feature.editevaluation
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,23 +16,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -47,19 +52,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notifast.data.model.EvaluationType
+import com.example.notifast.presentation.atoms.NotiFastCard
 import com.example.notifast.presentation.atoms.NotiFastDatePickerField
 import com.example.notifast.presentation.atoms.NotiFastFormField
 import com.example.notifast.presentation.atoms.NotiFastImagePickerField
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
+import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.example.notifast.presentation.atoms.TopBarType
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,16 +80,22 @@ fun EditEvaluationScreen(
 
     var selectedImageUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var selectedDate by remember { mutableStateOf(uiState.date ?: Date()) }
+    var expanded by remember { mutableStateOf(false) }
 
     val evaluationType = EvaluationType.fromName(uiState.type)
+    
+    var expandedStep by remember { mutableStateOf(1) }
+
+    // Validation
+    val isGradeInvalid = uiState.grade.isNotBlank() && (uiState.grade.toDoubleOrNull()?.let { it < 1 || it > 10 } ?: true)
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                com.example.notifast.presentation.atoms.NotiFastTopBar(
-                    type = com.example.notifast.presentation.atoms.TopBarType.Detail(
+                NotiFastTopBar(
+                    type = TopBarType.Detail(
                         title = "Editar ${evaluationType.label}",
                         onBackClick = onBack
                     )
@@ -97,146 +108,268 @@ fun EditEvaluationScreen(
                     .padding(padding)
                     .padding(horizontal = 24.dp)
                     .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextField(
-                    value = uiState.subjectName,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Materia") },
-                    leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = Aqua) },
-                    shape = RoundedCornerShape(20.dp),
-                    enabled = false,
-                    colors = TextFieldDefaults.colors(
-                        disabledContainerColor = Color.White.copy(alpha = 0.7f),
-                        disabledIndicatorColor = Color.Transparent,
-                        disabledLabelColor = Aqua,
-                        disabledTextColor = Color.Gray
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                NotiFastFormField(
-                    value = uiState.title,
-                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateTitle(it)) },
-                    label = "Título de la Evaluación",
-                    leadingIcon = Icons.Default.Title
-                )
-
-                if (evaluationType.showGrade) {
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        NotiFastFormField(
-                            value = uiState.grade,
-                            onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateGrade(it)) },
-                            label = "Nota (1-10)",
-                            leadingIcon = Icons.Default.Grade,
-                            cursorColor = Color(0xFFFFB300),
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Surface(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp)
-                                .clip(RoundedCornerShape(20.dp))
-                                .clickable { viewModel.onEvent(EditEvaluationEvent.TogglePresented) },
-                            color = if (uiState.isPresented) Aqua.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.7f),
-                            border = if (uiState.isPresented) BorderStroke(1.dp, Aqua) else null
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (uiState.isPresented) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
-                                    contentDescription = null,
-                                    tint = if (uiState.isPresented) Aqua else Color.Gray
-                                )
+                // --- PASO 1 ---
+                NotiFastCard(
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { expandedStep = 1 },
+                    contentPadding = 0.dp
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                        Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth()) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                                Icon(Icons.Default.Category, contentDescription = null, tint = Color.White)
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    if (uiState.isPresented) "Presentado" else "Pendiente",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (uiState.isPresented) Aqua else Color.Gray
-                                )
+                                Text("1. Materia", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.weight(1f))
+                                if (uiState.subjectName.isNotBlank() && expandedStep != 1) {
+                                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                }
                             }
+                        }
+
+                        AnimatedVisibility(visible = expandedStep == 1) {
+                            Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(16.dp)) {
+                                ExposedDropdownMenuBox(
+                                    expanded = expanded,
+                                    onExpandedChange = { expanded = !expanded },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    TextField(
+                                        value = uiState.subjectName,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text("Materia") },
+                                        leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                        shape = RoundedCornerShape(20.dp),
+                                        colors = ExposedDropdownMenuDefaults.textFieldColors(
+                                            focusedContainerColor = Color(0xFFF5F5F5),
+                                            unfocusedContainerColor = Color(0xFFF5F5F5),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                                    )
+
+                                    ExposedDropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false },
+                                        modifier = Modifier.background(Color.White, RoundedCornerShape(20.dp)).clip(RoundedCornerShape(20.dp))
+                                    ) {
+                                        uiState.subjects.forEach { subjectData ->
+                                            DropdownMenuItem(
+                                                text = { Text(subjectData.name, fontWeight = FontWeight.SemiBold) },
+                                                onClick = {
+                                                    viewModel.onEvent(EditEvaluationEvent.SelectSubject(subjectData.name))
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Button(
+                                    onClick = { expandedStep = 2 },
+                                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                                    enabled = uiState.subjectName.isNotBlank(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledContentColor = Color.LightGray
+                                    )
+                                ) {
+                                    Text("Siguiente", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+
+                        AnimatedVisibility(visible = expandedStep != 1) {
+                            Text(text = uiState.subjectName.ifBlank { "Sin seleccionar" }, color = Color.Gray, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                NotiFastDatePickerField(
-                    date = selectedDate,
-                    onDateSelected = { selectedDate = it },
-                    label = "Fecha de Evaluación"
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                NotiFastImagePickerField(
-                    existingImageUrl = uiState.existingImageUrl,
-                    placeholderText = "Cambiar imagen de referencia",
-                    onImageSelected = { selectedImageUri = it }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                NotiFastFormField(
-                    value = uiState.description,
-                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateDescription(it)) },
-                    label = "Descripción",
-                    height = 100.dp
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                NotiFastFormField(
-                    value = uiState.quickTips,
-                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateQuickTips(it)) },
-                    label = "Tips / Apuntes Rápidos",
-                    leadingIcon = Icons.Default.Lightbulb,
-                    cursorColor = Color(0xFFFBC02D)
-                )
-
-                if (evaluationType.showWeight) {
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    NotiFastFormField(
-                        value = uiState.weight,
-                        onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateWeight(it)) },
-                        label = "Peso / Porcentaje (opcional)",
-                        leadingIcon = Icons.Default.Scale,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        cursorColor = Aqua
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-                        if (uiState.title.isNotBlank()) {
-                            viewModel.onEvent(EditEvaluationEvent.Save(selectedDate, selectedImageUri))
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Ruby),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                    enabled = uiState.title.isNotBlank() && !uiState.isSaving
+                // --- PASO 2 ---
+                NotiFastCard(
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { expandedStep = 2 },
+                    contentPadding = 0.dp
                 ) {
-                    Text("ACTUALIZAR ${evaluationType.label.uppercase()}", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                        Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth()) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                                Icon(Icons.Default.Title, contentDescription = null, tint = Color.White)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("2. Detalles Principales", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.weight(1f))
+                                if (uiState.title.isNotBlank() && !isGradeInvalid && expandedStep != 2) {
+                                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                }
+                            }
+                        }
+
+                        AnimatedVisibility(visible = expandedStep == 2) {
+                            Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(16.dp)) {
+                                NotiFastFormField(
+                                    value = uiState.title,
+                                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateTitle(it)) },
+                                    label = "Título de la Evaluación",
+                                    leadingIcon = Icons.Default.Title
+                                )
+
+                                if (evaluationType.showGrade) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                        verticalAlignment = Alignment.Top
+                                    ) {
+                                        NotiFastFormField(
+                                            value = uiState.grade,
+                                            onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateGrade(it)) },
+                                            label = "Nota (1-10)",
+                                            leadingIcon = Icons.Default.Grade,
+                                            cursorColor = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.weight(1f),
+                                            isError = isGradeInvalid,
+                                            supportingText = if (isGradeInvalid) {
+                                                { Text("La nota debe estar entre 1 y 10", color = MaterialTheme.colorScheme.error) }
+                                            } else null
+                                        )
+
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(56.dp)
+                                                .clip(RoundedCornerShape(20.dp))
+                                                .clickable { viewModel.onEvent(EditEvaluationEvent.TogglePresented) }
+                                        ) {
+                                            Switch(
+                                                checked = uiState.isPresented,
+                                                onCheckedChange = { viewModel.onEvent(EditEvaluationEvent.TogglePresented) },
+                                                colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.secondary)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                if (uiState.isPresented) "Presentado" else "Pendiente",
+                                                fontSize = 13.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (uiState.isPresented) MaterialTheme.colorScheme.secondary else Color.Gray
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Button(
+                                    onClick = { expandedStep = 3 },
+                                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                                    enabled = uiState.title.isNotBlank() && !isGradeInvalid,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledContentColor = Color.LightGray
+                                    )
+                                ) {
+                                    Text("Siguiente", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+
+                        AnimatedVisibility(visible = expandedStep != 2) {
+                            Text(
+                                text = if (uiState.title.isNotBlank()) uiState.title else "Sin título",
+                                color = Color.Gray,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+
+                // --- PASO 3 ---
+                NotiFastCard(
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { expandedStep = 3 },
+                    contentPadding = 0.dp
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                        Surface(color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth()) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                                Icon(Icons.Default.Lightbulb, contentDescription = null, tint = Color.White)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("3. Opcionales", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
+                            }
+                        }
+
+                        AnimatedVisibility(visible = expandedStep == 3) {
+                            Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(16.dp)) {
+                                NotiFastDatePickerField(
+                                    date = selectedDate,
+                                    onDateSelected = { selectedDate = it },
+                                    label = "Fecha de Evaluación"
+                                )
+
+                                NotiFastImagePickerField(
+                                    existingImageUrl = uiState.existingImageUrl,
+                                    placeholderText = "Cambiar imagen de referencia",
+                                    onImageSelected = { selectedImageUri = it }
+                                )
+
+                                NotiFastFormField(
+                                    value = uiState.description,
+                                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateDescription(it)) },
+                                    label = "Descripción",
+                                    height = 100.dp
+                                )
+
+                                NotiFastFormField(
+                                    value = uiState.quickTips,
+                                    onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateQuickTips(it)) },
+                                    label = "Tips / Apuntes Rápidos",
+                                    leadingIcon = Icons.Default.Lightbulb,
+                                    cursorColor = MaterialTheme.colorScheme.secondary
+                                )
+
+                                if (evaluationType.showWeight) {
+                                    NotiFastFormField(
+                                        value = uiState.weight,
+                                        onValueChange = { viewModel.onEvent(EditEvaluationEvent.UpdateWeight(it)) },
+                                        label = "Peso / Porcentaje (opcional)",
+                                        leadingIcon = Icons.Default.Scale,
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                        cursorColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Button(
+                                    onClick = {
+                                        if (uiState.title.isNotBlank() && !isGradeInvalid) {
+                                            viewModel.onEvent(EditEvaluationEvent.Save(selectedDate, selectedImageUri))
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledContentColor = Color.LightGray
+                                    ),
+                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                                    enabled = uiState.title.isNotBlank() && !isGradeInvalid && !uiState.isSaving
+                                ) {
+                                    Text("ACTUALIZAR EVALUACIÓN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
