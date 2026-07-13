@@ -71,6 +71,7 @@ import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
 import com.example.notifast.presentation.atoms.NotiFastCircularLoading
 import com.example.notifast.presentation.atoms.NotiFastDialog
 import com.example.notifast.presentation.atoms.NotiFastStudyBackground
+import com.example.notifast.data.model.EvaluationType
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
 import java.text.SimpleDateFormat
@@ -242,6 +243,8 @@ fun CalendarScreen(
 @Composable
 fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
+    val evaluationType = EvaluationType.fromName(eval.type)
+
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -251,8 +254,8 @@ fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: ()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.size(40.dp).background(Ruby.copy(alpha = 0.08f), CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Event, contentDescription = null, tint = Ruby)
+                Box(modifier = Modifier.size(40.dp).background(evaluationType.color.copy(alpha = 0.08f), CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(evaluationType.icon, contentDescription = null, tint = evaluationType.color)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -271,6 +274,17 @@ fun EvaluationExpandableItem(eval: Evaluation, isExpanded: Boolean, onToggle: ()
                     DetailRow(icon = Icons.AutoMirrored.Filled.Subject, label = "Descripción", content = eval.description)
                     Spacer(modifier = Modifier.height(12.dp))
                     DetailRow(icon = Icons.Default.Lightbulb, label = "Tips Rápidos", content = eval.quickTips, color = Color(0xFFFBC02D))
+
+                    if (evaluationType.showGrade && eval.grade != null) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        DetailRow(icon = Icons.Default.Event, label = "Nota Obtenida", content = "${eval.grade}/10", color = Aqua)
+                    }
+
+                    if (evaluationType.showWeight && eval.weight != null) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        DetailRow(icon = Icons.Default.Event, label = "Peso / Porcentaje", content = "${eval.weight}%", color = Aqua)
+                    }
+
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         TextButton(onClick = onToggle) {
