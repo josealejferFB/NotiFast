@@ -6,11 +6,13 @@ import com.notifast.app.data.repository.EvaluationRepositoryImpl
 import com.notifast.app.data.repository.ImageRepositoryImpl
 import com.notifast.app.data.repository.NoteRepositoryImpl
 import com.notifast.app.data.repository.ScheduleRepositoryImpl
+import com.notifast.app.data.repository.UserPrefsRepositoryImpl
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.util.AnalyticsTracker
 import dagger.Binds
 import dagger.Module
@@ -41,6 +43,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserPrefsRepository(impl: UserPrefsRepositoryImpl): UserPrefsRepository
 
     @Binds
     @Singleton
