@@ -8,39 +8,29 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,50 +43,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.SubcomposeAsyncImage
-import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.presentation.feature.notes.SubjectInfo
+import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.color.Aqua
-import com.notifast.app.presentation.theme.color.Ruby
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import java.util.Date
-
-private fun getSubjectColor(info: SubjectInfo): Color {
-    if (info.colorHex.isNotBlank()) {
-        return info.colorHex.toSafeComposeColor(Aqua)
-    }
-    val hash = info.name.hashCode()
-    val hue = ((hash and 0xFF).toFloat() / 255f * 360f)
-    return Color.hsl(hue, 0.7f, 0.55f)
-}
-
-private fun getInitials(name: String): String {
-    return name.trim().split(" ")
-        .mapNotNull { it.firstOrNull()?.toString() }
-        .take(2)
-        .joinToString("")
-        .uppercase()
-}
-
-private fun daysUntil(date: Date): Long {
-    val diff = date.time - System.currentTimeMillis()
-    return diff / (1000 * 60 * 60 * 24)
-}
-
-private fun urgencyColor(days: Long): Color {
-    return when {
-        days < 0 -> Color.Gray
-        days <= 7 -> Color(0xFFE53935)
-        days <= 14 -> Color(0xFFFB8C00)
-        else -> Color(0xFF43A047)
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -110,8 +64,17 @@ fun SubjectCard(
     onDeleteSubject: () -> Unit,
     onSubjectDetail: () -> Unit = {}
 ) {
-    val color = getSubjectColor(info)
-    val initials = getInitials(info.name)
+    val isDark = isSystemInDarkTheme()
+    val color = remember(info.colorHex, isDark) {
+        if (info.colorHex.isNotBlank()) {
+            ThemeUtils.getAccessibleColor(info.colorHex, isDark)
+        } else {
+            val hash = info.name.hashCode()
+            val hue = ((hash and 0xFF).toFloat() / 255f * 360f)
+            Color.hsl(hue, 0.7f, if (isDark) 0.65f else 0.45f)
+        }
+    }
+
     var showMenu by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
@@ -122,12 +85,12 @@ fun SubjectCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = if (androidx.compose.foundation.isSystemInDarkTheme()) Color(0xFF223838) else MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
     ) {
         Column {
-            // Compact header (always visible)
+            // Compact Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -138,7 +101,6 @@ fun SubjectCard(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Colored left bar logic incorporated into padding if desired, or here as a colored box
                 Box(
                     modifier = Modifier
                         .size(44.dp)
@@ -158,34 +120,33 @@ fun SubjectCard(
                     Text(info.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "${info.notes.size} apuntes · ${info.evaluations.size} evaluaciones" + if(info.pendingEvalCount > 0) " · ${info.pendingEvalCount} pdts" else "",
-                        style = MaterialTheme.typography.bodySmall, 
+                        text = "${info.notes.size} apuntes · ${info.evaluations.size} evaluaciones" +
+                                if (info.pendingEvalCount > 0) " · ${info.pendingEvalCount} pdts" else "",
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 if (info.averageGrade != null) {
-                    Column(horizontalAlignment = Alignment.End) {
-                        Surface(
-                            color = color.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = String.format("%.1f", info.averageGrade), 
-                                style = MaterialTheme.typography.titleMedium, 
-                                fontWeight = FontWeight.ExtraBold, 
-                                color = color,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        }
+                    Surface(
+                        color = color.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = String.format("%.1f", info.averageGrade),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = color,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
                     }
-                } else {
-                    Spacer(Modifier.width(8.dp))
                 }
                 Spacer(Modifier.width(8.dp))
                 Icon(
-                    Icons.Default.KeyboardArrowDown,
+                    imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp).graphicsLayer { rotationZ = rotation },
+                    modifier = Modifier
+                        .size(24.dp)
+                        .graphicsLayer { rotationZ = rotation },
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -195,13 +156,13 @@ fun SubjectCard(
                 onDismissRequest = { showMenu = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Eliminar materia", color = Color(0xFFE53935)) },
+                    text = { Text("Eliminar materia", color = MaterialTheme.colorScheme.error) },
                     onClick = {
                         showMenu = false
                         onDeleteSubject()
                     },
                     leadingIcon = {
-                        Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFE53935))
+                        Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                     }
                 )
             }
@@ -209,16 +170,21 @@ fun SubjectCard(
             // Expanded content
             AnimatedVisibility(
                 visible = isExpanded,
-                enter = expandVertically(animationSpec = spring(dampingRatio = 0.6f, stiffness = 280f)) + fadeIn(animationSpec = spring(dampingRatio = 0.6f, stiffness = 280f)),
-                exit = shrinkVertically(animationSpec = spring(dampingRatio = 0.6f, stiffness = 280f)) + fadeOut(animationSpec = spring(dampingRatio = 0.6f, stiffness = 280f))
+                enter = expandVertically(spring(0.6f, 280f)) + fadeIn(spring(0.6f, 280f)),
+                exit = shrinkVertically(spring(0.6f, 280f)) + fadeOut(spring(0.6f, 280f))
             ) {
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     Spacer(Modifier.height(16.dp))
 
                     // Upcoming evaluations
                     if (info.upcomingEvaluations.isNotEmpty()) {
-                        Text("Próximas evaluaciones", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Text(
+                            text = "Próximas evaluaciones",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                         Spacer(Modifier.height(8.dp))
                         info.upcomingEvaluations.forEach { eval ->
                             val days = eval.date?.let { daysUntil(it) } ?: 999
@@ -228,86 +194,30 @@ fun SubjectCard(
                         Spacer(Modifier.height(8.dp))
                     }
 
-                    // Dashboard: average + stats
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Estadísticas", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Spacer(Modifier.height(8.dp))
-                            Text("${info.evaluations.size} totales", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("${info.completedEvalCount} completadas", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("${info.pendingEvalCount} pendientes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        Box(
-                            modifier = Modifier.size(64.dp).clip(CircleShape).background(color.copy(alpha = 0.1f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = info.averageGrade?.let { String.format("%.1f", it) } ?: "—",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = color
-                                )
-                                Text("Promedio", style = MaterialTheme.typography.labelSmall, color = color.copy(alpha = 0.8f))
-                            }
-                        }
-                    }
-
-                    Spacer(Modifier.height(16.dp))
+                    // Dashboard stats & action buttons
+                    SubjectCardDashboard(
+                        info = info,
+                        color = color,
+                        onAddNote = onAddNote,
+                        onAddEvaluation = onAddEvaluation,
+                        onSubjectDetail = onSubjectDetail
+                    )
 
                     // Recent notes mini cards
                     if (info.notes.isNotEmpty()) {
-                        Text("Últimos apuntes", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            text = "Últimos apuntes",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                         Spacer(Modifier.height(8.dp))
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             info.notes.take(3).forEach { note ->
                                 MiniNoteCard(note = note, color = color, onClick = { onNoteClick(note) })
                             }
                         }
-                        Spacer(Modifier.height(16.dp))
-                    }
-
-                    // Quick actions
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = { onAddNote(info.name) },
-                            modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, color),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text("Apunte", fontWeight = FontWeight.Bold)
-                        }
-                        Button(
-                            onClick = { onAddEvaluation(info.name) },
-                            modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = color)
-                        ) {
-                            Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text("Evaluación", fontWeight = FontWeight.Bold)
-                        }
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = onSubjectDetail,
-                        modifier = Modifier.fillMaxWidth().height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, color),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = color)
-                    ) {
-                        Icon(Icons.Default.Info, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text("Más detalles", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -315,99 +225,7 @@ fun SubjectCard(
     }
 }
 
-@Composable
-private fun UrgencyCard(eval: Evaluation, days: Long, color: Color) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val chipColor = urgencyColor(days)
-            Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(chipColor))
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(eval.title, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-                Spacer(Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val weight = eval.weight ?: 0.0
-                    if (weight > 0.0) {
-                        Text("${(weight * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(" · ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Text(eval.date?.let { formatDate(it) } ?: "Sin fecha", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Text(
-                text = when {
-                    days < 0 -> "Vencida"
-                    days == 0L -> "Hoy"
-                    days == 1L -> "Mañana"
-                    else -> "${days}d"
-                },
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = chipColor
-            )
-        }
-    }
-}
-
-@Composable
-private fun MiniNoteCard(note: Note, color: Color, onClick: () -> Unit) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        color = color.copy(alpha = 0.15f)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .height(24.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(color)
-            )
-            Spacer(Modifier.width(10.dp))
-            Text(
-                text = note.title,
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
-            if (note.imageUrl != null) {
-                Spacer(Modifier.width(8.dp))
-                Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                ) {
-                    SubcomposeAsyncImage(
-                        model = note.imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-        }
-    }
-}
-
-private fun formatDate(date: Date): String {
-    val cal = java.util.Calendar.getInstance().apply { time = date }
-    return "${cal.get(java.util.Calendar.DAY_OF_MONTH)}/${cal.get(java.util.Calendar.MONTH) + 1}"
+private fun daysUntil(date: Date): Long {
+    val diff = date.time - System.currentTimeMillis()
+    return diff / (1000 * 60 * 60 * 24)
 }
