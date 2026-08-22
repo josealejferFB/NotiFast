@@ -26,6 +26,7 @@ sealed interface EditScheduleEvent {
     data class UpdateDayOfWeek(val day: Int) : EditScheduleEvent
     data class UpdateStartTime(val time: String) : EditScheduleEvent
     data class UpdateEndTime(val time: String) : EditScheduleEvent
+    data class UpdateTimeRange(val startTime: String, val endTime: String) : EditScheduleEvent
     data class UpdateClassroom(val classroom: String) : EditScheduleEvent
     data class UpdateTeacher(val teacher: String) : EditScheduleEvent
     data class UpdateMeetingUrl(val url: String) : EditScheduleEvent

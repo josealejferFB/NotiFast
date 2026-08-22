@@ -89,4 +89,36 @@ class AddScheduleViewModelTest {
         assertTrue(viewModel.uiState.value.isSaved)
         assertFalse(viewModel.uiState.value.isSaving)
     }
+
+    @Test
+    fun `when endTime is less than or equal to startTime, autocorrects endTime`() = runTest {
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateStartTime("10:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateEndTime("09:00"))
+
+        assertEquals("10:00", viewModel.uiState.value.startTime)
+        assertEquals("12:00", viewModel.uiState.value.endTime)
+    }
+
+    @Test
+    fun `when updateTimeRange is called with invalid range, autocorrects endTime`() = runTest {
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateTimeRange("14:00", "14:00"))
+
+        assertEquals("14:00", viewModel.uiState.value.startTime)
+        assertEquals("16:00", viewModel.uiState.value.endTime)
+    }
+
+    @Test
+    fun `when dayOfWeek is updated, dayOfWeek in state reflects change`() = runTest {
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(4)) // Viernes
+        assertEquals(4, viewModel.uiState.value.dayOfWeek)
+    }
 }

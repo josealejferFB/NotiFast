@@ -5,28 +5,18 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,11 +32,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
-import com.notifast.app.data.model.Schedule
 import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.TopBarType
+import com.notifast.app.presentation.feature.addschedule.components.ScheduleDaySegmentedBar
+import com.notifast.app.presentation.feature.addschedule.components.ScheduleSubjectChips
+import com.notifast.app.presentation.feature.addschedule.components.ScheduleTimeRangePicker
 import com.notifast.app.presentation.feature.schedules.components.ScheduleConflictBanner
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
@@ -56,7 +51,8 @@ import com.notifast.app.presentation.theme.color.Ruby
 fun AddScheduleScreen(
     viewModel: AddScheduleViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onScheduleAdded: () -> Unit
+    onScheduleAdded: () -> Unit,
+    onNavigateToAddSubject: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -75,11 +71,11 @@ fun AddScheduleScreen(
         }
     }
 
-    var showSubjectDropdown by remember { mutableStateOf(false) }
-    var showDayDropdown by remember { mutableStateOf(false) }
     var showDiscardDialog by remember { mutableStateOf(false) }
 
-    val hasUnsavedChanges = uiState.subjectName.isNotBlank() || uiState.startTime.isNotBlank() || uiState.endTime.isNotBlank() || uiState.classroom.isNotBlank() || uiState.teacher.isNotBlank()
+    val hasUnsavedChanges = uiState.subjectName.isNotBlank() || uiState.startTime.isNotBlank() ||
+            uiState.endTime.isNotBlank() || uiState.classroom.isNotBlank() || uiState.teacher.isNotBlank()
+
     val handleBack = {
         if (hasUnsavedChanges) {
             showDiscardDialog = true
@@ -97,14 +93,11 @@ fun AddScheduleScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text(stringResource(R.string.schedules_add_title), fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = handleBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
+                NotiFastTopBar(
+                    type = TopBarType.Detail(
+                        title = stringResource(R.string.schedules_add_title),
+                        onBackClick = handleBack
+                    )
                 )
             }
         ) { padding ->
@@ -114,112 +107,72 @@ fun AddScheduleScreen(
                     .padding(padding)
                     .padding(horizontal = 24.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                Spacer(modifier = Modifier.height(4.dp))
+
                 // Conflict Banner
                 ScheduleConflictBanner(conflicts = uiState.conflictingSchedules)
 
-                // Subject Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = showSubjectDropdown,
-                    onExpandedChange = { showSubjectDropdown = it }
-                ) {
-                    NotiFastTextField(
-                        value = uiState.subjectName,
-                        onValueChange = {},
-                        label = stringResource(R.string.schedules_field_subject),
-                        readOnly = true,
-                        leadingIcon = Icons.Default.School,
-                        modifier = Modifier.menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = showSubjectDropdown,
-                        onDismissRequest = { showSubjectDropdown = false }
+                NotiFastCard(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(18.dp)
                     ) {
-                        uiState.subjects.forEach { subject ->
-                            DropdownMenuItem(
-                                text = { Text(subject.name) },
-                                onClick = {
-                                    viewModel.onEvent(AddScheduleEvent.UpdateSubjectName(subject.name))
-                                    showSubjectDropdown = false
-                                }
-                            )
-                        }
-                        if (uiState.subjects.isEmpty()) {
-                            DropdownMenuItem(text = { Text("No hay materias") }, onClick = { showSubjectDropdown = false })
-                        }
+                        // 1-Tap Subject Chips + Create action
+                        ScheduleSubjectChips(
+                            subjects = uiState.subjects,
+                            selectedSubject = uiState.subjectName,
+                            onSubjectSelected = { viewModel.onEvent(AddScheduleEvent.UpdateSubjectName(it)) },
+                            onCreateSubjectClick = onNavigateToAddSubject
+                        )
+
+                        // 7-day Segmented Bar
+                        ScheduleDaySegmentedBar(
+                            selectedDayIndex = uiState.dayOfWeek,
+                            onDaySelected = { viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(it)) }
+                        )
+
+                        // M3 TimeRangePicker with presets + dialog
+                        ScheduleTimeRangePicker(
+                            startTime = uiState.startTime,
+                            endTime = uiState.endTime,
+                            onTimeRangeChanged = { start, end ->
+                                viewModel.onEvent(AddScheduleEvent.UpdateTimeRange(start, end))
+                            }
+                        )
+
+                        // Classroom
+                        NotiFastTextField(
+                            value = uiState.classroom,
+                            onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateClassroom(it)) },
+                            label = stringResource(R.string.schedules_field_classroom),
+                            placeholder = "Ej: Aula 302 / Laboratorio",
+                            leadingIcon = Icons.Default.MeetingRoom,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Teacher
+                        NotiFastTextField(
+                            value = uiState.teacher,
+                            onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateTeacher(it)) },
+                            label = stringResource(R.string.schedules_field_teacher),
+                            placeholder = "Ej: Dr. Pérez",
+                            leadingIcon = Icons.Default.Person,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
-
-                // Day of week Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = showDayDropdown,
-                    onExpandedChange = { showDayDropdown = it }
-                ) {
-                    val dayName = Schedule.DAY_NAMES.getOrElse(uiState.dayOfWeek) { "Día ${uiState.dayOfWeek}" }
-                    NotiFastTextField(
-                        value = dayName,
-                        onValueChange = {},
-                        label = stringResource(R.string.schedules_field_day),
-                        readOnly = true,
-                        leadingIcon = Icons.Default.Schedule,
-                        modifier = Modifier.menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = showDayDropdown,
-                        onDismissRequest = { showDayDropdown = false }
-                    ) {
-                        Schedule.DAY_NAMES.forEachIndexed { index, day ->
-                            DropdownMenuItem(
-                                text = { Text(day) },
-                                onClick = {
-                                    viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(index))
-                                    showDayDropdown = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    NotiFastTextField(
-                        value = uiState.startTime,
-                        onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateStartTime(it)) },
-                        label = stringResource(R.string.schedules_field_start_time),
-                        placeholder = "Ej: 08:00",
-                        modifier = Modifier.weight(1f)
-                    )
-                    NotiFastTextField(
-                        value = uiState.endTime,
-                        onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateEndTime(it)) },
-                        label = stringResource(R.string.schedules_field_end_time),
-                        placeholder = "Ej: 10:00",
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                NotiFastTextField(
-                    value = uiState.classroom,
-                    onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateClassroom(it)) },
-                    label = stringResource(R.string.schedules_field_classroom),
-                    leadingIcon = Icons.Default.MeetingRoom
-                )
-
-                NotiFastTextField(
-                    value = uiState.teacher,
-                    onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateTeacher(it)) },
-                    label = stringResource(R.string.schedules_field_teacher),
-                    leadingIcon = Icons.Default.Person
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
 
                 NotiFastButton(
                     text = stringResource(R.string.schedules_save_button),
                     onClick = { viewModel.onEvent(AddScheduleEvent.SaveSchedule) },
                     isLoading = uiState.isSaving,
                     backgroundColor = Aqua,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+                    enabled = uiState.subjectName.isNotBlank() && uiState.startTime.isNotBlank() && uiState.endTime.isNotBlank(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp)
                 )
             }
         }

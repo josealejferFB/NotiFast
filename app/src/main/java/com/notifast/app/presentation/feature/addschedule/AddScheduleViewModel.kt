@@ -57,11 +57,22 @@ class AddScheduleViewModel @Inject constructor(
                 checkConflicts()
             }
             is AddScheduleEvent.UpdateStartTime -> {
-                _uiState.update { it.copy(startTime = event.time) }
+                val correctedEnd = if (_uiState.value.endTime.isNotBlank()) {
+                    sanitizeEndTime(event.time, _uiState.value.endTime)
+                } else _uiState.value.endTime
+                _uiState.update { it.copy(startTime = event.time, endTime = correctedEnd) }
                 checkConflicts()
             }
             is AddScheduleEvent.UpdateEndTime -> {
-                _uiState.update { it.copy(endTime = event.time) }
+                val correctedEnd = if (_uiState.value.startTime.isNotBlank()) {
+                    sanitizeEndTime(_uiState.value.startTime, event.time)
+                } else event.time
+                _uiState.update { it.copy(endTime = correctedEnd) }
+                checkConflicts()
+            }
+            is AddScheduleEvent.UpdateTimeRange -> {
+                val correctedEnd = sanitizeEndTime(event.startTime, event.endTime)
+                _uiState.update { it.copy(startTime = event.startTime, endTime = correctedEnd) }
                 checkConflicts()
             }
             is AddScheduleEvent.UpdateClassroom -> _uiState.update { it.copy(classroom = event.classroom) }
@@ -69,6 +80,21 @@ class AddScheduleViewModel @Inject constructor(
             is AddScheduleEvent.UpdateMeetingUrl -> _uiState.update { it.copy(meetingUrl = event.url) }
             is AddScheduleEvent.ClearError -> _uiState.update { it.copy(error = null) }
             is AddScheduleEvent.SaveSchedule -> saveSchedule()
+        }
+    }
+
+    private fun sanitizeEndTime(start: String, end: String): String {
+        if (start.isBlank() || end.isBlank()) return end
+        val startParts = start.split(":").mapNotNull { it.toIntOrNull() }
+        val endParts = end.split(":").mapNotNull { it.toIntOrNull() }
+        if (startParts.size != 2 || endParts.size != 2) return end
+        val startMins = startParts[0] * 60 + startParts[1]
+        val endMins = endParts[0] * 60 + endParts[1]
+        return if (endMins <= startMins) {
+            val correctedMins = minOf(startMins + 120, 23 * 60 + 59)
+            String.format(java.util.Locale.US, "%02d:%02d", correctedMins / 60, correctedMins % 60)
+        } else {
+            end
         }
     }
 
