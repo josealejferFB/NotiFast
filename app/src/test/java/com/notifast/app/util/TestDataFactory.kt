@@ -1,6 +1,5 @@
 package com.notifast.app.util
 
-import com.google.firebase.Timestamp
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
@@ -20,8 +19,8 @@ object TestDataFactory {
         title: String = "Álgebra Lineal",
         content: String = "Matrices y determinantes",
         imageUrl: String? = null,
-        timestamp: Timestamp = Timestamp(Date()),
-        updatedAt: Timestamp = Timestamp(Date())
+        timestamp: Date? = Date(),
+        updatedAt: Date? = Date()
     ) = Note(
         id = id,
         userId = userId,
@@ -51,7 +50,7 @@ object TestDataFactory {
         description: String = "Temas 1 al 4",
         quickTips: String = "Repasar fórmulas",
         type: String = "EXAM",
-        date: Timestamp = Timestamp(Date()),
+        date: Date? = Date(),
         grade: Double? = 9.5,
         weight: Double? = 30.0,
         isPresented: Boolean = true,
@@ -94,12 +93,12 @@ object TestDataFactory {
         email: String = "test@example.com",
         firstName: String = "Juan",
         lastName: String = "Pérez",
-        profileImageUrl: String? = null
+        profilePictureUrl: String? = null
     ) = User(
         uid = uid,
         email = email,
         firstName = firstName,
         lastName = lastName,
-        profileImageUrl = profileImageUrl
+        profilePictureUrl = profilePictureUrl
     )
 }
