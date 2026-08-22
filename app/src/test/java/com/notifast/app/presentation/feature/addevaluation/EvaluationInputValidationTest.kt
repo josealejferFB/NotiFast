@@ -53,4 +53,15 @@ class EvaluationInputValidationTest {
         assertEquals(0.0, (-10.0).coerceIn(0.0, 100.0), 0.001)
         assertEquals(35.5, 35.5.coerceIn(0.0, 100.0), 0.001)
     }
+
+    @Test
+    fun `5 percent discrete step rounding behaves correctly`() {
+        fun stepTo5(value: Float): Int = (kotlin.math.round((value / 5.0f).toDouble()).toInt() * 5).coerceIn(0, 100)
+
+        assertEquals(0, stepTo5(2.0f))
+        assertEquals(5, stepTo5(3.0f))
+        assertEquals(15, stepTo5(14.0f))
+        assertEquals(20, stepTo5(18.5f))
+        assertEquals(100, stepTo5(103.0f))
+    }
 }

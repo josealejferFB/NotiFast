@@ -1,86 +1,129 @@
 package com.notifast.app.presentation.feature.addevaluation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.notifast.app.R
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
+import com.notifast.app.presentation.theme.color.Aqua
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EvaluationSubjectSelector(
     selectedSubject: String,
     subjects: List<SubjectData>,
-    onSubjectSelected: (String) -> Unit
+    onSubjectSelected: (String) -> Unit,
+    onCreateSubjectClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        TextField(
-            value = selectedSubject,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Seleccionar Materia") },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Category,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary
-                )
-            },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            shape = RoundedCornerShape(20.dp),
-            colors = ExposedDropdownMenuDefaults.textFieldColors(
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-                .fillMaxWidth()
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.schedules_field_subject),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
         )
+        Spacer(Modifier.height(8.dp))
 
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
+        Row(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(20.dp))
-                .clip(RoundedCornerShape(20.dp))
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            // "➕ Crear Materia" chip
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Aqua.copy(alpha = 0.12f))
+                    .border(1.dp, Aqua.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                    .clickable { onCreateSubjectClick() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = Aqua,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.notes_create_subject_chip),
+                        color = Aqua,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // Existing Subjects
             subjects.forEach { subjectData ->
-                DropdownMenuItem(
-                    text = { Text(subjectData.name, fontWeight = FontWeight.SemiBold) },
-                    onClick = {
-                        onSubjectSelected(subjectData.name)
-                        expanded = false
+                val isSelected = selectedSubject.equals(subjectData.name, ignoreCase = true)
+                val subjectColor = try {
+                    Color(android.graphics.Color.parseColor(subjectData.colorHex))
+                } catch (e: Exception) {
+                    Aqua
+                }
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(if (isSelected) subjectColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                        .border(
+                            width = if (isSelected) 1.5.dp else 1.dp,
+                            color = if (isSelected) subjectColor else Color.Transparent,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .clickable { onSubjectSelected(subjectData.name) }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = SubjectIconMapper.getIcon(subjectData.icon),
+                            contentDescription = null,
+                            tint = if (isSelected) Color.White else subjectColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = subjectData.name,
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                            fontSize = 13.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                        )
                     }
-                )
+                }
             }
         }
     }

@@ -57,17 +57,18 @@ class AddEvaluationViewModel @Inject constructor(
             }
             is AddEvaluationEvent.SelectType -> _uiState.update { it.copy(selectedType = event.type) }
             is AddEvaluationEvent.Save -> save(event.date, event.imageUri)
+            is AddEvaluationEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
     private fun save(date: java.util.Date, imageUri: android.net.Uri?) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(isSaving = true) }
+            _uiState.update { it.copy(isSaving = true, error = null) }
             val state = _uiState.value
             val cleanTitle = state.title.trim()
             if (cleanTitle.isBlank() || state.selectedSubject.isBlank()) {
-                _uiState.update { it.copy(isSaving = false) }
+                _uiState.update { it.copy(isSaving = false, error = "Materia y título son requeridos") }
                 return@launch
             }
             val evaluation = Evaluation(
@@ -82,8 +83,8 @@ class AddEvaluationViewModel @Inject constructor(
             )
             evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess {
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
-            }.onFailure {
-                _uiState.update { it.copy(isSaving = false) }
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSaving = false, error = e.message ?: "Error al guardar la evaluación") }
             }
         }
     }
