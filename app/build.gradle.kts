@@ -90,6 +90,9 @@ dependencies {
     // Google Sign-In
     implementation(libs.play.services.auth)
 
+    // DataStore Preferences
+    implementation(libs.androidx.datastore.preferences)
+
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
