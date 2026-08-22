@@ -110,4 +110,59 @@
     <string name="btn_delete">Eliminar</string>
     <string name="btn_close">Cerrar</string>
     <string name="btn_edit">Editar</string>
+
+    <!-- Phase 2.1: Subjects, Schedules, Notes & Evaluations Ergonomics -->
+    <string name="add_subject_title">Nueva Materia</string>
+    <string name="add_subject_color_title">Elige un color</string>
+    <string name="add_subject_icon_title">Elige un icono</string>
+    <string name="add_subject_btn_create">CREAR MATERIA</string>
+    <string name="add_subject_name_label">Nombre de la materia</string>
+    <string name="add_subject_discard_title">Descartar materia</string>
+    <string name="add_subject_discard_message">¿Deseas salir sin guardar los cambios de esta materia?</string>
+
+    <!-- Schedules Ergonomics -->
+    <string name="schedule_day_mon">L</string>
+    <string name="schedule_day_tue">M</string>
+    <string name="schedule_day_wed">M</string>
+    <string name="schedule_day_thu">J</string>
+    <string name="schedule_day_fri">V</string>
+    <string name="schedule_day_sat">S</string>
+    <string name="schedule_day_sun">D</string>
+    <string name="schedule_time_preset_morning_1">08:00 - 10:00</string>
+    <string name="schedule_time_preset_morning_2">10:00 - 12:00</string>
+    <string name="schedule_time_preset_afternoon_1">14:00 - 16:00</string>
+    <string name="schedule_time_preset_afternoon_2">16:00 - 18:00</string>
+    <string name="schedule_time_custom">Personalizado</string>
+    <string name="schedule_create_subject_chip">➕ Crear Materia</string>
+    <string name="schedule_time_select_start">Hora de inicio</string>
+    <string name="schedule_time_select_end">Hora de fin</string>
+
+    <!-- Notes Quick Tags -->
+    <string name="notes_quick_tag_summary">#resumen</string>
+    <string name="notes_quick_tag_exam">#examen</string>
+    <string name="notes_quick_tag_formulas">#fórmulas</string>
+    <string name="notes_quick_tag_homework">#tarea</string>
+    <string name="notes_quick_tag_lab">#laboratorio</string>
+    <string name="notes_quick_tag_project">#proyecto</string>
+    <string name="notes_quick_tag_glossary">#glosario</string>
+    <string name="notes_quick_tag_bibliography">#bibliografía</string>
+    <string name="notes_create_subject_chip">➕ Crear Materia</string>
+
+    <!-- Evaluation Ergonomics -->
+    <string name="evaluation_add_title">Añadir Evaluación</string>
+    <string name="evaluation_edit_title">Editar Evaluación</string>
+    <string name="evaluation_field_type">Tipo de Evaluación</string>
+    <string name="evaluation_field_title">Título de la evaluación</string>
+    <string name="evaluation_field_date">Fecha</string>
+    <string name="evaluation_field_weight">Ponderación (%)</string>
+    <string name="evaluation_available_weight">Disponible en materia: %1$d%%</string>
+    <string name="evaluation_weight_exceeded">⚠️ La ponderación total supera el 100%%</string>
+    <string name="evaluation_field_description">Descripción / Temas (Opcional)</string>
+    <string name="evaluation_field_quick_tips">Consejos rápidos de estudio (Opcional)</string>
+    <string name="evaluation_field_grade">Calificación obtenida</string>
+    <string name="evaluation_status_presented">Evaluación ya realizada / calificada</string>
+    <string name="evaluation_btn_save">Guardar Evaluación</string>
+    <string name="evaluation_btn_save_changes">Guardar Cambios</string>
+    <string name="evaluation_discard_title">Descartar evaluación</string>
+    <string name="evaluation_discard_message">¿Estás seguro de que deseas salir? Se perderán los datos ingresados.</string>
 </resources>
