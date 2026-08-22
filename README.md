@@ -147,6 +147,8 @@ users/
 
 | Documento | Ubicación |
 |---|---|
+| PRD Maestro v2.0 | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) |
+| Estado del Roadmap | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) |
 | Auditoría completa | [`docs/audit/`](docs/audit/) |
 | Planes de implementación | [`docs/superpowers/plans/`](docs/superpowers/plans/) |
 | Specs de diseño | [`docs/superpowers/specs/`](docs/superpowers/specs/) |
