@@ -187,7 +187,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>> {
+    override fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>> {
         return db.collection("users").document(userId)
             .collection("subjects").document(subject)
             .collection("notes")
