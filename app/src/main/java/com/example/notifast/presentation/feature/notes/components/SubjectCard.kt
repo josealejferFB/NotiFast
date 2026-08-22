@@ -64,19 +64,16 @@ import com.example.notifast.data.model.Note
 import com.example.notifast.presentation.feature.notes.SubjectInfo
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
+import com.example.notifast.presentation.theme.color.toSafeComposeColor
 import java.util.Date
 
 private fun getSubjectColor(info: SubjectInfo): Color {
-    return try {
-        if (info.colorHex.isNotBlank()) Color(android.graphics.Color.parseColor(info.colorHex))
-        else {
-            val hash = info.name.hashCode()
-            val hue = ((hash and 0xFF).toFloat() / 255f * 360f)
-            Color.hsl(hue, 0.7f, 0.55f)
-        }
-    } catch (e: Exception) {
-        Aqua
+    if (info.colorHex.isNotBlank()) {
+        return info.colorHex.toSafeComposeColor(Aqua)
     }
+    val hash = info.name.hashCode()
+    val hue = ((hash and 0xFF).toFloat() / 255f * 360f)
+    return Color.hsl(hue, 0.7f, 0.55f)
 }
 
 private fun getInitials(name: String): String {

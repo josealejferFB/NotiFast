@@ -68,10 +68,12 @@ fun LoginScreen(
 
     val context = LocalContext.current
     val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(BuildConfig.WEB_CLIENT_ID)
+        val builder = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .build()
+        if (BuildConfig.WEB_CLIENT_ID.isNotBlank()) {
+            builder.requestIdToken(BuildConfig.WEB_CLIENT_ID)
+        }
+        builder.build()
     }
     val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
 
@@ -155,7 +157,7 @@ fun LoginScreen(
                     NotiFastFormField(
                         value = firstName,
                         onValueChange = { firstName = it },
-                        label = "Nombre",
+                        label = stringResource(R.string.login_field_firstname),
                         leadingIcon = Icons.Default.Person,
                         cursorColor = Aqua,
                         modifier = Modifier.weight(1f)
@@ -164,7 +166,8 @@ fun LoginScreen(
                     NotiFastFormField(
                         value = lastName,
                         onValueChange = { lastName = it },
-                        label = "Apellido",
+                        label = stringResource(R.string.login_field_lastname),
+                        leadingIcon = Icons.Default.Person,
                         cursorColor = Aqua,
                         modifier = Modifier.weight(1f)
                     )
@@ -175,7 +178,7 @@ fun LoginScreen(
             NotiFastFormField(
                 value = email,
                 onValueChange = { email = it },
-                label = "Correo electrónico",
+                label = stringResource(R.string.login_field_email),
                 leadingIcon = Icons.Default.AlternateEmail,
                 cursorColor = if (isSignUp) Aqua else Ruby
             )
@@ -185,7 +188,7 @@ fun LoginScreen(
             NotiFastFormField(
                 value = password,
                 onValueChange = { password = it },
-                label = "Contraseña",
+                label = stringResource(R.string.login_field_password),
                 leadingIcon = Icons.Default.LockOpen,
                 cursorColor = if (isSignUp) Aqua else Ruby
             )
@@ -230,9 +233,9 @@ fun LoginScreen(
 
                 TextButton(onClick = { isSignUp = !isSignUp }) {
                     Text(
-                        text = if (isSignUp) "¿Ya eres parte de NotiFast? Inicia sesión"
-                               else "¿Eres nuevo? Regístrate y empieza a aprender",
-                        color = Color.DarkGray,
+                        text = if (isSignUp) stringResource(R.string.login_switch_to_login)
+                               else stringResource(R.string.login_switch_to_signup),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -241,12 +244,12 @@ fun LoginScreen(
             uiState.error?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = it,
-                        color = Color.Red,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.padding(12.dp),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodySmall

@@ -1,22 +1,44 @@
 <resources>
     <string name="app_name">NotiFast</string>
-    <!-- Login -->
+    
+    <!-- Login & Auth -->
     <string name="login_title">NotiFast</string>
     <string name="login_subtitle">Tu aprendizaje, a la velocidad de tus ideas.</string>
     <string name="login_button">Entrar</string>
     <string name="signup_button">Crear Cuenta</string>
     <string name="google_button">Continuar con Google</string>
     <string name="login_error">Error al iniciar sesión</string>
+    <string name="login_field_firstname">Nombre</string>
+    <string name="login_field_lastname">Apellido</string>
+    <string name="login_field_email">Correo electrónico</string>
+    <string name="login_field_password">Contraseña</string>
+    <string name="login_switch_to_login">¿Ya eres parte de NotiFast? Inicia sesión</string>
+    <string name="login_switch_to_signup">¿Eres nuevo? Regístrate y empieza a aprender</string>
     
-    <!-- Notes -->
+    <!-- Notes & Subjects -->
     <string name="notes_title">Mis Apuntes</string>
     <string name="notes_search_placeholder">Buscar apuntes o materias…</string>
-    <string name="notes_empty_title">Sin apuntes</string>
-    <string name="notes_empty_message">Aún no tienes materias o apuntes registrados.</string>
+    <string name="notes_empty_title">Aún no tienes apuntes</string>
+    <string name="notes_empty_message">Empieza creando tu primera materia para poder añadir apuntes y organizar tu estudio.</string>
+    <string name="subjects_empty_title">Sin materias</string>
+    <string name="subjects_empty_message">Crea tu primera materia usando el botón inferior.</string>
+    <string name="notes_no_matches">No hay coincidencias</string>
+    <string name="notes_tab_notes">Apuntes</string>
+    <string name="notes_tab_subjects">Materias</string>
+    <string name="notes_filter_recent">Recientes</string>
+    <string name="notes_filter_oldest">Más Antiguas</string>
+    <string name="notes_filter_by_subject">Por Materia</string>
     <string name="notes_add_button">Nuevo Apunte</string>
+    
+    <!-- Dialogs -->
     <string name="delete_note_title">¿Eliminar apunte?</string>
+    <string name="delete_note_message">¿Estás seguro de eliminar el apunte \'%1$s\'?</string>
     <string name="delete_note_confirm">Eliminar</string>
     <string name="delete_note_cancel">Cancelar</string>
+    <string name="delete_subject_title">Eliminar materia</string>
+    <string name="delete_subject_message">¿Estás seguro de eliminar %1$s? También se borrarán todos los apuntes y evaluaciones asociadas.</string>
+    <string name="delete_subject_confirm">Eliminar</string>
+    <string name="delete_subject_cancel">Cancelar</string>
     
     <!-- FAB -->
     <string name="fab_add_subject">Nueva Materia</string>

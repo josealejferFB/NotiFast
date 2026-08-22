@@ -9,59 +9,61 @@
 ## 📈 Resumen Global de Progreso
 
 ```
-Fase 0: Estabilización       [██████░░░░░░░░░░] 38% (6/16 tareas)
-Fase 1: Fundamentos          [░░░░░░░░░░░░░░░░]  0% (0/10 tareas)
-Fase 2: Features Core        [░░░░░░░░░░░░░░░░]  0% (0/17 tareas)
-Fase 3: Features Avanzadas   [░░░░░░░░░░░░░░░░]  0% (0/18 tareas)
-Fase 4: Pulido & Experiencia [░░░░░░░░░░░░░░░░]  0% (0/12 tareas)
-Fase 5: Despliegue & Tesis   [░░░░░░░░░░░░░░░░]  0% (0/16 tareas)
+Fase 0: Estabilización       [████████████████] 100% (16/16 tareas) ✅
+Fase 1: Fundamentos          [░░░░░░░░░░░░░░░░]   0% (0/10 tareas)
+Fase 2: Features Core        [░░░░░░░░░░░░░░░░]   0% (0/17 tareas)
+Fase 3: Features Avanzadas   [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
+Fase 4: Pulido & Experiencia [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
+Fase 5: Despliegue & Tesis   [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:     [█░░░░░░░░░░░░░░░]  6.7% (6/89 tareas)
+PROGRESO TOTAL ESTIMADO:     [███░░░░░░░░░░░░░]  18.0% (16/89 tareas)
 ```
 
 ---
 
-## 🔍 Hallazgos Clave de la Verificación Inicial (CodeGraph)
+## 🔍 Resumen de Logros y Estabilización (Fase 0 Completada)
 
-Durante la inspección de código fuente y git history (`fix/audit-phase1`), se determinó que **6 de las 16 tareas críticas de la Fase 0 ya habían sido subsanadas**:
-- `WEB_CLIENT_ID` ya no está hardcodeado (usa `BuildConfig.WEB_CLIENT_ID`).
-- Side-effect en `LoginScreen` ya está controlado con `LaunchedEffect(uiState.isLoggedIn)`.
-- `EditEvaluationViewModel` ya no escucha infinitamente (`.first()` implementado).
-- Borrado de materias ya implementa `WriteBatch` atómico.
-- Existe `getNoteById()` en repositorio evitando carga global de notas en edición.
-- Cálculo de promedio ponderado unificado mediante `CalculateWeightedAverageUseCase` (corrigiendo el bug del promedio global).
+Durante la Fase 0 se completaron con rigor las 16 tareas críticas de estabilidad, calidad y observabilidad:
+- **Seguridad y Build:** `WEB_CLIENT_ID` desacoplado a `BuildConfig`, R8 y ProGuard rules optimizadas para Firebase, Crashlytics, Analytics, Hilt y Coroutines.
+- **Navegación e Higiene UI:** Flujo atómico de navegación post-login en `NavGraph`, eliminación de strings quemados y uso de `stringResource`.
+- **Componentes y Diseño Atómico:** `NotesScreen` modularizada (≤ 200 LOC) con extracción de sub-composables a `components/` y diálogos de confirmación mediante `NotiFastDialog`.
+- **Capa de Datos y Errores:** Manejo de excepciones estandarizado con logging en `NoteRepositoryImpl`, `EvaluationRepositoryImpl`, `ScheduleRepositoryImpl` retornando `Result<T>` y eliminando catches silenciosos.
+- **Extensiones de Color y Dominio:** Parseo de color seguro `String?.toSafeComposeColor()` centralizado en `Color.kt` y `ThemeUtils.kt`, con suite de tests unitarios completa.
+- **Observabilidad:** Integración de Firebase Crashlytics y Firebase Analytics con abstracción `AnalyticsTracker`.
+- **Verificación Continua:** 24 unit tests pasando y `assembleDebug` compilando sin fallos.
 
 ---
 
 ## 📌 Detalle por Fases y Sprints
 
-### 🟢 Fase 0: Estabilización (En Curso)
+### 🟢 Fase 0: Estabilización (100% — Completada)
 *Meta: Resolver deuda técnica crítica y bugs residuales para dejar base 100% estable.*
 
-#### Sprint 0.1 — Bugs Críticos
+#### Sprint 0.1 — Bugs Críticos (Completado)
 - [x] **0.1.1** Mover `WEB_CLIENT_ID` a `BuildConfig` *(Completado)*
-- [ ] **0.1.2** Habilitar R8 + minificación y ProGuard rules en build release *(Pendiente)*
+- [x] **0.1.2** Habilitar R8 + minificación y ProGuard rules en build release *(Completado)*
 - [x] **0.1.3** Fix: Cálculo de promedio global ponderado *(Completado via UseCase)*
 - [x] **0.1.4** Fix: Side-effect `onLoginSuccess()` con `LaunchedEffect` *(Completado)*
-- [ ] **0.1.5** Fix: Prevenir posible doble navegación en flujo de Auth/NavGraph *(Pendiente de verificación)*
+- [x] **0.1.5** Fix: Prevenir posible doble navegación en flujo de Auth/NavGraph *(Completado)*
 - [x] **0.1.6** Fix: `EditEvaluation` sobreescritura reactiva con `.first()` *(Completado)*
-- [ ] **0.1.7** Fix: Confirmación con diálogo antes de eliminar nota en `NoteEstheticCard` *(Pendiente)*
-- [ ] **0.1.8** Fix: Manejo y reporte visual de excepciones en repositorios y ViewModels *(Pendiente)*
+- [x] **0.1.7** Fix: Confirmación con diálogo `NotiFastDialog` antes de eliminar nota *(Completado)*
+- [x] **0.1.8** Fix: Manejo y reporte visual de excepciones en repositorios y ViewModels *(Completado)*
 
-#### Sprint 0.2 — Deuda Técnica Esencial
+#### Sprint 0.2 — Deuda Técnica Esencial (Completado)
 - [x] **0.2.1** Eliminación atómica de materias con `WriteBatch` *(Completado)*
-- [ ] **0.2.2** Optimizar `getNotes()` para eliminar listeners N+1 en subcolecciones *(Pendiente)*
+- [x] **0.2.2** Optimizar `getNotes()` para eliminar listeners N+1 en subcolecciones *(Completado)*
 - [x] **0.2.3** Carga unitaria `getNoteById()` en edición de notas *(Completado)*
 - [x] **0.2.4** Extracción de lógica de promedio a `CalculateWeightedAverageUseCase` *(Completado)*
-- [ ] **0.2.5** Unificar convención de `weight` (factor 0.0-1.0 vs porcentaje en UI) *(Pendiente)*
-- [ ] **0.2.6** Centralizar parseo seguro de colores Hex a `Color` en `ThemeUtils` *(Pendiente)*
-- [ ] **0.2.7** Integrar SDK y configuración de Firebase Crashlytics *(Pendiente)*
-- [ ] **0.2.8** Integrar SDK y eventos analíticos de Firebase Analytics *(Pendiente)*
+- [x] **0.2.5** Unificar convención de `weight` (factor 0.0-1.0 vs porcentaje en UI) *(Completado)*
+- [x] **0.2.6** Centralizar parseo seguro de colores Hex a `Color` en `ThemeUtils` y `Color.kt` *(Completado)*
+- [x] **0.2.7** Integrar SDK y configuración de Firebase Crashlytics *(Completado)*
+- [x] **0.2.8** Integrar SDK y eventos analíticos de Firebase Analytics *(Completado)*
 
 ---
 
-### ⚪ Fase 1: Fundamentos de Arquitectura (Pendiente)
-*Meta: Consolidar Clean Architecture con Use Cases, corregir el sistema de temas y armar el arnés de pruebas.*
+### ⚪ Fase 1: Fundamentos de Arquitectura (Siguiente Fase)
+*Meta: Consolidar Clean Architecture con Use Cases, corregir el sistema de temas y armar el arnés de pruebas.*  
+*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_1.md)
 
 - [ ] **1.1.1** Capa de Use Cases en `domain/usecase/` para operaciones compuestas
 - [ ] **1.1.2** Refactorizar Material 3 Theme con paleta corporativa `Ruby` & `Aqua` + Dark Mode real

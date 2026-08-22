@@ -1,16 +1,18 @@
 package com.example.notifast.presentation.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
+import com.example.notifast.presentation.theme.color.Aqua
+import com.example.notifast.presentation.theme.color.toSafeComposeColor
 
 object ThemeUtils {
+    /**
+     * Calibrates a subject color for accessibility in light or dark themes.
+     */
     fun getAccessibleColor(hex: String, isDark: Boolean): Color {
-        val baseColorInt = try {
-            if (hex.isNotBlank()) android.graphics.Color.parseColor(hex)
-            else android.graphics.Color.parseColor("#3B9797") // Aqua fallback
-        } catch (e: Exception) {
-            android.graphics.Color.parseColor("#3B9797")
-        }
+        val baseColor = hex.toSafeComposeColor(Aqua)
+        val baseColorInt = baseColor.toArgb()
 
         val hsl = FloatArray(3)
         ColorUtils.colorToHSL(baseColorInt, hsl)

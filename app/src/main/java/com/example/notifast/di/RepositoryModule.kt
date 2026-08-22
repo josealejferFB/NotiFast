@@ -1,5 +1,6 @@
 package com.example.notifast.di
 
+import com.example.notifast.data.analytics.FirebaseAnalyticsTracker
 import com.example.notifast.data.repository.AuthRepositoryImpl
 import com.example.notifast.data.repository.EvaluationRepositoryImpl
 import com.example.notifast.data.repository.ImageRepositoryImpl
@@ -10,6 +11,7 @@ import com.example.notifast.domain.repository.EvaluationRepository
 import com.example.notifast.domain.repository.ImageRepository
 import com.example.notifast.domain.repository.NoteRepository
 import com.example.notifast.domain.repository.ScheduleRepository
+import com.example.notifast.domain.util.AnalyticsTracker
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -39,4 +41,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnalyticsTracker(impl: FirebaseAnalyticsTracker): AnalyticsTracker
 }

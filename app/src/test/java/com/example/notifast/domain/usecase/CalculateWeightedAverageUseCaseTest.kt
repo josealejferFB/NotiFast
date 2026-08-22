@@ -56,7 +56,7 @@ class CalculateWeightedAverageUseCaseTest {
     }
 
     @Test
-    fun `invoke calculates true weighted average`() {
+    fun `invoke calculates true weighted average with decimal factor weights`() {
         val evaluations = listOf(
             createEvaluation(id = "1", grade = 10.0, weight = 0.3), // 30% weight
             createEvaluation(id = "2", grade = 5.0, weight = 0.7)   // 70% weight
@@ -65,6 +65,29 @@ class CalculateWeightedAverageUseCaseTest {
         // Sum = (10 * 0.3) + (5 * 0.7) = 3 + 3.5 = 6.5. Total weight = 1.0. Avg = 6.5
         val result = useCase(evaluations)
         assertEquals(6.5, result!!, 0.001)
+    }
+
+    @Test
+    fun `invoke calculates true weighted average with percentage weights`() {
+        val evaluations = listOf(
+            createEvaluation(id = "1", grade = 18.0, weight = 30.0), // 30% weight
+            createEvaluation(id = "2", grade = 14.0, weight = 70.0)  // 70% weight
+        )
+        
+        // Sum = (18 * 30) + (14 * 70) = 540 + 980 = 1520. Total weight = 100. Avg = 15.2
+        val result = useCase(evaluations)
+        assertEquals(15.2, result!!, 0.001)
+    }
+
+    @Test
+    fun `invoke ignores evaluations that are graded but not presented`() {
+        val evaluations = listOf(
+            createEvaluation(id = "1", grade = 16.0, weight = 50.0, isPresented = true),
+            createEvaluation(id = "2", grade = 10.0, weight = 50.0, isPresented = false) // Not presented yet
+        )
+        
+        val result = useCase(evaluations)
+        assertEquals(16.0, result!!, 0.001)
     }
 
     @Test
@@ -80,7 +103,12 @@ class CalculateWeightedAverageUseCaseTest {
         assertEquals(6.5, result!!, 0.001)
     }
 
-    private fun createEvaluation(id: String, grade: Double?, weight: Double? = null): Evaluation {
+    private fun createEvaluation(
+        id: String,
+        grade: Double?,
+        weight: Double? = null,
+        isPresented: Boolean = grade != null
+    ): Evaluation {
         return Evaluation(
             id = id,
             userId = "user",
@@ -92,7 +120,7 @@ class CalculateWeightedAverageUseCaseTest {
             quickTips = "",
             grade = grade,
             weight = weight,
-            isPresented = grade != null
+            isPresented = isPresented
         )
     }
 }

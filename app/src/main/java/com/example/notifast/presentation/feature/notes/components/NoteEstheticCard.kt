@@ -39,6 +39,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.notifast.data.model.Note
 import com.example.notifast.presentation.theme.color.Aqua
 import com.example.notifast.presentation.theme.color.Ruby
+import com.example.notifast.presentation.theme.color.toSafeComposeColor
 
 @Composable
 fun NoteEstheticCard(
@@ -50,14 +51,8 @@ fun NoteEstheticCard(
     subjectColorHex: String = ""
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    
-    // Fallback logic for color
-    val accentColor = try {
-        if (subjectColorHex.isNotBlank()) Color(android.graphics.Color.parseColor(subjectColorHex))
-        else if (isEven) Ruby else Aqua
-    } catch(e: Exception) {
-        if (isEven) Ruby else Aqua
-    }
+    val defaultColor = if (isEven) Ruby else Aqua
+    val accentColor = subjectColorHex.toSafeComposeColor(default = defaultColor)
 
     Card(
         modifier = Modifier

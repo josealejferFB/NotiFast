@@ -1,44 +1,44 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Project ProGuard rules for NotiFast Release Builds
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Preserve line numbers and source files for Crashlytics stack traces
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-# Firebase
+# Firebase General
 -keepattributes Signature
 -keepattributes *Annotation*
 
-# Firestore data models - keep all fields for serialization
--keep class com.example.notifast.data.model.** { *; }
+# Firebase Crashlytics
+-keepattributes *Annotation*,InnerClasses
+-dontwarn com.google.firebase.crashlytics.**
+-keep class com.google.firebase.crashlytics.** { *; }
 
-# Hilt
+# Firebase Analytics & GMS
+-keep class com.google.android.gms.internal.measurement.** { *; }
+-keep class com.google.firebase.analytics.** { *; }
+
+# Firestore data models - keep all fields for POJO serialization
+-keep class com.example.notifast.data.model.** { *; }
+-keepclassmembers class com.example.notifast.data.model.** {
+    <fields>;
+    <init>(...);
+}
+
+# Hilt & Dagger
 -dontwarn dagger.hilt.**
 -keep class dagger.hilt.** { *; }
 -keep class javax.inject.** { *; }
 -keep class * extends dagger.hilt.android.lifecycle.HiltViewModel
 
-# Coil
+# Coil Image Loader
 -dontwarn coil.**
+-keep class coil.** { *; }
 
 # Kotlin Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-dontwarn kotlinx.coroutines.**
 
-# Keep Compose
+# Jetpack Compose
 -dontwarn androidx.compose.**
+-keep class androidx.compose.** { *; }

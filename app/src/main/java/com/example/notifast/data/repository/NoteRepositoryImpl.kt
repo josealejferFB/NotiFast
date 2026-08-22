@@ -20,6 +20,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val TAG = "NoteRepository"
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class NoteRepositoryImpl @Inject constructor(
@@ -32,9 +34,9 @@ class NoteRepositoryImpl @Inject constructor(
             .collection("subjects")
             .snapshots()
             .flatMapLatest { snapshot ->
-                val subjects = snapshot.documents.map { it.getString("name") ?: it.id }
+                val subjects = snapshot.documents.mapNotNull { it.getString("name") ?: it.id }
                 if (subjects.isEmpty()) {
-                    flowOf<List<Note>>(emptyList())
+                    flowOf(emptyList())
                 } else {
                     val noteFlows: List<Flow<List<Note>>> = subjects.map { subject ->
                         db.collection("users").document(userId)
@@ -50,7 +52,10 @@ class NoteRepositoryImpl @Inject constructor(
                     combine(noteFlows) { arrays: Array<List<Note>> -> arrays.flatMap { it } }
                 }
             }
-            .catch { emit(emptyList()) }
+            .catch { e ->
+                Log.e(TAG, "Error fetching notes for user $userId", e)
+                emit(emptyList())
+            }
     }
 
     override fun getSubjects(userId: String): Flow<List<SubjectData>> {
@@ -65,6 +70,10 @@ class NoteRepositoryImpl @Inject constructor(
                         colorHex = doc.getString("colorHex") ?: ""
                     )
                 }
+            }
+            .catch { e ->
+                Log.e(TAG, "Error fetching subjects for user $userId", e)
+                emit(emptyList())
             }
     }
 
@@ -97,6 +106,7 @@ class NoteRepositoryImpl @Inject constructor(
                 .collection("notes").add(noteMap).await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to add note '$title' in subject '$subject'", e)
             Result.failure(e)
         }
     }
@@ -119,6 +129,7 @@ class NoteRepositoryImpl @Inject constructor(
             docRef.set(data).await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to add subject '$subjectName'", e)
             Result.failure(e)
         }
     }
@@ -129,7 +140,7 @@ class NoteRepositoryImpl @Inject constructor(
                 try {
                     imageRepository.deleteImage(note.imageUrl)
                 } catch (e: Exception) {
-                    Log.w("NoteRepository", "Failed to delete note image: ${note.imageUrl}", e)
+                    Log.w(TAG, "Failed to delete note image: ${note.imageUrl}", e)
                 }
             }
             db.collection("users").document(userId)
@@ -138,6 +149,7 @@ class NoteRepositoryImpl @Inject constructor(
                 .delete().await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete note '${note.id}'", e)
             Result.failure(e)
         }
     }
@@ -170,6 +182,7 @@ class NoteRepositoryImpl @Inject constructor(
                 .update(updates).await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to update note '${note.id}'", e)
             Result.failure(e)
         }
     }
@@ -184,14 +197,14 @@ class NoteRepositoryImpl @Inject constructor(
                     doc.toObject(Note::class.java)?.copy(id = doc.id)
                 }
             }
-            .catch { emit(emptyList()) }
+            .catch { e ->
+                Log.e(TAG, "Error fetching notes for subject '$subject'", e)
+                emit(emptyList())
+            }
     }
 
     override suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit> {
         return try {
-            // NOTE: Firestore WriteBatch has a 500-operation limit.
-            // In normal usage (notes + evaluations + schedules per subject), this is unlikely
-            // to be reached, but should be monitored if subjects grow very large.
             val batch = db.batch()
 
             // 1. Delete all notes under this subject and their local images
@@ -206,7 +219,7 @@ class NoteRepositoryImpl @Inject constructor(
                     try {
                         imageRepository.deleteImage(imageUrl)
                     } catch (e: Exception) {
-                        Log.w("NoteRepository", "Failed to delete note image: $imageUrl", e)
+                        Log.w(TAG, "Failed to delete note image: $imageUrl", e)
                     }
                 }
                 batch.delete(doc.reference)
@@ -224,7 +237,7 @@ class NoteRepositoryImpl @Inject constructor(
                     try {
                         imageRepository.deleteImage(imageUrl)
                     } catch (e: Exception) {
-                        Log.w("NoteRepository", "Failed to delete evaluation image: $imageUrl", e)
+                        Log.w(TAG, "Failed to delete evaluation image: $imageUrl", e)
                     }
                 }
                 batch.delete(doc.reference)
@@ -249,6 +262,7 @@ class NoteRepositoryImpl @Inject constructor(
             batch.commit().await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete subject '$subjectName' and cascading children", e)
             Result.failure(e)
         }
     }
@@ -267,6 +281,7 @@ class NoteRepositoryImpl @Inject constructor(
                 Result.failure(Exception("Note not found"))
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch note with id '$noteId' in subject '$subject'", e)
             Result.failure(e)
         }
     }

@@ -15,6 +15,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val TAG = "EvaluationRepository"
+
 @Singleton
 class EvaluationRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore,
@@ -30,7 +32,10 @@ class EvaluationRepositoryImpl @Inject constructor(
                     doc.toObject(Evaluation::class.java)?.copy(id = doc.id)
                 }
             }
-            .catch { emit(emptyList()) }
+            .catch { e ->
+                Log.e(TAG, "Error observing evaluations for user $userId", e)
+                emit(emptyList())
+            }
     }
 
     override fun getEvaluation(userId: String, evaluationId: String): Flow<Evaluation?> {
@@ -41,7 +46,10 @@ class EvaluationRepositoryImpl @Inject constructor(
             .map { snapshot ->
                 snapshot.toObject(Evaluation::class.java)?.copy(id = snapshot.id)
             }
-            .catch { emit(null) }
+            .catch { e ->
+                Log.e(TAG, "Error observing evaluation $evaluationId for user $userId", e)
+                emit(null)
+            }
     }
 
     override suspend fun addEvaluation(
@@ -76,6 +84,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 .collection("evaluations").add(evalMap).await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to add evaluation '${evaluation.title}'", e)
             Result.failure(e)
         }
     }
@@ -121,6 +130,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 .update(updates).await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to update evaluation '${evaluation.id}'", e)
             Result.failure(e)
         }
     }
@@ -131,7 +141,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 try {
                     imageRepository.deleteImage(evaluation.imageUrl)
                 } catch (e: Exception) {
-                    Log.w("EvaluationRepository", "Failed to delete evaluation image: ${evaluation.imageUrl}", e)
+                    Log.w(TAG, "Failed to delete evaluation image: ${evaluation.imageUrl}", e)
                 }
             }
             db.collection("users").document(userId)
@@ -139,6 +149,7 @@ class EvaluationRepositoryImpl @Inject constructor(
                 .delete().await()
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete evaluation '${evaluation.id}'", e)
             Result.failure(e)
         }
     }
