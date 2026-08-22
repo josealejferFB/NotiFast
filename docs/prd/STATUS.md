@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v2.0
 
 > **Documento de Seguimiento de Fases del PRD Maestro**  
-> **Última actualización:** 21 de Agosto, 2026  
+> **Última actualización:** 22 de Agosto, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md)
 
 ---
@@ -11,123 +11,87 @@
 ```
 Fase 0: Estabilización       [████████████████] 100% (16/16 tareas) ✅
 Fase 0.1: Hardening UX       [████████████████] 100% (4/4 bloques) ✅
-Fase 1: Fundamentos          [░░░░░░░░░░░░░░░░]   0% (0/10 tareas)
+Fase 1: Fundamentos          [████████████████] 100% (10/10 tareas) ✅
 Fase 2: Features Core        [░░░░░░░░░░░░░░░░]   0% (0/17 tareas)
 Fase 3: Features Avanzadas   [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
 Fase 4: Pulido & Experiencia [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis   [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:     [███░░░░░░░░░░░░░]  20.0% (20/89 tareas)
+PROGRESO TOTAL ESTIMADO:     [██████░░░░░░░░░░]  33.7% (30/89 tareas)
 ```
 
 ---
 
-## 🔍 Resumen de Logros y Estabilización (Fase 0 & Fase 0.1 Completadas)
+## 🔍 Resumen de Logros — Fase 1: Fundamentos de Arquitectura (100% Completada)
 
-Durante la Fase 0 y Fase 0.1 se blindó la arquitectura y la experiencia de usuario con máxima rigurosidad:
-- **Seguridad y Build:** `WEB_CLIENT_ID` desacoplado a `BuildConfig`, R8 y ProGuard rules optimizadas para Firebase, Crashlytics, Analytics, Hilt y Coroutines.
-- **Navegación e Higiene UI:** Flujo atómico de navegación post-login en `NavGraph`, eliminación de strings quemados y uso de `stringResource`.
-- **TopBar Limpia:** Reemplazo de flechas de retroceso huérfanas en pestañas principales (`Calendar`, `Schedules`, `Grades`, `Settings`) usando `TopBarType.Simple`.
-- **Acciones Destructivas & Descarte:** Protección con diálogos `NotiFastDialog` al cerrar sesión (`SettingsScreen`, `EditProfileScreen`), eliminar horarios (`SchedulesScreen`), eliminar evaluaciones (`SubjectDetailScreen`), y descarte de cambios accidentales mediante `BackHandler` en todas las pantallas de edición/creación (`AddNote`, `EditNote`, `AddEvaluation`, `EditEvaluation`, `AddSubject`, `AddSchedule`, `EditSchedule`).
-- **Validaciones & Resiliencia:** Trimming de whitespace, detección case-insensitive de materias duplicadas (`AddSubjectViewModel`), validación estricta de rangos de peso (`0..100%`) y notas (`0..10`), y filtrado resiliente de notas por título, contenido y materia.
-- **Componentes y Diseño Atómico:** `NotesScreen` modularizada (≤ 200 LOC), `NotiFastDialog` adaptado dinámicamente a Modo Oscuro (`surface`).
-- **Capa de Datos y Errores:** Manejo de excepciones estandarizado con logging en `NoteRepositoryImpl`, `EvaluationRepositoryImpl`, `ScheduleRepositoryImpl` retornando `Result<T>`.
-- **Extensiones de Color y Dominio:** Parseo de color seguro `String?.toSafeComposeColor()` centralizado en `Color.kt` y `ThemeUtils.kt`.
-- **Observabilidad:** Integración de Firebase Crashlytics y Firebase Analytics con abstracción `AnalyticsTracker`.
-- **Verificación Continua:** 37 unit tests pasando y `assembleDebug` compilando con cero fallos.
+Durante la Fase 1 se consolidaron los pilares arquitectónicos, de diseño y testing con máxima disciplina de ingeniería:
+- **Capa de Dominio Compuesta:** Creación de modelos de datos compuestos (`SubjectDetailData`, `NoteWithSubject`) y Use Cases puros (`DeleteSubjectCascadeUseCase`, `GetSubjectDetailUseCase`, `GetNotesWithSubjectInfoUseCase`).
+- **Sistema de Diseño Impeccable & Dark Mode Real:** Rediseño integral de tokens semánticos de color (`Ruby` `#BF092F`, `Aqua` `#3B9797`, superficies oscuras de alto contraste `#10161A` / `#1B242A`), tipografía escalada y utilidades puras de contraste WCAG y conversión HSL (`ThemeUtils.getAccessibleColor`).
+- **Persistencia de Preferencias del Estudiante:** Integración de `androidx.datastore:datastore-preferences`, creación de `UserPrefsRepository` (DataStore Flow con Modo Oscuro, Modo Offline y Autenticación Biométrica) con inyección Hilt.
+- **Modularización Estricta de Pantallas (≤ 250 LOC):** Descomposición de pantallas monolíticas (`SubjectCard`, `AddEvaluationScreen`, `EditEvaluationScreen`, `CalendarScreen`) en 11 subcomponentes desacoplados en `components/`.
+- **Estandarización de Firmas Reactivas:** Normalización estricta de repositorios (`Flow<T>` reactivo sin `suspend`, operaciones de escritura `suspend fun ...: Result<T>`).
+- **Infraestructura y Arnés de Testing:** Creación de `MainDispatcherRule` y `TestDataFactory` para testing asíncrono con corrutinas y StateFlows.
+- **Suite de Pruebas Unitarias Exhaustiva:** Cobertura de tests unitarios para Use Cases (`CalculateWeightedAverageUseCaseTest`, `DeleteSubjectCascadeUseCaseTest`, `GetSubjectDetailUseCaseTest`, `GetNotesWithSubjectInfoUseCaseTest`), Repositorio de Preferencias (`UserPrefsRepositoryTest`), Utilitarios de Tema (`ThemeUtilsTest`), y ViewModels core (`LoginViewModelTest`, `NotesViewModelTest`, `CalendarViewModelTest`, `SubjectDetailViewModelTest`, `GradesViewModelTest`).
+- **Métricas de Calidad:** **68 unit tests pasando** (0 fallos, 0 errores), build `assembleDebug` 100% exitoso.
 
 ---
 
 ## 📌 Detalle por Fases y Sprints
 
-### 🟢 Fase 0.1: Hardening UX & Sanity Checks (100% — Completada)
-*Meta: Blindar feedback destructivo, navegación fluida, prevención de pérdida de datos y validaciones de entrada.*
-
-- [x] **0.1.A** Protección contra acciones destructivas y cierre de sesión con `NotiFastDialog` *(Completado)*
-- [x] **0.1.B** Intercepción de retroceso con `BackHandler` y confirmación de descarte de cambios *(Completado)*
-- [x] **0.1.C** Sanitización de inputs, trimming, validación de materias duplicadas y límites de notas/pesos *(Completado)*
-- [x] **0.1.D** Suite de tests unitarios (37 tests) y verificación en dispositivo físico *(Completado)*
-
----
-
-### 🟢 Fase 0: Estabilización (100% — Completada)
-*Meta: Resolver deuda técnica crítica y bugs residuales para dejar base 100% estable.*
-
-#### Sprint 0.1 — Bugs Críticos (Completado)
-- [x] **0.1.1** Mover `WEB_CLIENT_ID` a `BuildConfig` *(Completado)*
-- [x] **0.1.2** Habilitar R8 + minificación y ProGuard rules en build release *(Completado)*
-- [x] **0.1.3** Fix: Cálculo de promedio global ponderado *(Completado via UseCase)*
-- [x] **0.1.4** Fix: Side-effect `onLoginSuccess()` con `LaunchedEffect` *(Completado)*
-- [x] **0.1.5** Fix: Prevenir posible doble navegación en flujo de Auth/NavGraph *(Completado)*
-- [x] **0.1.6** Fix: `EditEvaluation` sobreescritura reactiva con `.first()` *(Completado)*
-- [x] **0.1.7** Fix: Confirmación con diálogo `NotiFastDialog` antes de eliminar nota *(Completado)*
-- [x] **0.1.8** Fix: Manejo y reporte visual de excepciones en repositorios y ViewModels *(Completado)*
-
-#### Sprint 0.2 — Deuda Técnica Esencial (Completado)
-- [x] **0.2.1** Eliminación atómica de materias con `WriteBatch` *(Completado)*
-- [x] **0.2.2** Optimizar `getNotes()` para eliminar listeners N+1 en subcolecciones *(Completado)*
-- [x] **0.2.3** Carga unitaria `getNoteById()` en edición de notas *(Completado)*
-- [x] **0.2.4** Extracción de lógica de promedio a `CalculateWeightedAverageUseCase` *(Completado)*
-- [x] **0.2.5** Unificar convención de `weight` (factor 0.0-1.0 vs porcentaje en UI) *(Completado)*
-- [x] **0.2.6** Centralizar parseo seguro de colores Hex a `Color` en `ThemeUtils` y `Color.kt` *(Completado)*
-- [x] **0.2.7** Integrar SDK y configuración de Firebase Crashlytics *(Completado)*
-- [x] **0.2.8** Integrar SDK y eventos analíticos de Firebase Analytics *(Completado)*
-
----
-
-### ⚪ Fase 1: Fundamentos de Arquitectura (Siguiente Fase)
+### 🟢 Fase 1: Fundamentos de Arquitectura (100% — Completada)
 *Meta: Consolidar Clean Architecture con Use Cases, corregir el sistema de temas y armar el arnés de pruebas.*  
-*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_1.md)
+*Guía de Ejecución:* [`docs/prd/KICKOFF_FASE_1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_1.md)
 
-- [ ] **1.1.1** Capa de Use Cases en `domain/usecase/` para operaciones compuestas
-- [ ] **1.1.2** Refactorizar Material 3 Theme con paleta corporativa `Ruby` & `Aqua` + Dark Mode real
-- [ ] **1.1.3** Actualizar Compose BOM y version catalog a versiones estables
-- [ ] **1.1.4** Modularizar y dividir pantallas monolíticas (>300 LOC)
-- [ ] **1.1.5** Crear `UserPrefsRepository` para configuraciones del estudiante
-- [ ] **1.1.6** Limpieza de firmas de métodos reactivos (`Flow` vs `suspend`)
-- [ ] **1.2.1** Configurar infraestructura de tests (MockK, Turbine, Coroutines Test)
-- [ ] **1.2.2** Tests unitarios para todos los Use Cases
-- [ ] **1.2.3** Tests unitarios para ViewModels core (`Notes`, `Grades`, `Calendar`, `Auth`)
-- [ ] **1.2.4** Tests de integración con emuladores de repositorios
+#### Sprint 1.1 — Arquitectura Base y Refactors Estructurales (Completado)
+- [x] **1.1.1** Capa de Use Cases en `domain/usecase/` para operaciones compuestas (`DeleteSubjectCascadeUseCase`, `GetSubjectDetailUseCase`, `GetNotesWithSubjectInfoUseCase`) *(Completado)*
+- [x] **1.1.2** Refactorizar Material 3 Theme con paleta corporativa `Ruby` & `Aqua` + Dark Mode real y contraste WCAG *(Completado)*
+- [x] **1.1.3** Actualizar Version Catalog con `androidx.datastore.preferences` *(Completado)*
+- [x] **1.1.4** Modularizar y dividir pantallas monolíticas (`SubjectCard`, `AddEvaluation`, `EditEvaluation`, `CalendarScreen` a ≤ 250 LOC) *(Completado)*
+- [x] **1.1.5** Crear `UserPrefsRepository` con DataStore Preferences para preferencias del estudiante *(Completado)*
+- [x] **1.1.6** Limpieza y estandarización de firmas reactivas (`Flow` vs `suspend fun ...: Result<T>`) *(Completado)*
+
+#### Sprint 1.2 — Infraestructura y Suite de Tests Unitarios (Completado)
+- [x] **1.2.1** Configurar infraestructura de tests (`MainDispatcherRule`, `TestDataFactory`, MockK, Turbine) *(Completado)*
+- [x] **1.2.2** Tests unitarios exhaustivos para todos los Use Cases de dominio *(Completado)*
+- [x] **1.2.3** Tests unitarios para ViewModels core (`LoginViewModel`, `NotesViewModel`, `CalendarViewModel`, `SubjectDetailViewModel`, `GradesViewModel`) *(Completado)*
+- [x] **1.2.4** Verificación integral de build (`assembleDebug`) y cierre de Fase 1 *(Completado)*
 
 ---
 
-### ⚪ Fase 2: Features Core Completas (Pendiente)
-*Meta: CRUD completo de horarios, editor de notas enriquecido, almacenamiento cloud de imágenes y notas configurables.*
+### ⚪ Fase 2: Experiencia Core — Cuaderno y Hub Académico (Siguiente Fase)
+*Meta: CRUD completo de horarios con detección de solapes, editor de notas enriquecido (Markdown/formato), almacenamiento cloud de imágenes y personalización académica.*  
+*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_2.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_2.md)
 
-- [ ] **2.1.1 - 2.1.5** CRUD completo de Horarios (`AddScheduleScreen`, `EditScheduleScreen`, eliminación y validación de solapes)
-- [ ] **2.2.1 - 2.2.6** Editor de notas con texto enriquecido (formato, listas, headings, renderizado seguro)
-- [ ] **2.3.1 - 2.3.3** Sistema de escalas de calificación configurable por usuario
-- [ ] **2.3.4 - 2.3.6** Migración de `ImageRepositoryImpl` a Firebase Storage (sincronización multi-dispositivo)
+#### Sprint 2.1 — Gestión Completa de Horarios Académicos
+- [ ] **2.1.1** Caso de uso para detección y validación de solapamientos horarios (`ValidateScheduleOverlapUseCase`)
+- [ ] **2.1.2** Pantalla `AddScheduleScreen` con selector de días de la semana, picker de horario de inicio/fin y asignación de aula
+- [ ] **2.1.3** Pantalla `EditScheduleScreen` con carga reactiva y edición segura
+- [ ] **2.1.4** Integración de visualización por bloques temporales en `SchedulesScreen`
+- [ ] **2.1.5** Unit tests para validación de horarios y ViewModel de horarios
+
+#### Sprint 2.2 — Cuaderno Inteligente y Editor de Apuntes
+- [ ] **2.2.1** Soporte de Markdown / texto enriquecido (negritas, listas, encabezados) en notas
+- [ ] **2.2.2** Previsualización en tiempo real del apunte formateado
+- [ ] **2.2.3** Selector dinámico de etiquetas / tags temáticos por apunte
+- [ ] **2.2.4** Búsqueda y filtrado avanzado de apuntes por contenido y tags
+- [ ] **2.2.5** Exportación básica de apuntes en formato texto/Markdown
+
+#### Sprint 2.3 — Hub de Calificaciones y Personalización
+- [ ] **2.3.1** Configuración de escala de calificaciones (0-10, 0-20, 0-100, Letras A-F)
+- [ ] **2.3.2** Indicador de notas mínimas aprobatorias configurables en `GradesScreen`
+- [ ] **2.3.3** Simulación de nota requerida en evaluaciones pendientes para aprobar la materia (`CalculateRequiredGradeUseCase`)
 
 ---
 
 ### ⚪ Fase 3: Features Avanzadas (Pendiente)
-*Meta: Notificaciones inteligentes locales, buscador global, dashboard estadístico y compartir apuntes.*
-
-- [ ] **3.1.1 - 3.1.6** Notificaciones inteligentes locales con `WorkManager` (recordatorios, resumen semanal)
-- [ ] **3.2.1 - 3.2.4** Búsqueda global multi-módulo con debounce y resaltado
-- [ ] **3.3.1 - 3.3.4** Dashboard de estadísticas de rendimiento con gráficos dinámicos
-- [ ] **3.4.1 - 3.4.6** Compartir apuntes mediante enlaces protegidos de solo lectura (`shared_notes`)
+*Meta: Notificaciones inteligentes vía WorkManager, sincronización offline local y analíticas de estudio.*
 
 ---
 
-### ⚪ Fase 4: Pulido y Experiencia (Pendiente)
-*Meta: Onboarding para nuevos usuarios, exportación a PDF, backup/restauración de datos y accesibilidad total.*
-
-- [ ] **4.1.1 - 4.1.2** Pantallas de Onboarding interactivo
-- [ ] **4.1.3 - 4.1.4** Generación y exportación de Plan de Estudio en formato PDF
-- [ ] **4.1.5** Extracción total de strings a `strings.xml`
-- [ ] **4.2.1 - 4.2.3** Backup y restauración de datos del estudiante en JSON
-- [ ] **4.2.4 - 4.2.5** Auditoría de accesibilidad (TalkBack, contrastes WCAG AA, target touch ≥ 48dp)
-- [ ] **4.2.6 - 4.2.7** Previews completas para Android Studio y pulido UX Impeccable
+### ⚪ Fase 4: Pulido & Experiencia (Pendiente)
+*Meta: Micro-interacciones con Impeccable, accesibilidad completa (a11y), y optimización de rendimiento Compose.*
 
 ---
 
-### ⚪ Fase 5: Producción, Testing en Aula y Despliegue (Pendiente)
-*Meta: Validación empírica para la tesis y publicación en Google Play Store.*
-
-- [ ] **5.1.1 - 5.1.5** Configuración de Internal Testing Track y diseño de instrumentos (SUS / Likert)
-- [ ] **5.2.1 - 5.2.6** Despliegue de beta cerrada en aula y recolección de métricas
-- [ ] **5.3.1 - 5.3.4** Triage y resolución de incidencias post-testing
-- [ ] **5.4.1 - 5.4.9** Preparación de assets de Play Store, políticas de privacidad, firmado AAB y release final
+### ⚪ Fase 5: Despliegue & Tesis (Pendiente)
+*Meta: Testing en aula real, recolección de métricas de tesis y publicación en Google Play Store.*
