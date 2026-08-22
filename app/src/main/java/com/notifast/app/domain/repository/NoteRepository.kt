@@ -13,7 +13,8 @@ interface NoteRepository {
         subject: String,
         title: String,
         content: String,
-        imageUri: Uri?
+        imageUri: Uri?,
+        tags: List<String> = emptyList()
     ): Result<Unit>
     suspend fun addSubject(
         userId: String,

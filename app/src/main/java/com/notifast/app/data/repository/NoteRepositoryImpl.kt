@@ -82,7 +82,8 @@ class NoteRepositoryImpl @Inject constructor(
         subject: String,
         title: String,
         content: String,
-        imageUri: Uri?
+        imageUri: Uri?,
+        tags: List<String>
     ): Result<Unit> {
         return try {
             var imageUrl: String? = null
@@ -95,6 +96,7 @@ class NoteRepositoryImpl @Inject constructor(
                 "subject" to subject,
                 "title" to title,
                 "content" to content,
+                "tags" to tags,
                 "timestamp" to FieldValue.serverTimestamp(),
                 "updatedAt" to FieldValue.serverTimestamp()
             )
@@ -169,6 +171,7 @@ class NoteRepositoryImpl @Inject constructor(
                 "title" to note.title,
                 "content" to note.content,
                 "subject" to note.subject,
+                "tags" to note.tags,
                 "updatedAt" to FieldValue.serverTimestamp()
             )
             if (!imageUrl.isNullOrEmpty()) {

@@ -1,11 +1,14 @@
 package com.notifast.app.presentation.feature.editschedule
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.usecase.ScheduleOverlapResult
+import com.notifast.app.domain.usecase.ValidateScheduleOverlapUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,13 +18,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
-import androidx.lifecycle.SavedStateHandle
 
 @HiltViewModel
 class EditScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val authRepository: AuthRepository,
     private val noteRepository: NoteRepository,
+    private val validateScheduleOverlapUseCase: ValidateScheduleOverlapUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -32,20 +35,21 @@ class EditScheduleViewModel @Inject constructor(
     val uiState: StateFlow<EditScheduleUiState> = _uiState.asStateFlow()
 
     init {
-        loadSubjects()
-        loadSchedule()
+        loadData()
     }
 
-    private fun loadSchedule() {
+    private fun loadData() {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            // We get the schedule by filtering the schedules stream
+            val subjects = noteRepository.getSubjects(userId).first()
             val schedules = scheduleRepository.getSchedules(userId).first()
             val schedule = schedules.find { it.id == scheduleId }
             if (schedule != null) {
                 originalSchedule = schedule
                 _uiState.update { 
                     it.copy(
+                        subjects = subjects,
+                        existingSchedules = schedules,
                         subjectName = schedule.subjectName,
                         modality = schedule.modality,
                         dayOfWeek = schedule.dayOfWeek,
@@ -57,16 +61,8 @@ class EditScheduleViewModel @Inject constructor(
                     ) 
                 }
             } else {
-                _uiState.update { it.copy(error = "Horario no encontrado") }
+                _uiState.update { it.copy(subjects = subjects, existingSchedules = schedules, error = "Horario no encontrado") }
             }
-        }
-    }
-
-    private fun loadSubjects() {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            val subjects = noteRepository.getSubjects(userId).first()
-            _uiState.update { it.copy(subjects = subjects) }
         }
     }
 
@@ -74,16 +70,24 @@ class EditScheduleViewModel @Inject constructor(
         when (event) {
             is EditScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
             is EditScheduleEvent.UpdateModality -> _uiState.update {
-                // When switching to virtual, clear time/day/classroom fields
                 if (event.modality == Schedule.MODALITY_VIRTUAL) {
-                    it.copy(modality = event.modality, dayOfWeek = 0, startTime = "", endTime = "", classroom = "")
+                    it.copy(modality = event.modality, dayOfWeek = 0, startTime = "", endTime = "", classroom = "", conflictingSchedules = emptyList())
                 } else {
                     it.copy(modality = event.modality, meetingUrl = "")
                 }
             }
-            is EditScheduleEvent.UpdateDayOfWeek -> _uiState.update { it.copy(dayOfWeek = event.day) }
-            is EditScheduleEvent.UpdateStartTime -> _uiState.update { it.copy(startTime = event.time) }
-            is EditScheduleEvent.UpdateEndTime -> _uiState.update { it.copy(endTime = event.time) }
+            is EditScheduleEvent.UpdateDayOfWeek -> {
+                _uiState.update { it.copy(dayOfWeek = event.day) }
+                checkConflicts()
+            }
+            is EditScheduleEvent.UpdateStartTime -> {
+                _uiState.update { it.copy(startTime = event.time) }
+                checkConflicts()
+            }
+            is EditScheduleEvent.UpdateEndTime -> {
+                _uiState.update { it.copy(endTime = event.time) }
+                checkConflicts()
+            }
             is EditScheduleEvent.UpdateClassroom -> _uiState.update { it.copy(classroom = event.classroom) }
             is EditScheduleEvent.UpdateTeacher -> _uiState.update { it.copy(teacher = event.teacher) }
             is EditScheduleEvent.UpdateMeetingUrl -> _uiState.update { it.copy(meetingUrl = event.url) }
@@ -92,16 +96,40 @@ class EditScheduleViewModel @Inject constructor(
         }
     }
 
+    private fun checkConflicts() {
+        val state = _uiState.value
+        if (state.modality != Schedule.MODALITY_PRESENCIAL || state.startTime.isBlank() || state.endTime.isBlank()) {
+            _uiState.update { it.copy(conflictingSchedules = emptyList()) }
+            return
+        }
+        val tempSchedule = Schedule(
+            id = scheduleId,
+            subjectName = state.subjectName,
+            dayOfWeek = state.dayOfWeek,
+            startTime = state.startTime,
+            endTime = state.endTime
+        )
+        val result = validateScheduleOverlapUseCase(
+            existingSchedules = state.existingSchedules,
+            newSchedule = tempSchedule,
+            excludeScheduleId = scheduleId
+        )
+        val conflicts = when (result) {
+            is ScheduleOverlapResult.Conflict -> result.conflictingSchedules
+            is ScheduleOverlapResult.NoOverlap -> emptyList()
+        }
+        _uiState.update { it.copy(conflictingSchedules = conflicts) }
+    }
+
     private fun saveSchedule() {
         val state = _uiState.value
         if (state.subjectName.isBlank()) {
             _uiState.update { it.copy(error = "El nombre de la materia es requerido") }
             return
         }
-        // Presencial requires time and day; virtual does not
         if (state.modality == Schedule.MODALITY_PRESENCIAL) {
             if (state.startTime.isBlank() || state.endTime.isBlank()) {
-                _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas para clases presenciales") }
+                _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas") }
                 return
             }
         }
@@ -110,7 +138,6 @@ class EditScheduleViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isSaving = true, error = null) }
 
-            // Find subject color
             val subjectColorHex = state.subjects.find { it.name == state.subjectName }?.colorHex
             val subjectColor = if (!subjectColorHex.isNullOrBlank()) {
                 try {

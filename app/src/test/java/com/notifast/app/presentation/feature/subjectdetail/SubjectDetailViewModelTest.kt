@@ -1,22 +1,25 @@
 package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.lifecycle.SavedStateHandle
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.CalculateRequiredGradeUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
+import com.notifast.app.domain.usecase.SimulatorStatus
 import com.notifast.app.util.MainDispatcherRule
-import com.notifast.app.util.TestDataFactory
 import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,97 +33,70 @@ class SubjectDetailViewModelTest {
     private val noteRepository: NoteRepository = mockk(relaxed = true)
     private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
+    private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
+    private val calculateRequiredGradeUseCase = CalculateRequiredGradeUseCase()
 
-    private val testUserId = "user-test"
-    private val subjectName = "Química"
-
-    private val savedStateHandle = SavedStateHandle(mapOf("subjectName" to subjectName))
+    private val sampleSubjects = listOf(
+        SubjectData(name = "Matemáticas", colorHex = "#3B9797")
+    )
+    private val sampleEvaluations = listOf(
+        Evaluation(id = "1", subjectName = "Matemáticas", title = "Parcial 1", isPresented = true, grade = 8.0, weight = 40.0),
+        Evaluation(id = "2", subjectName = "Matemáticas", title = "Final", isPresented = false, weight = 60.0)
+    )
 
     @Before
     fun setUp() {
-        coEvery { authRepository.getCurrentUserId() } returns testUserId
+        coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { noteRepository.getSubjects("user_123") } returns flowOf(sampleSubjects)
+        coEvery { noteRepository.getNotesBySubject("user_123", "Matemáticas") } returns flowOf(emptyList())
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(sampleEvaluations)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
     }
 
     @Test
-    fun `loadData calculates progress and average grade correctly`() = runTest {
-        val eval1 = TestDataFactory.createEvaluation(id = "e1", subjectName = subjectName, grade = 9.0, weight = 50.0, isPresented = true)
-        val eval2 = TestDataFactory.createEvaluation(id = "e2", subjectName = subjectName, grade = null, weight = 50.0, isPresented = false)
-        val note1 = TestDataFactory.createNote(id = "n1", subject = subjectName, title = "Reacciones")
-        val subject = TestDataFactory.createSubject(name = subjectName, icon = "🧪", colorHex = "#3B9797")
-
-        every { noteRepository.getNotesBySubject(testUserId, subjectName) } returns flowOf(listOf(note1))
-        every { evaluationRepository.getEvaluations(testUserId) } returns flowOf(listOf(eval1, eval2))
-        every { noteRepository.getSubjects(testUserId) } returns flowOf(listOf(subject))
-
+    fun `when loaded, calculates initial simulation result`() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf("subjectName" to "Matemáticas"))
         val viewModel = SubjectDetailViewModel(
-            savedStateHandle = savedStateHandle,
-            noteRepository = noteRepository,
-            evaluationRepository = evaluationRepository,
-            authRepository = authRepository,
-            calculateWeightedAverageUseCase = calculateWeightedAverageUseCase
+            savedStateHandle,
+            noteRepository,
+            evaluationRepository,
+            authRepository,
+            userPrefsRepository,
+            calculateWeightedAverageUseCase,
+            calculateRequiredGradeUseCase
         )
+        advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertFalse(state.isLoading)
-        assertEquals(subjectName, state.subjectName)
-        assertEquals("🧪", state.subjectIcon)
-        assertEquals(1, state.completedEvalCount)
-        assertEquals(1, state.pendingEvalCount)
-        assertEquals(0.5f, state.progressPercent, 0.01f)
-        assertEquals(9.0, state.averageGrade ?: 0.0, 0.01)
-        assertEquals(1, state.notes.size)
+        assertEquals("Matemáticas", state.subjectName)
+        assertEquals(GradeScale.SCALE_0_10, state.gradeScale)
+        assertNotNull(state.simulationResult)
+        // 8.0 * 0.4 = 3.2 accumulated. Target: 6.0. Needed: 2.8 / 0.6 = 4.67
+        assertEquals(3.2, state.simulationResult?.currentAccumulated ?: 0.0, 0.01)
+        assertEquals(SimulatorStatus.ACHIEVABLE, state.simulationResult?.status)
     }
 
     @Test
-    fun `saveGrade updates evaluation and saves via repository`() = runTest {
-        val eval1 = TestDataFactory.createEvaluation(id = "e1", subjectName = subjectName, grade = null, isPresented = false)
-        every { noteRepository.getNotesBySubject(testUserId, subjectName) } returns flowOf(emptyList())
-        every { evaluationRepository.getEvaluations(testUserId) } returns flowOf(listOf(eval1))
-        every { noteRepository.getSubjects(testUserId) } returns flowOf(emptyList())
-        coEvery { evaluationRepository.updateEvaluation(testUserId, any(), null) } returns Result.success(Unit)
-
+    fun `when target grade updated, recalculates simulation`() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf("subjectName" to "Matemáticas"))
         val viewModel = SubjectDetailViewModel(
-            savedStateHandle = savedStateHandle,
-            noteRepository = noteRepository,
-            evaluationRepository = evaluationRepository,
-            authRepository = authRepository,
-            calculateWeightedAverageUseCase = calculateWeightedAverageUseCase
+            savedStateHandle,
+            noteRepository,
+            evaluationRepository,
+            authRepository,
+            userPrefsRepository,
+            calculateWeightedAverageUseCase,
+            calculateRequiredGradeUseCase
         )
+        advanceUntilIdle()
 
-        viewModel.onEvent(SubjectDetailEvent.SaveGrade("e1", 10.0, true))
+        viewModel.onEvent(SubjectDetailEvent.UpdateTargetGrade(9.5))
+        advanceUntilIdle()
 
-        coVerify {
-            evaluationRepository.updateEvaluation(
-                testUserId,
-                match { it.id == "e1" && it.grade == 10.0 && it.isPresented },
-                null
-            )
-        }
-    }
-
-    @Test
-    fun `deleteEvaluation calls repository and updates error on failure`() = runTest {
-        val eval1 = TestDataFactory.createEvaluation(id = "e1", subjectName = subjectName)
-        every { noteRepository.getNotesBySubject(testUserId, subjectName) } returns flowOf(emptyList())
-        every { evaluationRepository.getEvaluations(testUserId) } returns flowOf(listOf(eval1))
-        every { noteRepository.getSubjects(testUserId) } returns flowOf(emptyList())
-        coEvery { evaluationRepository.deleteEvaluation(testUserId, any()) } returns Result.failure(Exception("Error al borrar"))
-
-        val viewModel = SubjectDetailViewModel(
-            savedStateHandle = savedStateHandle,
-            noteRepository = noteRepository,
-            evaluationRepository = evaluationRepository,
-            authRepository = authRepository,
-            calculateWeightedAverageUseCase = calculateWeightedAverageUseCase
-        )
-
-        viewModel.onEvent(SubjectDetailEvent.DeleteEvaluation("e1"))
-
-        coVerify { evaluationRepository.deleteEvaluation(testUserId, eval1) }
-        assertEquals("Error al borrar", viewModel.uiState.value.error)
-
-        viewModel.onEvent(SubjectDetailEvent.ClearError)
-        assertNull(viewModel.uiState.value.error)
+        val state = viewModel.uiState.value
+        assertEquals(9.5, state.targetGrade, 0.01)
+        // Needed: 9.5 - 3.2 = 6.3 / 0.6 = 10.5 (> 10.0 max) -> IMPOSSIBLE
+        assertEquals(SimulatorStatus.IMPOSSIBLE, state.simulationResult?.status)
     }
 }

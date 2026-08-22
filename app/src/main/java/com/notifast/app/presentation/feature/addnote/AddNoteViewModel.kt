@@ -42,6 +42,16 @@ class AddNoteViewModel @Inject constructor(
             is AddNoteEvent.SubjectChanged -> _uiState.update { it.copy(subject = event.value) }
             is AddNoteEvent.TitleChanged -> _uiState.update { it.copy(title = event.value) }
             is AddNoteEvent.ContentChanged -> _uiState.update { it.copy(content = event.value) }
+            is AddNoteEvent.AddTag -> {
+                val clean = event.tag.trim()
+                if (clean.isNotBlank() && !_uiState.value.tags.contains(clean)) {
+                    _uiState.update { it.copy(tags = it.tags + clean) }
+                }
+            }
+            is AddNoteEvent.RemoveTag -> {
+                _uiState.update { it.copy(tags = it.tags.filterNot { tag -> tag == event.tag }) }
+            }
+            is AddNoteEvent.ToggleLivePreview -> _uiState.update { it.copy(isLivePreview = event.enabled) }
             is AddNoteEvent.ImageSelected -> _uiState.update { it.copy(imageUri = event.uri) }
             is AddNoteEvent.SaveClicked -> saveNote()
             is AddNoteEvent.ClearError -> _uiState.update { it.copy(error = null) }
@@ -66,7 +76,14 @@ class AddNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }
                 return@launch
             }
-            noteRepository.addNote(userId, state.subject, state.title, state.content, state.imageUri).fold(
+            noteRepository.addNote(
+                userId = userId,
+                subject = state.subject,
+                title = state.title,
+                content = state.content,
+                imageUri = state.imageUri,
+                tags = state.tags
+            ).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true) } },
                 onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al guardar") } }
             )

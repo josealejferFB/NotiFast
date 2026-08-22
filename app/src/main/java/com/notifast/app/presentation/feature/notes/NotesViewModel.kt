@@ -32,6 +32,7 @@ class NotesViewModel @Inject constructor(
 
     private val _currentFilter = MutableStateFlow(NoteFilter.RECIENTES)
     private val _searchQuery = MutableStateFlow("")
+    private val _selectedTag = MutableStateFlow<String?>(null)
 
     init {
         loadNotes()
@@ -56,28 +57,35 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val filterParamsFlow = combine(_currentFilter, _searchQuery, _selectedTag) { filter, query, tag ->
+                Triple(filter, query, tag)
+            }
+
             combine(
                 noteRepository.getNotes(userId),
                 noteRepository.getSubjects(userId),
                 evaluationRepository.getEvaluations(userId),
-                _currentFilter,
-                _searchQuery
-            ) { notes, subjects, evaluations, filter, query ->
-                val filtered = filterNotes(notes, filter, query)
+                filterParamsFlow
+            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, params: Triple<NoteFilter, String, String?> ->
+                val (filter, query, tag) = params
+                val availableTags = notes.flatMap { it.tags }.distinct().sorted()
+                val filtered = filterNotes(notes, filter, query, tag)
                 val subjectInfos = computeSubjectInfos(notes, subjects, evaluations)
                 val subjectNames = subjects.map { it.name }
-                _uiState.value to NotesUiState(
+                NotesUiState(
                     notes = filtered,
                     rawNotes = notes,
                     subjects = subjectNames,
                     subjectInfos = subjectInfos,
                     currentFilter = filter,
-                    searchQuery = query
+                    searchQuery = query,
+                    availableTags = availableTags,
+                    selectedTag = tag
                 )
             }.catch { e ->
-                val current = _uiState.value
-                emit(current to current.copy(error = e.message ?: "Error al cargar notas", isLoading = false))
-            }.collect { (_, newState) ->
+                _uiState.update { it.copy(error = e.message ?: "Error al cargar notas", isLoading = false) }
+            }.collect { newState ->
                 _uiState.update { it.copy(
                     notes = newState.notes,
                     rawNotes = newState.rawNotes,
@@ -85,6 +93,8 @@ class NotesViewModel @Inject constructor(
                     subjectInfos = newState.subjectInfos,
                     currentFilter = newState.currentFilter,
                     searchQuery = newState.searchQuery,
+                    availableTags = newState.availableTags,
+                    selectedTag = newState.selectedTag,
                     isLoading = false,
                     error = newState.error
                 ) }
@@ -120,14 +130,18 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun filterNotes(notes: List<Note>, filter: NoteFilter, query: String): Map<String, List<Note>> {
+    private fun filterNotes(notes: List<Note>, filter: NoteFilter, query: String, selectedTag: String?): Map<String, List<Note>> {
         var filtered = notes
+        if (!selectedTag.isNullOrBlank()) {
+            filtered = filtered.filter { it.tags.any { tag -> tag.equals(selectedTag, ignoreCase = true) } }
+        }
         val cleanQuery = query.trim()
         if (cleanQuery.isNotEmpty()) {
             filtered = filtered.filter {
                 it.title.contains(cleanQuery, ignoreCase = true) ||
                 it.content.contains(cleanQuery, ignoreCase = true) ||
-                it.subject.contains(cleanQuery, ignoreCase = true)
+                it.subject.contains(cleanQuery, ignoreCase = true) ||
+                it.tags.any { tag -> tag.contains(cleanQuery, ignoreCase = true) }
             }
         }
         return when (filter) {
@@ -142,6 +156,7 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.LoadNotes -> loadNotes()
             is NotesEvent.SetFilter -> _currentFilter.value = event.filter
             is NotesEvent.Search -> _searchQuery.value = event.query
+            is NotesEvent.SelectTag -> _selectedTag.value = event.tag
             is NotesEvent.ClearSyncMessage -> _uiState.update { it.copy(syncMessage = null) }
             is NotesEvent.DeleteNote -> deleteNote(event.note)
             is NotesEvent.ToggleSubject -> {

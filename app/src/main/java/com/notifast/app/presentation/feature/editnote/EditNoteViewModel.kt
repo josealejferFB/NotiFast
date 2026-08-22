@@ -39,7 +39,15 @@ class EditNoteViewModel @Inject constructor(
             if (note != null) {
                 val subjects = noteRepository.getSubjects(userId).first()
                 val colorHex = subjects.find { it.name == note.subject }?.colorHex ?: ""
-                _uiState.update { it.copy(note = note, subjectColorHex = colorHex, title = note.title, content = note.content) }
+                _uiState.update { 
+                    it.copy(
+                        note = note,
+                        subjectColorHex = colorHex,
+                        title = note.title,
+                        content = note.content,
+                        tags = note.tags
+                    ) 
+                }
             }
         }
     }
@@ -54,11 +62,26 @@ class EditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(content = event.value, syncStatus = "Guardando...") }
                 scheduleAutoSave()
             }
+            is EditNoteEvent.AddTag -> {
+                val clean = event.tag.trim()
+                if (clean.isNotBlank() && !_uiState.value.tags.contains(clean)) {
+                    _uiState.update { it.copy(tags = it.tags + clean, syncStatus = "Guardando...") }
+                    scheduleAutoSave()
+                }
+            }
+            is EditNoteEvent.RemoveTag -> {
+                _uiState.update { it.copy(tags = it.tags.filterNot { tag -> tag == event.tag }, syncStatus = "Guardando...") }
+                scheduleAutoSave()
+            }
+            is EditNoteEvent.ToggleLivePreview -> _uiState.update { it.copy(isLivePreview = event.enabled) }
             is EditNoteEvent.ImageSelected -> {
                 _uiState.update { it.copy(imageUri = event.uri, syncStatus = "Guardando...") }
                 scheduleAutoSave()
             }
-            is EditNoteEvent.SaveClicked -> saveNote(exitAfter = true)
+            is EditNoteEvent.SaveClicked -> {
+                saveJob?.cancel()
+                saveNote(exitAfter = true)
+            }
             is EditNoteEvent.ClearError -> _uiState.update { it.copy(error = null) }
             else -> {}
         }
@@ -78,7 +101,11 @@ class EditNoteViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId()
             if (userId == null) { _uiState.update { it.copy(error = "Usuario no autenticado", syncStatus = "Error") }; return@launch }
             
-            noteRepository.updateNote(userId, note.copy(title = state.title, content = state.content), state.imageUri).fold(
+            noteRepository.updateNote(
+                userId = userId,
+                note = note.copy(title = state.title, content = state.content, tags = state.tags),
+                imageUri = state.imageUri
+            ).fold(
                 onSuccess = { _uiState.update { it.copy(syncStatus = "Guardado", isSaved = exitAfter) } },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al guardar", syncStatus = "Error") } }
             )

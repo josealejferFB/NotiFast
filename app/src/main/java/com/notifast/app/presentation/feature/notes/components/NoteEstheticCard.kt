@@ -78,6 +78,15 @@ fun NoteEstheticCard(
                         color = Color.White.copy(alpha = 0.8f),
                         fontWeight = FontWeight.Bold
                     )
+                    if (note.tags.isNotEmpty()) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "#${note.tags.first()}" + if (note.tags.size > 1) " +${note.tags.size - 1}" else "",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.95f),
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
                     Spacer(modifier = Modifier.weight(1f))
                     Row {
                         IconButton(onClick = onEdit, modifier = Modifier.size(24.dp)) {

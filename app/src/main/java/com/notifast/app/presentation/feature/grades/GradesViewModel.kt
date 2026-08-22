@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,7 @@ class GradesViewModel @Inject constructor(
     private val evaluationRepository: EvaluationRepository,
     private val noteRepository: NoteRepository,
     private val authRepository: AuthRepository,
+    private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
 ) : ViewModel() {
 
@@ -36,10 +39,12 @@ class GradesViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             combine(
                 evaluationRepository.getEvaluations(userId),
-                noteRepository.getSubjects(userId)
-            ) { evaluations, subjects ->
+                noteRepository.getSubjects(userId),
+                userPrefsRepository.defaultGradeScaleFlow
+            ) { evaluations, subjects, scaleId ->
                 val evalsBySubject = evaluations.groupBy { it.subjectName }
                 val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
+                val scale = GradeScale.fromId(scaleId)
                 val subjectGrades = evalsBySubject.map { (subject, evals) ->
                     SubjectGradeInfo(
                         subject = subject,
@@ -52,6 +57,7 @@ class GradesViewModel @Inject constructor(
                     evaluationsBySubject = evalsBySubject,
                     subjects = subjects,
                     globalAverage = globalAverage,
+                    gradeScale = scale,
                     subjectGrades = subjectGrades
                 )
             }.collect { state -> _uiState.value = state }
@@ -62,6 +68,11 @@ class GradesViewModel @Inject constructor(
         when (event) {
             is GradesEvent.LoadData -> loadData()
             is GradesEvent.UpdateGrade -> updateGrade(event.evaluationId, event.grade, event.isPresented)
+            is GradesEvent.SetGradeScale -> {
+                viewModelScope.launch {
+                    userPrefsRepository.setDefaultGradeScale(event.scale.id)
+                }
+            }
             is GradesEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }

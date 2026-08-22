@@ -135,7 +135,7 @@ fun NotesTabContent(
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 8.dp),
                 contentPadding = PaddingValues(horizontal = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -162,6 +162,14 @@ fun NotesTabContent(
                     }
                 }
             }
+        }
+
+        item {
+            NoteTagFilterRow(
+                availableTags = uiState.availableTags,
+                selectedTag = uiState.selectedTag,
+                onSelectTag = { viewModel.onEvent(NotesEvent.SelectTag(it)) }
+            )
         }
 
         if (uiState.isLoading) {

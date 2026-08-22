@@ -15,7 +15,9 @@ data class AddScheduleUiState(
     val isSaving: Boolean = false,
     val error: String? = null,
     val isSaved: Boolean = false,
-    val subjects: List<SubjectData> = emptyList()
+    val subjects: List<SubjectData> = emptyList(),
+    val existingSchedules: List<Schedule> = emptyList(),
+    val conflictingSchedules: List<Schedule> = emptyList()
 )
 
 sealed interface AddScheduleEvent {

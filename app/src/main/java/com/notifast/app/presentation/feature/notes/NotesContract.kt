@@ -27,6 +27,8 @@ data class NotesUiState(
     val expandedSubject: String? = null,
     val currentFilter: NoteFilter = NoteFilter.RECIENTES,
     val searchQuery: String = "",
+    val availableTags: List<String> = emptyList(),
+    val selectedTag: String? = null,
     val syncMessage: String? = null,
     val userFirstName: String = "",
     val userLastName: String = "",
@@ -38,6 +40,7 @@ sealed interface NotesEvent {
     data object LoadNotes : NotesEvent
     data class SetFilter(val filter: NoteFilter) : NotesEvent
     data class Search(val query: String) : NotesEvent
+    data class SelectTag(val tag: String?) : NotesEvent
     data class DeleteNote(val note: Note) : NotesEvent
     data object ClearSyncMessage : NotesEvent
     data class ToggleSubject(val subjectName: String) : NotesEvent

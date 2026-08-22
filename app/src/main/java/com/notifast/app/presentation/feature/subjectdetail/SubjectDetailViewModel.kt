@@ -4,9 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.CalculateRequiredGradeUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,12 +26,16 @@ class SubjectDetailViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
     private val authRepository: AuthRepository,
-    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
+    private val userPrefsRepository: UserPrefsRepository,
+    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
+    private val calculateRequiredGradeUseCase: CalculateRequiredGradeUseCase
 ) : ViewModel() {
 
     private val subjectName: String = checkNotNull(savedStateHandle["subjectName"])
     private val _uiState = MutableStateFlow(SubjectDetailUiState(subjectName = subjectName))
     val uiState: StateFlow<SubjectDetailUiState> = _uiState.asStateFlow()
+
+    private val _targetGrade = MutableStateFlow(6.0)
 
     init { loadData() }
 
@@ -39,10 +46,13 @@ class SubjectDetailViewModel @Inject constructor(
             combine(
                 noteRepository.getNotesBySubject(userId, subjectName),
                 evaluationRepository.getEvaluations(userId),
-                noteRepository.getSubjects(userId)
-            ) { notes, evaluations, subjects ->
+                noteRepository.getSubjects(userId),
+                userPrefsRepository.defaultGradeScaleFlow,
+                _targetGrade
+            ) { notes, evaluations, subjects, scaleId, targetGrade ->
                 val subjectEvals = evaluations.filter { it.subjectName == subjectName }
                 val subjectData = subjects.find { it.name == subjectName } ?: SubjectData(name = subjectName)
+                val scale = GradeScale.fromId(scaleId)
 
                 val avg = calculateWeightedAverageUseCase(subjectEvals)
 
@@ -55,6 +65,12 @@ class SubjectDetailViewModel @Inject constructor(
                 val total = subjectEvals.size
                 val progress = if (total > 0) completed.toFloat() / total else 0f
 
+                val simResult = calculateRequiredGradeUseCase(
+                    evaluations = subjectEvals,
+                    targetGrade = targetGrade,
+                    scale = scale
+                )
+
                 SubjectDetailUiState(
                     isLoading = false,
                     subjectName = subjectName,
@@ -66,7 +82,10 @@ class SubjectDetailViewModel @Inject constructor(
                     completedEvalCount = completed,
                     pendingEvalCount = subjectEvals.count { !it.isPresented },
                     upcomingEvaluations = upcoming,
-                    progressPercent = progress
+                    progressPercent = progress,
+                    gradeScale = scale,
+                    targetGrade = targetGrade,
+                    simulationResult = simResult
                 )
             }.collect { state -> _uiState.value = state }
         }
@@ -77,6 +96,12 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.LoadData -> loadData()
             is SubjectDetailEvent.SaveGrade -> saveGrade(event.evaluationId, event.grade, event.isPresented)
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
+            is SubjectDetailEvent.UpdateTargetGrade -> _targetGrade.value = event.targetGrade
+            is SubjectDetailEvent.SetGradeScale -> {
+                viewModelScope.launch {
+                    userPrefsRepository.setDefaultGradeScale(event.scale.id)
+                }
+            }
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }

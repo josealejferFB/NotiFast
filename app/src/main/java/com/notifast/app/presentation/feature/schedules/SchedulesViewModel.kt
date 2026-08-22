@@ -29,10 +29,13 @@ class SchedulesViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isLoading = true) }
             scheduleRepository.getSchedules(userId).collect { schedules ->
-                _uiState.value = SchedulesUiState(
-                    schedules = schedules,
-                    groupedSchedules = schedules.groupBy { it.dayOfWeek }
-                )
+                _uiState.update { current ->
+                    current.copy(
+                        isLoading = false,
+                        schedules = schedules,
+                        groupedSchedules = schedules.groupBy { it.dayOfWeek }
+                    )
+                }
             }
         }
     }
@@ -40,6 +43,7 @@ class SchedulesViewModel @Inject constructor(
     fun onEvent(event: SchedulesEvent) {
         when (event) {
             is SchedulesEvent.LoadData -> loadData()
+            is SchedulesEvent.SelectDay -> _uiState.update { it.copy(selectedDay = event.dayOfWeek) }
             is SchedulesEvent.DeleteSchedule -> deleteSchedule(event.schedule)
             is SchedulesEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }

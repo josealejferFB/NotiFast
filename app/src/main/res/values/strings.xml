@@ -53,7 +53,61 @@
     <string name="schedules_title">Mis Horarios</string>
     <string name="schedules_empty_title">Sin horarios</string>
     <string name="schedules_empty_message">No tienes horarios registrados para este día.</string>
+    <string name="schedules_empty_all">Aún no has registrado ningún horario de clase.</string>
+    <string name="schedules_delete_title">¿Eliminar Horario?</string>
+    <string name="schedules_delete_message">¿Deseas eliminar el horario de %1$s (%2$s - %3$s)? Esta acción no se puede deshacer.</string>
+    <string name="schedules_add_title">Nuevo Horario</string>
+    <string name="schedules_edit_title">Editar Horario</string>
+    <string name="schedules_conflict_warning">¡Advertencia de conflicto! Se solapa con: %1$s</string>
+    <string name="schedules_save_button">Guardar Horario</string>
+    <string name="schedules_discard_title">¿Descartar cambios?</string>
+    <string name="schedules_discard_message">Tienes cambios sin guardar en este horario. ¿Estás seguro de que deseas salir?</string>
+    <string name="schedules_discard_confirm">Descartar</string>
+    <string name="schedules_discard_cancel">Continuar editando</string>
+    <string name="schedules_field_subject">Materia</string>
+    <string name="schedules_field_day">Día de la semana</string>
+    <string name="schedules_field_start_time">Hora Inicio</string>
+    <string name="schedules_field_end_time">Hora Fin</string>
+    <string name="schedules_field_classroom">Salón (Opcional)</string>
+    <string name="schedules_field_teacher">Profesor (Opcional)</string>
+
+    <!-- Markdown & Note Editor -->
+    <string name="notes_tab_edit">Editar</string>
+    <string name="notes_tab_preview">Vista Previa</string>
+    <string name="notes_tags_label">Etiquetas temáticas</string>
+    <string name="notes_add_tag_placeholder">Nueva etiqueta…</string>
+    <string name="notes_tag_suggestion_exam">Examen</string>
+    <string name="notes_tag_suggestion_homework">Tarea</string>
+    <string name="notes_tag_suggestion_formula">Fórmula</string>
+    <string name="notes_tag_suggestion_summary">Resumen</string>
+    <string name="notes_tag_suggestion_important">Importante</string>
+    <string name="notes_share_note">Compartir Apunte</string>
+    <string name="notes_discard_title">¿Descartar cambios?</string>
+    <string name="notes_discard_message">Tienes cambios sin guardar en este apunte. ¿Estás seguro de que deseas salir?</string>
+    <string name="notes_no_tags_found">Sin etiquetas</string>
+
+    <!-- Grade Simulator & Scales -->
+    <string name="simulator_title">Simulador de Calificaciones</string>
+    <string name="simulator_subtitle">¿Cuánto necesito para aprobar?</string>
+    <string name="simulator_target_grade">Nota Objetivo</string>
+    <string name="simulator_required_grade_label">Nota Requerida en pendientes</string>
+    <string name="simulator_status_passed">¡Materia Aprobada!</string>
+    <string name="simulator_status_achievable">Meta Alcanzable</string>
+    <string name="simulator_status_at_risk">Meta Difícil / En Riesgo</string>
+    <string name="simulator_status_impossible">Matemáticamente Imposible</string>
+    <string name="simulator_remaining_weight">Ponderación restante: %1$.0f%%</string>
+    <string name="simulator_no_pending_weight">No hay evaluaciones pendientes con ponderación</string>
+    <string name="grade_scale_label">Escala de Calificación</string>
+    <string name="grade_scale_min_passing">Nota Mínima Aprobatoria: %1$.1f</string>
     
+    <string name="notes_filter_all_tags">Todas</string>
+    <string name="notes_export_markdown">Exportar Markdown</string>
+
     <!-- General -->
     <string name="general_error">Ocurrió un error</string>
+    <string name="btn_save">Guardar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_delete">Eliminar</string>
+    <string name="btn_close">Cerrar</string>
+    <string name="btn_edit">Editar</string>
 </resources>

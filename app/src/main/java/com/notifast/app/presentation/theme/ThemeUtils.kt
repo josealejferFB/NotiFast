@@ -13,6 +13,13 @@ object ThemeUtils {
      */
     fun getAccessibleColor(hex: String, isDark: Boolean): Color {
         val baseColor = hex.toSafeComposeColor(Aqua)
+        return getAccessibleColor(baseColor, isDark)
+    }
+
+    /**
+     * Calibrates a Compose Color for accessibility in light or dark themes.
+     */
+    fun getAccessibleColor(baseColor: Color, isDark: Boolean): Color {
         val hsl = rgbToHsl(baseColor.red, baseColor.green, baseColor.blue)
 
         if (isDark) {
