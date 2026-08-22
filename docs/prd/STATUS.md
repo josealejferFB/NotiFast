@@ -13,11 +13,12 @@ Fase 0: Estabilización       [████████████████]
 Fase 0.1: Hardening UX       [████████████████] 100% (4/4 bloques) ✅
 Fase 1: Fundamentos          [████████████████] 100% (10/10 tareas) ✅
 Fase 2: Experiencia Core     [████████████████] 100% (13/13 tareas) ✅
+Fase 2.1: Ergonomía Forms    [░░░░░░░░░░░░░░░░]   0% (0/9 tareas)
 Fase 3: Features Avanzadas   [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
 Fase 4: Pulido & Experiencia [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis   [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:     [████████░░░░░░░░]  48.3% (43/89 tareas)
+PROGRESO TOTAL ESTIMADO:     [████████░░░░░░░░]  43.8% (43/98 tareas)
 ```
 
 ---
@@ -70,24 +71,31 @@ Durante la Fase 2 se implementaron las funcionalidades centrales del cuaderno y 
 
 ---
 
-### ⚪ Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (Siguiente Fase)
+### ⚪ Fase 2.1: Experiencia sin Fricción y Ergonomía de Formularios (Siguiente Fase)
+*Meta: Eliminar la sobrecarga cognitiva en los cuestionarios y formularios de entrada de datos (Materias, Horarios, Apuntes y Evaluaciones) mediante formularios continuos, TimePicker nativo de Material 3 y selección a 1 solo toque.*  
+*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_2.1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_2.1.md)
+
+#### Sprint 2.1.1 — Formulario Fluido de Materias
+- [ ] **2.1.1.1** Formulario One-Page continuo en `AddSubjectScreen` (eliminar acordeón de pasos).
+- [ ] **2.1.1.2** Sub-componente `SubjectPreviewBadge` con animación viva de color e icono.
+- [ ] **2.1.1.3** Tests unitarios para `AddSubjectViewModel`.
+
+#### Sprint 2.1.2 — Ergonomía en Horarios
+- [ ] **2.1.2.1** Selector segmentado de días a 1 toque (`ScheduleDaySegmentedBar`).
+- [ ] **2.1.2.2** Selector interactivo de horas con `TimePicker` de Material 3 y chips rápidos (`ScheduleTimeRangePicker`).
+- [ ] **2.1.2.3** Selector de materia con chips horizontales (`ScheduleSubjectChips`).
+- [ ] **2.1.2.4** Integración fluida en `AddScheduleScreen` y `EditScheduleScreen` con detección de solapes en vivo.
+
+#### Sprint 2.1.3 — Simplificación de Apuntes y Evaluaciones
+- [ ] **2.1.3.1** Carrusel superior de materias y tags rápidos a 1 toque en `AddNoteScreen` y `EditNoteScreen`.
+- [ ] **2.1.3.2** Formulario continuo en `AddEvaluationScreen` (eliminar acordeón de 3 pasos) con selector de tipo y slider de ponderación.
+- [ ] **2.1.3.3** Tests de integración de ViewModels.
+
+---
+
+### ⚪ Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (Planificada)
 *Meta: Notificaciones locales inteligentes vía Android WorkManager, recordatorios proactivos de entregas/clases, sincronización offline local y analíticas de estudio.*  
 *Guía de Arranque:* [`docs/prd/KICKOFF_FASE_3.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.md)
-
-#### Sprint 3.1 — Motor de Notificaciones Locales y Recordatorios Proactivos con WorkManager
-- [ ] **3.1.1** `NotificationSchedulerUseCase` y Worker de Android `NotificationWorker` para recordatorios programados (24h antes, 2h antes de evaluaciones y clases)
-- [ ] **3.1.2** Canales de notificación en Android (`NotificationChannel`) para Evaluaciones, Clases y Alertas Académicas con permisos Android 13+ (`POST_NOTIFICATIONS`)
-- [ ] **3.1.3** Pantalla / Diálogo de Configuración de Notificaciones (activar/desactivar recordatorios, anticipación en horas/días)
-- [ ] **3.1.4** Unit tests para el scheduler y serialización de parámetros de background
-
-#### Sprint 3.2 — Analíticas de Rendimiento Académico y Dashboard Predictivo
-- [ ] **3.2.1** `CalculateAcademicStatsUseCase` (índice de aprobación por materia, distribución de calificaciones, carga horaria semanal)
-- [ ] **3.2.2** Dashboard analítico en `StatsScreen` con gráficos de rendimiento (Compose Canvas / barras de progreso segmentadas)
-- [ ] **3.2.3** Recomendaciones inteligentes de estudio basadas en proximidad de evaluaciones y dificultad
-
-#### Sprint 3.3 — Modo Offline y Sincronización Resiliente
-- [ ] **3.3.1** Caché de datos Firestore persistente y manejo de conectividad en tiempo real (`ConnectivityObserver`)
-- [ ] **3.3.2** Indicador visual de estado de sincronización (Offline / Sincronizando / Sincronizado) en UI
 
 ---
 

@@ -35,7 +35,8 @@ Antes de iniciar cualquier trabajo o responder sobre el roadmap, consulta siempr
 | **Kickoff Fase 0** | [`docs/prd/KICKOFF_FASE_0.md`](docs/prd/KICKOFF_FASE_0.md) | Guía de arranque y prompt de sesión para estabilización y resolución de bugs (Completada). |
 | **Kickoff Fase 1** | [`docs/prd/KICKOFF_FASE_1.md`](docs/prd/KICKOFF_FASE_1.md) | Guía de arranque y prompt de sesión para Fundamentos de Arquitectura (Completada). |
 | **Kickoff Fase 2** | [`docs/prd/KICKOFF_FASE_2.md`](docs/prd/KICKOFF_FASE_2.md) | Guía de arranque y prompt de sesión para Experiencia Core — Cuaderno y Hub Académico (Completada). |
-| **Kickoff Fase 3** | [`docs/prd/KICKOFF_FASE_3.md`](docs/prd/KICKOFF_FASE_3.md) | Guía de arranque y prompt de sesión para Inteligencia Predictiva y Notificaciones Proactivas (Siguiente fase). |
+| **Kickoff Fase 2.1** | [`docs/prd/KICKOFF_FASE_2.1.md`](docs/prd/KICKOFF_FASE_2.1.md) | Guía de arranque y prompt de sesión para Experiencia sin Fricción y Ergonomía de Formularios (Siguiente fase). |
+| **Kickoff Fase 3** | [`docs/prd/KICKOFF_FASE_3.md`](docs/prd/KICKOFF_FASE_3.md) | Guía de arranque y prompt de sesión para Inteligencia Predictiva y Notificaciones Proactivas (Planificada). |
 | **Auditoría Histórica** | [`docs/audit/2026-06-18-full-audit.md`](docs/audit/2026-06-18-full-audit.md) | Análisis base de seguridad, arquitectura y bugs iniciales. |
 | **Planes y Specs** | [`docs/superpowers/plans/`](docs/superpowers/plans/) y [`docs/superpowers/specs/`](docs/superpowers/specs/) | Diseños y planes de ejecución atómicos. |
 
