@@ -51,6 +51,19 @@ class AddNoteViewModel @Inject constructor(
             is AddNoteEvent.RemoveTag -> {
                 _uiState.update { it.copy(tags = it.tags.filterNot { tag -> tag == event.tag }) }
             }
+            is AddNoteEvent.ToggleTag -> {
+                val clean = event.tag.trim()
+                if (clean.isNotBlank()) {
+                    _uiState.update { state ->
+                        val newTags = if (state.tags.contains(clean)) {
+                            state.tags.filterNot { it == clean }
+                        } else {
+                            state.tags + clean
+                        }
+                        state.copy(tags = newTags)
+                    }
+                }
+            }
             is AddNoteEvent.ToggleLivePreview -> _uiState.update { it.copy(isLivePreview = event.enabled) }
             is AddNoteEvent.ImageSelected -> _uiState.update { it.copy(imageUri = event.uri) }
             is AddNoteEvent.SaveClicked -> saveNote()

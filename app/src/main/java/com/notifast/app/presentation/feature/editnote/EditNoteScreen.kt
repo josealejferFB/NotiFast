@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -28,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -47,10 +49,12 @@ import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.feature.addnote.components.NoteFormattingToolbar
+import com.notifast.app.presentation.feature.addnote.components.NoteQuickTagRow
 import com.notifast.app.presentation.feature.addnote.components.NoteTagSelector
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNoteScreen(
     viewModel: EditNoteViewModel = hiltViewModel(),
@@ -120,16 +124,11 @@ fun EditNoteScreen(
                 targetState = uiState.isLivePreview,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                 label = "EditPreviewTransition",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
+                modifier = Modifier.fillMaxSize().padding(innerPadding)
             ) { isPreview ->
                 if (isPreview) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(20.dp),
+                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         NotiFastCard(modifier = Modifier.fillMaxWidth()) {
@@ -157,10 +156,16 @@ fun EditNoteScreen(
                             .padding(horizontal = 20.dp, vertical = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        uiState.syncStatus?.let { status ->
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                                Text(text = status, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                            }
+                        }
+
                         NotiFastFormField(
                             value = uiState.title,
                             onValueChange = { viewModel.onEvent(EditNoteEvent.TitleChanged(it)) },
-                            label = "Título del Apunte"
+                            label = "Título del apunte"
                         )
 
                         NoteFormattingToolbar(
@@ -177,6 +182,12 @@ fun EditNoteScreen(
                             singleLine = false
                         )
 
+                        // 8 Preset Academic Tags with toggle
+                        NoteQuickTagRow(
+                            selectedTags = uiState.tags,
+                            onTagToggled = { viewModel.onEvent(EditNoteEvent.ToggleTag(it)) }
+                        )
+
                         NoteTagSelector(
                             selectedTags = uiState.tags,
                             onAddTag = { viewModel.onEvent(EditNoteEvent.AddTag(it)) },
@@ -184,7 +195,8 @@ fun EditNoteScreen(
                         )
 
                         NotiFastImagePickerField(
-                            placeholderText = if (uiState.imageUri == null) "Añadir foto de referencia" else "Cambiar foto adjuntada",
+                            existingImageUrl = uiState.note?.imageUrl,
+                            placeholderText = if (uiState.imageUri == null && uiState.note?.imageUrl == null) "Añadir foto de referencia" else "Cambiar foto adjuntada",
                             onImageSelected = { viewModel.onEvent(EditNoteEvent.ImageSelected(it)) }
                         )
 
@@ -210,10 +222,7 @@ fun EditNoteScreen(
                 dismissText = stringResource(R.string.schedules_discard_cancel),
                 confirmColor = Ruby,
                 confirmWeight = FontWeight.Bold,
-                onConfirm = {
-                    showDiscardDialog = false
-                    onBackClick()
-                },
+                onConfirm = { showDiscardDialog = false; onBackClick() },
                 onDismiss = { showDiscardDialog = false }
             )
         }

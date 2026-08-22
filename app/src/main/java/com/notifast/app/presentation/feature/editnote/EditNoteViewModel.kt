@@ -73,6 +73,20 @@ class EditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(tags = it.tags.filterNot { tag -> tag == event.tag }, syncStatus = "Guardando...") }
                 scheduleAutoSave()
             }
+            is EditNoteEvent.ToggleTag -> {
+                val clean = event.tag.trim()
+                if (clean.isNotBlank()) {
+                    _uiState.update { state ->
+                        val newTags = if (state.tags.contains(clean)) {
+                            state.tags.filterNot { it == clean }
+                        } else {
+                            state.tags + clean
+                        }
+                        state.copy(tags = newTags, syncStatus = "Guardando...")
+                    }
+                    scheduleAutoSave()
+                }
+            }
             is EditNoteEvent.ToggleLivePreview -> _uiState.update { it.copy(isLivePreview = event.enabled) }
             is EditNoteEvent.ImageSelected -> {
                 _uiState.update { it.copy(imageUri = event.uri, syncStatus = "Guardando...") }

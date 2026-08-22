@@ -22,6 +22,7 @@ sealed interface AddNoteEvent {
     data class ContentChanged(val value: String) : AddNoteEvent
     data class AddTag(val tag: String) : AddNoteEvent
     data class RemoveTag(val tag: String) : AddNoteEvent
+    data class ToggleTag(val tag: String) : AddNoteEvent
     data class ToggleLivePreview(val enabled: Boolean) : AddNoteEvent
     data class ImageSelected(val uri: Uri?) : AddNoteEvent
     data object SaveClicked : AddNoteEvent

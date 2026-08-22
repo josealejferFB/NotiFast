@@ -77,4 +77,22 @@ class AddNoteViewModelTest {
         coVerify { noteRepository.addNote("user_123", "Matemáticas", "Derivadas", "Contenido", any(), listOf("Examen")) }
         assertTrue(viewModel.uiState.value.isSaved)
     }
+
+    @Test
+    fun `when ToggleTag is called, adds tag if absent and removes if present`() = runTest {
+        val viewModel = AddNoteViewModel(noteRepository, authRepository)
+        advanceUntilIdle()
+
+        // Toggle on
+        viewModel.onEvent(AddNoteEvent.ToggleTag("resumen"))
+        assertTrue(viewModel.uiState.value.tags.contains("resumen"))
+
+        // Toggle on second tag
+        viewModel.onEvent(AddNoteEvent.ToggleTag("examen"))
+        assertEquals(listOf("resumen", "examen"), viewModel.uiState.value.tags)
+
+        // Toggle off first tag
+        viewModel.onEvent(AddNoteEvent.ToggleTag("resumen"))
+        assertEquals(listOf("examen"), viewModel.uiState.value.tags)
+    }
 }
