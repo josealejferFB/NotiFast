@@ -6,8 +6,11 @@ colors:
   secondary: "#3B9797"
   surface-light: "#FAFAFA"
   on-surface-light: "#1C1B1F"
-  surface-dark: "#1B262C"
-  on-surface-dark: "#E6E1E5"
+  surface-dark: "#1B242A"
+  background-dark: "#10161A"
+  surface-dark-container: "#25333C"
+  on-surface-dark: "#ECEFF1"
+  on-surface-dark-variant: "#94A3B8"
 typography:
   body:
     fontFamily: "System Default"
@@ -61,11 +64,16 @@ La paleta se centra en brindar acciones rápidas con un rojo vivo y confirmar es
 ### Neutral
 - **Fondo Principal Claro** (`#FAFAFA`): Fondo base para el modo claro.
 - **Texto Principal Claro** (`#1C1B1F`): Texto de alto contraste sobre el fondo claro.
-- **Fondo Principal Oscuro** (`#1B262C`): Fondo base con tono pizarra (slate) para el modo oscuro, reduciendo la dureza del negro puro.
-- **Texto Principal Oscuro** (`#E6E1E5`): Texto sobre fondos oscuros.
+- **Fondo Base Oscuro** (`#10161A`): Fondo profundo que evita el negro puro `#000000` pero maximiza contraste.
+- **Superficie Oscura** (`#1B242A`): Elevación tonal para tarjetas y modales.
+- **Superficie Contenedora Oscura** (`#25333C`): Componentes internos y badges.
+- **Texto Principal Oscuro** (`#ECEFF1`): Texto de alto contraste sobre superficies oscuras.
+- **Texto Secundario Oscuro** (`#94A3B8`): Subtítulos y metadatos con contraste calibrado.
 
 ### Named Rules
 **The Tonal Surface Rule.** Las agrupaciones y jerarquías se diferencian mediante ligeros cambios en el color de fondo (superficies tonales), no mediante líneas fuertes o sombras pesadas.
+
+**The WCAG HSL Contrast Rule.** Los colores dinámicos de materias son procesados en tiempo de ejecución por `ThemeUtils.getAccessibleColor()` mediante cálculo en espacio HSL, garantizando un ratio de contraste mínimo de 4.5:1 (WCAG AA) tanto en tema claro como oscuro.
 
 ## 3. Typography
 
