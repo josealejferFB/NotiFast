@@ -2,21 +2,58 @@ package com.notifast.app.presentation.theme.color
 
 import androidx.compose.ui.graphics.Color
 
-// COLORES CORPORATIVOS NOTIFAST
+// COLORES CORPORATIVOS NOTIFAST (Brand Core)
 val Ruby = Color(0xFFBF092F)
 val Aqua = Color(0xFF3B9797)
 
-// Light
+// Light Theme Tokens
 val RubyLight = Color(0xFFBF092F)
-val AquaLight = Color(0xFF3B9797)
-val SurfaceLight = Color(0xFFFAFAFA)
-val OnSurfaceLight = Color(0xFF1C1B1F)
+val OnRubyLight = Color(0xFFFFFFFF)
+val RubyContainerLight = Color(0xFFFFDAD9)
+val OnRubyContainerLight = Color(0xFF41000B)
 
-// Dark
-val RubyDark = Color(0xFFCC5A68) // Muted Ruby
-val AquaDark = Color(0xFF4A9696) // Muted Aqua
-val SurfaceDark = Color(0xFF1B262C) // Slate
-val OnSurfaceDark = Color(0xFFE6E1E5)
+val AquaLight = Color(0xFF3B9797)
+val OnAquaLight = Color(0xFFFFFFFF)
+val AquaContainerLight = Color(0xFFBCEBEB)
+val OnAquaContainerLight = Color(0xFF002020)
+
+val BackgroundLight = Color(0xFFF8FAFC)
+val OnBackgroundLight = Color(0xFF0F172A)
+val SurfaceLight = Color(0xFFFFFFFF)
+val OnSurfaceLight = Color(0xFF0F172A)
+val SurfaceVariantLight = Color(0xFFF1F5F9)
+val OnSurfaceVariantLight = Color(0xFF64748B)
+val OutlineLight = Color(0xFFCBD5E1)
+
+// Dark Theme Tokens (Impeccable High-Contrast Dark Mode)
+val RubyDark = Color(0xFFFFB3B8)
+val OnRubyDark = Color(0xFF680015)
+val RubyContainerDark = Color(0xFF920021)
+val OnRubyContainerDark = Color(0xFFFFDAD9)
+
+val AquaDark = Color(0xFF7DDADA)
+val OnAquaDark = Color(0xFF003737)
+val AquaContainerDark = Color(0xFF1E4E4E)
+val OnAquaContainerDark = Color(0xFFBCEBEB)
+
+val BackgroundDark = Color(0xFF10161A)
+val OnBackgroundDark = Color(0xFFECEFF1)
+val SurfaceDark = Color(0xFF1B242A)
+val OnSurfaceDark = Color(0xFFECEFF1)
+val SurfaceVariantDark = Color(0xFF25333C)
+val OnSurfaceVariantDark = Color(0xFF94A3B8)
+val OutlineDark = Color(0xFF3D4D59)
+
+// Error Tokens
+val ErrorLight = Color(0xFFBA1A1A)
+val OnErrorLight = Color(0xFFFFFFFF)
+val ErrorContainerLight = Color(0xFFFFDAD6)
+val OnErrorContainerLight = Color(0xFF410002)
+
+val ErrorDark = Color(0xFFFFB4AB)
+val OnErrorDark = Color(0xFF690005)
+val ErrorContainerDark = Color(0xFF93000A)
+val OnErrorContainerDark = Color(0xFFFFDAD6)
 
 /**
  * Parses a hex string into a Jetpack Compose [Color] safely without crashing.
