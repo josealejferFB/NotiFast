@@ -221,7 +221,7 @@ service cloud.firestore {
 -keepattributes *Annotation*
 
 # Firestore data models - keep all fields for serialization
--keep class com.example.notifast.data.model.** { *; }
+-keep class com.notifast.app.data.model.** { *; }
 
 # Hilt
 -dontwarn dagger.hilt.**
@@ -481,9 +481,9 @@ dependencies {
 
 Utilidades comunes de testing:
 ```kotlin
-package com.example.notifast
+package com.notifast.app
 
-import com.example.notifast.data.model.*
+import com.notifast.app.data.model.*
 import java.util.Date
 
 object TestData {

@@ -31,7 +31,7 @@
 - [ ] **Step 1: Create `EvaluationType.kt`**
 
 ```kotlin
-package com.example.notifast.data.model
+package com.notifast.app.data.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
@@ -40,8 +40,8 @@ import androidx.compose.material.icons.filled.Task
 import androidx.compose.material.icons.filled.PresentToAll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 enum class EvaluationType(
     val label: String,
@@ -193,7 +193,7 @@ val selectedType: EvaluationType = EvaluationType.EXAM,
 
 Add new import:
 ```kotlin
-import com.example.notifast.data.model.EvaluationType
+import com.notifast.app.data.model.EvaluationType
 ```
 
 Add new event to `AddEvaluationEvent`:
@@ -224,7 +224,7 @@ val evaluation = Evaluation(
 
 Add import:
 ```kotlin
-import com.example.notifast.data.model.EvaluationType
+import com.notifast.app.data.model.EvaluationType
 ```
 
 - [ ] **Step 3: Update `AddEvaluationScreen.kt`**
@@ -289,7 +289,7 @@ Add required imports:
 ```kotlin
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import com.example.notifast.data.model.EvaluationType
+import com.notifast.app.data.model.EvaluationType
 ```
 
 - [ ] **Step 4: Build to verify**
@@ -326,7 +326,7 @@ val type: String = EvaluationType.EXAM.name,
 
 Add import:
 ```kotlin
-import com.example.notifast.data.model.EvaluationType
+import com.notifast.app.data.model.EvaluationType
 ```
 
 - [ ] **Step 2: Update `EditEvaluationViewModel.kt`**
@@ -394,7 +394,7 @@ Add required imports:
 ```kotlin
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import com.example.notifast.data.model.EvaluationType
+import com.notifast.app.data.model.EvaluationType
 ```
 
 - [ ] **Step 4: Build to verify**
@@ -508,7 +508,7 @@ fun EvaluationDetailContent(eval: Evaluation, onEdit: () -> Unit, onDelete: () -
 - [ ] **Step 4: Add missing import**
 
 ```kotlin
-import com.example.notifast.data.model.EvaluationType
+import com.notifast.app.data.model.EvaluationType
 ```
 
 - [ ] **Step 5: Build to verify**

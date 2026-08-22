@@ -127,10 +127,10 @@ git commit -m "feat: wire SubjectDetail navigation from NotesScreen"
 
 Replace entire file content:
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Note
 
 data class SubjectDetailUiState(
     val isLoading: Boolean = true,
@@ -169,15 +169,15 @@ git commit -m "feat: enrich SubjectDetailUiState with SubjectData and computed s
 
 Replace entire file content:
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.data.model.SubjectData
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -265,7 +265,7 @@ git commit -m "feat: enrich SubjectDetailViewModel with stats computation and Su
 - [ ] **Step 1: Create hero header composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -289,8 +289,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.notifast.presentation.atoms.SubjectIconMapper
-import com.example.notifast.presentation.theme.color.Aqua
+import com.notifast.app.presentation.atoms.SubjectIconMapper
+import com.notifast.app.presentation.theme.color.Aqua
 
 private fun parseSubjectColor(hex: String): Color {
     return try {
@@ -375,7 +375,7 @@ git commit -m "feat: create SubjectDetailHero with gradient background and subje
 - [ ] **Step 1: Create stats dashboard composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -404,8 +404,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 import java.util.Date
 
 private fun parseSubjectColor(hex: String): Color {
@@ -545,7 +545,7 @@ git commit -m "feat: create SubjectDetailStats with score circle and stat cards"
 - [ ] **Step 1: Create timeline composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -572,8 +572,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.presentation.theme.color.Aqua
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.presentation.theme.color.Aqua
 import java.util.Date
 
 private fun parseSubjectColor(hex: String): Color {
@@ -705,7 +705,7 @@ git commit -m "feat: create SubjectDetailTimeline with urgency dots and gradable
 - [ ] **Step 1: Create calendar card composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -732,8 +732,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.presentation.theme.color.Aqua
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.presentation.theme.color.Aqua
 import java.util.Calendar
 import java.util.Date
 
@@ -865,7 +865,7 @@ git commit -m "feat: create SubjectDetailCalendarCard with calendar-square desig
 - [ ] **Step 1: Create note tile composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -897,8 +897,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.theme.color.Aqua
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.theme.color.Aqua
 import java.util.Calendar
 import java.util.Date
 
@@ -999,7 +999,7 @@ import androidx.compose.foundation.layout.heightIn
 - [ ] **Step 2: Create progress composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -1025,7 +1025,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.notifast.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Aqua
 
 private fun parseSubjectColor(hex: String): Color {
     return try {
@@ -1116,7 +1116,7 @@ mkdir -p app/src/main/java/com/example/notifast/presentation/feature/subjectdeta
 
 Replace the entire file:
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -1145,16 +1145,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastStudyBackground
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailCalendarRow
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailHero
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailNotesMosaic
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailProgress
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailStats
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailTimeline
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailCalendarRow
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailHero
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailNotesMosaic
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailProgress
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailStats
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailTimeline
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

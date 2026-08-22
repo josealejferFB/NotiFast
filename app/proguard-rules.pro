@@ -18,8 +18,8 @@
 -keep class com.google.firebase.analytics.** { *; }
 
 # Firestore data models - keep all fields for POJO serialization
--keep class com.example.notifast.data.model.** { *; }
--keepclassmembers class com.example.notifast.data.model.** {
+-keep class com.notifast.app.data.model.** { *; }
+-keepclassmembers class com.notifast.app.data.model.** {
     <fields>;
     <init>(...);
 }

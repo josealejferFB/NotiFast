@@ -19,7 +19,7 @@
 - [ ] **Step 1: Write NotiFastStudyBackground.kt**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -45,8 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 @Composable
 fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
@@ -132,7 +132,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 1: Write NotiFastCenterAlignedTopBar.kt**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -179,7 +179,7 @@ Replace entire LoginScreen.kt with the restored design featuring:
 - On Google Sign-In success, navigate to Notes
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth
+package com.notifast.app.presentation.feature.auth
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -211,11 +211,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.notifast.R
-import com.example.notifast.presentation.atoms.NotiFastFormField
-import com.example.notifast.presentation.atoms.NotiFastStudyBackground
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.R
+import com.notifast.app.presentation.atoms.NotiFastFormField
+import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -439,7 +439,7 @@ fun LoginScreen(
 Replace existing events with:
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth
+package com.notifast.app.presentation.feature.auth
 
 import android.net.Uri
 
@@ -468,12 +468,12 @@ sealed interface LoginEvent {
 Replace with:
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth
+package com.notifast.app.presentation.feature.auth
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

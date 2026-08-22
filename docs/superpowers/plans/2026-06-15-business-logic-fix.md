@@ -46,7 +46,7 @@ Run: `cd /home/analista/AndroidStudioProjects/NotiFast && ./gradlew assembleDebu
 - [ ] **Step 1: Replace file content**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addnote
+package com.notifast.app.presentation.feature.addnote
 
 import android.net.Uri
 
@@ -86,12 +86,12 @@ Run: `cd /home/analista/AndroidStudioProjects/NotiFast && ./gradlew assembleDebu
 - [ ] **Step 1: Replace file content**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addnote
+package com.notifast.app.presentation.feature.addnote
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -176,7 +176,7 @@ Run: `cd /home/analista/AndroidStudioProjects/NotiFast && ./gradlew assembleDebu
 - [ ] **Step 1: Replace file content**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addnote
+package com.notifast.app.presentation.feature.addnote
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -210,10 +210,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
-import com.example.notifast.presentation.atoms.NotiFastStudyBackground
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastCenterAlignedTopBar
+import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.theme.color.Ruby
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -405,10 +405,10 @@ Run: `cd /home/analista/AndroidStudioProjects/NotiFast && ./gradlew assembleDebu
 
 Replace with:
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Note
 
 data class SubjectDetailUiState(
     val subjectName: String = "",
@@ -426,14 +426,14 @@ sealed interface SubjectDetailEvent {
 
 Replace with:
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -482,7 +482,7 @@ class SubjectDetailViewModel @Inject constructor(
 
 Replace with:
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -518,11 +518,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastCenterAlignedTopBar
-import com.example.notifast.presentation.atoms.NotiFastStudyBackground
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastCenterAlignedTopBar
+import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

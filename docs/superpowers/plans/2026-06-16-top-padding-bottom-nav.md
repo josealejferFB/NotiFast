@@ -18,7 +18,7 @@
 - [ ] **Step 1: Replace file content**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -55,7 +55,7 @@ Expected: BUILD SUCCESSFUL
 - [ ] **Step 1: Write the atom**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -88,8 +88,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.notifast.presentation.navigation.Screen
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.navigation.Screen
+import com.notifast.app.presentation.theme.color.Ruby
 
 @Composable
 fun NotiFastBottomNav(
@@ -202,7 +202,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy // was only in Nav
 
 Add this import:
 ```kotlin
-import com.example.notifast.presentation.atoms.NotiFastBottomNav
+import com.notifast.app.presentation.atoms.NotiFastBottomNav
 ```
 
 - [ ] **Step 2: Replace NavigationBar block**

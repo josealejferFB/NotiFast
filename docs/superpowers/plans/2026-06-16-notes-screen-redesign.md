@@ -18,7 +18,7 @@
 - [ ] **Step 1: Create file**
 
 ```kotlin
-package com.example.notifast.data.model
+package com.notifast.app.data.model
 
 data class SubjectData(
     val name: String,
@@ -43,11 +43,11 @@ git commit -m "feat: add SubjectData model with name and icon"
 - [ ] **Step 1: Change getSubjects return type and addSubject signature**
 
 ```kotlin
-package com.example.notifast.domain.repository
+package com.notifast.app.domain.repository
 
 import android.net.Uri
-import com.example.notifast.data.model.Note
-import com.example.notifast.data.model.SubjectData
+import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.SubjectData
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
@@ -116,7 +116,7 @@ to:
 
 Add import:
 ```kotlin
-import com.example.notifast.data.model.SubjectData
+import com.notifast.app.data.model.SubjectData
 ```
 
 - [ ] **Step 2: Update addSubject to accept icon**
@@ -177,12 +177,12 @@ data class AddSubjectUiState(
 - [ ] **Step 2: Update AddSubjectViewModel**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addsubject
+package com.notifast.app.presentation.feature.addsubject
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -283,7 +283,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.heightIn
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.presentation.theme.color.Ruby
 ```
 
 - [ ] **Step 2: Update the AddSubjectEvent to include IconSelected**
@@ -315,7 +315,7 @@ git commit -m "feat: add emoji picker to AddSubjectScreen"
 - [ ] **Step 1: Change subjects type in AddNoteUiState**
 
 ```kotlin
-import com.example.notifast.data.model.SubjectData
+import com.notifast.app.data.model.SubjectData
 
 data class AddNoteUiState(
     val subject: String = "",
@@ -398,7 +398,7 @@ val expandedSubject: String? = null,
 
 Add import:
 ```kotlin
-import com.example.notifast.data.model.Evaluation
+import com.notifast.app.data.model.Evaluation
 ```
 
 Add event:
@@ -415,7 +415,7 @@ private val evaluationRepository: EvaluationRepository
 
 Add import:
 ```kotlin
-import com.example.notifast.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.EvaluationRepository
 ```
 
 Update the combine to include evaluations:
@@ -541,7 +541,7 @@ git commit -m "refactor: compress NoteEstheticCard height from 208dp to 148dp"
 - [ ] **Step 1: Create the SubjectCard composable**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes.components
+package com.notifast.app.presentation.feature.notes.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -590,11 +590,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.feature.notes.SubjectInfo
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.feature.notes.SubjectInfo
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 import java.util.Date
 
 private fun subjectColor(name: String): Color {

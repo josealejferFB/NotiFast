@@ -20,9 +20,9 @@
 Edit `NotesContract.kt` — add `rawNotes` field and `UpdateNote` event:
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes
+package com.notifast.app.presentation.feature.notes
 
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Note
 
 enum class NoteFilter { RECIENTES, ANTIGUAS, POR_MATERIA }
 
@@ -71,13 +71,13 @@ Edit `NotesViewModel.kt`:
 Full file (replace existing):
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes
+package com.notifast.app.presentation.feature.notes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.data.model.Note
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.data.model.Note
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -194,7 +194,7 @@ Run: `./gradlew assembleDebug`
 - [ ] **Step 1: Create `NoteEstheticCard.kt`**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes.components
+package com.notifast.app.presentation.feature.notes.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -232,9 +232,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 @Composable
 fun NoteEstheticCard(note: Note, isEven: Boolean, onClick: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
@@ -285,7 +285,7 @@ Run: `./gradlew assembleDebug`
 - [ ] **Step 1: Create `SubjectFeaturedCard.kt`**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes.components
+package com.notifast.app.presentation.feature.notes.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -323,8 +323,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.theme.color.Ruby
 
 @Composable
 fun SubjectFeaturedCard(subjectName: String, notes: List<Note>, onNoteClick: (Note) -> Unit, onSubjectClick: () -> Unit) {
@@ -380,7 +380,7 @@ Full replacement with:
 - Improved empty state with "Crear mi primera Materia" button
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes
+package com.notifast.app.presentation.feature.notes
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -458,13 +458,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastStudyBackground
-import com.example.notifast.presentation.feature.notes.components.NoteEstheticCard
-import com.example.notifast.presentation.feature.notes.components.SubjectFeaturedCard
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.feature.notes.components.NoteEstheticCard
+import com.notifast.app.presentation.feature.notes.components.SubjectFeaturedCard
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -805,7 +805,7 @@ Screen with direct `Box(Modifier.fillMaxSize().safeDrawingPadding())` (no Scaffo
 - [ ] **Step 1: For Scaffold-based screens (1-9)**
 
 Pattern for each file:
-Add import: `import com.example.notifast.presentation.atoms.NotiFastStudyBackground`
+Add import: `import com.notifast.app.presentation.atoms.NotiFastStudyBackground`
 Then wrap: `Scaffold(...)` → `Box(modifier = Modifier.fillMaxSize()) { NotiFastStudyBackground(); Scaffold(...) }`
 
 Example for SettingsScreen (line 53):
@@ -831,7 +831,7 @@ Apply the exact same pattern to all 9 screens.
 
 - [ ] **Step 2: For CalendarScreen (10)**
 
-Add import: `import com.example.notifast.presentation.atoms.NotiFastStudyBackground`
+Add import: `import com.notifast.app.presentation.atoms.NotiFastStudyBackground`
 
 ```kotlin
 // Before:

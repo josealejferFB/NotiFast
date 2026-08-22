@@ -10,31 +10,45 @@
 
 ```
 Fase 0: Estabilización       [████████████████] 100% (16/16 tareas) ✅
+Fase 0.1: Hardening UX       [████████████████] 100% (4/4 bloques) ✅
 Fase 1: Fundamentos          [░░░░░░░░░░░░░░░░]   0% (0/10 tareas)
 Fase 2: Features Core        [░░░░░░░░░░░░░░░░]   0% (0/17 tareas)
 Fase 3: Features Avanzadas   [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
 Fase 4: Pulido & Experiencia [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis   [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:     [███░░░░░░░░░░░░░]  18.0% (16/89 tareas)
+PROGRESO TOTAL ESTIMADO:     [███░░░░░░░░░░░░░]  20.0% (20/89 tareas)
 ```
 
 ---
 
-## 🔍 Resumen de Logros y Estabilización (Fase 0 Completada)
+## 🔍 Resumen de Logros y Estabilización (Fase 0 & Fase 0.1 Completadas)
 
-Durante la Fase 0 se completaron con rigor las 16 tareas críticas de estabilidad, calidad y observabilidad:
+Durante la Fase 0 y Fase 0.1 se blindó la arquitectura y la experiencia de usuario con máxima rigurosidad:
 - **Seguridad y Build:** `WEB_CLIENT_ID` desacoplado a `BuildConfig`, R8 y ProGuard rules optimizadas para Firebase, Crashlytics, Analytics, Hilt y Coroutines.
 - **Navegación e Higiene UI:** Flujo atómico de navegación post-login en `NavGraph`, eliminación de strings quemados y uso de `stringResource`.
-- **Componentes y Diseño Atómico:** `NotesScreen` modularizada (≤ 200 LOC) con extracción de sub-composables a `components/` y diálogos de confirmación mediante `NotiFastDialog`.
-- **Capa de Datos y Errores:** Manejo de excepciones estandarizado con logging en `NoteRepositoryImpl`, `EvaluationRepositoryImpl`, `ScheduleRepositoryImpl` retornando `Result<T>` y eliminando catches silenciosos.
-- **Extensiones de Color y Dominio:** Parseo de color seguro `String?.toSafeComposeColor()` centralizado en `Color.kt` y `ThemeUtils.kt`, con suite de tests unitarios completa.
+- **TopBar Limpia:** Reemplazo de flechas de retroceso huérfanas en pestañas principales (`Calendar`, `Schedules`, `Grades`, `Settings`) usando `TopBarType.Simple`.
+- **Acciones Destructivas & Descarte:** Protección con diálogos `NotiFastDialog` al cerrar sesión (`SettingsScreen`, `EditProfileScreen`), eliminar horarios (`SchedulesScreen`), eliminar evaluaciones (`SubjectDetailScreen`), y descarte de cambios accidentales mediante `BackHandler` en todas las pantallas de edición/creación (`AddNote`, `EditNote`, `AddEvaluation`, `EditEvaluation`, `AddSubject`, `AddSchedule`, `EditSchedule`).
+- **Validaciones & Resiliencia:** Trimming de whitespace, detección case-insensitive de materias duplicadas (`AddSubjectViewModel`), validación estricta de rangos de peso (`0..100%`) y notas (`0..10`), y filtrado resiliente de notas por título, contenido y materia.
+- **Componentes y Diseño Atómico:** `NotesScreen` modularizada (≤ 200 LOC), `NotiFastDialog` adaptado dinámicamente a Modo Oscuro (`surface`).
+- **Capa de Datos y Errores:** Manejo de excepciones estandarizado con logging en `NoteRepositoryImpl`, `EvaluationRepositoryImpl`, `ScheduleRepositoryImpl` retornando `Result<T>`.
+- **Extensiones de Color y Dominio:** Parseo de color seguro `String?.toSafeComposeColor()` centralizado en `Color.kt` y `ThemeUtils.kt`.
 - **Observabilidad:** Integración de Firebase Crashlytics y Firebase Analytics con abstracción `AnalyticsTracker`.
-- **Verificación Continua:** 24 unit tests pasando y `assembleDebug` compilando sin fallos.
+- **Verificación Continua:** 37 unit tests pasando y `assembleDebug` compilando con cero fallos.
 
 ---
 
 ## 📌 Detalle por Fases y Sprints
+
+### 🟢 Fase 0.1: Hardening UX & Sanity Checks (100% — Completada)
+*Meta: Blindar feedback destructivo, navegación fluida, prevención de pérdida de datos y validaciones de entrada.*
+
+- [x] **0.1.A** Protección contra acciones destructivas y cierre de sesión con `NotiFastDialog` *(Completado)*
+- [x] **0.1.B** Intercepción de retroceso con `BackHandler` y confirmación de descarte de cambios *(Completado)*
+- [x] **0.1.C** Sanitización de inputs, trimming, validación de materias duplicadas y límites de notas/pesos *(Completado)*
+- [x] **0.1.D** Suite de tests unitarios (37 tests) y verificación en dispositivo físico *(Completado)*
+
+---
 
 ### 🟢 Fase 0: Estabilización (100% — Completada)
 *Meta: Resolver deuda técnica crítica y bugs residuales para dejar base 100% estable.*

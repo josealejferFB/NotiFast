@@ -217,7 +217,7 @@ git commit -m "feat: add long-press context menu to SubjectDetailTimeline"
 - [ ] **Step 1: Create the evaluation list component**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -258,9 +258,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.presentation.theme.color.Aqua
-import com.example.notifast.presentation.theme.color.Ruby
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.color.Ruby
 
 private fun parseSubjectColor(hex: String): Color {
     return try {
@@ -394,7 +394,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.input.KeyboardType
-import com.example.notifast.presentation.feature.subjectdetail.components.SubjectDetailEvaluationList
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailEvaluationList
 ```
 
 - [ ] **Step 3: Add state and dialog logic inside SubjectDetailScreen composable**

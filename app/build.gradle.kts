@@ -11,11 +11,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.notifast"
+    namespace = "com.notifast.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.notifast"
+        applicationId = "com.notifast.app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -29,8 +29,8 @@ android {
         if (localPropertiesFile.exists()) {
             FileInputStream(localPropertiesFile).use { localProperties.load(it) }
         }
-        val webClientId = localProperties.getProperty("WEB_CLIENT_ID") ?: "\"\""
-        buildConfigField("String", "WEB_CLIENT_ID", webClientId)
+        val webClientId = localProperties.getProperty("WEB_CLIENT_ID", "").replace("\"", "")
+        buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
     }
 
     buildTypes {

@@ -193,7 +193,7 @@ Also ensure `kotlin("plugin.serialization")` is not needed — we won't use kotl
 
 Create `NotiFastApplication.kt`:
 ```kotlin
-package com.example.notifast
+package com.notifast.app
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
@@ -234,10 +234,10 @@ git add -A && git commit -m "feat: add Hilt DI and Firebase Storage dependencies
 - [ ] **Step 1: Create AuthRepository interface**
 
 ```kotlin
-package com.example.notifast.domain.repository
+package com.notifast.app.domain.repository
 
 import android.net.Uri
-import com.example.notifast.data.model.User
+import com.notifast.app.data.model.User
 
 interface AuthRepository {
     suspend fun login(email: String, password: String): Result<String> // returns uid
@@ -263,9 +263,9 @@ interface AuthRepository {
 - [ ] **Step 2: Create NoteRepository interface**
 
 ```kotlin
-package com.example.notifast.domain.repository
+package com.notifast.app.domain.repository
 
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Note
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
@@ -288,9 +288,9 @@ interface NoteRepository {
 - [ ] **Step 3: Create EvaluationRepository interface**
 
 ```kotlin
-package com.example.notifast.domain.repository
+package com.notifast.app.domain.repository
 
-import com.example.notifast.data.model.Evaluation
+import com.notifast.app.data.model.Evaluation
 import kotlinx.coroutines.flow.Flow
 
 interface EvaluationRepository {
@@ -304,7 +304,7 @@ interface EvaluationRepository {
 - [ ] **Step 4: Create ImageRepository interface**
 
 ```kotlin
-package com.example.notifast.domain.repository
+package com.notifast.app.domain.repository
 
 import android.net.Uri
 
@@ -337,7 +337,7 @@ git add -A && git commit -m "feat: add repository interfaces (domain layer)"
 - [ ] **Step 1: Create AppModule**
 
 ```kotlin
-package com.example.notifast.di
+package com.notifast.app.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -369,16 +369,16 @@ object AppModule {
 - [ ] **Step 2: Create RepositoryModule**
 
 ```kotlin
-package com.example.notifast.di
+package com.notifast.app.di
 
-import com.example.notifast.data.repository.AuthRepositoryImpl
-import com.example.notifast.data.repository.EvaluationRepositoryImpl
-import com.example.notifast.data.repository.ImageRepositoryImpl
-import com.example.notifast.data.repository.NoteRepositoryImpl
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
-import com.example.notifast.domain.repository.ImageRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.data.repository.AuthRepositoryImpl
+import com.notifast.app.data.repository.EvaluationRepositoryImpl
+import com.notifast.app.data.repository.ImageRepositoryImpl
+import com.notifast.app.data.repository.NoteRepositoryImpl
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.ImageRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -437,13 +437,13 @@ Copy logic from old `data/repository/AuthRepository.kt`, but:
 - Use `@Inject constructor`
 
 ```kotlin
-package com.example.notifast.data.repository
+package com.notifast.app.data.repository
 
 import android.content.Context
 import android.net.Uri
-import com.example.notifast.data.model.User
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.ImageRepository
+import com.notifast.app.data.model.User
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.ImageRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -550,12 +550,12 @@ class AuthRepositoryImpl @Inject constructor(
 Split from old monolithic `NotesRepository.kt`. Extract only note + subject logic. Use `@Inject constructor`.
 
 ```kotlin
-package com.example.notifast.data.repository
+package com.notifast.app.data.repository
 
 import android.net.Uri
-import com.example.notifast.data.model.Note
-import com.example.notifast.domain.repository.ImageRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.data.model.Note
+import com.notifast.app.domain.repository.ImageRepository
+import com.notifast.app.domain.repository.NoteRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
@@ -695,12 +695,12 @@ class NoteRepositoryImpl @Inject constructor(
 Extract from old `NotesRepository.kt`.
 
 ```kotlin
-package com.example.notifast.data.repository
+package com.notifast.app.data.repository
 
 import android.net.Uri
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.domain.repository.EvaluationRepository
-import com.example.notifast.domain.repository.ImageRepository
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.ImageRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
@@ -808,12 +808,12 @@ class EvaluationRepositoryImpl @Inject constructor(
 New implementation — uploads to Firebase Storage instead of local filesystem.
 
 ```kotlin
-package com.example.notifast.data.repository
+package com.notifast.app.data.repository
 
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
-import com.example.notifast.domain.repository.ImageRepository
+import com.notifast.app.domain.repository.ImageRepository
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.UUID
@@ -901,7 +901,7 @@ git add -A && git commit -m "feat: implement repository layer with Firebase Stor
 - [ ] **Step 1: Create NotiFastButton.kt**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -947,7 +947,7 @@ fun NotiFastButton(
 - [ ] **Step 2: Create NotiFastTextField.kt**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -996,7 +996,7 @@ fun NotiFastTextField(
 - [ ] **Step 3: Create NotiFastCard.kt**
 
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -1031,7 +1031,7 @@ fun NotiFastCard(
 
 `NotiFastChip.kt`:
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -1060,7 +1060,7 @@ fun NotiFastChip(
 
 `NotiFastTopBar.kt`:
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -1102,7 +1102,7 @@ fun NotiFastTopBar(
 
 `NotiFastCircularLoading.kt`:
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -1124,7 +1124,7 @@ fun NotiFastCircularLoading(modifier: Modifier = Modifier) {
 
 `NotiFastEmptyState.kt`:
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -1170,7 +1170,7 @@ fun NotiFastEmptyState(
 
 `NotiFastDialog.kt`:
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -1202,7 +1202,7 @@ fun NotiFastDialog(
 
 `NotiFastBackground.kt` — simplified version of StudyBackground (fewer particles for performance):
 ```kotlin
-package com.example.notifast.presentation.atoms
+package com.notifast.app.presentation.atoms
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -1303,7 +1303,7 @@ git add -A && git commit -m "feat: add shared atomic components (atoms)"
 - [ ] **Step 1: Rewrite MainActivity.kt**
 
 ```kotlin
-package com.example.notifast
+package com.notifast.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -1313,8 +1313,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.notifast.presentation.navigation.MainContent
-import com.example.notifast.presentation.theme.theme.NotiFastTheme
+import com.notifast.app.presentation.navigation.MainContent
+import com.notifast.app.presentation.theme.theme.NotiFastTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -1358,7 +1358,7 @@ git add -A && git commit -m "feat: update MainActivity with Hilt @AndroidEntryPo
 - [ ] **Step 1: Update Screen.kt with argument-based routes**
 
 ```kotlin
-package com.example.notifast.presentation.navigation
+package com.notifast.app.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -1407,7 +1407,7 @@ sealed class Screen(
 - [ ] **Step 2: Update NavGraph.kt — remove mutableStateOf data passing, use navArguments**
 
 ```kotlin
-package com.example.notifast.presentation.navigation
+package com.notifast.app.presentation.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -1549,7 +1549,7 @@ git add -A && git commit -m "feat: refactor navigation with typed route argument
 - [ ] **Step 1: Create LoginContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth
+package com.notifast.app.presentation.feature.auth
 
 data class LoginUiState(
     val email: String = "",
@@ -1571,11 +1571,11 @@ sealed interface LoginEvent {
 - [ ] **Step 2: Create LoginViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth
+package com.notifast.app.presentation.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -1638,7 +1638,7 @@ class LoginViewModel @Inject constructor(
 - [ ] **Step 3: Create LoginScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth
+package com.notifast.app.presentation.feature.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -1658,9 +1658,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastBackground
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastBackground
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
 
 @Composable
 fun LoginScreen(
@@ -1728,7 +1728,7 @@ fun LoginScreen(
 - [ ] **Step 4: Create LoginForm molecule**
 
 ```kotlin
-package com.example.notifast.presentation.feature.auth.components
+package com.notifast.app.presentation.feature.auth.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -1738,7 +1738,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.notifast.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTextField
 
 @Composable
 fun LoginForm(
@@ -1799,7 +1799,7 @@ composable(Screen.Login.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.auth.LoginScreen`
+Add import: `import com.notifast.app.presentation.feature.auth.LoginScreen`
 
 - [ ] **Step 6: Verify build**
 
@@ -1827,9 +1827,9 @@ git add -A && git commit -m "feat: migrate auth feature to MVVM contract pattern
 - [ ] **Step 1: Create NotesContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes
+package com.notifast.app.presentation.feature.notes
 
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Note
 
 enum class NoteFilter { RECIENTES, ANTIGUAS, POR_MATERIA }
 
@@ -1856,13 +1856,13 @@ sealed interface NotesEvent {
 - [ ] **Step 2: Create NotesViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes
+package com.notifast.app.presentation.feature.notes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.data.model.Note
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.data.model.Note
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -1969,7 +1969,7 @@ class NotesViewModel @Inject constructor(
 - [ ] **Step 3: Create NotesScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes
+package com.notifast.app.presentation.feature.notes
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -1989,12 +1989,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastEmptyState
-import com.example.notifast.presentation.feature.notes.components.NoteCard
-import com.example.notifast.presentation.feature.notes.components.NoteFilterBar
-import com.example.notifast.presentation.feature.notes.components.NoteSearchBar
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastEmptyState
+import com.notifast.app.presentation.feature.notes.components.NoteCard
+import com.notifast.app.presentation.feature.notes.components.NoteFilterBar
+import com.notifast.app.presentation.feature.notes.components.NoteSearchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2009,7 +2009,7 @@ fun NotesScreen(
 
     Scaffold(
         topBar = {
-            com.example.notifast.presentation.atoms.NotiFastTopBar(title = "NotiFast")
+            com.notifast.app.presentation.atoms.NotiFastTopBar(title = "NotiFast")
         }
     ) { innerPadding ->
         Column(
@@ -2072,7 +2072,7 @@ private fun SubjectHeader(
 - [ ] **Step 4: Create NoteCard molecule**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes.components
+package com.notifast.app.presentation.feature.notes.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -2092,8 +2092,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.notifast.data.model.Note
-import com.example.notifast.presentation.atoms.NotiFastCard
+import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.atoms.NotiFastCard
 
 @Composable
 fun NoteCard(
@@ -2140,7 +2140,7 @@ fun NoteCard(
 - [ ] **Step 5: Create NoteSearchBar molecule**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes.components
+package com.notifast.app.presentation.feature.notes.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -2173,7 +2173,7 @@ fun NoteSearchBar(
 - [ ] **Step 6: Create NoteFilterBar molecule**
 
 ```kotlin
-package com.example.notifast.presentation.feature.notes.components
+package com.notifast.app.presentation.feature.notes.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -2181,8 +2181,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.notifast.presentation.atoms.NotiFastChip
-import com.example.notifast.presentation.feature.notes.NoteFilter
+import com.notifast.app.presentation.atoms.NotiFastChip
+import com.notifast.app.presentation.feature.notes.NoteFilter
 
 @Composable
 fun NoteFilterBar(
@@ -2231,7 +2231,7 @@ composable(Screen.Notes.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.notes.NotesScreen`
+Add import: `import com.notifast.app.presentation.feature.notes.NotesScreen`
 
 - [ ] **Step 8: Verify build**
 
@@ -2257,7 +2257,7 @@ git add -A && git commit -m "feat: migrate notes feature to MVVM contract patter
 - [ ] **Step 1: Create AddNoteContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addnote
+package com.notifast.app.presentation.feature.addnote
 
 import android.net.Uri
 
@@ -2285,12 +2285,12 @@ sealed interface AddNoteEvent {
 - [ ] **Step 2: Create AddNoteViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addnote
+package com.notifast.app.presentation.feature.addnote
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -2353,7 +2353,7 @@ class AddNoteViewModel @Inject constructor(
 - [ ] **Step 3: Create AddNoteScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addnote
+package com.notifast.app.presentation.feature.addnote
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -2372,9 +2372,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastTextField
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2460,7 +2460,7 @@ composable(Screen.AddNote.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.addnote.AddNoteScreen`
+Add import: `import com.notifast.app.presentation.feature.addnote.AddNoteScreen`
 
 - [ ] **Step 5: Verify build**
 
@@ -2485,10 +2485,10 @@ git add -A && git commit -m "feat: migrate add-note feature to MVVM contract pat
 - [ ] **Step 1: Create EditNoteContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editnote
+package com.notifast.app.presentation.feature.editnote
 
 import android.net.Uri
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Note
 
 data class EditNoteUiState(
     val note: Note? = null,
@@ -2514,14 +2514,14 @@ sealed interface EditNoteEvent {
 - [ ] **Step 2: Create EditNoteViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editnote
+package com.notifast.app.presentation.feature.editnote
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.data.model.Note
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.data.model.Note
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -2611,7 +2611,7 @@ class EditNoteViewModel @Inject constructor(
 (similar to AddNoteScreen but pre-populated with note data)
 
 ```kotlin
-package com.example.notifast.presentation.feature.editnote
+package com.notifast.app.presentation.feature.editnote
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -2630,10 +2630,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastTextField
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2726,7 +2726,7 @@ composable(
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.editnote.EditNoteScreen`
+Add import: `import com.notifast.app.presentation.feature.editnote.EditNoteScreen`
 
 - [ ] **Step 5: Verify build**
 
@@ -2751,10 +2751,10 @@ git add -A && git commit -m "feat: migrate edit-note feature to MVVM contract pa
 - [ ] **Step 1: Create SubjectDetailContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Note
 
 data class SubjectDetailUiState(
     val subjectName: String = "",
@@ -2771,14 +2771,14 @@ sealed interface SubjectDetailEvent {
 - [ ] **Step 2: Create SubjectDetailViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -2837,7 +2837,7 @@ class SubjectDetailViewModel @Inject constructor(
 - [ ] **Step 3: Create SubjectDetailScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail
+package com.notifast.app.presentation.feature.subjectdetail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -2857,9 +2857,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastEmptyState
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastEmptyState
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -2933,7 +2933,7 @@ composable(
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.subjectdetail.SubjectDetailScreen`
+Add import: `import com.notifast.app.presentation.feature.subjectdetail.SubjectDetailScreen`
 
 - [ ] **Step 5: Verify build && commit**
 
@@ -2950,10 +2950,10 @@ Add import: `import com.example.notifast.presentation.feature.subjectdetail.Subj
 - [ ] **Step 1: Create CalendarContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.calendar
+package com.notifast.app.presentation.feature.calendar
 
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.data.model.Note
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Note
 import java.util.Date
 
 data class CalendarUiState(
@@ -2973,13 +2973,13 @@ sealed interface CalendarEvent {
 - [ ] **Step 2: Create CalendarViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.calendar
+package com.notifast.app.presentation.feature.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
-import com.example.notifast.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3051,7 +3051,7 @@ class CalendarViewModel @Inject constructor(
 - [ ] **Step 3: Create CalendarScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.calendar
+package com.notifast.app.presentation.feature.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -3071,10 +3071,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastCard
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastTopBar
-import com.example.notifast.presentation.feature.calendar.components.CalendarGrid
+import com.notifast.app.presentation.atoms.NotiFastCard
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.feature.calendar.components.CalendarGrid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3145,7 +3145,7 @@ fun CalendarScreen(
 - [ ] **Step 4: Create CalendarGrid molecule**
 
 ```kotlin
-package com.example.notifast.presentation.feature.calendar.components
+package com.notifast.app.presentation.feature.calendar.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -3271,7 +3271,7 @@ composable(Screen.Calendar.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.calendar.CalendarScreen`
+Add import: `import com.notifast.app.presentation.feature.calendar.CalendarScreen`
 
 - [ ] **Step 6: Verify build**
 
@@ -3300,7 +3300,7 @@ git add -A && git commit -m "feat: migrate calendar feature to MVVM contract pat
 - [ ] **Step 1: Create Schedule data class in data/model/Schedule.kt**
 
 ```kotlin
-package com.example.notifast.data.model
+package com.notifast.app.data.model
 
 data class Schedule(
     val id: String = "",
@@ -3316,9 +3316,9 @@ data class Schedule(
 - [ ] **Step 2: Create domain/repository/ScheduleRepository.kt**
 
 ```kotlin
-package com.example.notifast.domain.repository
+package com.notifast.app.domain.repository
 
-import com.example.notifast.data.model.Schedule
+import com.notifast.app.data.model.Schedule
 import kotlinx.coroutines.flow.Flow
 
 interface ScheduleRepository {
@@ -3331,10 +3331,10 @@ interface ScheduleRepository {
 - [ ] **Step 3: Create data/repository/ScheduleRepositoryImpl.kt**
 
 ```kotlin
-package com.example.notifast.data.repository
+package com.notifast.app.data.repository
 
-import com.example.notifast.data.model.Schedule
-import com.example.notifast.domain.repository.ScheduleRepository
+import com.notifast.app.data.model.Schedule
+import com.notifast.app.domain.repository.ScheduleRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
@@ -3393,9 +3393,9 @@ abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepos
 - [ ] **Step 5: Create SchedulesContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.schedules
+package com.notifast.app.presentation.feature.schedules
 
-import com.example.notifast.data.model.Schedule
+import com.notifast.app.data.model.Schedule
 
 data class SchedulesUiState(
     val schedules: List<Schedule> = emptyList(),
@@ -3412,12 +3412,12 @@ sealed interface SchedulesEvent {
 - [ ] **Step 6: Create SchedulesViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.schedules
+package com.notifast.app.presentation.feature.schedules
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.ScheduleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3463,7 +3463,7 @@ class SchedulesViewModel @Inject constructor(
 - [ ] **Step 7: Create SchedulesScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.schedules
+package com.notifast.app.presentation.feature.schedules
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -3485,9 +3485,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastCard
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastCard
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3565,7 +3565,7 @@ composable(Screen.Schedules.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.schedules.SchedulesScreen`
+Add import: `import com.notifast.app.presentation.feature.schedules.SchedulesScreen`
 
 - [ ] **Step 9: Verify build && commit**
 
@@ -3582,9 +3582,9 @@ Add import: `import com.example.notifast.presentation.feature.schedules.Schedule
 - [ ] **Step 1: Create GradesContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.grades
+package com.notifast.app.presentation.feature.grades
 
-import com.example.notifast.data.model.Evaluation
+import com.notifast.app.data.model.Evaluation
 
 data class GradesUiState(
     val evaluationsBySubject: Map<String, List<Evaluation>> = emptyMap(),
@@ -3600,12 +3600,12 @@ sealed interface GradesEvent {
 - [ ] **Step 2: Create GradesViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.grades
+package com.notifast.app.presentation.feature.grades
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3656,7 +3656,7 @@ class GradesViewModel @Inject constructor(
 - [ ] **Step 3: Create GradeCard molecule**
 
 ```kotlin
-package com.example.notifast.presentation.feature.grades.components
+package com.notifast.app.presentation.feature.grades.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -3669,8 +3669,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.presentation.atoms.NotiFastCard
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.presentation.atoms.NotiFastCard
 
 @Composable
 fun GradeCard(
@@ -3712,7 +3712,7 @@ fun GradeCard(
 - [ ] **Step 4: Create GradesScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.grades
+package com.notifast.app.presentation.feature.grades
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -3732,10 +3732,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastCard
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastTopBar
-import com.example.notifast.presentation.feature.grades.components.GradeCard
+import com.notifast.app.presentation.atoms.NotiFastCard
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.feature.grades.components.GradeCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3797,7 +3797,7 @@ composable(Screen.Grades.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.grades.GradesScreen`
+Add import: `import com.notifast.app.presentation.feature.grades.GradesScreen`
 
 - [ ] **Step 6: Commit**
 
@@ -3817,9 +3817,9 @@ git add -A && git commit -m "feat: migrate grades feature to MVVM contract patte
 - [ ] **Step 1: Create SettingsContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.settings
+package com.notifast.app.presentation.feature.settings
 
-import com.example.notifast.data.model.User
+import com.notifast.app.data.model.User
 
 data class SettingsUiState(
     val user: User? = null,
@@ -3835,11 +3835,11 @@ sealed interface SettingsEvent {
 - [ ] **Step 2: Create SettingsViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.settings
+package com.notifast.app.presentation.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -3891,7 +3891,7 @@ class SettingsViewModel @Inject constructor(
 - [ ] **Step 3: Create SettingsScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.settings
+package com.notifast.app.presentation.feature.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -3909,9 +3909,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastCard
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastCard
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -3980,7 +3980,7 @@ composable(Screen.Settings.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.settings.SettingsScreen`
+Add import: `import com.notifast.app.presentation.feature.settings.SettingsScreen`
 
 - [ ] **Step 5: Verify build && commit**
 
@@ -3996,7 +3996,7 @@ Add import: `import com.example.notifast.presentation.feature.settings.SettingsS
 - [ ] **Step 1: Create EditProfileContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editprofile
+package com.notifast.app.presentation.feature.editprofile
 
 import android.net.Uri
 
@@ -4021,11 +4021,11 @@ sealed interface EditProfileEvent {
 - [ ] **Step 2: Create EditProfileViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editprofile
+package com.notifast.app.presentation.feature.editprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -4096,7 +4096,7 @@ class EditProfileViewModel @Inject constructor(
 - [ ] **Step 3: Create EditProfileScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editprofile
+package com.notifast.app.presentation.feature.editprofile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -4115,9 +4115,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastTextField
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -4193,7 +4193,7 @@ composable(Screen.EditProfile.route) {
 }
 ```
 
-Add import: `import com.example.notifast.presentation.feature.editprofile.EditProfileScreen`
+Add import: `import com.notifast.app.presentation.feature.editprofile.EditProfileScreen`
 
 - [ ] **Step 5: Verify build && commit**
 
@@ -4212,10 +4212,10 @@ Add import: `import com.example.notifast.presentation.feature.editprofile.EditPr
 - [ ] **Step 1: Create AddEvaluationContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addevaluation
+package com.notifast.app.presentation.feature.addevaluation
 
 import android.net.Uri
-import com.example.notifast.data.model.Evaluation
+import com.notifast.app.data.model.Evaluation
 import java.util.Date
 
 data class AddEvaluationUiState(
@@ -4247,13 +4247,13 @@ sealed interface AddEvaluationEvent {
 - [ ] **Step 2: Create AddEvaluationViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addevaluation
+package com.notifast.app.presentation.feature.addevaluation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -4324,7 +4324,7 @@ class AddEvaluationViewModel @Inject constructor(
 - [ ] **Step 3: Create AddEvaluationScreen.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.addevaluation
+package com.notifast.app.presentation.feature.addevaluation
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -4343,9 +4343,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastTextField
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -4435,10 +4435,10 @@ fun AddEvaluationScreen(
 - [ ] **Step 4: Create EditEvaluationContract.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editevaluation
+package com.notifast.app.presentation.feature.editevaluation
 
 import android.net.Uri
-import com.example.notifast.data.model.Evaluation
+import com.notifast.app.data.model.Evaluation
 
 data class EditEvaluationUiState(
     val evaluation: Evaluation? = null,
@@ -4470,14 +4470,14 @@ sealed interface EditEvaluationEvent {
 - [ ] **Step 5: Create EditEvaluationViewModel.kt**
 
 ```kotlin
-package com.example.notifast.presentation.feature.editevaluation
+package com.notifast.app.presentation.feature.editevaluation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.notifast.data.model.Evaluation
-import com.example.notifast.domain.repository.AuthRepository
-import com.example.notifast.domain.repository.EvaluationRepository
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -4567,7 +4567,7 @@ class EditEvaluationViewModel @Inject constructor(
 - [ ] **Step 6: Create EditEvaluationScreen.kt** (similar to AddEvaluationScreen but pre-populated)
 
 ```kotlin
-package com.example.notifast.presentation.feature.editevaluation
+package com.notifast.app.presentation.feature.editevaluation
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -4586,10 +4586,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.notifast.presentation.atoms.NotiFastButton
-import com.example.notifast.presentation.atoms.NotiFastCircularLoading
-import com.example.notifast.presentation.atoms.NotiFastTextField
-import com.example.notifast.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastCircularLoading
+import com.notifast.app.presentation.atoms.NotiFastTextField
+import com.notifast.app.presentation.atoms.NotiFastTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -4709,8 +4709,8 @@ composable(
 
 Add imports:
 ```kotlin
-import com.example.notifast.presentation.feature.addevaluation.AddEvaluationScreen
-import com.example.notifast.presentation.feature.editevaluation.EditEvaluationScreen
+import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
+import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
 ```
 
 - [ ] **Step 8: Verify build**

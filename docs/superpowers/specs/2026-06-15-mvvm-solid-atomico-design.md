@@ -38,7 +38,7 @@ Migrar la aplicación NotiFast de su arquitectura actual (capa única sin DI, si
 ## 4. Estructura de paquetes
 
 ```
-com.example.notifast/
+com.notifast.app/
 ├── NotiFastApplication.kt              (@HiltAndroidApp)
 ├── MainActivity.kt                      (@AndroidEntryPoint -> setContent)
 │

@@ -32,7 +32,7 @@
 
 - [ ] **Step 1: Write test for ThemeUtils**
 ```kotlin
-package com.example.notifast.presentation.theme
+package com.notifast.app.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 import org.junit.Assert.assertEquals
@@ -57,12 +57,12 @@ class ThemeUtilsTest {
 ```
 
 - [ ] **Step 2: Run test (will fail)**
-Run: `./gradlew testDebugUnitTest --tests "com.example.notifast.presentation.theme.ThemeUtilsTest"`
+Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.theme.ThemeUtilsTest"`
 Expected: FAIL (Unresolved reference: ThemeUtils)
 
 - [ ] **Step 3: Implement ThemeUtils**
 ```kotlin
-package com.example.notifast.presentation.theme
+package com.notifast.app.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.ColorUtils
@@ -106,7 +106,7 @@ val OnSurfaceDark = Color(0xFFE6E1E5)
 ```
 
 - [ ] **Step 5: Run test to verify**
-Run: `./gradlew testDebugUnitTest --tests "com.example.notifast.presentation.theme.ThemeUtilsTest"`
+Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.theme.ThemeUtilsTest"`
 Expected: PASS
 
 - [ ] **Step 6: Commit**
@@ -138,7 +138,7 @@ Do the same principle if applicable in `NotiFastBackground.kt`.
 - [ ] **Step 2: Redesign SubjectDetailHero**
 Replace the harsh linear gradient with a solid background and radial glow, plus a glassmorphism icon container.
 ```kotlin
-package com.example.notifast.presentation.feature.subjectdetail.components
+package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -156,8 +156,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.notifast.presentation.feature.notes.components.SubjectIconMapper
-import com.example.notifast.presentation.theme.ThemeUtils
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
+import com.notifast.app.presentation.theme.ThemeUtils
 
 @Composable
 fun SubjectDetailHero(
