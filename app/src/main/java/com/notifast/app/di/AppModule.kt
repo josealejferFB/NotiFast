@@ -35,4 +35,9 @@ object AppModule {
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         context.userPrefsDataStore
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): androidx.work.WorkManager =
+        androidx.work.WorkManager.getInstance(context)
 }
