@@ -36,7 +36,8 @@ Antes de iniciar cualquier trabajo o responder sobre el roadmap, consulta siempr
 | **Kickoff Fase 1** | [`docs/prd/KICKOFF_FASE_1.md`](docs/prd/KICKOFF_FASE_1.md) | Guía de arranque y prompt de sesión para Fundamentos de Arquitectura (Completada). |
 | **Kickoff Fase 2** | [`docs/prd/KICKOFF_FASE_2.md`](docs/prd/KICKOFF_FASE_2.md) | Guía de arranque y prompt de sesión para Experiencia Core — Cuaderno y Hub Académico (Completada). |
 | **Kickoff Fase 3** | [`docs/prd/KICKOFF_FASE_3.md`](docs/prd/KICKOFF_FASE_3.md) | Guía de arranque para Sprint 3.1: Notificaciones Proactivas WorkManager (Completado). |
-| **Kickoff Fase 3.1** | [`docs/prd/KICKOFF_FASE_3.1.md`](docs/prd/KICKOFF_FASE_3.1.md) | Guía de arranque y prompt de sesión para Sprints 3.2, 3.3 y 3.4 (Siguiente sesión). |
+| **Kickoff Fase 3.1** | [`docs/prd/KICKOFF_FASE_3.1.md`](docs/prd/KICKOFF_FASE_3.1.md) | Guía de arranque para Sprint 3.2: Analíticas Predictivas en Canvas (Completado). |
+| **Kickoff Fase 3.2** | [`docs/prd/KICKOFF_FASE_3.2.md`](docs/prd/KICKOFF_FASE_3.2.md) | Guía de arranque y prompt de sesión para Sprints 3.3 y 3.4 — Búsqueda Global y Pack Académico P2P (Siguiente sesión). |
 | **Auditoría Histórica** | [`docs/audit/2026-06-18-full-audit.md`](docs/audit/2026-06-18-full-audit.md) | Análisis base de seguridad, arquitectura y bugs iniciales. |
 | **Planes y Specs** | [`docs/superpowers/plans/`](docs/superpowers/plans/) y [`docs/superpowers/specs/`](docs/superpowers/specs/) | Diseños y planes de ejecución atómicos. |
 
