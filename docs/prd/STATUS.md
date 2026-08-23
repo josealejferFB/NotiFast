@@ -15,11 +15,11 @@ Fase 1: Fundamentos               [███████████████
 Fase 2: Experiencia Core          [████████████████] 100% (13/13 tareas) ✅
 Fase 2.1: Ergonomía Forms         [████████████████] 100% (9/9 tareas) ✅
 Sprint Design 3.0: Tactile Studio [████████████████] 100% (3/3 Sprints) ✅
-Fase 3: Features Avanzadas        [█████░░░░░░░░░░░]  33% (6/18 tareas) 🟡 (Sprint 3.1 Listo)
+Fase 3: Features Avanzadas        [██████████░░░░░░]  66% (12/18 tareas) 🟡 (Sprint 3.1 y 3.2 Listos)
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████░░░░]  64.2% (63/98 tareas)
+PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  70.4% (69/98 tareas)
 ```
 
 ---
@@ -141,9 +141,9 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
-### 🟡 Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (En Progreso — 33%)
+### 🟡 Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (En Progreso — 66%)
 *Meta: Notificaciones locales inteligentes vía Android WorkManager, recordatorios proactivos de entregas/clases, analíticas predictivas de rendimiento académico, búsqueda global multientidad y pack académico P2P.*  
-*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_3.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.md)
+*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_3.1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.1.md)
 
 - [x] **Sprint 3.1: Motor de Notificaciones Proactivas con WorkManager (100% Completado)**
   * **Infraestructura:** WorkManager 2.10.0 + HiltWorkerFactory (`Configuration.Provider`), canales de notificación especializados con vibración y deep links directos (`NotificationChannelsManager`, `NotificationSender`).
@@ -153,8 +153,14 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
   * **Integración:** Sincronización en tiempo real en `AddEvaluationViewModel`, `EditEvaluationViewModel`, `AddScheduleViewModel`, `EditScheduleViewModel`, `SchedulesViewModel`, `SubjectDetailViewModel` y `SettingsViewModel`.
   * **Calidad:** 100% tests unitarios pasando y compilación `assembleDebug` exitosa.
 
-- [ ] **Sprint 3.2: Analíticas de Rendimiento Académico y Dashboard Predictivo (Siguiente Sprint)**
-- [ ] **Sprint 3.3: Búsqueda Global Multientidad en Tiempo Real**
+- [x] **Sprint 3.2: Analíticas de Rendimiento Académico y Dashboard Predictivo (100% Completado)**
+  * **Dominio Puro & TDD:** `CalculateAcademicStatsUseCase` multiescala (0-10, 0-20, 0-100) con diagnóstico de asignaturas (`APPROVED`, `ON_TRACK`, `AT_RISK`, `CRITICAL_FAIL`), cálculo de puntos faltantes y nota mínima requerida sobre el peso restante, tasa proyectada de éxito y correlación horaria semanal.
+  * **Gráficos en Canvas Nativo:** `AcademicProgressChart` (barras comparativas animadas con línea de corte aprobatoria y monograms) y `GradeDistributionHistogram` (4 rangos de desempeño en `JetBrains Mono`).
+  * **Fichas Bento Táctiles:** `AcademicEarlyWarningCard` (diagnóstico temprano y recomendaciones), `AcademicWorkloadCard` (correlación horas vs notas) y `AcademicAnalyticsContent`.
+  * **Integración Ergonómica:** Conmutador segmentado táctil en `GradesScreen` (`[ Resumen Materias | Analíticas & Proyecciones ]`) manteniendo SRP (< 140 LOC).
+  * **Calidad:** 100% de tests unitarios pasando (`CalculateAcademicStatsUseCaseTest`, `GradesViewModelTest`) y `assembleDebug` exitoso.
+
+- [ ] **Sprint 3.3: Búsqueda Global Multientidad en Tiempo Real (Siguiente Sprint)**
 - [ ] **Sprint 3.4: Pack Académico P2P, Intercambio Offline y Resiliencia Free-Tier**
 
 ---
