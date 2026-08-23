@@ -2,8 +2,23 @@ package com.notifast.app.presentation.feature.notes
 
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.Schedule
 
 enum class NoteFilter { RECIENTES, ANTIGUAS, POR_MATERIA }
+
+sealed interface NextActivity {
+    data class ClassActivity(
+        val schedule: Schedule,
+        val colorHex: String = ""
+    ) : NextActivity
+
+    data class EvaluationActivity(
+        val evaluation: Evaluation,
+        val colorHex: String = ""
+    ) : NextActivity
+
+    data object FreeDay : NextActivity
+}
 
 data class SubjectInfo(
     val name: String,
@@ -24,6 +39,10 @@ data class NotesUiState(
     val rawNotes: List<Note> = emptyList(),
     val subjects: List<String> = emptyList(),
     val subjectInfos: List<SubjectInfo> = emptyList(),
+    val nextActivity: NextActivity = NextActivity.FreeDay,
+    val globalAverage: Double? = null,
+    val totalNotesCount: Int = 0,
+    val totalSubjectsCount: Int = 0,
     val expandedSubject: String? = null,
     val currentFilter: NoteFilter = NoteFilter.RECIENTES,
     val searchQuery: String = "",

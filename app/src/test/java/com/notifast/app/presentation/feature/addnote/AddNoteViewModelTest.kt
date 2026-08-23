@@ -95,4 +95,35 @@ class AddNoteViewModelTest {
         viewModel.onEvent(AddNoteEvent.ToggleTag("resumen"))
         assertEquals(listOf("examen"), viewModel.uiState.value.tags)
     }
+
+    @Test
+    fun `when ResetState is called, clears inputs but retains loaded subjects`() = runTest {
+        val viewModel = AddNoteViewModel(noteRepository, authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddNoteEvent.SubjectChanged("Matemáticas"))
+        viewModel.onEvent(AddNoteEvent.TitleChanged("Derivadas"))
+        viewModel.onEvent(AddNoteEvent.AddTag("resumen"))
+
+        viewModel.onEvent(AddNoteEvent.ResetState)
+
+        assertEquals("", viewModel.uiState.value.title)
+        assertEquals("", viewModel.uiState.value.subject)
+        assertTrue(viewModel.uiState.value.tags.isEmpty())
+        assertEquals(sampleSubjects, viewModel.uiState.value.subjects)
+    }
+
+    @Test
+    fun `when ClearError is called, resets error state to null`() = runTest {
+        val viewModel = AddNoteViewModel(noteRepository, authRepository)
+        advanceUntilIdle()
+
+        // Trigger validation error
+        viewModel.onEvent(AddNoteEvent.SaveClicked)
+        assertTrue(viewModel.uiState.value.error != null)
+
+        viewModel.onEvent(AddNoteEvent.ClearError)
+        assertEquals(null, viewModel.uiState.value.error)
+    }
 }
+

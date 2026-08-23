@@ -14,22 +14,40 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Architecture
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.AutoGraph
+import androidx.compose.material.icons.filled.AutoStories
+import androidx.compose.material.icons.filled.Biotech
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Draw
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Functions
+import androidx.compose.material.icons.filled.HistoryEdu
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Quiz
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.notifast.app.presentation.theme.color.Aqua
-import com.notifast.app.presentation.theme.color.Ruby
 
+/**
+ * NotiFast 3.0 Tactile Paper / Studio Notebook Dynamic Background.
+ * Renders a warm parchment or slate desk gradient with subtle floating educational watermarks.
+ */
 @Composable
 fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "floating")
+    val infiniteTransition = rememberInfiniteTransition(label = "floating_bg_icons")
     val isDark = isSystemInDarkTheme()
 
     val studyIcons = listOf(
@@ -49,24 +67,25 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
         Icons.Default.EmojiEvents,
         Icons.Default.Quiz,
         Icons.Default.Translate,
-        Icons.Default.Abc,
         Icons.Default.AutoAwesome,
         Icons.Default.AutoGraph
     )
 
-    val bgColor1 = if (isDark) Color(0xFF1B262C) else Color.White
-    val bgColor2 = if (isDark) Color(0xFF223038) else Color(0xFFF8F9FA)
-    val iconAlpha = if (isDark) 0.08f else 0.04f
+    val bgColor1 = MaterialTheme.colorScheme.background
+    val bgColor2 = MaterialTheme.colorScheme.surfaceVariant
+    val iconAlpha = if (isDark) 0.05f else 0.035f
 
-    Box(modifier = modifier.fillMaxSize().background(
-        Brush.verticalGradient(listOf(bgColor1, bgColor2))
-    )) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Brush.verticalGradient(listOf(bgColor1, bgColor2)))
+    ) {
         studyIcons.forEachIndexed { index, icon ->
-            val duration = 4000 + (index * 600)
+            val duration = 4500 + (index * 500)
 
             val yOffset by infiniteTransition.animateFloat(
                 initialValue = 0f,
-                targetValue = 40f,
+                targetValue = 35f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(duration, easing = LinearEasing),
                     repeatMode = RepeatMode.Reverse
@@ -75,17 +94,17 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
             )
 
             val rotation by infiniteTransition.animateFloat(
-                initialValue = -10f,
-                targetValue = 10f,
+                initialValue = -8f,
+                targetValue = 8f,
                 animationSpec = infiniteRepeatable(
-                    animation = tween(duration + 1200, easing = LinearEasing),
+                    animation = tween(duration + 1000, easing = LinearEasing),
                     repeatMode = RepeatMode.Reverse
                 ),
                 label = "rotation_$index"
             )
 
-            val xPos = (index * 17) % 95
-            val yPos = (index * 31) % 100
+            val xPos = (index * 19) % 92
+            val yPos = (index * 29) % 96
 
             Icon(
                 imageVector = icon,
@@ -93,9 +112,9 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .offset(x = (xPos.dp * 4), y = (yPos.dp * 10) + yOffset.dp)
                     .graphicsLayer(rotationZ = rotation)
-                    .size(44.dp)
+                    .size(42.dp)
                     .alpha(iconAlpha),
-                tint = if (index % 2 == 0) Ruby else Aqua
+                tint = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
             )
         }
     }

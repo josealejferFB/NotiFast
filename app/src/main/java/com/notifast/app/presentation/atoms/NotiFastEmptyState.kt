@@ -1,11 +1,15 @@
 package com.notifast.app.presentation.atoms
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material3.Icon
@@ -14,74 +18,75 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import com.notifast.app.presentation.theme.color.Ruby
-import com.notifast.app.presentation.theme.color.Aqua
 
+/**
+ * NotiFast 3.0 Tactile Empty State.
+ * Features 72dp circular icon container in surfaceContainer tone, primary indigo icon,
+ * editorial hierarchy title + guidance copy, and optional direct CTA action button.
+ */
 @Composable
 fun NotiFastEmptyState(
     message: String,
     modifier: Modifier = Modifier,
     title: String? = null,
-    icon: ImageVector = Icons.Outlined.Inbox
+    icon: ImageVector = Icons.Outlined.Inbox,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(horizontal = 32.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Contenedor suave y atractivo para el ícono
+        // Contenedor circular tonal (72dp x 72dp)
         Box(
             modifier = Modifier
-                .size(120.dp)
+                .size(72.dp)
                 .clip(CircleShape)
-                .background(Ruby.copy(alpha = 0.08f)),
+                .background(MaterialTheme.colorScheme.surfaceContainer),
             contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Ruby.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp),
-                    tint = Ruby
-                )
-            }
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(36.dp)
+            )
         }
-        
-        Spacer(Modifier.height(24.dp))
-        
+
         if (title != null) {
+            Spacer(Modifier.height(16.dp))
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(12.dp))
         }
-        
+
+        Spacer(Modifier.height(8.dp))
         Text(
             text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center,
-            lineHeight = 24.sp
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
+
+        if (actionLabel != null && onActionClick != null) {
+            Spacer(Modifier.height(20.dp))
+            NotiFastButton(
+                text = actionLabel,
+                onClick = onActionClick,
+                modifier = Modifier.fillMaxWidth(0.75f)
+            )
+        }
     }
 }

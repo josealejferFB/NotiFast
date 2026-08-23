@@ -5,7 +5,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,15 +23,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Schedule
-import com.notifast.app.presentation.theme.color.Ruby
 
+/**
+ * NotiFast 3.0 Accessible Schedule Conflict Warning Banner.
+ */
 @Composable
 fun ScheduleConflictBanner(
     conflicts: List<Schedule>,
@@ -46,7 +49,8 @@ fun ScheduleConflictBanner(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(Ruby.copy(alpha = 0.12f))
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f)), RoundedCornerShape(12.dp))
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -54,13 +58,13 @@ fun ScheduleConflictBanner(
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = null,
-                tint = Ruby,
+                tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(20.dp)
             )
             Text(
                 text = stringResource(R.string.schedules_conflict_warning, conflictNames),
                 style = MaterialTheme.typography.bodySmall,
-                color = Ruby,
+                color = MaterialTheme.colorScheme.onErrorContainer,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 12.sp,
                 lineHeight = 16.sp

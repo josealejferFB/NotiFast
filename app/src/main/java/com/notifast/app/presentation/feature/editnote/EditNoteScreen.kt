@@ -48,9 +48,8 @@ import com.notifast.app.presentation.atoms.NotiFastMarkdown
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
-import com.notifast.app.presentation.feature.addnote.components.NoteFormattingToolbar
-import com.notifast.app.presentation.feature.addnote.components.NoteQuickTagRow
-import com.notifast.app.presentation.feature.addnote.components.NoteTagSelector
+import com.notifast.app.presentation.feature.addnote.components.NoteMarkdownToolbar
+import com.notifast.app.presentation.feature.addnote.components.NoteTagsFlowRow
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
 
@@ -168,7 +167,7 @@ fun EditNoteScreen(
                             label = "Título del apunte"
                         )
 
-                        NoteFormattingToolbar(
+                        NoteMarkdownToolbar(
                             onInsertFormatting = { prefix, suffix ->
                                 viewModel.onEvent(EditNoteEvent.ContentChanged(uiState.content + "$prefix$suffix"))
                             }
@@ -182,15 +181,10 @@ fun EditNoteScreen(
                             singleLine = false
                         )
 
-                        // 8 Preset Academic Tags with toggle
-                        NoteQuickTagRow(
+                        NoteTagsFlowRow(
                             selectedTags = uiState.tags,
-                            onTagToggled = { viewModel.onEvent(EditNoteEvent.ToggleTag(it)) }
-                        )
-
-                        NoteTagSelector(
-                            selectedTags = uiState.tags,
-                            onAddTag = { viewModel.onEvent(EditNoteEvent.AddTag(it)) },
+                            onTagToggled = { viewModel.onEvent(EditNoteEvent.ToggleTag(it)) },
+                            onAddCustomTag = { viewModel.onEvent(EditNoteEvent.AddTag(it)) },
                             onRemoveTag = { viewModel.onEvent(EditNoteEvent.RemoveTag(it)) }
                         )
 

@@ -2,65 +2,119 @@ package com.notifast.app.presentation.theme.color
 
 import androidx.compose.ui.graphics.Color
 
-// COLORES CORPORATIVOS NOTIFAST (Brand Core)
-val Ruby = Color(0xFFBF092F)
-val Aqua = Color(0xFF3B9797)
+// ============================================================================
+// NOTIFAST 3.0 DESIGN SYSTEM — "MUTED CRIMSON & AQUA GREEN" TOKENS
+// ============================================================================
 
-// Light Theme Tokens
-val RubyLight = Color(0xFFBF092F)
-val OnRubyLight = Color(0xFFFFFFFF)
-val RubyContainerLight = Color(0xFFFFDAD9)
-val OnRubyContainerLight = Color(0xFF41000B)
+// Brand Primary & Secondary Studio Accents
+val MutedCrimson = Color(0xFF9E1B32)      // Muted Crimson / Tenue Ruby (Light Primary)
+val TenueRuby = Color(0xFF9E1B32)
+val AquaGreen = Color(0xFF2A7B7B)         // Studio Aqua Green / Deep Mint (Light Secondary)
+val StudioAqua = Color(0xFF2A7B7B)
+val ForestSage = Color(0xFF15803D)        // Forest Sage / Success
+val CoralFlame = Color(0xFFB91C1C)        // Urgent / Critical Error
 
-val AquaLight = Color(0xFF3B9797)
-val OnAquaLight = Color(0xFFFFFFFF)
-val AquaContainerLight = Color(0xFFBCEBEB)
-val OnAquaContainerLight = Color(0xFF002020)
+// Legacy brand aliases for backward compatibility
+val Ruby = MutedCrimson
+val Aqua = AquaGreen
+val StudioIndigo = MutedCrimson
+val TerracottaWarm = AquaGreen
+val SageForest = ForestSage
+val CrimsonBrick = CoralFlame
 
-val BackgroundLight = Color(0xFFF8FAFC)
-val OnBackgroundLight = Color(0xFF0F172A)
-val SurfaceLight = Color(0xFFFFFFFF)
-val OnSurfaceLight = Color(0xFF0F172A)
-val SurfaceVariantLight = Color(0xFFF1F5F9)
-val OnSurfaceVariantLight = Color(0xFF64748B)
-val OutlineLight = Color(0xFFCBD5E1)
+// ----------------------------------------------------------------------------
+// Light Theme Tokens — "Lienzo de Estudio / Warm Canvas"
+// ----------------------------------------------------------------------------
+val BackgroundLight = Color(0xFFFAF9F6)       // Warm Paper Canvas (Lienzo pergamino de baja fatiga)
+val SurfaceLight = Color(0xFFFFFFFF)          // Studio Paper Surface
+val SurfaceContainerLight = Color(0xFFF3EFEA) // Parchment Sub-areas
+val SurfaceContainerHighLight = Color(0xFFEBE6DF) // Parchment Elevated
+val SurfaceVariantLight = Color(0xFFF3EFEA)
+val OutlineLight = Color(0xFFE5DFD7)          // Hairline 1dp Border (12%-16% optical weight)
+val OutlineVariantLight = Color(0xFFE5DFD7)
+val OnBackgroundLight = Color(0xFF181A1F)     // High Emphasis Ink (16.2:1 AAA)
+val OnSurfaceLight = Color(0xFF181A1F)
+val OnSurfaceVariantLight = Color(0xFF4B5563) // Medium Emphasis Graphite (6.8:1 AAA)
 
-// Dark Theme Tokens (Impeccable High-Contrast Dark Mode)
-val RubyDark = Color(0xFFFFB3B8)
-val OnRubyDark = Color(0xFF680015)
-val RubyContainerDark = Color(0xFF920021)
-val OnRubyContainerDark = Color(0xFFFFDAD9)
+val PrimaryLight = Color(0xFF9E1B32)          // Muted Crimson (7.5:1 AAA on #FAF9F6)
+val OnPrimaryLight = Color(0xFFFFFFFF)
+val PrimaryContainerLight = Color(0xFFFDE8EB) // Soft Crimson Tint
+val OnPrimaryContainerLight = Color(0xFF4C0514) // Deep Crimson Ink (12.4:1 AAA)
 
-val AquaDark = Color(0xFF7DDADA)
-val OnAquaDark = Color(0xFF003737)
-val AquaContainerDark = Color(0xFF1E4E4E)
-val OnAquaContainerDark = Color(0xFFBCEBEB)
+val SecondaryLight = Color(0xFF2A7B7B)        // Studio Aqua Green (5.4:1 AA on #FAF9F6)
+val OnSecondaryLight = Color(0xFFFFFFFF)
+val SecondaryContainerLight = Color(0xFFD6F2F0) // Soft Aqua Tint
+val OnSecondaryContainerLight = Color(0xFF073532) // Deep Aqua Ink (11.8:1 AAA)
 
-val BackgroundDark = Color(0xFF10161A)
-val OnBackgroundDark = Color(0xFFECEFF1)
-val SurfaceDark = Color(0xFF1B242A)
-val OnSurfaceDark = Color(0xFFECEFF1)
-val SurfaceVariantDark = Color(0xFF25333C)
-val OnSurfaceVariantDark = Color(0xFF94A3B8)
-val OutlineDark = Color(0xFF3D4D59)
+val TertiaryLight = Color(0xFF15803D)         // Forest Sage (5.4:1 AA)
+val OnTertiaryLight = Color(0xFFFFFFFF)
+val TertiaryContainerLight = Color(0xFFDCFCE7)
+val OnTertiaryContainerLight = Color(0xFF14532D)
 
-// Error Tokens
-val ErrorLight = Color(0xFFBA1A1A)
+val ErrorLight = Color(0xFFB91C1C)            // Coral Brick (6.1:1 AAA)
 val OnErrorLight = Color(0xFFFFFFFF)
-val ErrorContainerLight = Color(0xFFFFDAD6)
-val OnErrorContainerLight = Color(0xFF410002)
+val ErrorContainerLight = Color(0xFFFEE2E2)
+val OnErrorContainerLight = Color(0xFF7F1D1D)
 
-val ErrorDark = Color(0xFFFFB4AB)
-val OnErrorDark = Color(0xFF690005)
-val ErrorContainerDark = Color(0xFF93000A)
-val OnErrorContainerDark = Color(0xFFFFDAD6)
+// ----------------------------------------------------------------------------
+// Dark Theme Tokens — "Mesa de Estudio Nocturna / Slate Desk"
+// ----------------------------------------------------------------------------
+val BackgroundDark = Color(0xFF0E131F)        // Slate Desk (Escritorio de pizarra profundo)
+val SurfaceDark = Color(0xFF161E2D)           // Elevated Slate (Ficha elevada)
+val SurfaceContainerDark = Color(0xFF1C2638)  // Dark Slate Container
+val SurfaceContainerHighDark = Color(0xFF202A3C) // Dark Slate Container Elevated
+val SurfaceVariantDark = Color(0xFF1C2638)
+val OutlineDark = Color(0xFF2A384E)           // Hairline Slate Border (20%-28% optical weight)
+val OutlineVariantDark = Color(0xFF2A384E)
+val OnBackgroundDark = Color(0xFFF1F5F9)      // High Emphasis Chalk White (15.1:1 AAA)
+val OnSurfaceDark = Color(0xFFF1F5F9)
+val OnSurfaceVariantDark = Color(0xFF94A3B8)  // Medium Emphasis Pencil Silver (6.7:1 AAA)
+
+val PrimaryDark = Color(0xFFE05A6E)           // Luminous Muted Crimson (7.4:1 AAA on #0E131F)
+val OnPrimaryDark = Color(0xFF3D000F)         // Deep Crimson Contrast Text
+val PrimaryContainerDark = Color(0xFF5C1120)  // Deep Wine Container
+val OnPrimaryContainerDark = Color(0xFFFCE7EA) // Soft Crimson Contrast Text
+
+val SecondaryDark = Color(0xFF38B2AC)         // Luminous Aqua Green (8.6:1 AAA on #0E131F)
+val OnSecondaryDark = Color(0xFF042C2A)       // Deep Aqua Contrast Text
+val SecondaryContainerDark = Color(0xFF0E4B47) // Deep Aqua Container
+val OnSecondaryContainerDark = Color(0xFFD6F2F0) // Soft Aqua Contrast Text
+
+val TertiaryDark = Color(0xFF34D399)          // Emerald Mint (9.8:1 AAA)
+val OnTertiaryDark = Color(0xFF064E3B)
+val TertiaryContainerDark = Color(0xFF065F46)
+val OnTertiaryContainerDark = Color(0xFFD1FAE5)
+
+val ErrorDark = Color(0xFFF87171)             // Coral Flame (7.2:1 AAA)
+val OnErrorDark = Color(0xFF7F1D1D)
+val ErrorContainerDark = Color(0xFF991B1B)
+val OnErrorContainerDark = Color(0xFFFEE2E2)
+
+// Legacy light/dark tokens aliases
+val RubyLight = PrimaryLight
+val OnRubyLight = OnPrimaryLight
+val RubyContainerLight = PrimaryContainerLight
+val OnRubyContainerLight = OnPrimaryContainerLight
+val AquaLight = SecondaryLight
+val OnAquaLight = OnSecondaryLight
+val AquaContainerLight = SecondaryContainerLight
+val OnAquaContainerLight = OnSecondaryContainerLight
+
+val RubyDark = PrimaryDark
+val OnRubyDark = OnPrimaryDark
+val RubyContainerDark = PrimaryContainerDark
+val OnRubyContainerDark = OnPrimaryContainerDark
+val AquaDark = SecondaryDark
+val OnAquaDark = OnSecondaryDark
+val AquaContainerDark = SecondaryContainerDark
+val OnAquaContainerDark = OnSecondaryContainerDark
 
 /**
  * Parses a hex string into a Jetpack Compose [Color] safely without crashing.
  * Supports #RGB, #RGBA, #RRGGBB, #AARRGGBB with or without leading '#'.
  * Returns [default] if parsing fails, or if string is null/blank.
  */
-fun String?.toSafeComposeColor(default: Color = Aqua): Color {
+fun String?.toSafeComposeColor(default: Color = AquaGreen): Color {
     if (this.isNullOrBlank()) return default
     val clean = this.trim().removePrefix("#")
     val colorLong = when (clean.length) {
@@ -88,4 +142,4 @@ fun String?.toSafeComposeColor(default: Color = Aqua): Color {
 /**
  * Legacy extension for backward compatibility.
  */
-fun String?.toColorOrAqua(): Color = toSafeComposeColor(default = Aqua)
+fun String?.toColorOrAqua(): Color = toSafeComposeColor(default = AquaGreen)

@@ -17,7 +17,77 @@ interface UserPrefsRepository {
     suspend fun setDarkMode(enabled: Boolean?): Result<Unit>
 
     /**
-     * Flow emitting the default grading scale format (e.g., "0-10", "0-20", "0-100", "A-F").
+     * Flow emitting current theme accent: "aqua", "ruby", "indigo", "terracotta", "sage".
+     */
+    val themeAccentFlow: Flow<String>
+
+    /**
+     * Sets theme accent preference.
+     */
+    suspend fun setThemeAccent(accent: String): Result<Unit>
+
+    /**
+     * Flow emitting whether tactile haptic feedback is enabled.
+     */
+    val hapticsEnabledFlow: Flow<Boolean>
+
+    /**
+     * Sets tactile haptic feedback preference.
+     */
+    suspend fun setHapticsEnabled(enabled: Boolean): Result<Unit>
+
+    /**
+     * Flow emitting whether class reminder alerts are enabled.
+     */
+    val classAlertsEnabledFlow: Flow<Boolean>
+
+    /**
+     * Sets whether class reminder alerts are enabled.
+     */
+    suspend fun setClassAlertsEnabled(enabled: Boolean): Result<Unit>
+
+    /**
+     * Flow emitting minutes before class to trigger notification (e.g. 10, 15, 30).
+     */
+    val classAlertMinutesFlow: Flow<Int>
+
+    /**
+     * Sets minutes before class for alert notification.
+     */
+    suspend fun setClassAlertMinutes(minutes: Int): Result<Unit>
+
+    /**
+     * Flow emitting whether evaluation reminder alerts are enabled.
+     */
+    val evalAlertsEnabledFlow: Flow<Boolean>
+
+    /**
+     * Sets whether evaluation reminder alerts are enabled.
+     */
+    suspend fun setEvalAlertsEnabled(enabled: Boolean): Result<Unit>
+
+    /**
+     * Flow emitting days before evaluation to trigger notification (e.g. 1, 2, 3).
+     */
+    val evalAlertDaysFlow: Flow<Int>
+
+    /**
+     * Sets days before evaluation for alert notification.
+     */
+    suspend fun setEvalAlertDays(days: Int): Result<Unit>
+
+    /**
+     * Flow emitting whether daily 07:00 AM morning summary notification is enabled.
+     */
+    val dailySummaryEnabledFlow: Flow<Boolean>
+
+    /**
+     * Sets daily morning summary notification preference.
+     */
+    suspend fun setDailySummaryEnabled(enabled: Boolean): Result<Unit>
+
+    /**
+     * Flow emitting the default grading scale format (e.g., "0-20", "0-10", "0-100").
      */
     val defaultGradeScaleFlow: Flow<String>
 
@@ -25,6 +95,36 @@ interface UserPrefsRepository {
      * Sets the default grading scale format.
      */
     suspend fun setDefaultGradeScale(scale: String): Result<Unit>
+
+    /**
+     * Flow emitting the minimum passing grade threshold (e.g. 11.0f for 0-20, 6.0f for 0-10).
+     */
+    val minPassingGradeFlow: Flow<Float>
+
+    /**
+     * Sets the minimum passing grade threshold.
+     */
+    suspend fun setMinPassingGrade(grade: Float): Result<Unit>
+
+    /**
+     * Flow emitting the active academic cycle/semester (e.g., "2026-I").
+     */
+    val activeAcademicCycleFlow: Flow<String>
+
+    /**
+     * Sets the active academic cycle/semester.
+     */
+    suspend fun setActiveAcademicCycle(cycle: String): Result<Unit>
+
+    /**
+     * Flow emitting the first day of week ("MONDAY" or "SUNDAY").
+     */
+    val firstDayOfWeekFlow: Flow<String>
+
+    /**
+     * Sets the first day of week ("MONDAY" or "SUNDAY").
+     */
+    suspend fun setFirstDayOfWeek(day: String): Result<Unit>
 
     /**
      * Flow emitting whether completed evaluations should be shown in lists by default.
@@ -36,3 +136,4 @@ interface UserPrefsRepository {
      */
     suspend fun setShowCompletedEvaluations(show: Boolean): Result<Unit>
 }
+

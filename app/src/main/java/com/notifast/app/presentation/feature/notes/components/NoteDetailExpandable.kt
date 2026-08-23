@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -42,9 +41,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
+import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastMarkdown
-import com.notifast.app.presentation.theme.color.Aqua
-import com.notifast.app.presentation.theme.color.Ruby
 
 @Composable
 fun NoteDetailExpandable(
@@ -69,10 +67,10 @@ fun NoteDetailExpandable(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = 600.dp),
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier
@@ -90,18 +88,19 @@ fun NoteDetailExpandable(
                 }
             }
 
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = note.subject.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Aqua
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                         onClick = exportMarkdown
                     ) {
                         Row(
@@ -111,7 +110,7 @@ fun NoteDetailExpandable(
                             Icon(
                                 Icons.Default.Share,
                                 contentDescription = stringResource(R.string.notes_export_markdown),
-                                tint = Aqua,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -119,7 +118,7 @@ fun NoteDetailExpandable(
                                 text = "Exportar",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Aqua
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -146,12 +145,12 @@ fun NoteDetailExpandable(
                         note.tags.forEach { tag ->
                             Surface(
                                 shape = RoundedCornerShape(10.dp),
-                                color = Aqua.copy(alpha = 0.12f)
+                                color = MaterialTheme.colorScheme.primaryContainer
                             ) {
                                 Text(
                                     text = "#$tag",
-                                    color = Aqua,
-                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    fontWeight = FontWeight.SemiBold,
                                     fontSize = 11.sp,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 )
@@ -161,12 +160,12 @@ fun NoteDetailExpandable(
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 NotiFastMarkdown(content = note.content)
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -176,35 +175,40 @@ fun NoteDetailExpandable(
                         onClick = onClose,
                         modifier = Modifier
                             .weight(1f)
-                            .height(54.dp),
-                        shape = RoundedCornerShape(18.dp),
+                            .height(48.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     ) {
-                        Text(stringResource(R.string.btn_close), fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                        Text(
+                            stringResource(R.string.btn_close),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp
+                        )
                     }
                     Button(
                         onClick = onEdit,
                         modifier = Modifier
                             .weight(1f)
-                            .height(54.dp),
-                        shape = RoundedCornerShape(18.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Ruby)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.White
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             stringResource(R.string.btn_edit),
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 15.sp,
-                            color = Color.White
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp
                         )
                     }
                 }

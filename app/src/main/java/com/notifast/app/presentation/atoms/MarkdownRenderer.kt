@@ -206,7 +206,13 @@ fun NotiFastMarkdown(
                         modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
                         verticalAlignment = Alignment.Top
                     ) {
-                        Text("•", color = Aqua, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(end = 8.dp))
+                        Text(
+                            "•",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
                         Text(
                             text = MarkdownParser.parseInlineFormatting(block.text),
                             style = MaterialTheme.typography.bodyMedium,
@@ -229,7 +235,7 @@ fun NotiFastMarkdown(
                         Checkbox(
                             checked = block.isChecked,
                             onCheckedChange = { isChecked -> onTaskCheckedChange?.invoke(block.index, isChecked) },
-                            colors = CheckboxDefaults.colors(checkedColor = Aqua),
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary),
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -247,13 +253,13 @@ fun NotiFastMarkdown(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Aqua.copy(alpha = 0.08f))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .width(3.dp)
-                                .background(Aqua, RoundedCornerShape(2.dp))
+                                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                                 .padding(vertical = 4.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -269,15 +275,15 @@ fun NotiFastMarkdown(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             .horizontalScroll(rememberScrollState())
                             .padding(12.dp)
                     ) {
                         Text(
                             text = block.code,
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = com.notifast.app.presentation.theme.type.JetBrainsMonoFamily,
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

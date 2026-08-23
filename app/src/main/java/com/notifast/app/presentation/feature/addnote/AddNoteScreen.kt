@@ -38,19 +38,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
 import com.notifast.app.presentation.atoms.NotiFastButton
-import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastDialog
-import com.notifast.app.presentation.atoms.NotiFastFormField
-import com.notifast.app.presentation.atoms.NotiFastImagePickerField
-import com.notifast.app.presentation.atoms.NotiFastMarkdown
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
-import com.notifast.app.presentation.feature.addnote.components.NoteFormattingToolbar
-import com.notifast.app.presentation.feature.addnote.components.NoteQuickTagRow
-import com.notifast.app.presentation.feature.addnote.components.NoteSubjectChips
-import com.notifast.app.presentation.feature.addnote.components.NoteTagSelector
-import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.feature.addnote.components.NoteEditorFormFields
+import com.notifast.app.presentation.feature.addnote.components.NotePreviewCard
 import com.notifast.app.presentation.theme.color.Ruby
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,11 +81,11 @@ fun AddNoteScreen(
                     TabRow(
                         selectedTabIndex = if (uiState.isLivePreview) 1 else 0,
                         containerColor = Color.Transparent,
-                        contentColor = Ruby,
+                        contentColor = MaterialTheme.colorScheme.primary,
                         indicator = { tabPositions ->
                             TabRowDefaults.SecondaryIndicator(
                                 modifier = Modifier.tabIndicatorOffset(tabPositions[if (uiState.isLivePreview) 1 else 0]),
-                                color = Ruby
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     ) {
@@ -113,91 +106,47 @@ fun AddNoteScreen(
             AnimatedContent(
                 targetState = uiState.isLivePreview,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "EditPreviewTransition",
+                label = "ScreenEditPreview",
                 modifier = Modifier.fillMaxSize().padding(innerPadding)
             ) { isPreview ->
-                if (isPreview) {
-                    Column(
-                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        NotiFastCard(modifier = Modifier.fillMaxWidth()) {
-                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Text(
-                                    text = uiState.subject.ifBlank { "Sin Materia" }.uppercase(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Aqua
-                                )
-                                Text(
-                                    text = uiState.title.ifBlank { "Sin Título" },
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                                NotiFastMarkdown(content = uiState.content.ifBlank { "_Sin contenido escrito aún..._" })
-                            }
-                        }
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        // 1-Tap Subject Chips + Create action
-                        NoteSubjectChips(
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    if (isPreview) {
+                        NotePreviewCard(
+                            subject = uiState.subject,
+                            title = uiState.title,
+                            content = uiState.content
+                        )
+                    } else {
+                        NoteEditorFormFields(
                             subjects = uiState.subjects,
                             selectedSubject = uiState.subject,
+                            title = uiState.title,
+                            content = uiState.content,
+                            tags = uiState.tags,
+                            imageUri = uiState.imageUri,
                             onSubjectSelected = { viewModel.onEvent(AddNoteEvent.SubjectChanged(it)) },
-                            onCreateSubjectClick = onNavigateToAddSubject
-                        )
-
-                        NotiFastFormField(
-                            value = uiState.title,
-                            onValueChange = { viewModel.onEvent(AddNoteEvent.TitleChanged(it)) },
-                            label = "Título del apunte"
-                        )
-
-                        NoteFormattingToolbar(
-                            onInsertFormatting = { prefix, suffix ->
-                                viewModel.onEvent(AddNoteEvent.ContentChanged(uiState.content + "$prefix$suffix"))
-                            }
-                        )
-
-                        NotiFastFormField(
-                            value = uiState.content,
-                            onValueChange = { viewModel.onEvent(AddNoteEvent.ContentChanged(it)) },
-                            label = "Contenido en Markdown...",
-                            height = 200.dp,
-                            singleLine = false
-                        )
-
-                        // 8 Preset Academic Tags
-                        NoteQuickTagRow(
-                            selectedTags = uiState.tags,
-                            onTagToggled = { viewModel.onEvent(AddNoteEvent.ToggleTag(it)) }
-                        )
-
-                        NoteTagSelector(
-                            selectedTags = uiState.tags,
-                            onAddTag = { viewModel.onEvent(AddNoteEvent.AddTag(it)) },
-                            onRemoveTag = { viewModel.onEvent(AddNoteEvent.RemoveTag(it)) }
-                        )
-
-                        NotiFastImagePickerField(
-                            placeholderText = if (uiState.imageUri == null) "Añadir foto de referencia" else "Cambiar foto adjuntada",
-                            onImageSelected = { viewModel.onEvent(AddNoteEvent.ImageSelected(it)) }
+                            onTitleChanged = { viewModel.onEvent(AddNoteEvent.TitleChanged(it)) },
+                            onContentChanged = { viewModel.onEvent(AddNoteEvent.ContentChanged(it)) },
+                            onTagToggled = { viewModel.onEvent(AddNoteEvent.ToggleTag(it)) },
+                            onAddCustomTag = { viewModel.onEvent(AddNoteEvent.AddTag(it)) },
+                            onRemoveTag = { viewModel.onEvent(AddNoteEvent.RemoveTag(it)) },
+                            onImageSelected = { viewModel.onEvent(AddNoteEvent.ImageSelected(it)) },
+                            onCreateSubjectClick = onNavigateToAddSubject,
+                            contentHeight = 200.dp
                         )
 
                         Spacer(Modifier.height(8.dp))
 
                         NotiFastButton(
-                            text = stringResource(R.string.btn_save),
+                            text = stringResource(R.string.add_note_btn_save_note),
                             onClick = { viewModel.onEvent(AddNoteEvent.SaveClicked) },
                             isLoading = uiState.isLoading,
-                            backgroundColor = Aqua,
                             enabled = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading,
                             modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                         )

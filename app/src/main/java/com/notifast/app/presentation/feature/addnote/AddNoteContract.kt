@@ -27,5 +27,7 @@ sealed interface AddNoteEvent {
     data class ImageSelected(val uri: Uri?) : AddNoteEvent
     data object SaveClicked : AddNoteEvent
     data object ClearError : AddNoteEvent
+    data object ResetState : AddNoteEvent
     data class SetSubjects(val subjects: List<SubjectData>) : AddNoteEvent
 }
+

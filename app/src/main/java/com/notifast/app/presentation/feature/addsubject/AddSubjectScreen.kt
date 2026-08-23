@@ -4,10 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,12 +31,10 @@ import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
-import com.notifast.app.presentation.atoms.NotiFastTextField
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
-import com.notifast.app.presentation.feature.addsubject.components.SubjectColorGrid
-import com.notifast.app.presentation.feature.addsubject.components.SubjectIconGrid
-import com.notifast.app.presentation.feature.addsubject.components.SubjectPreviewBadge
+import com.notifast.app.presentation.feature.addsubject.components.SubjectEditorFormFields
+import com.notifast.app.presentation.feature.addsubject.components.SubjectLivePreviewCard
 import com.notifast.app.presentation.theme.color.Ruby
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,23 +47,17 @@ fun AddSubjectScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDiscardDialog by remember { mutableStateOf(false) }
 
-    if (uiState.isSaved) {
-        onSubjectCreated(uiState.subjectName.trim())
-        return
-    }
-
-    val hasUnsavedChanges = uiState.subjectName.isNotBlank()
-    val handleBack = {
-        if (hasUnsavedChanges) {
-            showDiscardDialog = true
-        } else {
-            onBackClick()
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) {
+            val createdName = uiState.createdSubjectName.ifBlank { uiState.subjectName.trim() }
+            onSubjectCreated(createdName)
         }
     }
 
-    BackHandler(enabled = hasUnsavedChanges) {
-        showDiscardDialog = true
-    }
+    val hasUnsavedChanges = uiState.subjectName.isNotBlank()
+    val handleBack = { if (hasUnsavedChanges) showDiscardDialog = true else onBackClick() }
+
+    BackHandler(enabled = hasUnsavedChanges) { showDiscardDialog = true }
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
@@ -87,37 +77,24 @@ fun AddSubjectScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Live Animated Preview Badge
-                SubjectPreviewBadge(
+                SubjectLivePreviewCard(
+                    subjectName = uiState.subjectName,
                     iconName = uiState.selectedIcon,
                     hexColor = uiState.selectedColor
                 )
 
-                // Continuous One-Page Form Card
                 NotiFastCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        NotiFastTextField(
-                            value = uiState.subjectName,
-                            onValueChange = { viewModel.onEvent(AddSubjectEvent.NameChanged(it)) },
-                            label = stringResource(R.string.add_subject_name_label),
-                            placeholder = "Ej: Cálculo Diferencial",
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        SubjectColorGrid(
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SubjectEditorFormFields(
+                            subjectName = uiState.subjectName,
                             selectedColor = uiState.selectedColor,
-                            onColorSelected = { viewModel.onEvent(AddSubjectEvent.ColorSelected(it)) }
-                        )
-
-                        SubjectIconGrid(
                             selectedIcon = uiState.selectedIcon,
-                            selectedColor = uiState.selectedColor,
+                            onNameChanged = { viewModel.onEvent(AddSubjectEvent.NameChanged(it)) },
+                            onSuggestionSelected = { viewModel.onEvent(AddSubjectEvent.SuggestionSelected(it)) },
+                            onColorSelected = { viewModel.onEvent(AddSubjectEvent.ColorSelected(it)) },
                             onIconSelected = { viewModel.onEvent(AddSubjectEvent.IconSelected(it)) }
                         )
                     }
@@ -127,9 +104,7 @@ fun AddSubjectScreen(
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
 
@@ -138,9 +113,7 @@ fun AddSubjectScreen(
                     onClick = { viewModel.onEvent(AddSubjectEvent.SaveClicked) },
                     isLoading = uiState.isLoading,
                     enabled = uiState.subjectName.isNotBlank() && !uiState.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                 )
             }
         }

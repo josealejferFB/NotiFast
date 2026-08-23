@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +30,7 @@ class NotesViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val authRepository: AuthRepository,
     private val evaluationRepository: EvaluationRepository,
+    private val scheduleRepository: ScheduleRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
 ) : ViewModel() {
 
@@ -66,18 +73,28 @@ class NotesViewModel @Inject constructor(
                 noteRepository.getNotes(userId),
                 noteRepository.getSubjects(userId),
                 evaluationRepository.getEvaluations(userId),
+                scheduleRepository.getSchedules(userId),
                 filterParamsFlow
-            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, params: Triple<NoteFilter, String, String?> ->
+            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, schedules: List<Schedule>, params: Triple<NoteFilter, String, String?> ->
                 val (filter, query, tag) = params
                 val availableTags = notes.flatMap { it.tags }.distinct().sorted()
                 val filtered = filterNotes(notes, filter, query, tag)
                 val subjectInfos = computeSubjectInfos(notes, subjects, evaluations)
                 val subjectNames = subjects.map { it.name }
+                val nextActivity = computeNextActivity(schedules, evaluations, subjects)
+                val globalAverage = calculateWeightedAverageUseCase(evaluations)?.let {
+                    kotlin.math.round(it * 10) / 10.0
+                }
+
                 NotesUiState(
                     notes = filtered,
                     rawNotes = notes,
                     subjects = subjectNames,
                     subjectInfos = subjectInfos,
+                    nextActivity = nextActivity,
+                    globalAverage = globalAverage,
+                    totalNotesCount = notes.size,
+                    totalSubjectsCount = subjects.size,
                     currentFilter = filter,
                     searchQuery = query,
                     availableTags = availableTags,
@@ -91,6 +108,10 @@ class NotesViewModel @Inject constructor(
                     rawNotes = newState.rawNotes,
                     subjects = newState.subjects,
                     subjectInfos = newState.subjectInfos,
+                    nextActivity = newState.nextActivity,
+                    globalAverage = newState.globalAverage,
+                    totalNotesCount = newState.totalNotesCount,
+                    totalSubjectsCount = newState.totalSubjectsCount,
                     currentFilter = newState.currentFilter,
                     searchQuery = newState.searchQuery,
                     availableTags = newState.availableTags,
@@ -100,6 +121,41 @@ class NotesViewModel @Inject constructor(
                 ) }
             }
         }
+    }
+
+    private fun computeNextActivity(
+        schedules: List<Schedule>,
+        evaluations: List<Evaluation>,
+        subjects: List<SubjectData>
+    ): NextActivity {
+        val subjectColorMap = subjects.associate { it.name to it.colorHex }
+        val todayDayOfWeek = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)
+        val todaySchedules = schedules
+            .filter { it.dayOfWeek == todayDayOfWeek }
+            .sortedBy { it.startTime }
+
+        if (todaySchedules.isNotEmpty()) {
+            val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+            val upcomingClass = todaySchedules.firstOrNull { it.endTime >= now } ?: todaySchedules.first()
+            return NextActivity.ClassActivity(
+                schedule = upcomingClass,
+                colorHex = subjectColorMap[upcomingClass.subjectName].orEmpty()
+            )
+        }
+
+        val upcomingEval = evaluations
+            .filter { !it.isPresented && it.date != null }
+            .sortedBy { it.date }
+            .firstOrNull()
+
+        if (upcomingEval != null) {
+            return NextActivity.EvaluationActivity(
+                evaluation = upcomingEval,
+                colorHex = subjectColorMap[upcomingEval.subjectName].orEmpty()
+            )
+        }
+
+        return NextActivity.FreeDay
     }
 
     private fun computeSubjectInfos(
@@ -146,7 +202,7 @@ class NotesViewModel @Inject constructor(
         }
         return when (filter) {
             NoteFilter.RECIENTES -> filtered.sortedByDescending { it.timestamp }.groupBy { it.subject }
-            NoteFilter.ANTIGUAS -> filtered.sortedBy { it.timestamp ?: java.util.Date() }.groupBy { it.subject }
+            NoteFilter.ANTIGUAS -> filtered.sortedBy { it.timestamp ?: Date() }.groupBy { it.subject }
             NoteFilter.POR_MATERIA -> filtered.groupBy { it.subject }
         }
     }

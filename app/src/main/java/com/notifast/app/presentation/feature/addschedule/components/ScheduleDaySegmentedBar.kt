@@ -30,7 +30,21 @@ import com.notifast.app.R
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.presentation.theme.color.Aqua
 
-private val DAY_ABBREVIATIONS = listOf("L", "M", "M", "J", "V", "S", "D")
+private data class DayOption(
+    val dayOfWeek: Int,
+    val abbreviation: String,
+    val fullName: String
+)
+
+private val DAYS_ORDER = listOf(
+    DayOption(1, "L", "Lunes"),
+    DayOption(2, "M", "Martes"),
+    DayOption(3, "M", "Miércoles"),
+    DayOption(4, "J", "Jueves"),
+    DayOption(5, "V", "Viernes"),
+    DayOption(6, "S", "Sábado"),
+    DayOption(0, "D", "Domingo")
+)
 
 @Composable
 fun ScheduleDaySegmentedBar(
@@ -55,8 +69,8 @@ fun ScheduleDaySegmentedBar(
                 .padding(4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Schedule.DAY_NAMES.forEachIndexed { index, fullName ->
-                val isSelected = selectedDayIndex == index
+            DAYS_ORDER.forEach { dayOption ->
+                val isSelected = selectedDayIndex == dayOption.dayOfWeek
                 val animBgColor by animateColorAsState(
                     targetValue = if (isSelected) Aqua else Color.Transparent,
                     animationSpec = tween(durationMillis = 200),
@@ -70,11 +84,11 @@ fun ScheduleDaySegmentedBar(
                         .height(40.dp)
                         .clip(CircleShape)
                         .background(animBgColor)
-                        .clickable { onDaySelected(index) },
+                        .clickable { onDaySelected(dayOption.dayOfWeek) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = DAY_ABBREVIATIONS.getOrElse(index) { fullName.take(1) },
+                        text = dayOption.abbreviation,
                         color = textColor,
                         fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
                         fontSize = 14.sp

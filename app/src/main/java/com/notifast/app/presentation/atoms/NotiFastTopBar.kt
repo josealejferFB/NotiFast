@@ -1,40 +1,32 @@
 package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.CloudOff
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.SubcomposeAsyncImage
-import com.notifast.app.presentation.theme.color.Aqua
-import com.notifast.app.presentation.theme.color.Ruby
+import com.notifast.app.R
+import com.notifast.app.presentation.atoms.header.HeaderAvatar
+import com.notifast.app.presentation.atoms.header.HeaderBackButton
+import com.notifast.app.presentation.atoms.header.HeaderContextPill
+import com.notifast.app.presentation.atoms.header.HeaderHomeActions
 import java.util.Locale
 
 sealed class TopBarType {
@@ -44,125 +36,202 @@ sealed class TopBarType {
         val profilePictureUrl: String?,
         val hasUnreadNotifications: Boolean = false,
         val isCloudSynced: Boolean = true,
+        val contextText: String? = null,
         val onProfileClick: () -> Unit,
         val onNotificationsClick: () -> Unit = {}
     ) : TopBarType()
 
     data class Detail(
         val title: String,
-        val onBackClick: () -> Unit
+        val subtitle: String? = null,
+        val onBackClick: () -> Unit,
+        val actions: @Composable () -> Unit = {}
     ) : TopBarType()
 
     data class Simple(
-        val title: String
+        val title: String,
+        val subtitle: String? = null,
+        val actions: @Composable () -> Unit = {}
     ) : TopBarType()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * NotiFast 3.0 AAA Editorial TopBar.
+ * Implements the Tactile Studio Notebook aesthetic: high-contrast typography,
+ * spring-physics avatar, real-time sync ring, contextual date pill, and modular architecture.
+ */
 @Composable
-fun NotiFastTopBar(type: TopBarType) {
-    val homeDisplayName = remember(type) {
+fun NotiFastTopBar(
+    type: TopBarType,
+    modifier: Modifier = Modifier
+) {
+    val defaultStudentName = stringResource(R.string.topbar_default_student)
+    val homeDisplayName = remember(type, defaultStudentName) {
         if (type is TopBarType.Home) {
-            if (type.firstName.isNotBlank()) type.firstName 
-            else type.email.split("@").getOrElse(0) { "Estudiante" }.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+            if (type.firstName.isNotBlank()) {
+                type.firstName.trim()
+            } else {
+                type.email.split("@").getOrElse(0) { defaultStudentName }
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+            }
         } else ""
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .background(Ruby)
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
     ) {
-        CenterAlignedTopAppBar(
-            title = {
-                when (type) {
-                    is TopBarType.Home -> {
-                        Text(
-                            text = "Hola, $homeDisplayName",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                    is TopBarType.Detail -> {
-                        Text(
-                            text = type.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                    is TopBarType.Simple -> {
-                        Text(
-                            text = type.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
-            },
-            navigationIcon = {
-                when (type) {
-                    is TopBarType.Home -> {
-                        Box(
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 12.dp)
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Aqua)
-                                .clickable { type.onProfileClick() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (type.profilePictureUrl != null) {
-                                SubcomposeAsyncImage(model = type.profilePictureUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                            } else {
-                                Text(homeDisplayName.take(1).uppercase(Locale.getDefault()), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            }
-                        }
-                    }
-                    is TopBarType.Detail -> {
-                        IconButton(onClick = type.onBackClick) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = Color.White)
-                        }
-                    }
-                    is TopBarType.Simple -> {
-                        // Sin ícono de navegación para pestañas raíz
-                    }
-                }
-            },
-            actions = {
-                if (type is TopBarType.Home) {
-                    // Indicador de Nube / Sincronización
-                    Icon(
-                        imageVector = if (type.isCloudSynced) androidx.compose.material.icons.Icons.Default.CloudDone else androidx.compose.material.icons.Icons.Default.CloudOff,
-                        contentDescription = "Estado de Sincronización",
-                        tint = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(end = 8.dp).size(22.dp)
+        when (type) {
+            is TopBarType.Home -> {
+                HomeTopBarContent(
+                    displayName = homeDisplayName,
+                    type = type
+                )
+            }
+            is TopBarType.Detail -> {
+                DetailTopBarContent(type = type)
+            }
+            is TopBarType.Simple -> {
+                SimpleTopBarContent(type = type)
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeTopBarContent(
+    displayName: String,
+    type: TopBarType.Home
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Left Group: Tactile Avatar + Editorial Greeting & Date Pill
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f, fill = false)
+            ) {
+                HeaderAvatar(
+                    displayName = displayName,
+                    profilePictureUrl = type.profilePictureUrl,
+                    isCloudSynced = type.isCloudSynced,
+                    onClick = type.onProfileClick
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = stringResource(R.string.topbar_greeting, displayName),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    
-                    // Campana de Notificaciones con Badge
-                    androidx.compose.material3.BadgedBox(
-                        badge = {
-                            if (type.hasUnreadNotifications) {
-                                androidx.compose.material3.Badge(containerColor = Aqua)
-                            }
-                        },
-                        modifier = Modifier.padding(end = 16.dp).clickable { type.onNotificationsClick() }
-                    ) {
-                        Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = Color.White
-                        )
-                    }
+                    HeaderContextPill(text = type.contextText)
                 }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color.Transparent,
-                titleContentColor = Color.White,
-                navigationIconContentColor = Color.White
+            }
+
+            // Right Group: Cloud Sync + Notifications Bell
+            HeaderHomeActions(
+                hasUnreadNotifications = type.hasUnreadNotifications,
+                isCloudSynced = type.isCloudSynced,
+                onNotificationsClick = type.onNotificationsClick
             )
+        }
+
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
+        )
+    }
+}
+
+@Composable
+private fun DetailTopBarContent(type: TopBarType.Detail) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 16.dp, top = 6.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HeaderBackButton(onBackClick = type.onBackClick)
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+            ) {
+                Text(
+                    text = type.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (!type.subtitle.isNullOrBlank()) {
+                    Text(
+                        text = type.subtitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            type.actions()
+        }
+
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
+        )
+    }
+}
+
+@Composable
+private fun SimpleTopBarContent(type: TopBarType.Simple) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = type.title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    letterSpacing = (-0.2).sp
+                )
+                if (!type.subtitle.isNullOrBlank()) {
+                    Text(
+                        text = type.subtitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            type.actions()
+        }
+
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
         )
     }
 }

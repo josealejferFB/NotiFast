@@ -1,5 +1,6 @@
 package com.notifast.app.presentation.feature.notes.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,11 +34,13 @@ fun MiniNoteCard(note: Note, color: Color, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        color = color.copy(alpha = 0.15f)
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shadowElevation = 0.dp
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -62,8 +65,8 @@ fun MiniNoteCard(note: Note, color: Color, onClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .size(24.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
                 ) {
                     SubcomposeAsyncImage(
                         model = note.imageUrl,

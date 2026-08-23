@@ -42,6 +42,7 @@ class GradesViewModelTest {
     @Before
     fun setUp() {
         coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { authRepository.getUserProfile(any()) } returns Result.success(com.notifast.app.util.TestDataFactory.createUser())
         coEvery { noteRepository.getSubjects("user_123") } returns flowOf(sampleSubjects)
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(sampleEvaluations)
         coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")

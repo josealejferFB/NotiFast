@@ -17,7 +17,10 @@ data class GradesUiState(
     val globalAverage: Double = 0.0,
     val gradeScale: GradeScale = GradeScale.SCALE_0_10,
     val subjectGrades: List<SubjectGradeInfo> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val userFirstName: String = "",
+    val userEmail: String = "",
+    val userProfilePictureUrl: String? = null
 )
 
 sealed interface GradesEvent {

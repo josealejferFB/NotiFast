@@ -1,6 +1,8 @@
 package com.notifast.app.presentation.feature.subjectdetail.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,27 +32,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.data.model.Evaluation
-import com.notifast.app.presentation.theme.color.Aqua
+import com.notifast.app.presentation.theme.ThemeUtils
+import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import java.util.Calendar
 import java.util.Date
-
-private fun parseSubjectColor(hex: String): Color {
-    return try {
-        if (hex.isNotBlank()) Color(android.graphics.Color.parseColor(hex))
-        else Aqua
-    } catch (e: Exception) { Aqua }
-}
 
 private fun daysUntil(date: Date): Long {
     val diff = date.time - System.currentTimeMillis()
     return diff / (1000 * 60 * 60 * 24)
 }
 
-private fun urgencyColor(days: Long): Color = when {
-    days < 0 -> Color.Gray
-    days <= 7 -> Color(0xFFE53935)
-    days <= 14 -> Color(0xFFFB8C00)
-    else -> Color(0xFF43A047)
+@Composable
+private fun urgencyColor(days: Long): Color {
+    return when {
+        days < 0 -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        days <= 7 -> MaterialTheme.colorScheme.error
+        days <= 14 -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.tertiary
+    }
 }
 
 private val months = listOf("ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC")
@@ -62,13 +64,15 @@ fun SubjectDetailCalendarRow(
 ) {
     if (evaluations.isEmpty()) return
 
-    val color = parseSubjectColor(subjectColorHex)
+    val isDark = isSystemInDarkTheme()
+    val rawColor = subjectColorHex.toSafeComposeColor(default = MaterialTheme.colorScheme.secondary)
+    val color = remember(rawColor, isDark) { ThemeUtils.getAccessibleColor(rawColor, isDark) }
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(Modifier.height(16.dp))
-        androidx.compose.material3.Surface(
-            shape = androidx.compose.foundation.shape.CircleShape,
+        Surface(
+            shape = CircleShape,
             color = color.copy(alpha = 0.15f)
         ) {
             Text(
@@ -109,9 +113,10 @@ private fun CalendarSquare(
 ) {
     Card(
         modifier = Modifier.size(120.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(

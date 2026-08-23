@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +30,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
+/**
+ * NotiFast 3.0 Tactile Image Picker Block.
+ */
 @Composable
 fun NotiFastImagePickerField(
     existingImageUrl: String? = null,
@@ -57,9 +60,9 @@ fun NotiFastImagePickerField(
         modifier = modifier
             .fillMaxWidth()
             .height(160.dp)
-            .background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(20.dp))
-            .border(1.dp, Color.LightGray.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
-            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(16.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
             .clickable { galleryLauncher.launch("image/*") },
         contentAlignment = Alignment.Center
     ) {
@@ -72,11 +75,25 @@ fun NotiFastImagePickerField(
             )
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Surface(modifier = Modifier.size(50.dp), shape = CircleShape, color = Color(0xFF3B9797).copy(alpha = 0.1f)) {
-                    Icon(Icons.Default.Image, contentDescription = null, tint = Color(0xFF3B9797), modifier = Modifier.padding(12.dp))
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        Icons.Default.Image,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(placeholderText, color = Color.Gray, fontWeight = FontWeight.Medium)
+                Text(
+                    text = placeholderText,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

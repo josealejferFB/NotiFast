@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -40,7 +42,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.notifast.app.presentation.theme.color.Ruby
 
 data class FabAction(
     val label: String,
@@ -50,11 +51,16 @@ data class FabAction(
     val color: Color
 )
 
+/**
+ * NotiFast 3.0 Tactile Expandable FAB.
+ * Features a circular primary trigger, smooth rotating icon, and expandable action pills
+ * with hairline borders and high contrast labels.
+ */
 @Composable
 fun NotiFastExpandableFab(
     actions: List<FabAction>,
     modifier: Modifier = Modifier,
-    mainColor: Color = Ruby
+    mainColor: Color = MaterialTheme.colorScheme.primary
 ) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(if (expanded) 45f else 0f, label = "fab_rotation")
@@ -87,26 +93,28 @@ fun NotiFastExpandableFab(
                             }
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = MaterialTheme.colorScheme.surface,
-                            shadowElevation = 2.dp
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            shadowElevation = 0.dp
                         ) {
                             Text(
                                 text = action.label,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                 style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = action.color
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                         SmallFloatingActionButton(
                             onClick = {
                                 expanded = false
                                 action.onClick()
                             },
                             containerColor = action.color,
-                            contentColor = Color.White
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
                         ) {
                             Icon(action.icon, contentDescription = null)
                         }
@@ -118,8 +126,9 @@ fun NotiFastExpandableFab(
         FloatingActionButton(
             onClick = { expanded = !expanded },
             containerColor = if (expanded) MaterialTheme.colorScheme.surface else mainColor,
-            contentColor = if (expanded) mainColor else Color.White,
-            shape = CircleShape
+            contentColor = if (expanded) mainColor else MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape,
+            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
         ) {
             Icon(
                 imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,

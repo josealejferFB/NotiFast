@@ -29,17 +29,18 @@ import java.util.Date
 
 @Composable
 fun UrgencyCard(eval: Evaluation, days: Long, color: Color) {
+    val chipColor = urgencyColor(days)
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val chipColor = urgencyColor(days)
             Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(chipColor))
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -86,12 +87,13 @@ fun UrgencyCard(eval: Evaluation, days: Long, color: Color) {
     }
 }
 
+@Composable
 private fun urgencyColor(days: Long): Color {
     return when {
-        days < 0 -> Color.Gray
-        days <= 7 -> Color(0xFFE53935)
-        days <= 14 -> Color(0xFFFB8C00)
-        else -> Color(0xFF43A047)
+        days < 0 -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        days <= 7 -> MaterialTheme.colorScheme.error
+        days <= 14 -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.tertiary
     }
 }
 

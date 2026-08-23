@@ -36,7 +36,7 @@ fun NotiFastBackground(modifier: Modifier = Modifier) {
         particles.forEachIndexed { index, particle ->
             val alphaValue = alphas[index].value
             drawCircle(
-                color = Color(particle.color).copy(alpha = alphaValue * 0.15f),
+                color = Color(particle.color).copy(alpha = alphaValue * 0.12f),
                 radius = particle.size,
                 center = Offset(
                     x = particle.baseX * this.size.width,
@@ -60,14 +60,14 @@ private data class Particle(
 private fun rememberParticles(): List<Particle> {
     return remember {
         listOf(
-            Particle(0, 0.1f, 0.1f, 30f, 3000, 0xFF3B9797),
-            Particle(1, 0.9f, 0.2f, 25f, 4000, 0xFFBF092F),
-            Particle(2, 0.2f, 0.8f, 35f, 3500, 0xFF3B9797),
-            Particle(3, 0.8f, 0.85f, 20f, 4500, 0xFFBF092F),
-            Particle(4, 0.5f, 0.5f, 40f, 5000, 0xFF3B9797),
-            Particle(5, 0.15f, 0.5f, 20f, 2800, 0xFFBF092F),
-            Particle(6, 0.7f, 0.4f, 28f, 3800, 0xFF3B9797),
-            Particle(7, 0.35f, 0.7f, 22f, 4200, 0xFFBF092F)
+            Particle(0, 0.1f, 0.1f, 30f, 3000, 0xFF9E1B32), // Muted Crimson
+            Particle(1, 0.9f, 0.2f, 25f, 4000, 0xFF2A7B7B), // Aqua Green
+            Particle(2, 0.2f, 0.8f, 35f, 3500, 0xFF15803D), // Forest Sage
+            Particle(3, 0.8f, 0.85f, 20f, 4500, 0xFF9E1B32),
+            Particle(4, 0.5f, 0.5f, 40f, 5000, 0xFF2A7B7B),
+            Particle(5, 0.15f, 0.5f, 20f, 2800, 0xFF15803D),
+            Particle(6, 0.7f, 0.4f, 28f, 3800, 0xFF9E1B32),
+            Particle(7, 0.35f, 0.7f, 22f, 4200, 0xFF2A7B7B)
         )
     }
 }

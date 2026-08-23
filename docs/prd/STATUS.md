@@ -1,64 +1,129 @@
-# 📊 Estado de Ejecución y Roadmap — NotiFast v2.0
+# 📊 Estado de Ejecución y Roadmap — NotiFast v3.0
 
-> **Documento de Seguimiento de Fases del PRD Maestro**  
-> **Última actualización:** 22 de Agosto, 2026  
-> **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md)
+> **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.0**  
+> **Última actualización:** 23 de Agosto, 2026  
+> **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/NotiFast/PRODUCT.md)
 
 ---
 
 ## 📈 Resumen Global de Progreso
 
 ```
-Fase 0: Estabilización       [████████████████] 100% (16/16 tareas) ✅
-Fase 0.1: Hardening UX       [████████████████] 100% (4/4 bloques) ✅
-Fase 1: Fundamentos          [████████████████] 100% (10/10 tareas) ✅
-Fase 2: Experiencia Core     [████████████████] 100% (13/13 tareas) ✅
-Fase 2.1: Ergonomía Forms    [████████████████] 100% (9/9 tareas) ✅
-Fase 3: Features Avanzadas   [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
-Fase 4: Pulido & Experiencia [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
-Fase 5: Despliegue & Tesis   [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
+Fase 0: Estabilización            [████████████████] 100% (16/16 tareas) ✅
+Fase 0.1: Hardening UX            [████████████████] 100% (4/4 bloques) ✅
+Fase 1: Fundamentos               [████████████████] 100% (10/10 tareas) ✅
+Fase 2: Experiencia Core          [████████████████] 100% (13/13 tareas) ✅
+Fase 2.1: Ergonomía Forms         [████████████████] 100% (9/9 tareas) ✅
+Sprint Design 3.0: Tactile Studio [████████████████] 100% (3/3 Sprints) ✅
+Fase 3: Features Avanzadas        [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
+Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
+Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:     [██████████░░░░░░]  53.0% (52/98 tareas)
+PROGRESO TOTAL ESTIMADO:          [███████████░░░░░]  58.0% (57/98 tareas)
 ```
 
 ---
 
-## 🔍 Resumen de Logros — Fase 2.1: Experiencia sin Fricción y Ergonomía de Formularios (100% Completada)
+## 🎨 Resumen de Logros — NotiFast 3.0: Tactile Papercraft / Studio Notebook (100% Completado)
 
-Durante la Fase 2.1 se erradicaron los formularios engorrosos y los acordeones de pasos en favor de pantallas de entrada de datos continuas, ergonómicas y fluidas:
-- **Formularios Continuos y Reducción Drástica de Pasos:**
-  - `AddSubjectScreen`: Formulario One-Page continuo (< 150 LOC) con `SubjectPreviewBadge` con animación fluida de color e icono, `SubjectColorGrid` de 12 tonos compactos y `SubjectIconGrid` temático.
-  - `AddScheduleScreen` y `EditScheduleScreen`: Formularios One-Page (< 170 LOC) con `ScheduleDaySegmentedBar` (selector L-D a 1 toque), `ScheduleTimeRangePicker` (diálogo nativo M3 TimePicker adaptable a 12h/24h con presets rápidos y autocorrección de horarios) y `ScheduleSubjectChips` con opción rápida de "➕ Crear Materia".
-  - `AddNoteScreen` y `EditNoteScreen`: Formularios unificados (< 190 LOC) con `NoteSubjectChips`, selector horizontal de 8 etiquetas académicas rápidas a 1 toque (`NoteQuickTagRow`: `#resumen`, `#examen`, `#fórmulas`, `#tarea`, `#laboratorio`, `#proyecto`, `#glosario`, `#bibliografía`), toolbar de markdown y previsualización animada.
-  - `AddEvaluationScreen` y `EditEvaluationScreen`: Erradicación total de acordeones `StepCard` en favor de formularios One-Page (< 190 LOC) con `EvaluationDatePickerField` (diálogo nativo de calendario), `EvaluationWeightSlider` con pasos discretos del 5% y badge en vivo de peso disponible en la materia.
-- **Métricas de Calidad:**
-  - **83 unit tests pasando** (0 fallos, 0 errores).
-  - Build `assembleDebug` 100% exitoso.
-  - 100% de strings localizados en `strings.xml`. Cero composables > 200 LOC.
+Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integralmente la experiencia visual y táctil de la aplicación basándose en las especificaciones de `DESIGN.md` y `PRODUCT.md`:
+
+### 1. Sprint 1: Fundamentos del Sistema de Diseño (Tokens, Tipografía y Colorimetría)
+- **Paleta Semántica Calibrada WCAG AAA / AA:**
+  - Lienzo pergamino cálido (`WarmPaperCanvas` `#FBF9F5` / `SlateDesk` `#0F141C`).
+  - Acentos de estudio: `StudioIndigo` (`#4338CA` / `#6366F1`), `TerracottaWarm` (`#B45309` / `#F59E0B`), `SageForest` (`#15803D` / `#22C55E`), `CrimsonBrick` (`#B91C1C` / `#EF4444`).
+  - Mapeo exhaustivo en `LightColorScheme` y `DarkColorScheme` de Material 3 con `surfaceContainer`, `surfaceContainerHigh`, `outlineVariant`, `tertiary` y `secondary`.
+- **Doble Familia Tipográfica Oficial:**
+  - `PlusJakartaSansFamily` para toda la jerarquía editorial de títulos y cuerpos.
+  - `JetBrainsMonoFamily` para cifras académicas, promedios, porcentajes y bloques de código (`Typography.monoAcademic`).
+  - Integración nativa con `androidx.compose.ui.text.googlefonts` y certificados `font_certs.xml`.
+- **Motor HSL de Materias con Contraste Garantizado:**
+  - Calibración en `ThemeUtils.kt` asegurando luminosidad $L \in [0.30, 0.42]$ en Light y $L \in [0.68, 0.80]$ en Dark, con tests unitarios completos en `ThemeUtilsTest.kt`.
+
+### 2. Sprint 2: Componentes Atómicos Táctiles (`presentation/atoms/`)
+- **Física Táctil y Micro-Bordes:**
+  - `NotiFastCard`: Micro-borde 1dp `outlineVariant`, 0dp elevación difusa, animación `spring` `0.97f` al tacto.
+  - `NotiFastButton`: Altura 48dp, esquinas 14dp, HapticFeedback `LongPress`, loader embebido sin saltos.
+  - `NotiFastTextField`: Bloque pergamino 56dp con `surfaceContainer`, borde táctil dinámico 1dp/2dp e indicador de error.
+  - `NotiFastEmptyState`: Contenedor 72dp con icono 36dp y microcopia empática.
+  - `NotiFastCardSkeleton` / `NotiFastListSkeleton`: Shimmer táctil animado de 1200ms con gradiente lineal entre `surfaceContainer` y `surfaceContainerHigh`.
+  - `NotiFastTopBar`: Header AAA editorial modularizado con `HeaderAvatar` (resortes táctiles `0.97f` y anillo dinámico de sincronización), `HeaderContextPill` (cápsula de fecha/semestre con micro-borde), y `HeaderActionButtons` (campana con badge ámbar y sync indicator).
+  - `NotiFastBottomNav`: Cápsula flotante pill `surfaceContainer` sin sombras sucias con borde 1dp.
+  - `NotiFastStudyBackground`: Gradiente de estudio pergamino con micro-iconos flotantes sutiles.
+  - Erradicación total de colores hexadecimales quemados en todos los átomos (`FormField`, `DatePickerField`, `ImagePickerField`, `Chip`, `ExpandableFab`, `Dialog`).
+
+### 3. Sprint 3: Refactorización Visual de Pantallas Core & Hub Académico 3.0
+- **Hub de Apuntes y Materias Bento (`presentation/feature/notes/`):**
+  - `NotesDashboardHero`: Hero Bento Dual con Próxima Actividad dinámica (clase de hoy u horario inminente vs evaluación más cercana) y 3 cápsulas métricas (Apuntes, Materias, Promedio Global en `JetBrains Mono`).
+  - `NotesFilterBar`: Barra de búsqueda táctil con contenedor `surfaceContainer`, foco dinámico y carrusel de etiquetas `#` temáticas (`#todos`, `#resumen`, `#examen`, etc.).
+  - `NoteEstheticCard`: Ficha táctil de estudio tipo ficha bibliográfica con lomo de materia accesible, preview de contenido, badges de tags, indicador de imágenes adjuntas y botón de exportación/copia a Markdown con feedback táctil.
+  - `SubjectGridBento`: Cuadrícula modular Bento de materias (2 columnas) con monogramas dinámicos, barras de progreso y promedios en `JetBrains Mono`.
+
+- **Cronograma Académico & Asistente de Clases en Tiempo Real (`presentation/feature/schedules/`):**
+  - `ScheduleLiveStatusCard` & `LiveStatusBeaconContent`: Widget "Live Class Beacon" en tiempo real con indicador pulsante de clase en curso, cuenta regresiva en `JetBrains Mono` para la próxima clase, barra de progreso lineal de clase y acciones rápidas ("Tomar Apunte" y "Unirse a Clase" virtual).
+  - `ScheduleDaySelector` & `ViewModeSegmentedToggle`: Selector de días táctil con píldoras de conteo y badge de "Hoy", junto con conmutador segmentado para alternar entre *Línea de Tiempo Diaria* y *Resumen Bento Semanal*.
+  - `ScheduleGapCard`: Detección inteligente y fichas de "Ventana Libre de Estudio" ($\ge 45\text{ min}$) entre clases consecutivas.
+  - `ScheduleTimelineView` & `ScheduleConflictBanner`: Riel vertical con horas monoespaciadas, tarjetas de clase y detección accesible de colisiones/solapamientos horarios.
+  - `ScheduleCard`: Ficha de clase con lomo accesible, modalidad, salón, profesor y menú de acciones directas (apunte, enlace virtual, editar, borrar).
+  - `ScheduleWeekBentoSummary` & `ScheduleDistributionBarChart`: Dashboard Bento semanal con métricas de carga horaria, gráfico de barras de distribución por días y desglose por materias.
+  - `ScheduleCalculations`: Módulo puro en `domain/util/` para cálculo reactivo de gaps, estados en vivo, colisiones y resúmenes semanales.
+  - Arquitectura modular SRP estricta ($\le 198$ LOC por archivo) con 100% de tests unitarios pasando.
+  - `NotesScreen`: Orquestador desacoplado y ligero ($\le 175$ LOC) con tabs de estudio y modal expandible `NoteDetailExpandable`.
+- **Horarios Bento (`presentation/feature/schedules/`):**
+  - `ScheduleCard`: Tarjetas modulares Bento con rangos horarios en `JetBrains Mono` y chips de modalidad.
+  - `ScheduleDayTabs`: Píldoras táctiles redondeadas de selección rápida de día.
+  - `ScheduleConflictBanner`: Banner accesible con contenedor de error y micro-borde.
+- **Calificaciones y Promedios (`presentation/feature/grades/`):**
+  - Modularización limpia de `GradesScreen.kt` (de 406 LOC a < 100 LOC) extrayendo:
+    * `MainAverageDashboard.kt`: Dashboard hero con promedio global gigante en `JetBrains Mono` y barra de progreso.
+    * `SubjectGradeCard.kt`: Tarjeta por materia con notas ponderadas y diálogo táctil `GradeRevampDialog.kt`.
+    * `EmptyGradesState.kt`: Estado vacío interactivo.
+- **Agenda Académica Unificada & Tri-Vista (`presentation/feature/schedules/`):**
+  - **Fusión Integral de Evaluaciones y Horarios:** Eliminación de la redundancia del calendario independiente, concentrando en la pestaña central "Agenda" todo el seguimiento temporal del estudiante.
+  - **Barra de Navegación Optimizada a 4 Pestañas:** `Apuntes`, `Agenda`, `Calificaciones` y `Ajustes`.
+  - `AgendaViewModeToggle`: Conmutador segmentado ergonómico de 3 modos:
+    * **Timeline Diario:** Clases del día, ventanas de estudio y sección de evaluaciones (`AgendaDayEvaluationsSection` + `AgendaEvaluationCard`).
+    * **Calendario Mensual (`AgendaMonthCalendarView`):** Cuadrícula mensual de 30/31 días con indicadores cromáticos de materia y lista interactiva de evaluaciones por fecha.
+    * **Semana Bento (`ScheduleWeekBentoSummary`):** Analítica visual de carga semanal y gráfico de distribución por días.
+  - `AgendaCreateActionBottomSheet`: Modal táctil desplegable desde el FAB (+) para crear rápidamente un Horario o una Evaluación.
+  - `AgendaEvaluationBottomSheet`: Ficha modal de detalle de evaluación con opciones de edición y eliminación.
+  - `ScheduleDaySelector`: Selector semanal con indicadores duales (píldoras de clases + punto rojo de exámenes/evaluaciones).
+- **Captura Rápida & Ergonomía de Entrada 3.0 (`presentation/feature/addnote/` & `addsubject/`):**
+  - **Sheets Modales Táctiles de Captura Ultrarrápida:**
+    * `AddNoteBottomSheet` (< 180 LOC) y `AddSubjectBottomSheet` (< 120 LOC) con 28dp esquinas, micro-bordes `outlineVariant`, soporte completo de insets de teclado `WindowInsets.ime` y `navigationBarsPadding`.
+    * Integración directa desde `NotesScreen` al tocar el FAB (+) o los accesos de creación de notas/materias, sin saltos de pantalla completa.
+  - **Editor Markdown con Toolbar de Formato:**
+    * `NoteMarkdownToolbar`: Barra de herramientas táctil flotante con 9 accesos directos (`#`, `##`, `###`, `**`, `*`, `- `, `- [ ]`, `$`, `>`, `code`) con feedback háptico.
+    * Conmutación fluida entre edición y previsualización en vivo (`NotePreviewCard`) con `AnimatedContent`.
+  - **Selector Dinámico de Materias & Tags Inteligentes:**
+    * `NoteSubjectSelectorChip`: Carrusel horizontal con colores dinámicos accesibles, monogramas e icono temático, más botón directo `➕ Crear Materia`.
+    * `NoteTagsFlowRow`: Etiquetas académicas inteligentes sugeridas (`#resumen`, `#examen`, `#fórmulas`, `#tarea`, `#importante`, etc.) con activación a un solo toque y creador de tags personalizados.
+    * `NoteAttachmentPreview`: Selector visual de fotografía de pizarra o referencia con previsualización en miniatura y botón de descarte.
+  - **Estudio Creativo de Materias 3.0 (`addsubject`):**
+    * `SubjectLivePreviewCard`: Previsualización interactiva en tiempo real del icono, color HSL accesible, nombre y estadísticas simuladas de la asignatura.
+    * `SubjectColorPickerBento`: Bento grid de 10 colores académicos armónicos con validación de contraste WCAG AA/AAA.
+    * `SubjectIconGridSelector`: Selector visual de 12 iconos temáticos académicos con resortes elásticos `spring(0.97f)`.
+    * `SubjectEditorFormFields`: Formulario desacoplado con chips de sugerencias instantáneas (*Cálculo*, *Física*, *Programación*, *Literatura*, *Química*, etc.).
+    * Detección y prevención automática de nombres duplicados en `AddSubjectViewModel`.
+  - **Arquitectura & Cumplimiento:**
+    * 100% de los archivos $\le 180$ LOC.
+    * Cobertura completa de tests unitarios en `AddNoteViewModelTest` y `AddSubjectViewModelTest`.
+
+### 4. Métricas de Calidad y Verificación
+- **100% Unit Tests Pasando** (`BUILD SUCCESSFUL` en `./gradlew testDebugUnitTest`).
+- **Build APK 100% Exitoso** (`BUILD SUCCESSFUL` en `./gradlew assembleDebug`).
+- **Verificación en dispositivo físico** con capturas de pantalla de `Captura Rápida` y `Nueva Materia`.
+- **100% de cumplimiento con directivas de Clean Architecture y límite $\le 200$ LOC por composable.**
 
 ---
 
 ## 📌 Detalle por Fases y Sprints
 
-### 🟢 Fase 2.1: Experiencia sin Fricción y Ergonomía de Formularios (100% — Completada)
-*Meta: Eliminar la sobrecarga cognitiva en los cuestionarios y formularios de entrada de datos (Materias, Horarios, Apuntes y Evaluaciones) mediante formularios continuos, TimePicker nativo de Material 3 y selección a 1 solo toque.*  
-*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_2.1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_2.1.md)
-
-#### Sprint 2.1.1 — Formulario Fluido de Materias (Completado)
-- [x] **2.1.1.1** Formulario One-Page continuo en `AddSubjectScreen` (eliminar acordeón de pasos). *(Completado)*
-- [x] **2.1.1.2** Sub-componente `SubjectPreviewBadge` con animación viva de color e icono. *(Completado)*
-- [x] **2.1.1.3** Tests unitarios para `AddSubjectViewModel`. *(Completado)*
-
-#### Sprint 2.1.2 — Ergonomía en Horarios (Completado)
-- [x] **2.1.2.1** Selector segmentado de días a 1 toque (`ScheduleDaySegmentedBar`). *(Completado)*
-- [x] **2.1.2.2** Selector interactivo de horas con `TimePicker` de Material 3 y chips rápidos (`ScheduleTimeRangePicker`). *(Completado)*
-- [x] **2.1.2.3** Selector de materia con chips horizontales (`ScheduleSubjectChips`). *(Completado)*
-- [x] **2.1.2.4** Integración fluida en `AddScheduleScreen` y `EditScheduleScreen` con detección de solapes en vivo y autocorrección. *(Completado)*
-
-#### Sprint 2.1.3 — Simplificación de Apuntes y Evaluaciones (Completado)
-- [x] **2.1.3.1** Carrusel superior de materias y 8 tags rápidos a 1 toque en `AddNoteScreen` y `EditNoteScreen` (`NoteSubjectChips` + `NoteQuickTagRow`). *(Completado)*
-- [x] **2.1.3.2** Formulario continuo en `AddEvaluationScreen` y `EditEvaluationScreen` (eliminación de acordeón `StepCard`) con `EvaluationDatePickerField` y slider de ponderación en pasos de 5% (`EvaluationWeightSlider`). *(Completado)*
-- [x] **2.1.3.3** Tests de integración de ViewModels y validación de ponderaciones. *(Completado)*
+### 🟢 Sprint Design 3.0: Tactile Studio Notebook (100% — Completado)
+- [x] **D3.0.1** Tokens semánticos, Color Schemes Material 3 y tipografía Plus Jakarta Sans + JetBrains Mono vía Google Fonts. *(Completado)*
+- [x] **D3.0.2** Catálogo completo de átomos táctiles en `presentation/atoms/` con micro-bordes y skeletons shimmer. *(Completado)*
+- [x] **D3.0.3** Refactorización visual de pantallas core (Notes, Schedules, Grades, Calendar) y modularización de `GradesScreen`. *(Completado)*
+- [x] **D3.0.4** Reingeniería Total y Centro de Control y Ajustes AAA (`SettingsScreen`): 6 secciones Bento, DataStore Preferences reactivo, cálculo y limpieza de caché, sincronización de temas y modales especializados. *(Completado)*
 
 ---
 
@@ -69,7 +134,7 @@ Durante la Fase 2.1 se erradicaron los formularios engorrosos y los acordeones d
 ---
 
 ### ⚪ Fase 4: Pulido & Experiencia (Pendiente)
-*Meta: Micro-interacciones con Impeccable, accesibilidad completa (a11y), y optimización de rendimiento Compose.*
+*Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), y optimización de rendimiento Compose.*
 
 ---
 

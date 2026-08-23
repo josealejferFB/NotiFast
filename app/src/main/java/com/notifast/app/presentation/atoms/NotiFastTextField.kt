@@ -1,16 +1,25 @@
 package com.notifast.app.presentation.atoms
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
+/**
+ * NotiFast 3.0 Parchment Block Text Field.
+ * Features 56dp standard height, parchment background container (surfaceContainer),
+ * hairline border (1dp) with smooth indigo focus transition (2dp), persistent label,
+ * and inline contextual error feedback.
+ */
 @Composable
 fun NotiFastTextField(
     value: String,
@@ -24,50 +33,36 @@ fun NotiFastTextField(
     minLines: Int = 1,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     readOnly: Boolean = false,
-    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    leadingIcon: ImageVector? = null,
     placeholder: String? = null
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = placeholder?.let { { Text(it) } },
-        leadingIcon = leadingIcon?.let { { androidx.compose.material3.Icon(it, contentDescription = null) } },
+        label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
+        placeholder = placeholder?.let { { Text(it, style = MaterialTheme.typography.bodyMedium) } },
+        leadingIcon = leadingIcon?.let { { Icon(it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) } },
         readOnly = readOnly,
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         singleLine = singleLine,
         minLines = minLines,
         maxLines = maxLines,
         isError = isError,
         supportingText = if (isError && errorMessage != null) {
-            { Text(errorMessage, color = MaterialTheme.colorScheme.error) }
+            { Text(errorMessage, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
         } else null,
         visualTransformation = visualTransformation,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
+            errorContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            errorBorderColor = MaterialTheme.colorScheme.error,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     )
-}
-
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
-@Composable
-fun NotiFastTextFieldPreview() {
-    com.notifast.app.presentation.theme.theme.NotiFastTheme {
-        androidx.compose.foundation.layout.Column(
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            NotiFastTextField(value = "", onValueChange = {}, label = "Empty Field")
-            NotiFastTextField(value = "Some text", onValueChange = {}, label = "Filled Field")
-            NotiFastTextField(
-                value = "Error text",
-                onValueChange = {},
-                label = "Error Field",
-                isError = true,
-                errorMessage = "This is an error"
-            )
-        }
-    }
 }

@@ -86,8 +86,8 @@ fun SubjectCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 2.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+        shadowElevation = 0.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Column {
             // Compact Header
@@ -132,9 +132,9 @@ fun SubjectCard(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = String.format("%.1f", info.averageGrade),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.ExtraBold,
+                            text = String.format(java.util.Locale.getDefault(), "%.1f", info.averageGrade),
+                            style = com.notifast.app.presentation.theme.type.MonoAcademicTextStyle,
+                            fontWeight = FontWeight.Bold,
                             color = color,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
@@ -174,7 +174,7 @@ fun SubjectCard(
                 exit = shrinkVertically(spring(0.6f, 280f)) + fadeOut(spring(0.6f, 280f))
             ) {
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(Modifier.height(16.dp))
 
                     // Upcoming evaluations

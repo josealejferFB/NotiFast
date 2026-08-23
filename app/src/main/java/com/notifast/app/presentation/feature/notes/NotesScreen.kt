@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.CreateNewFolder
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -45,15 +45,12 @@ import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.feature.notes.components.NoteDetailExpandable
 import com.notifast.app.presentation.feature.notes.components.NotesTabContent
-import com.notifast.app.presentation.feature.notes.components.SubjectsTabContent
-import com.notifast.app.presentation.theme.color.Aqua
-import com.notifast.app.presentation.theme.color.Ruby
+import com.notifast.app.presentation.feature.notes.components.SubjectGridBento
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen(
     viewModel: NotesViewModel = hiltViewModel(),
-    onAddNoteClick: () -> Unit,
+    onAddNoteClick: (String?) -> Unit = {},
     onAddSubjectClick: () -> Unit,
     onSubjectClick: (String) -> Unit,
     onNoteClick: (String) -> Unit,
@@ -66,6 +63,15 @@ fun NotesScreen(
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
     var expandedNote by remember { mutableStateOf<Note?>(null) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+    var showAddNoteSheet by remember { mutableStateOf(false) }
+    var addNoteSubject by remember { mutableStateOf<String?>(null) }
+    var showAddSubjectSheet by remember { mutableStateOf(false) }
+
+    val handleOpenAddNote: (String?) -> Unit = { subj ->
+        addNoteSubject = subj
+        showAddNoteSheet = true
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
@@ -84,61 +90,32 @@ fun NotesScreen(
             floatingActionButton = {
                 NotiFastExpandableFab(
                     actions = listOf(
-                        FabAction(
-                            label = stringResource(R.string.fab_add_subject),
-                            icon = Icons.Default.CreateNewFolder,
-                            onClick = onAddSubjectClick,
-                            contentDescription = stringResource(R.string.fab_add_subject),
-                            color = Aqua
-                        ),
-                        FabAction(
-                            label = stringResource(R.string.fab_add_note),
-                            icon = Icons.AutoMirrored.Filled.NoteAdd,
-                            onClick = onAddNoteClick,
-                            contentDescription = stringResource(R.string.fab_add_note),
-                            color = Ruby
-                        )
+                        FabAction(stringResource(R.string.fab_add_subject), Icons.Default.CreateNewFolder, { showAddSubjectSheet = true }, stringResource(R.string.fab_add_subject), MaterialTheme.colorScheme.secondary),
+                        FabAction(stringResource(R.string.fab_add_note), Icons.AutoMirrored.Filled.NoteAdd, { handleOpenAddNote(null) }, stringResource(R.string.fab_add_note), MaterialTheme.colorScheme.primary)
                     ),
                     modifier = Modifier.padding(bottom = 72.dp)
                 )
             }
         ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     TabRow(
                         selectedTabIndex = selectedTabIndex,
                         containerColor = Color.Transparent,
-                        contentColor = Ruby,
+                        contentColor = MaterialTheme.colorScheme.primary,
                         indicator = { tabPositions ->
-                            TabRowDefaults.SecondaryIndicator(
-                                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                                color = Ruby
-                            )
+                            TabRowDefaults.SecondaryIndicator(modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]), color = MaterialTheme.colorScheme.primary)
                         }
                     ) {
                         Tab(
                             selected = selectedTabIndex == 0,
                             onClick = { selectedTabIndex = 0 },
-                            text = {
-                                Text(
-                                    stringResource(R.string.notes_tab_notes),
-                                    fontWeight = if (selectedTabIndex == 0) FontWeight.Bold else FontWeight.Medium
-                                )
-                            }
+                            text = { Text(stringResource(R.string.notes_tab_notes), fontWeight = if (selectedTabIndex == 0) FontWeight.Bold else FontWeight.Medium) }
                         )
                         Tab(
                             selected = selectedTabIndex == 1,
                             onClick = { selectedTabIndex = 1 },
-                            text = {
-                                Text(
-                                    stringResource(R.string.notes_tab_subjects),
-                                    fontWeight = if (selectedTabIndex == 1) FontWeight.Bold else FontWeight.Medium
-                                )
-                            }
+                            text = { Text(stringResource(R.string.notes_tab_subjects), fontWeight = if (selectedTabIndex == 1) FontWeight.Bold else FontWeight.Medium) }
                         )
                     }
 
@@ -146,24 +123,50 @@ fun NotesScreen(
                         NotesTabContent(
                             uiState = uiState,
                             viewModel = viewModel,
-                            onSubjectClick = onSubjectClick,
+                            onAddNoteClick = handleOpenAddNote,
                             onNoteClick = onNoteClick,
                             onExpandNote = { expandedNote = it },
-                            onDeleteNote = { noteToDelete = it }
+                            onDeleteNote = { noteToDelete = it },
+                            onAddSubjectClick = { showAddSubjectSheet = true }
                         )
                     } else {
-                        SubjectsTabContent(
-                            uiState = uiState,
-                            viewModel = viewModel,
-                            onAddNoteClick = onAddNoteClick,
+                        SubjectGridBento(
+                            subjectInfos = uiState.subjectInfos,
+                            onSubjectClick = onSubjectClick,
+                            onAddNoteClick = handleOpenAddNote,
                             onAddEvaluationClick = onAddEvaluationClick,
-                            onNoteClick = onNoteClick,
                             onDeleteSubject = { subjectToDelete = it },
-                            onSubjectDetailClick = onSubjectDetailClick
+                            onAddSubjectClick = { showAddSubjectSheet = true }
                         )
                     }
                 }
             }
+        }
+
+        if (showAddNoteSheet) {
+            com.notifast.app.presentation.feature.addnote.AddNoteBottomSheet(
+                onDismissRequest = { showAddNoteSheet = false },
+                onNoteAdded = {
+                    showAddNoteSheet = false
+                    viewModel.onEvent(NotesEvent.LoadNotes)
+                },
+                initialSubject = addNoteSubject ?: "",
+                onNavigateToAddSubject = {
+                    showAddNoteSheet = false
+                    showAddSubjectSheet = true
+                }
+            )
+        }
+
+        if (showAddSubjectSheet) {
+            com.notifast.app.presentation.feature.addsubject.AddSubjectBottomSheet(
+                onDismissRequest = { showAddSubjectSheet = false },
+                onSubjectCreated = { name ->
+                    showAddSubjectSheet = false
+                    viewModel.onEvent(NotesEvent.LoadNotes)
+                    onSubjectClick(name)
+                }
+            )
         }
 
         subjectToDelete?.let { name ->
@@ -172,12 +175,9 @@ fun NotesScreen(
                 message = stringResource(R.string.delete_subject_message, name),
                 confirmText = stringResource(R.string.delete_subject_confirm),
                 dismissText = stringResource(R.string.delete_subject_cancel),
-                confirmColor = Ruby,
+                confirmColor = MaterialTheme.colorScheme.error,
                 confirmWeight = FontWeight.Bold,
-                onConfirm = {
-                    viewModel.onEvent(NotesEvent.DeleteSubject(name))
-                    subjectToDelete = null
-                },
+                onConfirm = { viewModel.onEvent(NotesEvent.DeleteSubject(name)); subjectToDelete = null },
                 onDismiss = { subjectToDelete = null }
             )
         }
@@ -188,41 +188,24 @@ fun NotesScreen(
                 message = stringResource(R.string.delete_note_message, note.title),
                 confirmText = stringResource(R.string.delete_note_confirm),
                 dismissText = stringResource(R.string.delete_note_cancel),
-                confirmColor = Ruby,
+                confirmColor = MaterialTheme.colorScheme.error,
                 confirmWeight = FontWeight.Bold,
-                onConfirm = {
-                    viewModel.onEvent(NotesEvent.DeleteNote(note))
-                    noteToDelete = null
-                },
+                onConfirm = { viewModel.onEvent(NotesEvent.DeleteNote(note)); noteToDelete = null },
                 onDismiss = { noteToDelete = null }
             )
         }
 
         AnimatedVisibility(
             visible = expandedNote != null,
-            enter = fadeIn(tween(250)) + scaleIn(
-                initialScale = 0.85f,
-                animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f)
-            ),
-            exit = fadeOut(tween(250)) + scaleOut(
-                targetScale = 0.85f,
-                animationSpec = spring(stiffness = 300f)
-            )
+            enter = fadeIn(tween(250)) + scaleIn(animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f), initialScale = 0.85f),
+            exit = fadeOut(tween(250)) + scaleOut(animationSpec = spring(stiffness = 300f), targetScale = 0.85f)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 40.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 40.dp), contentAlignment = Alignment.Center) {
                 expandedNote?.let { note ->
-                    NoteDetailExpandable(
-                        note = note,
-                        onClose = { expandedNote = null },
-                        onEdit = { onNoteClick(note.id); expandedNote = null }
-                    )
+                    NoteDetailExpandable(note = note, onClose = { expandedNote = null }, onEdit = { onNoteClick(note.id); expandedNote = null })
                 }
             }
         }
     }
 }
+

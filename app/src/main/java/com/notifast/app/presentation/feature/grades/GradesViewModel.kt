@@ -31,7 +31,23 @@ class GradesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(GradesUiState())
     val uiState: StateFlow<GradesUiState> = _uiState.asStateFlow()
 
-    init { loadData() }
+    init {
+        loadData()
+        loadUserProfile()
+    }
+
+    private fun loadUserProfile() {
+        viewModelScope.launch {
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            authRepository.getUserProfile(uid).onSuccess { user ->
+                _uiState.update { it.copy(
+                    userFirstName = user.firstName,
+                    userEmail = user.email,
+                    userProfilePictureUrl = user.profilePictureUrl
+                ) }
+            }
+        }
+    }
 
     private fun loadData() {
         viewModelScope.launch {
@@ -53,12 +69,13 @@ class GradesViewModel @Inject constructor(
                     )
                 }.sortedBy { it.subject }
                 
-                GradesUiState(
+                _uiState.value.copy(
                     evaluationsBySubject = evalsBySubject,
                     subjects = subjects,
                     globalAverage = globalAverage,
                     gradeScale = scale,
-                    subjectGrades = subjectGrades
+                    subjectGrades = subjectGrades,
+                    isLoading = false
                 )
             }.collect { state -> _uiState.value = state }
         }

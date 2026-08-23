@@ -10,10 +10,11 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -29,6 +29,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+/**
+ * NotiFast 3.0 Tactile Date Picker Field.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotiFastDatePickerField(
@@ -65,24 +68,30 @@ fun NotiFastDatePickerField(
         }
     }
 
-    TextField(
+    OutlinedTextField(
         value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date),
         onValueChange = {},
         readOnly = true,
-        label = { Text(label) },
+        label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
         leadingIcon = {
             IconButton(onClick = { showDatePicker = true }) {
-                Icon(Icons.Default.CalendarMonth, contentDescription = "Seleccionar fecha")
+                Icon(
+                    Icons.Default.CalendarMonth,
+                    contentDescription = "Seleccionar fecha",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         },
-        shape = RoundedCornerShape(20.dp),
-        modifier = modifier.fillMaxWidth().clickable { showDatePicker = true },
+        shape = RoundedCornerShape(14.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { showDatePicker = true },
         enabled = false,
-        colors = TextFieldDefaults.colors(
-            disabledContainerColor = Color.White.copy(alpha = 0.7f),
-            disabledIndicatorColor = Color.Transparent,
-            disabledLabelColor = Color(0xFF3B9797),
-            disabledTextColor = Color.Black
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledTextColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }

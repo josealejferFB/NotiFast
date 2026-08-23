@@ -2,9 +2,8 @@ package com.notifast.app.presentation.navigation
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,8 +25,7 @@ sealed class Screen(
     }
     data object AddSubject : Screen("add_subject")
 
-    data object Calendar : Screen("calendar", "Calendario", Icons.Default.CalendarMonth)
-    data object Schedules : Screen("horarios", "Horarios", Icons.Default.Schedule)
+    data object Schedules : Screen("agenda", "Agenda", Icons.Default.Schedule)
     data object Grades : Screen("calificaciones", "Calificaciones", Icons.Default.Grade)
     data object Settings : Screen("settings", "Ajustes", Icons.Default.Settings)
 
@@ -51,6 +49,6 @@ sealed class Screen(
     data object EditProfile : Screen("edit_profile")
 
     companion object {
-        val bottomNavItems = listOf(Notes, Calendar, Schedules, Grades, Settings)
+        val bottomNavItems = listOf(Notes, Schedules, Grades, Settings)
     }
 }

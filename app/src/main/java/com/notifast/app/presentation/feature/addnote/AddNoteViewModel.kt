@@ -68,9 +68,11 @@ class AddNoteViewModel @Inject constructor(
             is AddNoteEvent.ImageSelected -> _uiState.update { it.copy(imageUri = event.uri) }
             is AddNoteEvent.SaveClicked -> saveNote()
             is AddNoteEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            is AddNoteEvent.ResetState -> _uiState.update { AddNoteUiState(subjects = it.subjects) }
             is AddNoteEvent.SetSubjects -> _uiState.update { it.copy(subjects = event.subjects) }
         }
     }
+
 
     private fun saveNote() {
         val state = _uiState.value

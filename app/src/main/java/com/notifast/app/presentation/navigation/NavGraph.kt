@@ -27,7 +27,6 @@ import com.notifast.app.presentation.feature.addnote.AddNoteScreen
 import com.notifast.app.presentation.feature.addsubject.AddSubjectScreen
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
 import com.notifast.app.presentation.feature.auth.LoginScreen
-import com.notifast.app.presentation.feature.calendar.CalendarScreen
 import com.notifast.app.presentation.feature.editnote.EditNoteScreen
 import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
 import com.notifast.app.presentation.feature.editprofile.EditProfileScreen
@@ -109,7 +108,7 @@ fun MainContent() {
             }
             composable(Screen.Notes.route) {
                 NotesScreen(
-                    onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute()) },
+                    onAddNoteClick = { subject -> navController.navigate(Screen.AddNote.createRoute(subject)) },
                     onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
                     onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
                     onNoteClick = { noteId -> navController.navigate(Screen.EditNote.createRoute(noteId)) },
@@ -171,15 +170,14 @@ fun MainContent() {
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            composable(Screen.Calendar.route) {
-                CalendarScreen(
-                    onAddEvaluation = { navController.navigate(Screen.AddEvaluation.createRoute()) },
-                    onEditEvaluation = { eval -> navController.navigate(Screen.EditEvaluation.createRoute(eval.id)) }
-                )
-            }
             composable(Screen.Schedules.route) {
                 SchedulesScreen(
-                    onAddScheduleClick = { navController.navigate(Screen.AddSchedule.route) }
+                    onAddScheduleClick = { navController.navigate(Screen.AddSchedule.route) },
+                    onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute()) },
+                    onTakeNoteClick = { subject -> navController.navigate(Screen.AddNote.createRoute(subject)) },
+                    onEditScheduleClick = { scheduleId -> navController.navigate(Screen.EditSchedule.createRoute(scheduleId)) },
+                    onEditEvaluationClick = { eval -> navController.navigate(Screen.EditEvaluation.createRoute(eval.id)) },
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
                 )
             }
             composable(Screen.AddSchedule.route) {
@@ -198,7 +196,9 @@ fun MainContent() {
                 )
             }
             composable(Screen.Grades.route) {
-                GradesScreen()
+                GradesScreen(
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
+                )
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(

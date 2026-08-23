@@ -26,9 +26,12 @@ class AddSubjectViewModel @Inject constructor(
     fun onEvent(event: AddSubjectEvent) {
         when (event) {
             is AddSubjectEvent.NameChanged -> _uiState.update { it.copy(subjectName = event.name, error = null) }
+            is AddSubjectEvent.SuggestionSelected -> _uiState.update { it.copy(subjectName = event.name, error = null) }
             is AddSubjectEvent.IconSelected -> _uiState.update { it.copy(selectedIcon = event.icon) }
             is AddSubjectEvent.ColorSelected -> _uiState.update { it.copy(selectedColor = event.colorHex) }
             is AddSubjectEvent.SaveClicked -> saveSubject()
+            is AddSubjectEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            is AddSubjectEvent.ResetState -> _uiState.update { AddSubjectUiState() }
         }
     }
 
@@ -60,7 +63,7 @@ class AddSubjectViewModel @Inject constructor(
             }
 
             noteRepository.addSubject(userId, cleanName, state.selectedIcon, state.selectedColor).fold(
-                onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true, subjectName = cleanName) } },
+                onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true, createdSubjectName = cleanName, subjectName = cleanName) } },
                 onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al guardar la materia") } }
             )
         }
