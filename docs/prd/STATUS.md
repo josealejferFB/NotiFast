@@ -15,11 +15,11 @@ Fase 1: Fundamentos               [███████████████
 Fase 2: Experiencia Core          [████████████████] 100% (13/13 tareas) ✅
 Fase 2.1: Ergonomía Forms         [████████████████] 100% (9/9 tareas) ✅
 Sprint Design 3.0: Tactile Studio [████████████████] 100% (3/3 Sprints) ✅
-Fase 3: Features Avanzadas        [░░░░░░░░░░░░░░░░]   0% (0/18 tareas)
+Fase 3: Features Avanzadas        [█████░░░░░░░░░░░]  33% (6/18 tareas) 🟡 (Sprint 3.1 Listo)
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [███████████░░░░░]  58.0% (57/98 tareas)
+PROGRESO TOTAL ESTIMADO:          [████████████░░░░]  64.2% (63/98 tareas)
 ```
 
 ---
@@ -141,9 +141,21 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
-### ⚪ Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (Siguiente Fase)
-*Meta: Notificaciones locales inteligentes vía Android WorkManager, recordatorios proactivos de entregas/clases, sincronización offline local y analíticas de estudio.*  
+### 🟡 Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (En Progreso — 33%)
+*Meta: Notificaciones locales inteligentes vía Android WorkManager, recordatorios proactivos de entregas/clases, analíticas predictivas de rendimiento académico, búsqueda global multientidad y pack académico P2P.*  
 *Guía de Arranque:* [`docs/prd/KICKOFF_FASE_3.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.md)
+
+- [x] **Sprint 3.1: Motor de Notificaciones Proactivas con WorkManager (100% Completado)**
+  * **Infraestructura:** WorkManager 2.10.0 + HiltWorkerFactory (`Configuration.Provider`), canales de notificación especializados con vibración y deep links directos (`NotificationChannelsManager`, `NotificationSender`).
+  * **Alertas de Evaluaciones:** `ScheduleEvaluationAlertUseCase` y `EvaluationReminderWorker` con cálculo exacto de antelación configurable y tags deterministas `"eval_${id}"`.
+  * **Alertas de Clases:** `ScheduleClassAlertUseCase` y `ClassScheduleWorker` con cálculo del próximo día de semana, minutos de antelación y auto-reprogramación semanal continua.
+  * **Resumen Diario & Resiliencia:** `DailySummaryWorker` matutino (07:00 AM) periódico con resumen de clases y entregas en 48h, `BootCompletedReceiver` para reprogramación automática tras reinicio del dispositivo (`ACTION_BOOT_COMPLETED`), y `CancelAlertUseCase`.
+  * **Integración:** Sincronización en tiempo real en `AddEvaluationViewModel`, `EditEvaluationViewModel`, `AddScheduleViewModel`, `EditScheduleViewModel`, `SchedulesViewModel`, `SubjectDetailViewModel` y `SettingsViewModel`.
+  * **Calidad:** 100% tests unitarios pasando y compilación `assembleDebug` exitosa.
+
+- [ ] **Sprint 3.2: Analíticas de Rendimiento Académico y Dashboard Predictivo (Siguiente Sprint)**
+- [ ] **Sprint 3.3: Búsqueda Global Multientidad en Tiempo Real**
+- [ ] **Sprint 3.4: Pack Académico P2P, Intercambio Offline y Resiliencia Free-Tier**
 
 ---
 
