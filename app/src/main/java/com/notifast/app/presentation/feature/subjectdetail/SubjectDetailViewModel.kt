@@ -26,7 +26,8 @@ class SubjectDetailViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
-    private val calculateRequiredGradeUseCase: CalculateRequiredGradeUseCase
+    private val calculateRequiredGradeUseCase: CalculateRequiredGradeUseCase,
+    private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase? = null
 ) : ViewModel() {
 
     private val subjectName: String = checkNotNull(savedStateHandle["subjectName"])
@@ -148,6 +149,11 @@ class SubjectDetailViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val eval = _uiState.value.evaluations.find { it.id == evalId } ?: return@launch
             evaluationRepository.updateEvaluation(userId, eval.copy(grade = grade, isPresented = isPresented), null)
+                .onSuccess {
+                    if (grade != null || isPresented) {
+                        cancelAlertUseCase?.cancelEvaluationAlert(evalId)
+                    }
+                }
                 .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") } }
         }
     }
@@ -157,6 +163,9 @@ class SubjectDetailViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val eval = _uiState.value.evaluations.find { it.id == evalId } ?: return@launch
             evaluationRepository.deleteEvaluation(userId, eval)
+                .onSuccess {
+                    cancelAlertUseCase?.cancelEvaluationAlert(evalId)
+                }
                 .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar evaluación") } }
         }
     }
@@ -165,6 +174,9 @@ class SubjectDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             scheduleRepository.deleteSchedule(userId, schedule)
+                .onSuccess {
+                    cancelAlertUseCase?.cancelClassAlert(schedule.id)
+                }
                 .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar horario") } }
         }
     }

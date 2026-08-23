@@ -32,6 +32,8 @@ class EditScheduleViewModelTest {
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val noteRepository: NoteRepository = mockk(relaxed = true)
     private val validateScheduleOverlapUseCase = ValidateScheduleOverlapUseCase()
+    private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase = mockk(relaxed = true)
+    private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797")
@@ -51,7 +53,7 @@ class EditScheduleViewModelTest {
     @Test
     fun `when initialized with scheduleId, loads existing schedule fields`() = runTest {
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, savedStateHandle)
+        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase, cancelAlertUseCase, savedStateHandle)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -63,7 +65,7 @@ class EditScheduleViewModelTest {
     @Test
     fun `when time changed to overlap with different schedule, conflictingSchedules populated`() = runTest {
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, savedStateHandle)
+        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase, cancelAlertUseCase, savedStateHandle)
         advanceUntilIdle()
 
         viewModel.onEvent(EditScheduleEvent.UpdateStartTime("10:30"))
@@ -77,7 +79,7 @@ class EditScheduleViewModelTest {
     fun `when saving updated schedule, calls updateSchedule`() = runTest {
         coEvery { scheduleRepository.updateSchedule(any(), any()) } returns Result.success(Unit)
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, savedStateHandle)
+        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase, cancelAlertUseCase, savedStateHandle)
         advanceUntilIdle()
 
         viewModel.onEvent(EditScheduleEvent.UpdateClassroom("Aula 302"))

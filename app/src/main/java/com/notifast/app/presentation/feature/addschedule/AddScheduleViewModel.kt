@@ -23,7 +23,8 @@ class AddScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val authRepository: AuthRepository,
     private val noteRepository: NoteRepository,
-    private val validateScheduleOverlapUseCase: ValidateScheduleOverlapUseCase
+    private val validateScheduleOverlapUseCase: ValidateScheduleOverlapUseCase,
+    private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddScheduleUiState())
@@ -158,6 +159,9 @@ class AddScheduleViewModel @Inject constructor(
 
             scheduleRepository.addSchedule(userId, schedule).fold(
                 onSuccess = {
+                    if (schedule.modality == Schedule.MODALITY_PRESENCIAL) {
+                        scheduleClassAlertUseCase(schedule)
+                    }
                     _uiState.update { it.copy(isSaved = true, isSaving = false) }
                 },
                 onFailure = { e ->

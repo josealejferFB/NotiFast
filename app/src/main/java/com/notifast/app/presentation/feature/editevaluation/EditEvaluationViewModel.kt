@@ -22,7 +22,9 @@ class EditEvaluationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val scheduleEvaluationAlertUseCase: com.notifast.app.domain.usecase.ScheduleEvaluationAlertUseCase,
+    private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase
 ) : ViewModel() {
 
     private val evalId: String = checkNotNull(savedStateHandle["evalId"])
@@ -118,6 +120,11 @@ class EditEvaluationViewModel @Inject constructor(
                 isPresented = state.isPresented
             )
             evaluationRepository.updateEvaluation(userId, updatedEval, imageUri).onSuccess {
+                if (updatedEval.grade != null || updatedEval.isPresented) {
+                    cancelAlertUseCase.cancelEvaluationAlert(updatedEval.id)
+                } else {
+                    scheduleEvaluationAlertUseCase(updatedEval)
+                }
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure {
                 _uiState.update { it.copy(isSaving = false) }

@@ -25,6 +25,8 @@ class EditScheduleViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val noteRepository: NoteRepository,
     private val validateScheduleOverlapUseCase: ValidateScheduleOverlapUseCase,
+    private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase,
+    private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -188,6 +190,11 @@ class EditScheduleViewModel @Inject constructor(
 
             scheduleRepository.updateSchedule(userId, schedule).fold(
                 onSuccess = {
+                    if (schedule.modality == Schedule.MODALITY_PRESENCIAL) {
+                        scheduleClassAlertUseCase(schedule)
+                    } else {
+                        cancelAlertUseCase.cancelClassAlert(schedule.id)
+                    }
                     _uiState.update { it.copy(isSaved = true, isSaving = false) }
                 },
                 onFailure = { e ->

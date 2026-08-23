@@ -31,6 +31,7 @@ class SettingsViewModelTest {
 
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
+    private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
     private val cacheDir: File = mockk(relaxed = true)
 
@@ -65,7 +66,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when initialized, loads user profile and observes all preferences correctly`() = runTest {
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, context)
+        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -89,7 +90,7 @@ class SettingsViewModelTest {
     fun `when SetDarkMode event received, delegates to UserPrefsRepository`() = runTest {
         coEvery { userPrefsRepository.setDarkMode(true) } returns Result.success(Unit)
 
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, context)
+        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.SetDarkMode(true))
@@ -102,7 +103,7 @@ class SettingsViewModelTest {
     fun `when SetDefaultGradeScale event received, delegates to UserPrefsRepository`() = runTest {
         coEvery { userPrefsRepository.setDefaultGradeScale("0-10") } returns Result.success(Unit)
 
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, context)
+        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.SetDefaultGradeScale("0-10"))
@@ -115,7 +116,7 @@ class SettingsViewModelTest {
     fun `when SetMinPassingGrade event received, delegates to UserPrefsRepository`() = runTest {
         coEvery { userPrefsRepository.setMinPassingGrade(13.0f) } returns Result.success(Unit)
 
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, context)
+        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.SetMinPassingGrade(13.0f))
@@ -126,7 +127,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when OpenDialog and DismissDialog events received, updates activeDialog state`() = runTest {
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, context)
+        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.OpenDialog(SettingsDialogType.THEME))
@@ -138,7 +139,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when Logout event received, calls authRepository logout and sets isLoggedOut`() = runTest {
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, context)
+        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.Logout)

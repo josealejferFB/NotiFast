@@ -31,6 +31,7 @@ class AddScheduleViewModelTest {
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val noteRepository: NoteRepository = mockk(relaxed = true)
     private val validateScheduleOverlapUseCase = ValidateScheduleOverlapUseCase()
+    private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797")
@@ -48,7 +49,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when times set and overlap with existing, conflictingSchedules is populated`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(1))
@@ -61,7 +62,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when times set and no overlap, conflictingSchedules is empty`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(1))
@@ -75,7 +76,7 @@ class AddScheduleViewModelTest {
     fun `when saving with valid data, calls repository addSchedule and sets isSaved`() = runTest {
         coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success(Unit)
 
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
@@ -92,7 +93,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when endTime is less than or equal to startTime, autocorrects endTime`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateStartTime("10:00"))
@@ -104,7 +105,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when updateTimeRange is called with invalid range, autocorrects endTime`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateTimeRange("14:00", "14:00"))
@@ -115,7 +116,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when dayOfWeek is updated, dayOfWeek in state reflects change`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase)
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(4)) // Viernes

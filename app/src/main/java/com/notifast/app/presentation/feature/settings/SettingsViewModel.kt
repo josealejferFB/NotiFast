@@ -22,6 +22,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository,
+    private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -171,11 +172,26 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.SetDarkMode -> viewModelScope.launch { userPrefsRepository.setDarkMode(event.enabled) }
             is SettingsEvent.SetThemeAccent -> viewModelScope.launch { userPrefsRepository.setThemeAccent(event.accent) }
             is SettingsEvent.SetHapticsEnabled -> viewModelScope.launch { userPrefsRepository.setHapticsEnabled(event.enabled) }
-            is SettingsEvent.SetClassAlertsEnabled -> viewModelScope.launch { userPrefsRepository.setClassAlertsEnabled(event.enabled) }
-            is SettingsEvent.SetClassAlertMinutes -> viewModelScope.launch { userPrefsRepository.setClassAlertMinutes(event.minutes) }
-            is SettingsEvent.SetEvalAlertsEnabled -> viewModelScope.launch { userPrefsRepository.setEvalAlertsEnabled(event.enabled) }
-            is SettingsEvent.SetEvalAlertDays -> viewModelScope.launch { userPrefsRepository.setEvalAlertDays(event.days) }
-            is SettingsEvent.SetDailySummaryEnabled -> viewModelScope.launch { userPrefsRepository.setDailySummaryEnabled(event.enabled) }
+            is SettingsEvent.SetClassAlertsEnabled -> viewModelScope.launch {
+                userPrefsRepository.setClassAlertsEnabled(event.enabled)
+                rescheduleAllAlertsUseCase()
+            }
+            is SettingsEvent.SetClassAlertMinutes -> viewModelScope.launch {
+                userPrefsRepository.setClassAlertMinutes(event.minutes)
+                rescheduleAllAlertsUseCase()
+            }
+            is SettingsEvent.SetEvalAlertsEnabled -> viewModelScope.launch {
+                userPrefsRepository.setEvalAlertsEnabled(event.enabled)
+                rescheduleAllAlertsUseCase()
+            }
+            is SettingsEvent.SetEvalAlertDays -> viewModelScope.launch {
+                userPrefsRepository.setEvalAlertDays(event.days)
+                rescheduleAllAlertsUseCase()
+            }
+            is SettingsEvent.SetDailySummaryEnabled -> viewModelScope.launch {
+                userPrefsRepository.setDailySummaryEnabled(event.enabled)
+                rescheduleAllAlertsUseCase()
+            }
             is SettingsEvent.SetDefaultGradeScale -> viewModelScope.launch { userPrefsRepository.setDefaultGradeScale(event.scale) }
             is SettingsEvent.SetMinPassingGrade -> viewModelScope.launch { userPrefsRepository.setMinPassingGrade(event.grade) }
             is SettingsEvent.SetActiveAcademicCycle -> viewModelScope.launch { userPrefsRepository.setActiveAcademicCycle(event.cycle) }

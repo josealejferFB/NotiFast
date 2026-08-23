@@ -20,7 +20,8 @@ import javax.inject.Inject
 class AddEvaluationViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val scheduleEvaluationAlertUseCase: com.notifast.app.domain.usecase.ScheduleEvaluationAlertUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEvaluationUiState())
@@ -82,6 +83,7 @@ class AddEvaluationViewModel @Inject constructor(
                 weight = if (state.selectedType.showWeight) state.weight.toDoubleOrNull()?.coerceIn(0.0, 100.0) else null
             )
             evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess {
+                scheduleEvaluationAlertUseCase(evaluation)
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure { e ->
                 _uiState.update { it.copy(isSaving = false, error = e.message ?: "Error al guardar la evaluación") }

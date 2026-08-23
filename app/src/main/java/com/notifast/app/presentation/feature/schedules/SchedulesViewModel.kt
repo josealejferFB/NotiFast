@@ -25,7 +25,8 @@ import javax.inject.Inject
 class SchedulesViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val evaluationRepository: EvaluationRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SchedulesUiState())
@@ -46,7 +47,7 @@ class SchedulesViewModel @Inject constructor(
         evaluationRepository: EvaluationRepository,
         authRepository: AuthRepository,
         timeProvider: () -> Pair<Int, String>
-    ) : this(scheduleRepository, evaluationRepository, authRepository) {
+    ) : this(scheduleRepository, evaluationRepository, authRepository, null) {
         this.currentTimeProvider = timeProvider
         if (_uiState.value.schedules.isNotEmpty() || _uiState.value.evaluations.isNotEmpty()) {
             updateState(
@@ -230,7 +231,9 @@ class SchedulesViewModel @Inject constructor(
     private fun deleteSchedule(schedule: Schedule) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            scheduleRepository.deleteSchedule(userId, schedule).onFailure { e ->
+            scheduleRepository.deleteSchedule(userId, schedule).onSuccess {
+                cancelAlertUseCase?.cancelClassAlert(schedule.id)
+            }.onFailure { e ->
                 _uiState.update { it.copy(error = e.message ?: "Error al eliminar horario") }
             }
         }
@@ -239,7 +242,9 @@ class SchedulesViewModel @Inject constructor(
     private fun deleteEvaluation(evaluation: Evaluation) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            evaluationRepository.deleteEvaluation(userId, evaluation).onFailure { e ->
+            evaluationRepository.deleteEvaluation(userId, evaluation).onSuccess {
+                cancelAlertUseCase?.cancelEvaluationAlert(evaluation.id)
+            }.onFailure { e ->
                 _uiState.update { it.copy(error = e.message ?: "Error al eliminar evaluación") }
             }
         }
