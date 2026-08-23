@@ -1,0 +1,140 @@
+package com.notifast.app.presentation.feature.grades.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.notifast.app.R
+import com.notifast.app.domain.model.SubjectAcademicHealth
+import com.notifast.app.presentation.atoms.NotiFastCard
+import com.notifast.app.presentation.theme.color.AquaGreen
+import com.notifast.app.presentation.theme.color.Ruby
+import java.util.Locale
+
+@Composable
+fun AcademicWorkloadCard(
+    totalWeeklyHours: Double,
+    bestSubject: SubjectAcademicHealth?,
+    lowestSubject: SubjectAcademicHealth?,
+    modifier: Modifier = Modifier
+) {
+    NotiFastCard(
+        modifier = modifier.fillMaxWidth(),
+        onClick = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.analytics_workload_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.analytics_workload_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.analytics_workload_total_hours, totalWeeklyHours),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            if (bestSubject != null || lowestSubject != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    bestSubject?.let { best ->
+                        WorkloadPill(
+                            label = stringResource(R.string.analytics_best_subject_label),
+                            subjectName = best.subjectName,
+                            average = best.currentAverage,
+                            color = AquaGreen,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    lowestSubject?.let { lowest ->
+                        WorkloadPill(
+                            label = stringResource(R.string.analytics_lowest_subject_label),
+                            subjectName = lowest.subjectName,
+                            average = lowest.currentAverage,
+                            color = Ruby,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkloadPill(
+    label: String,
+    subjectName: String,
+    average: Double,
+    color: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .padding(10.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = subjectName,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1
+        )
+        Text(
+            text = String.format(Locale.US, "Prom: %.1f", average),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+    }
+}

@@ -424,4 +424,34 @@
     <string name="notification_class_title">Clase inminente: %1$s</string>
     <string name="notification_class_body">Comienza a las %1$s • Salón: %2$s</string>
     <string name="notification_daily_summary_title">Tu Jornada de Hoy en NotiFast</string>
+    <string name="notification_daily_summary_body">Tienes %1$d clases y %2$d evaluaciones programadas para hoy.</string>
+
+    <!-- Academic Analytics & Predictive Dashboard (Sprint 3.2) -->
+    <string name="grades_tab_subjects">Materias</string>
+    <string name="grades_tab_analytics">Analíticas &amp; Proyecciones</string>
+    <string name="analytics_title">Dashboard Predictivo</string>
+    <string name="analytics_projected_rate_label">Tasa de Éxito Proyectada</string>
+    <string name="analytics_projected_rate_desc">%1$d de %2$d materias en camino a aprobar</string>
+    <string name="analytics_chart_title">Progreso Ponderado por Materia</string>
+    <string name="analytics_chart_subtitle">Puntos acumulados vs meta de aprobación</string>
+    <string name="analytics_chart_min_passing">Mínimo: %1$s</string>
+    <string name="analytics_histogram_title">Distribución de Notas</string>
+    <string name="analytics_histogram_subtitle">Agrupación por rangos de desempeño</string>
+    <string name="analytics_band_excellent">Sobresaliente</string>
+    <string name="analytics_band_good">Notable</string>
+    <string name="analytics_band_regular">Regular</string>
+    <string name="analytics_band_at_risk">En Riesgo</string>
+    <string name="analytics_early_warning_title">Alertas de Diagnóstico Temprano</string>
+    <string name="analytics_early_warning_all_good">¡Excelente! Todas tus materias van al día y con proyección aprobatoria.</string>
+    <string name="analytics_early_warning_critical">Crítico</string>
+    <string name="analytics_early_warning_at_risk">En Riesgo</string>
+    <string name="analytics_early_warning_pts_needed">Faltan %1$s pts (%2$s%% restante)</string>
+    <string name="analytics_workload_title">Correlación de Carga Horaria</string>
+    <string name="analytics_workload_subtitle">Horas semanales de clase vs promedio obtenido</string>
+    <string name="analytics_workload_total_hours">%1$.1f hrs/sem</string>
+    <string name="analytics_best_subject_label">Mayor Rendimiento</string>
+    <string name="analytics_lowest_subject_label">Mayor Esfuerzo Requerido</string>
+    <string name="analytics_recommendations_title">Recomendaciones Tácticas</string>
+    <string name="analytics_no_data_title">Sin datos analíticos suficientes</string>
+    <string name="analytics_no_data_desc">Registra tus materias y calificaciones para visualizar diagnósticos predictivos.</string>
 </resources>

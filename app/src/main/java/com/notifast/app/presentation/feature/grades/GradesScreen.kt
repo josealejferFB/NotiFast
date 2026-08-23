@@ -25,13 +25,15 @@ import com.notifast.app.presentation.atoms.NotiFastListSkeleton
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
+import com.notifast.app.presentation.feature.grades.components.AcademicAnalyticsContent
 import com.notifast.app.presentation.feature.grades.components.EmptyGradesState
+import com.notifast.app.presentation.feature.grades.components.GradesTabSelector
 import com.notifast.app.presentation.feature.grades.components.MainAverageDashboard
 import com.notifast.app.presentation.feature.grades.components.SubjectGradeCard
 
 /**
- * NotiFast 3.0 Grades and Academic Performance Screen.
- * Fully modularized following Clean Architecture and SRP (< 100 LOC).
+ * NotiFast 3.0 Grades and Predictive Analytics Screen.
+ * Fully modularized following Clean Architecture and SRP (< 140 LOC).
  */
 @Composable
 fun GradesScreen(
@@ -79,24 +81,43 @@ fun GradesScreen(
                         .fillMaxSize()
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 88.dp)
                 ) {
                     item {
-                        MainAverageDashboard(generalAverage = uiState.globalAverage)
+                        GradesTabSelector(
+                            selectedTab = uiState.selectedTab,
+                            onTabSelected = { viewModel.onEvent(GradesEvent.SelectTab(it)) }
+                        )
                     }
 
-                    if (uiState.subjectGrades.isEmpty()) {
-                        item {
-                            EmptyGradesState()
-                        }
-                    } else {
-                        items(uiState.subjectGrades, key = { it.subject }) { subjectGrade ->
-                            SubjectGradeCard(
-                                subjectGrade = subjectGrade,
-                                onUpdateGrade = { id, g, p ->
-                                    viewModel.onEvent(GradesEvent.UpdateGrade(id, g, p))
+                    when (uiState.selectedTab) {
+                        GradesTab.SUBJECTS -> {
+                            item {
+                                MainAverageDashboard(generalAverage = uiState.globalAverage)
+                            }
+
+                            if (uiState.subjectGrades.isEmpty()) {
+                                item {
+                                    EmptyGradesState()
                                 }
-                            )
+                            } else {
+                                items(uiState.subjectGrades, key = { it.subject }) { subjectGrade ->
+                                    SubjectGradeCard(
+                                        subjectGrade = subjectGrade,
+                                        onUpdateGrade = { id, g, p ->
+                                            viewModel.onEvent(GradesEvent.UpdateGrade(id, g, p))
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        GradesTab.ANALYTICS -> {
+                            item {
+                                AcademicAnalyticsContent(
+                                    stats = uiState.academicStats,
+                                    gradeScale = uiState.gradeScale
+                                )
+                            }
                         }
                     }
                 }

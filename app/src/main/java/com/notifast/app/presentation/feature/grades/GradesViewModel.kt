@@ -8,7 +8,9 @@ import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.CalculateAcademicStatsUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +25,11 @@ import javax.inject.Inject
 class GradesViewModel @Inject constructor(
     private val evaluationRepository: EvaluationRepository,
     private val noteRepository: NoteRepository,
+    private val scheduleRepository: ScheduleRepository,
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository,
-    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
+    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
+    private val calculateAcademicStatsUseCase: CalculateAcademicStatsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GradesUiState())
@@ -56,8 +60,9 @@ class GradesViewModel @Inject constructor(
             combine(
                 evaluationRepository.getEvaluations(userId),
                 noteRepository.getSubjects(userId),
+                scheduleRepository.getSchedules(userId),
                 userPrefsRepository.defaultGradeScaleFlow
-            ) { evaluations, subjects, scaleId ->
+            ) { evaluations, subjects, schedules, scaleId ->
                 val evalsBySubject = evaluations.groupBy { it.subjectName }
                 val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
                 val scale = GradeScale.fromId(scaleId)
@@ -68,13 +73,21 @@ class GradesViewModel @Inject constructor(
                         average = calculateWeightedAverageUseCase(evals) ?: 0.0
                     )
                 }.sortedBy { it.subject }
-                
+
+                val academicStats = calculateAcademicStatsUseCase(
+                    evaluations = evaluations,
+                    subjects = subjects,
+                    schedules = schedules,
+                    gradeScale = scale
+                )
+
                 _uiState.value.copy(
                     evaluationsBySubject = evalsBySubject,
                     subjects = subjects,
                     globalAverage = globalAverage,
                     gradeScale = scale,
                     subjectGrades = subjectGrades,
+                    academicStats = academicStats,
                     isLoading = false
                 )
             }.collect { state -> _uiState.value = state }
@@ -84,6 +97,7 @@ class GradesViewModel @Inject constructor(
     fun onEvent(event: GradesEvent) {
         when (event) {
             is GradesEvent.LoadData -> loadData()
+            is GradesEvent.SelectTab -> _uiState.update { it.copy(selectedTab = event.tab) }
             is GradesEvent.UpdateGrade -> updateGrade(event.evaluationId, event.grade, event.isPresented)
             is GradesEvent.SetGradeScale -> {
                 viewModelScope.launch {
