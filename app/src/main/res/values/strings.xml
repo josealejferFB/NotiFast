@@ -410,4 +410,18 @@
     <string name="subject_detail_eval_status_graded">Calificada</string>
     <string name="subject_detail_eval_status_pending">Pendiente</string>
     <string name="subject_detail_eval_status_overdue">Vencida</string>
+
+    <!-- Notification Channels & Templates (Sprint 3.1) -->
+    <string name="channel_evaluations_name">Evaluaciones y Exámenes</string>
+    <string name="channel_evaluations_desc">Recordatorios de fechas límites, entregas y exámenes programados.</string>
+    <string name="channel_classes_name">Horarios y Clases</string>
+    <string name="channel_classes_desc">Alertas de inicio de clases inminentes con salón y profesor.</string>
+    <string name="channel_daily_summary_name">Resumen Diario</string>
+    <string name="channel_daily_summary_desc">Resumen matutino de clases y entregas del día.</string>
+
+    <string name="notification_eval_title">Recordatorio: %1$s</string>
+    <string name="notification_eval_body">Evaluación de %1$s programada para %2$s (Peso: %3$s%%).</string>
+    <string name="notification_class_title">Clase inminente: %1$s</string>
+    <string name="notification_class_body">Comienza a las %1$s • Salón: %2$s</string>
+    <string name="notification_daily_summary_title">Tu Jornada de Hoy en NotiFast</string>
 </resources>
