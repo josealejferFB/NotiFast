@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.CreateNewFolder
+import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -56,7 +57,8 @@ fun NotesScreen(
     onNoteClick: (String) -> Unit,
     onAddEvaluationClick: (String) -> Unit,
     onSubjectDetailClick: (String) -> Unit = {},
-    onEditProfile: () -> Unit
+    onEditProfile: () -> Unit,
+    onSearchClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var subjectToDelete by remember { mutableStateOf<String?>(null) }
@@ -67,6 +69,7 @@ fun NotesScreen(
     var showAddNoteSheet by remember { mutableStateOf(false) }
     var addNoteSubject by remember { mutableStateOf<String?>(null) }
     var showAddSubjectSheet by remember { mutableStateOf(false) }
+    var showImportSubjectSheet by remember { mutableStateOf(false) }
 
     val handleOpenAddNote: (String?) -> Unit = { subj ->
         addNoteSubject = subj
@@ -83,7 +86,8 @@ fun NotesScreen(
                         firstName = uiState.userFirstName,
                         email = uiState.userEmail,
                         profilePictureUrl = uiState.userProfilePictureUrl,
-                        onProfileClick = onEditProfile
+                        onProfileClick = onEditProfile,
+                        onSearchClick = onSearchClick
                     )
                 )
             },
@@ -91,6 +95,7 @@ fun NotesScreen(
                 NotiFastExpandableFab(
                     actions = listOf(
                         FabAction(stringResource(R.string.fab_add_subject), Icons.Default.CreateNewFolder, { showAddSubjectSheet = true }, stringResource(R.string.fab_add_subject), MaterialTheme.colorScheme.secondary),
+                        FabAction(stringResource(R.string.import_subject_title), androidx.compose.material.icons.Icons.Default.QrCode2, { showImportSubjectSheet = true }, stringResource(R.string.import_subject_title), MaterialTheme.colorScheme.tertiary),
                         FabAction(stringResource(R.string.fab_add_note), Icons.AutoMirrored.Filled.NoteAdd, { handleOpenAddNote(null) }, stringResource(R.string.fab_add_note), MaterialTheme.colorScheme.primary)
                     ),
                     modifier = Modifier.padding(bottom = 72.dp)
@@ -205,6 +210,18 @@ fun NotesScreen(
                     NoteDetailExpandable(note = note, onClose = { expandedNote = null }, onEdit = { onNoteClick(note.id); expandedNote = null })
                 }
             }
+        }
+
+        if (showImportSubjectSheet) {
+            com.notifast.app.presentation.feature.share.ImportSubjectBottomSheet(
+                userId = uiState.userId,
+                importUseCase = viewModel.importSubjectPackageUseCase,
+                onDismiss = { showImportSubjectSheet = false },
+                onSubjectImported = { importedName ->
+                    viewModel.onEvent(NotesEvent.LoadNotes)
+                    onSubjectClick(importedName)
+                }
+            )
         }
     }
 }

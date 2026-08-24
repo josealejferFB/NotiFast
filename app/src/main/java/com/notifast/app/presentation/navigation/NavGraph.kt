@@ -21,6 +21,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.notifast.app.presentation.feature.search.GlobalSearchBottomSheet
 import com.notifast.app.presentation.atoms.NotiFastBottomNav
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.feature.addnote.AddNoteScreen
@@ -40,6 +44,7 @@ import com.notifast.app.presentation.feature.addschedule.AddScheduleScreen
 import com.notifast.app.presentation.feature.editschedule.EditScheduleScreen
 import com.notifast.app.presentation.theme.color.Ruby
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent() {
     val mainViewModel: MainViewModel = hiltViewModel()
@@ -56,6 +61,7 @@ fun MainContent() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    var showGlobalSearchSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState) {
         if (authState == true) {
@@ -114,7 +120,8 @@ fun MainContent() {
                     onNoteClick = { noteId -> navController.navigate(Screen.EditNote.createRoute(noteId)) },
                     onAddEvaluationClick = { subject -> navController.navigate(Screen.AddEvaluation.createRoute(subject)) },
                     onSubjectDetailClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
-                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                    onSearchClick = { showGlobalSearchSheet = true }
                 )
             }
             composable(
@@ -177,7 +184,8 @@ fun MainContent() {
                     onTakeNoteClick = { subject -> navController.navigate(Screen.AddNote.createRoute(subject)) },
                     onEditScheduleClick = { scheduleId -> navController.navigate(Screen.EditSchedule.createRoute(scheduleId)) },
                     onEditEvaluationClick = { eval -> navController.navigate(Screen.EditEvaluation.createRoute(eval.id)) },
-                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                    onSearchClick = { showGlobalSearchSheet = true }
                 )
             }
             composable(Screen.AddSchedule.route) {
@@ -197,7 +205,8 @@ fun MainContent() {
             }
             composable(Screen.Grades.route) {
                 GradesScreen(
-                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                    onSearchClick = { showGlobalSearchSheet = true }
                 )
             }
             composable(Screen.Settings.route) {
@@ -240,6 +249,16 @@ fun MainContent() {
                     onBack = { navController.popBackStack() }
                 )
             }
+        }
+
+        if (showGlobalSearchSheet) {
+            GlobalSearchBottomSheet(
+                onDismiss = { showGlobalSearchSheet = false },
+                onNavigateToRoute = { route ->
+                    showGlobalSearchSheet = false
+                    navController.navigate(route)
+                }
+            )
         }
     }
 }

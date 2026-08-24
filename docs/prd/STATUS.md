@@ -15,11 +15,11 @@ Fase 1: Fundamentos               [███████████████
 Fase 2: Experiencia Core          [████████████████] 100% (13/13 tareas) ✅
 Fase 2.1: Ergonomía Forms         [████████████████] 100% (9/9 tareas) ✅
 Sprint Design 3.0: Tactile Studio [████████████████] 100% (3/3 Sprints) ✅
-Fase 3: Features Avanzadas        [██████████░░░░░░]  66% (12/18 tareas) 🟡 (Sprint 3.1 y 3.2 Listos)
+Fase 3: Features Avanzadas        [████████████████] 100% (18/18 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  70.4% (69/98 tareas)
+PROGRESO TOTAL ESTIMADO:          [████████████░░░░]  76.5% (75/98 tareas)
 ```
 
 ---
@@ -141,9 +141,9 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
-### 🟡 Fase 3: Features Avanzadas — Inteligencia Predictiva y Notificaciones Proactivas (En Progreso — 66%)
+### 🟢 Fase 3: Features Avanzadas — Inteligencia Predictiva, Búsqueda Global y Pack P2P (100% Completada)
 *Meta: Notificaciones locales inteligentes vía Android WorkManager, recordatorios proactivos de entregas/clases, analíticas predictivas de rendimiento académico, búsqueda global multientidad y pack académico P2P.*  
-*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_3.1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.1.md)
+*Guías de Arranque:* [`docs/prd/KICKOFF_FASE_3.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.md) | [`docs/prd/KICKOFF_FASE_3.1.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.1.md) | [`docs/prd/KICKOFF_FASE_3.2.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_3.2.md)
 
 - [x] **Sprint 3.1: Motor de Notificaciones Proactivas con WorkManager (100% Completado)**
   * **Infraestructura:** WorkManager 2.10.0 + HiltWorkerFactory (`Configuration.Provider`), canales de notificación especializados con vibración y deep links directos (`NotificationChannelsManager`, `NotificationSender`).
@@ -160,15 +160,26 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
   * **Integración Ergonómica:** Conmutador segmentado táctil en `GradesScreen` (`[ Resumen Materias | Analíticas & Proyecciones ]`) manteniendo SRP (< 140 LOC).
   * **Calidad:** 100% de tests unitarios pasando (`CalculateAcademicStatsUseCaseTest`, `GradesViewModelTest`) y `assembleDebug` exitoso.
 
-- [ ] **Sprint 3.3: Búsqueda Global Multientidad en Tiempo Real (Siguiente Sprint)**
-- [ ] **Sprint 3.4: Pack Académico P2P, Intercambio Offline y Resiliencia Free-Tier**
+- [x] **Sprint 3.3: Búsqueda Global Multientidad en Tiempo Real (100% Completado)**
+  * **Dominio Puro & TDD:** `SearchGlobalUseCase` con normalización diacrítica insensible a acentos/diacríticos (`Normalizer.Form.NFD`), tokenización multiterm y filtrado reactivo cruzado en 4 entidades (`SubjectData`, `Note`, `Evaluation`, `Schedule`).
+  * **Arquitectura MVI:** `SearchViewModel` con `StateFlow` único, `debounce(300ms)`, filtrado por chips de tipo y persistencia de hasta 5 búsquedas recientes.
+  * **Experiencia de Usuario:** `GlobalSearchBottomSheet` modal táctil interactivo, chips de filtro horizontal, tarjetas de resultado táctiles `SearchResultCard` con monogramas HSL y rutas type-safe hacia las pantallas de destino.
+  * **Integración:** Acceso unificado en el TopBar de toda la aplicación (`onSearchClick`).
+
+- [x] **Sprint 3.4: Pack Académico P2P, Intercambio Offline y Resiliencia Free-Tier (100% Completado)**
+  * **Schema & Codec Portable:** `SubjectPackage` y `SubjectPackageCodec` con serialización JSON completa (Syllabus, Clases, Evaluaciones, Ponderaciones y Notas opcionales), compresión binaria GZIP y codificación Base64 en encabezado mágico `NOTIFAST1:`.
+  * **Casos de Uso de Exportación e Importación:** `ExportSubjectPackageUseCase` e `ImportSubjectPackageUseCase` con sanitización de identificadores de usuario y estrategia de resolución de colisiones (`RENAME`, `OVERWRITE`, `SKIP_IF_EXISTS`).
+  * **QR Code Generator Offline:** `QrCodeGenerator` con motor ZXing y diálogo modal táctil `QrCodeShareDialog` de alto contraste.
+  * **UI de Intercambio P2P:** `ShareSubjectBottomSheet` integrado en `SubjectDetailScreen` y `ImportSubjectBottomSheet` integrado con selector de acciones en `NotesScreen`.
+  * **Verificación:** 100% tests unitarios pasando (`SubjectPackageCodecTest`, `ExportSubjectPackageUseCaseTest`, `ImportSubjectPackageUseCaseTest`, `SearchGlobalUseCaseTest`, `SearchViewModelTest`) y build APK `assembleDebug` exitoso.
 
 ---
 
-### ⚪ Fase 4: Pulido & Experiencia (Pendiente)
-*Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), y optimización de rendimiento Compose.*
+### ⚪ Fase 4: Pulido, Experiencia, Accesibilidad y Rendimiento (Siguiente Fase)
+*Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), transiciones de pantalla con View Transitions en Compose, auditoría de rendimiento y depuración de memoria.*  
+*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_4.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_4.md)
 
 ---
 
-### ⚪ Fase 5: Despliegue & Tesis (Pendiente)
+### ⚪ Fase 5: Despliegue, Métricas de Tesis y Lanzamiento en Play Store (Pendiente)
 *Meta: Testing en aula real, recolección de métricas de tesis y publicación en Google Play Store.*

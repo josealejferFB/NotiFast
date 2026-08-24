@@ -24,6 +24,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import com.notifast.app.domain.usecase.ImportSubjectPackageUseCase
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -31,7 +32,8 @@ class NotesViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val evaluationRepository: EvaluationRepository,
     private val scheduleRepository: ScheduleRepository,
-    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase
+    private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
+    val importSubjectPackageUseCase: ImportSubjectPackageUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -51,6 +53,7 @@ class NotesViewModel @Inject constructor(
             val uid = authRepository.getCurrentUserId() ?: return@launch
             authRepository.getUserProfile(uid).onSuccess { user ->
                 _uiState.update { it.copy(
+                    userId = uid,
                     userFirstName = user.firstName,
                     userLastName = user.lastName,
                     userEmail = user.email,
@@ -63,7 +66,7 @@ class NotesViewModel @Inject constructor(
     private fun loadNotes() {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(userId = userId, isLoading = true, error = null) }
 
             val filterParamsFlow = combine(_currentFilter, _searchQuery, _selectedTag) { filter, query, tag ->
                 Triple(filter, query, tag)

@@ -33,6 +33,7 @@ data class SubjectInfo(
 )
 
 data class NotesUiState(
+    val userId: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
     val notes: Map<String, List<Note>> = emptyMap(),

@@ -43,6 +43,8 @@ fun SettingsSectionsContent(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Section 1: Hero Card 3.0
         SettingsProfileHeroCard(
             user = uiState.userProfile,

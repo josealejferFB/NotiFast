@@ -454,4 +454,73 @@
     <string name="analytics_recommendations_title">Recomendaciones Tácticas</string>
     <string name="analytics_no_data_title">Sin datos analíticos suficientes</string>
     <string name="analytics_no_data_desc">Registra tus materias y calificaciones para visualizar diagnósticos predictivos.</string>
+
+    <!-- Global Search (Sprint 3.3) -->
+    <string name="search_global_title">Búsqueda Global</string>
+    <string name="search_placeholder">Buscar materias, apuntes, tareas, clases…</string>
+    <string name="search_filter_all">Todos</string>
+    <string name="search_filter_subjects">Materias</string>
+    <string name="search_filter_notes">Apuntes</string>
+    <string name="search_filter_evaluations">Evaluaciones</string>
+    <string name="search_filter_schedules">Horarios</string>
+    <string name="search_recent_title">Búsquedas recientes</string>
+    <string name="search_recent_clear">Borrar historial</string>
+    <string name="search_no_results_title">Sin resultados encontrados</string>
+    <string name="search_no_results_desc">No encontramos coincidencias para \"%1$s\". Intenta con otras palabras clave.</string>
+    <string name="search_empty_hint_title">Explora tu Cuaderno</string>
+    <string name="search_empty_hint_desc">Escribe el nombre de una materia, profesor, tema de apunte o evaluación para encontrarlo al instante.</string>
+    <string name="search_results_count">%1$d resultados</string>
+
+    <!-- Academic Pack P2P & Sharing (Sprint 3.4) -->
+    <string name="share_subject_title">Compartir Materia</string>
+    <string name="share_subject_subtitle">Exporta el syllabus, horarios y notas clave</string>
+    <string name="share_option_file_title">Exportar Pack .notifast</string>
+    <string name="share_option_file_desc">Genera un archivo comprimido para compartir por WhatsApp, Drive o Bluetooth</string>
+    <string name="share_option_qr_title">Código QR Offline</string>
+    <string name="share_option_qr_desc">Muestra un código QR en pantalla para escaneo instantáneo en el aula</string>
+    <string name="share_option_copy_title">Copiar Resumen Markdown</string>
+    <string name="share_option_copy_desc">Copia un texto formateado con horarios y syllabus al portapapeles</string>
+    <string name="share_copied_toast">¡Resumen de %1$s copiado al portapapeles!</string>
+    <string name="share_qr_dialog_title">Pack QR de Asignatura</string>
+    <string name="share_qr_dialog_desc">Pide a tu compañero que escanee este código desde NotiFast</string>
+    <string name="share_qr_subject_meta">%1$d clases/sem • %2$d evaluaciones</string>
+    
+    <!-- Import Academic Pack -->
+    <string name="import_pack_title">Importar Pack Académico</string>
+    <string name="import_pack_subtitle">Carga una materia compartida por un compañero</string>
+    <string name="import_pack_tab_file">Archivo .notifast</string>
+    <string name="import_pack_tab_qr">Código / QR</string>
+    <string name="import_pack_select_file_btn">Seleccionar Archivo .notifast</string>
+    <string name="import_pack_paste_label">Pegar Código del Pack o QR</string>
+    <string name="import_pack_paste_placeholder">Pega aquí el texto Base64 del código QR o pack...</string>
+    <string name="import_pack_btn_process">Importar Pack</string>
+    <string name="import_pack_success">¡Materia \"%1$s\" importada exitosamente!</string>
+    <string name="import_pack_error">Error al importar el pack: %1$s</string>
+    <string name="import_pack_conflict_title">Materia ya existente</string>
+    <string name="import_pack_conflict_msg">Ya tienes una materia llamada \"%1$s\". ¿Cómo deseas proceder?</string>
+    <string name="import_pack_conflict_rename">Crear con nuevo nombre</string>
+    <string name="import_pack_conflict_overwrite">Sobrescribir / Combinar</string>
+    <string name="import_pack_conflict_cancel">Cancelar</string>
+    <string name="import_pack_btn_open">Importar Pack</string>
+
+    <!-- Academic Pack Extended Strings -->
+    <string name="share_include_notes">Incluir mis apuntes personales</string>
+    <string name="share_include_notes_desc">Exporta también el contenido de tus notas de clase</string>
+    <string name="share_via_qr">Generar Código QR</string>
+    <string name="share_via_text">Compartir como Archivo / Texto</string>
+    <string name="share_copy_clipboard">Copiar al Portapapeles</string>
+    <string name="import_subject_title">Importar Asignatura</string>
+    <string name="import_subject_subtitle">Carga una materia compartida por un compañero</string>
+    <string name="import_paste_hint">Pega el código NotiFast o escanea QR</string>
+    <string name="import_success_toast">¡Materia \"%1$s\" importada exitosamente!</string>
+    <string name="import_invalid_code">El código ingresado no es válido</string>
+    <string name="import_btn_action">Importar Asignatura</string>
+    <string name="import_conflict_title">Materia ya existente</string>
+    <string name="import_conflict_desc">Ya tienes una materia llamada \"%1$s\". ¿Cómo deseas proceder?</string>
+    <string name="import_conflict_rename">Crear con nuevo nombre (Copia)</string>
+    <string name="import_conflict_overwrite">Sobrescribir datos</string>
+    <string name="import_conflict_cancel">Cancelar</string>
+    <string name="import_scan_camera_btn">Escanear QR con Cámara</string>
+    <string name="import_scan_or_paste">O pega el código de texto</string>
+    <string name="import_scanner_error">No se pudo abrir el escáner de cámara</string>
 </resources>

@@ -38,7 +38,8 @@ import com.notifast.app.presentation.feature.grades.components.SubjectGradeCard
 @Composable
 fun GradesScreen(
     viewModel: GradesViewModel = hiltViewModel(),
-    onEditProfile: () -> Unit = {}
+    onEditProfile: () -> Unit = {},
+    onSearchClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -53,7 +54,8 @@ fun GradesScreen(
                         email = uiState.userEmail,
                         profilePictureUrl = uiState.userProfilePictureUrl,
                         contextText = stringResource(R.string.grades_title),
-                        onProfileClick = onEditProfile
+                        onProfileClick = onEditProfile,
+                        onSearchClick = onSearchClick
                     )
                 )
             }

@@ -20,6 +20,7 @@ sealed interface SubjectMilestone {
 }
 
 data class SubjectDetailUiState(
+    val userId: String = "",
     val isLoading: Boolean = true,
     val subjectName: String = "",
     val subjectIcon: String = "📚",

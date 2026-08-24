@@ -17,6 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NotiFast">
 
+        <!-- Google Code Scanner (Play Services Camera QR Scanner) -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode_ui" />
+
         <!-- Disable default WorkManagerInitializer to use on-demand HiltWorkerFactory -->
         <provider
             android:name="androidx.startup.InitializationProvider"

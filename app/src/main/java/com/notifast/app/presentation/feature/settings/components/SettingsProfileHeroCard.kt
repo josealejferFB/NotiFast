@@ -80,19 +80,17 @@ fun SettingsProfileHeroCard(
     } else "N"
 
     Surface(
+        onClick = onEditProfile,
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) { onEditProfile() }
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             },
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        interactionSource = interactionSource
     ) {
         Column(
             modifier = Modifier

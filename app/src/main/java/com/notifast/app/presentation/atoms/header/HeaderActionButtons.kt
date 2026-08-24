@@ -32,16 +32,19 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 
+import androidx.compose.material.icons.filled.Search
+
 /**
  * NotiFast 3.0 Header Action Buttons.
- * Includes notification bell with warm badge, cloud sync status, and tactile back button.
+ * Includes search icon, notification bell with warm badge, cloud sync status, and tactile back button.
  */
 @Composable
 fun HeaderHomeActions(
     hasUnreadNotifications: Boolean,
     isCloudSynced: Boolean,
     onNotificationsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSearchClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -59,6 +62,45 @@ fun HeaderHomeActions(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
+        // Search button if provided
+        if (onSearchClick != null) {
+            val searchInteractionSource = remember { MutableInteractionSource() }
+            val isSearchPressed by searchInteractionSource.collectIsPressedAsState()
+            val searchScale by animateFloatAsState(
+                targetValue = if (isSearchPressed) 0.97f else 1.0f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                ),
+                label = "search_press_scale"
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .graphicsLayer {
+                        scaleX = searchScale
+                        scaleY = searchScale
+                    }
+                    .clip(CircleShape)
+                    .clickable(
+                        interactionSource = searchInteractionSource,
+                        indication = null,
+                        role = Role.Button,
+                        onClickLabel = "Buscar",
+                        onClick = onSearchClick
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Buscar",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
+
         // Cloud sync indicator
         val syncDescription = if (isCloudSynced) {
             stringResource(R.string.topbar_sync_synced_cd)
@@ -71,7 +113,7 @@ fun HeaderHomeActions(
             contentDescription = syncDescription,
             tint = if (isCloudSynced) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
             modifier = Modifier
-                .padding(end = 6.dp)
+                .padding(horizontal = 4.dp)
                 .size(20.dp)
         )
 

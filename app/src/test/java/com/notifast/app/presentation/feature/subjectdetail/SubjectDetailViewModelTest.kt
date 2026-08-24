@@ -44,6 +44,7 @@ class SubjectDetailViewModelTest {
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
     private val calculateRequiredGradeUseCase = CalculateRequiredGradeUseCase()
+    private val exportSubjectPackageUseCase: com.notifast.app.domain.usecase.ExportSubjectPackageUseCase = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797", icon = "📐")
@@ -80,7 +81,8 @@ class SubjectDetailViewModelTest {
             authRepository,
             userPrefsRepository,
             calculateWeightedAverageUseCase,
-            calculateRequiredGradeUseCase
+            calculateRequiredGradeUseCase,
+            exportSubjectPackageUseCase
         )
     }
 

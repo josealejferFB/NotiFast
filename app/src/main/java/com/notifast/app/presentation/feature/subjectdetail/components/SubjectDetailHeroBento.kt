@@ -25,6 +25,8 @@ import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.type.monoAcademicLarge
 
+import androidx.compose.material.icons.filled.Share
+
 @Composable
 fun SubjectDetailHeroBento(
     subjectName: String,
@@ -36,6 +38,7 @@ fun SubjectDetailHeroBento(
     onAddNoteClick: () -> Unit,
     onAddEvaluationClick: () -> Unit,
     onAddScheduleClick: () -> Unit,
+    onShareClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val isDark = isSystemInDarkTheme()
@@ -70,6 +73,9 @@ fun SubjectDetailHeroBento(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
+                IconButton(onClick = onShareClick, modifier = Modifier.size(38.dp)) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = stringResource(R.string.share_subject_title), tint = Color.White)
+                }
             }
 
             Spacer(Modifier.height(14.dp))

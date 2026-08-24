@@ -62,14 +62,14 @@ fun SettingsClassAlertTimingDialog(
                 options.forEach { (minutes, label) ->
                     val isSelected = minutes == currentMinutes
                     Surface(
+                        onClick = {
+                            onSelectMinutes(minutes)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .clickable {
-                                onSelectMinutes(minutes)
-                                onDismiss()
-                            },
+                            .padding(vertical = 3.dp),
+                        shape = RoundedCornerShape(14.dp),
                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                         border = BorderStroke(
@@ -145,14 +145,14 @@ fun SettingsEvalAlertTimingDialog(
                 options.forEach { (days, label) ->
                     val isSelected = days == currentDays
                     Surface(
+                        onClick = {
+                            onSelectDays(days)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .clickable {
-                                onSelectDays(days)
-                                onDismiss()
-                            },
+                            .padding(vertical = 3.dp),
+                        shape = RoundedCornerShape(14.dp),
                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                         border = BorderStroke(

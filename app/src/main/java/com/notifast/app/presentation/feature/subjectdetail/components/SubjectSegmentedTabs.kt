@@ -55,15 +55,17 @@ fun SubjectSegmentedTabs(
                 val animatedContent by animateColorAsState(targetValue = targetContent, animationSpec = spring(stiffness = 500f), label = "TabContent")
 
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = animatedBg,
-                    shadowElevation = if (isSelected) 2.dp else 0.dp,
-                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                    onClick = {
                         if (!isSelected) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onQuadrantSelected(quadrant)
                         }
-                    }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    color = animatedBg,
+                    shadowElevation = if (isSelected) 2.dp else 0.dp,
+                    modifier = Modifier.weight(1f),
+                    interactionSource = remember { MutableInteractionSource() }
                 ) {
                     Box(modifier = Modifier.padding(vertical = 8.dp, horizontal = 2.dp), contentAlignment = Alignment.Center) {
                         Text(text = label, style = MaterialTheme.typography.labelMedium, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium, color = animatedContent, textAlign = TextAlign.Center, maxLines = 1)

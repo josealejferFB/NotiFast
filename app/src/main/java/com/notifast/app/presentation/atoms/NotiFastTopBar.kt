@@ -38,7 +38,8 @@ sealed class TopBarType {
         val isCloudSynced: Boolean = true,
         val contextText: String? = null,
         val onProfileClick: () -> Unit,
-        val onNotificationsClick: () -> Unit = {}
+        val onNotificationsClick: () -> Unit = {},
+        val onSearchClick: (() -> Unit)? = null
     ) : TopBarType()
 
     data class Detail(
@@ -139,11 +140,12 @@ private fun HomeTopBarContent(
                 }
             }
 
-            // Right Group: Cloud Sync + Notifications Bell
+            // Right Group: Cloud Sync + Notifications Bell + Search
             HeaderHomeActions(
                 hasUnreadNotifications = type.hasUnreadNotifications,
                 isCloudSynced = type.isCloudSynced,
-                onNotificationsClick = type.onNotificationsClick
+                onNotificationsClick = type.onNotificationsClick,
+                onSearchClick = type.onSearchClick
             )
         }
 

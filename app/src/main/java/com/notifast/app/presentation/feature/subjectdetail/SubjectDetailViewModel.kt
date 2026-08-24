@@ -11,6 +11,7 @@ import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.*
 import com.notifast.app.domain.usecase.CalculateRequiredGradeUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
+import com.notifast.app.domain.usecase.ExportSubjectPackageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,6 +28,7 @@ class SubjectDetailViewModel @Inject constructor(
     private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
     private val calculateRequiredGradeUseCase: CalculateRequiredGradeUseCase,
+    val exportSubjectPackageUseCase: ExportSubjectPackageUseCase,
     private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase? = null
 ) : ViewModel() {
 
@@ -44,7 +46,7 @@ class SubjectDetailViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(userId = userId, isLoading = true) }
 
             val dataFlow = combine(
                 noteRepository.getNotesBySubject(userId, subjectName),
@@ -81,6 +83,7 @@ class SubjectDetailViewModel @Inject constructor(
                 val firstSchedule = subjectSchedules.firstOrNull()
 
                 SubjectDetailUiState(
+                    userId = userId,
                     isLoading = false,
                     subjectName = subjectName,
                     subjectIcon = subjectData.icon,

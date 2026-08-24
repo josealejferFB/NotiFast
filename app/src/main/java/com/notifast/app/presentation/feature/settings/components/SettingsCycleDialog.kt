@@ -58,14 +58,14 @@ fun SettingsCycleDialog(
                 cycles.forEach { cycle ->
                     val isSelected = cycle == currentCycle
                     Surface(
+                        onClick = {
+                            onSelectCycle(cycle)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .clickable {
-                                onSelectCycle(cycle)
-                                onDismiss()
-                            },
+                            .padding(vertical = 3.dp),
+                        shape = RoundedCornerShape(14.dp),
                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                         border = BorderStroke(
@@ -140,14 +140,14 @@ fun SettingsFirstDayDialog(
                 options.forEach { (key, label) ->
                     val isSelected = key == currentFirstDay
                     Surface(
+                        onClick = {
+                            onSelectFirstDay(key)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .clickable {
-                                onSelectFirstDay(key)
-                                onDismiss()
-                            },
+                            .padding(vertical = 3.dp),
+                        shape = RoundedCornerShape(14.dp),
                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                         border = BorderStroke(

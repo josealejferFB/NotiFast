@@ -157,11 +157,11 @@ private fun GradeScaleOptionItem(
     onClick: () -> Unit
 ) {
     Surface(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .clickable { onClick() },
+            .padding(vertical = 3.dp),
+        shape = RoundedCornerShape(14.dp),
         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
         else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         border = BorderStroke(

@@ -88,8 +88,15 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
-    // Google Sign-In
+    // ZXing (QR Code Generation & Scanning)
+    implementation(libs.zxing.core)
+
+    // JSON Serialization
+    implementation(libs.gson)
+
+    // Google Sign-In & Code Scanner (Camera QR)
     implementation(libs.play.services.auth)
+    implementation(libs.play.services.code.scanner)
 
     // DataStore Preferences
     implementation(libs.androidx.datastore.preferences)

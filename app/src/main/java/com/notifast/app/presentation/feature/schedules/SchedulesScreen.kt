@@ -68,7 +68,8 @@ fun SchedulesScreen(
     onTakeNoteClick: (String) -> Unit = {},
     onEditScheduleClick: (String) -> Unit = {},
     onEditEvaluationClick: (Evaluation) -> Unit = {},
-    onEditProfile: () -> Unit = {}
+    onEditProfile: () -> Unit = {},
+    onSearchClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var scheduleToDelete by remember { mutableStateOf<Schedule?>(null) }
@@ -107,7 +108,8 @@ fun SchedulesScreen(
                         email = uiState.userEmail,
                         profilePictureUrl = uiState.userProfilePictureUrl,
                         contextText = stringResource(R.string.agenda_title),
-                        onProfileClick = onEditProfile
+                        onProfileClick = onEditProfile,
+                        onSearchClick = onSearchClick
                     )
                 )
             },

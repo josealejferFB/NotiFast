@@ -36,6 +36,7 @@ class NotesViewModelTest {
     private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
     private val scheduleRepository: ScheduleRepository = mockk(relaxed = true)
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
+    private val importSubjectPackageUseCase: com.notifast.app.domain.usecase.ImportSubjectPackageUseCase = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797"),
@@ -44,6 +45,15 @@ class NotesViewModelTest {
     private val sampleNotes = listOf(
         Note(id = "1", subject = "Matemáticas", title = "Álgebra Lineal", content = "Matrices y determinantes", tags = listOf("Examen", "Fórmula")),
         Note(id = "2", subject = "Física", title = "Cinemática", content = "Velocidad y aceleración", tags = listOf("Resumen"))
+    )
+
+    private fun createViewModel(): NotesViewModel = NotesViewModel(
+        noteRepository,
+        authRepository,
+        evaluationRepository,
+        scheduleRepository,
+        calculateWeightedAverageUseCase,
+        importSubjectPackageUseCase
     )
 
     @Before
@@ -58,7 +68,7 @@ class NotesViewModelTest {
 
     @Test
     fun `when initialized, loads notes and populates availableTags and stats`() = runTest {
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -81,7 +91,7 @@ class NotesViewModelTest {
         )
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(listOf(todaySchedule))
 
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -104,7 +114,7 @@ class NotesViewModelTest {
         )
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(listOf(eval))
 
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -116,7 +126,7 @@ class NotesViewModelTest {
 
     @Test
     fun `when no schedules and no upcoming evaluations, nextActivity is FreeDay`() = runTest {
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -129,7 +139,7 @@ class NotesViewModelTest {
         val eval2 = Evaluation(id = "e2", subjectName = "Física", grade = 4.0, weight = 50.0, isPresented = true)
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(listOf(eval1, eval2))
 
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -138,7 +148,7 @@ class NotesViewModelTest {
 
     @Test
     fun `when SelectTag event dispatched, filters notes matching tag`() = runTest {
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(NotesEvent.SelectTag("Examen"))
@@ -151,7 +161,7 @@ class NotesViewModelTest {
 
     @Test
     fun `when searching by tag or keyword, returns matching notes`() = runTest {
-        val viewModel = NotesViewModel(noteRepository, authRepository, evaluationRepository, scheduleRepository, calculateWeightedAverageUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(NotesEvent.Search("aceleración"))

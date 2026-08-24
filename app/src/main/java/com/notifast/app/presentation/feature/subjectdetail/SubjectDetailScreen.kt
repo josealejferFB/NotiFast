@@ -39,6 +39,7 @@ fun SubjectDetailScreen(
     var gradeDialogEval by remember { mutableStateOf<Evaluation?>(null) }
     var deleteEval by remember { mutableStateOf<Evaluation?>(null) }
     var deleteSchedule by remember { mutableStateOf<Schedule?>(null) }
+    var showShareSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -61,7 +62,8 @@ fun SubjectDetailScreen(
                     onBackClick = onBackClick,
                     onAddNoteClick = { onAddNoteClick(uiState.subjectName) },
                     onAddEvaluationClick = { onAddEvaluationClick(uiState.subjectName) },
-                    onAddScheduleClick = { onAddScheduleClick(uiState.subjectName) }
+                    onAddScheduleClick = { onAddScheduleClick(uiState.subjectName) },
+                    onShareClick = { showShareSheet = true }
                 )
             }
         ) { padding ->
@@ -163,6 +165,16 @@ fun SubjectDetailScreen(
                     deleteSchedule = null
                 },
                 onDismiss = { deleteSchedule = null }
+            )
+        }
+
+        if (showShareSheet) {
+            com.notifast.app.presentation.feature.share.ShareSubjectBottomSheet(
+                userId = uiState.userId,
+                subjectName = uiState.subjectName,
+                subjectColorHex = uiState.subjectColorHex,
+                exportUseCase = viewModel.exportSubjectPackageUseCase,
+                onDismiss = { showShareSheet = false }
             )
         }
     }
