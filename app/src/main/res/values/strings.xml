@@ -523,4 +523,13 @@
     <string name="import_scan_camera_btn">Escanear QR con Cámara</string>
     <string name="import_scan_or_paste">O pega el código de texto</string>
     <string name="import_scanner_error">No se pudo abrir el escáner de cámara</string>
+
+    <!-- Local Onboarding (Fase 3.5 Offline-First) -->
+    <string name="onboarding_welcome_title">Bienvenido a NotiFast</string>
+    <string name="onboarding_welcome_subtitle">Tu cuaderno académico inteligente, 100% privado y en tu dispositivo.</string>
+    <string name="onboarding_name_label">¿Cómo te llamas?</string>
+    <string name="onboarding_lastname_label">Apellido (opcional)</string>
+    <string name="onboarding_start_button">Comenzar mi Cuaderno</string>
+    <string name="onboarding_avatar_hint">Toca para añadir una foto a tu perfil</string>
+    <string name="onboarding_error_name_required">Por favor escribe tu nombre para continuar</string>
 </resources>
