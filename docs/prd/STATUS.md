@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.0
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.0**  
-> **Última actualización:** 23 de Agosto, 2026  
+> **Última actualización:** 5 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/NotiFast/PRODUCT.md)
 
 ---
@@ -16,10 +16,11 @@ Fase 2: Experiencia Core          [███████████████
 Fase 2.1: Ergonomía Forms         [████████████████] 100% (9/9 tareas) ✅
 Sprint Design 3.0: Tactile Studio [████████████████] 100% (3/3 Sprints) ✅
 Fase 3: Features Avanzadas        [████████████████] 100% (18/18 tareas) ✅
+Fase 3.5: Offline-First Local     [████████████████] 100% (9/9 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████░░░░]  76.5% (75/98 tareas)
+PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  78.5% (84/107 tareas)
 ```
 
 ---
@@ -172,6 +173,57 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
   * **QR Code Generator Offline:** `QrCodeGenerator` con motor ZXing y diálogo modal táctil `QrCodeShareDialog` de alto contraste.
   * **UI de Intercambio P2P:** `ShareSubjectBottomSheet` integrado en `SubjectDetailScreen` y `ImportSubjectBottomSheet` integrado con selector de acciones en `NotesScreen`.
   * **Verificación:** 100% tests unitarios pasando (`SubjectPackageCodecTest`, `ExportSubjectPackageUseCaseTest`, `ImportSubjectPackageUseCaseTest`, `SearchGlobalUseCaseTest`, `SearchViewModelTest`) y build APK `assembleDebug` exitoso.
+
+---
+
+### 🟢 Fase 3.5: Almacenamiento Local 100% Offline-First (100% Completado)
+*Meta: Migración integral de NotiFast a una arquitectura autónoma 100% offline-first basada en Room Database, DataStore Preferences y almacenamiento interno de archivos, eliminando la dependencia obligatoria de Firebase en runtime y garantizando persistencia inmediata sin red.*  
+*Plan de Ejecución:* [Plan SDD Offline-First](file:///home/analista/Documents/Projects/Notifast/.superpowers/plans/2026-10-05-offline-first-local-storage.md)
+
+- [x] **Task 1: Configuración de Dependencias Room y Tipografías Offline**
+  * Incorporación de AndroidX Room 2.6.1 con plugin KSP (`androidx.room:room-runtime`, `androidx.room:room-ktx`, `androidx.room:room-compiler`).
+  * Inclusión de fuentes empaquetadas en `assets/fonts/` (`PlusJakartaSans` y `JetBrainsMono`) eliminando dependencias de Google Fonts descargables en red para garantizar consistencia visual 100% offline.
+  * Configuración de reglas de backup de Room y preferencias en `res/xml/backup_rules.xml` y `res/xml/data_extraction_rules.xml`.
+
+- [x] **Task 2: Entidades Room, TypeConverters y Desacoplamiento de Modelos de Dominio**
+  * Creación de entidades inmutables Room: `SubjectEntity`, `NoteEntity`, `EvaluationEntity`, `ScheduleEntity`, `UserEntity`.
+  * Configuración de índices optimizados (`userId`, `subjectId`) y claves foráneas en cascada.
+  * Implementación de `RoomConverters` con soporte para `Instant`, `List<String>` y `LocalDate`.
+  * Desacoplamiento total de dependencias de Firebase en modelos de dominio y mapping bidireccional puro (`toDomain()`, `toEntity()`).
+
+- [x] **Task 3: DAOs Reactivos Room y Base de Datos NotiFast**
+  * Definición de `SubjectDao`, `NoteDao`, `EvaluationDao`, `ScheduleDao` y `UserDao` con consultas reactivas basadas en `Flow` y operaciones de escritura suspendibles.
+  * Creación de `NotiFastDatabase` con soporte de Room Database y migración destructiva controlada en desarrollo.
+  * Módulo Hilt `DatabaseModule` para inyección de singleton de la base de datos y cada uno de los DAOs.
+
+- [x] **Task 4: Repositorios Locales Room y Cascada Segura de Archivos**
+  * Implementación de `LocalNoteRepositoryImpl`, `LocalEvaluationRepositoryImpl`, `LocalScheduleRepositoryImpl` e `ImageRepositoryImpl`.
+  * Lógica de eliminación en cascada segura (`DeleteSubjectCascadeUseCase`): borrado automático de registros asociados y purga física de archivos de imágenes en almacenamiento local (`app_notes_images/`) para evitar fugas de memoria o almacenamiento huérfano.
+  * Actualización de bindings Hilt en `RepositoryModule` conectando interfaces de dominio a repositorios Room locales.
+
+- [x] **Task 5: Autenticación Local Autónoma y Sesión en DataStore**
+  * Implementación de `LocalAuthRepositoryImpl` para gestión completa de perfil y sesión de estudiante sin conexión a Firebase Auth.
+  * Persistencia reactiva del usuario activo y credenciales mediante `UserPreferencesDataSource` (DataStore) y `UserDao`.
+  * Hashing seguro de contraseña con SHA-256 + salt determinista e interfaz limpia `AuthRepository`.
+
+- [x] **Task 6: Onboarding Local de Bienvenida para el Estudiante**
+  * Creación de `OnboardingScreen` y `OnboardingViewModel` bajo especificación Material 3 / Tactile Studio.
+  * Captura amigable y ergonómica de nombre, carrera, semestre, selección de avatar estudiantil y credenciales de acceso local opcional.
+  * Validación táctil con feedback instantáneo y guardado directo de perfil y sesión.
+
+- [x] **Task 7: Navegación Dinámica en NavGraph y Alineación de Ajustes**
+  * Integración en `NavGraph` con `startDestination` reactivo condicionado al estado de onboarding/sesión local (`Screen.Onboarding` vs `Screen.Notes`).
+  * Adaptación de `SettingsScreen` y `SettingsViewModel`: visualización del perfil local del estudiante, sincronización de DataStore y opción de cerrar sesión local.
+
+- [x] **Task 8: Indicador Honesto de Almacenamiento Local & Optimización de Autosave**
+  * Corrección visual en `NotiFastTopBar`: sustitución del texto engañoso "Sincronizado con la nube" por "Guardado localmente en este dispositivo" con icono táctil `CloudDone` y micro-borde `outlineVariant`.
+  * Optimización de guardado automático en `AddNoteViewModel` y `EditNoteViewModel`: verificación de URI previa para evitar duplicación y sobreescritura redundante de imágenes en almacenamiento interno.
+
+- [x] **Task 9: Test de Límite de Arquitectura Offline-First & Verificación Integral**
+  * Creación de `OfflineArchitectureBoundaryTest` para verificación estricta y automatizada en CI/CD:
+    - Validación de que ningún archivo de presentación, dominio o datos locales importe `com.google.firebase.firestore`.
+    - Validación de que ningún archivo de presentación o dominio importe `com.google.firebase.auth`.
+  * Verificación completa: 237 pruebas unitarias en 46 suites pasando exitosamente (`testDebugUnitTest`) y compilación APK completa aprobada (`assembleDebug`).
 
 ---
 
