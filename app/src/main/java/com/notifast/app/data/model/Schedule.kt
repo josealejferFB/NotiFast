@@ -1,6 +1,5 @@
 package com.notifast.app.data.model
 
-import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 data class Schedule(
@@ -15,8 +14,8 @@ data class Schedule(
     val teacher: String = "",
     val meetingUrl: String? = null, // Link para clases virtuales
     val color: Long = 0L,
-    @ServerTimestamp val createdAt: Date? = null,
-    @ServerTimestamp val updatedAt: Date? = null
+    val createdAt: Date? = null,
+    val updatedAt: Date? = null
 ) {
     companion object {
         val DAY_NAMES = listOf("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
