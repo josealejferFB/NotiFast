@@ -25,4 +25,9 @@ interface AuthRepository {
         lastName: String,
         profileImageUri: Uri?
     ): Result<Unit>
+    suspend fun createLocalProfile(
+        firstName: String,
+        lastName: String,
+        profileImageUri: Uri?
+    ): Result<String>
 }

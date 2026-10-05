@@ -1,8 +1,8 @@
 package com.notifast.app.di
 
 import com.notifast.app.data.analytics.FirebaseAnalyticsTracker
-import com.notifast.app.data.repository.AuthRepositoryImpl
 import com.notifast.app.data.repository.ImageRepositoryImpl
+import com.notifast.app.data.repository.LocalAuthRepositoryImpl
 import com.notifast.app.data.repository.LocalEvaluationRepositoryImpl
 import com.notifast.app.data.repository.LocalNoteRepositoryImpl
 import com.notifast.app.data.repository.LocalScheduleRepositoryImpl
@@ -26,7 +26,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+    abstract fun bindAuthRepository(impl: LocalAuthRepositoryImpl): AuthRepository
 
     @Binds
     @Singleton

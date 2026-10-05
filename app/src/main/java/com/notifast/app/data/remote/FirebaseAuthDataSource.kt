@@ -1,8 +1,7 @@
-package com.notifast.app.data.repository
+package com.notifast.app.data.remote
 
 import android.net.Uri
 import com.notifast.app.data.model.User
-import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -15,14 +14,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthRepositoryImpl @Inject constructor(
+class FirebaseAuthDataSource @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
     private val imageRepository: ImageRepository
-) : AuthRepository {
+) {
 
     private val _authState = MutableStateFlow<Boolean?>(null)
-    override val authState: StateFlow<Boolean?> = _authState.asStateFlow()
+    val authState: StateFlow<Boolean?> = _authState.asStateFlow()
 
     init {
         auth.addAuthStateListener { firebaseAuth ->
@@ -30,7 +29,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(email: String, password: String): Result<String> {
+    suspend fun login(email: String, password: String): Result<String> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val uid = result.user?.uid ?: return Result.failure(Exception("Login failed: no user"))
@@ -40,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signUp(
+    suspend fun signUp(
         email: String,
         password: String,
         firstName: String,
@@ -71,7 +70,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signInWithGoogle(idToken: String): Result<String> {
+    suspend fun signInWithGoogle(idToken: String): Result<String> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             val result = auth.signInWithCredential(credential).await()
@@ -97,15 +96,15 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout() {
+    suspend fun logout() {
         auth.signOut()
     }
 
-    override suspend fun getCurrentUserId(): String? {
+    suspend fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
     }
 
-    override suspend fun getUserProfile(uid: String): Result<User> {
+    suspend fun getUserProfile(uid: String): Result<User> {
         return try {
             val document = db.collection("users").document(uid).get().await()
             val user = document.toObject(User::class.java)
@@ -116,7 +115,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateProfile(
+    suspend fun updateProfile(
         uid: String,
         firstName: String,
         lastName: String,
