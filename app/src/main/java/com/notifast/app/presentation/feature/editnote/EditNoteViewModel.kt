@@ -120,7 +120,7 @@ class EditNoteViewModel @Inject constructor(
                 note = note.copy(title = state.title, content = state.content, tags = state.tags),
                 imageUri = state.imageUri
             ).fold(
-                onSuccess = { _uiState.update { it.copy(syncStatus = "Guardado", isSaved = exitAfter) } },
+                onSuccess = { _uiState.update { it.copy(imageUri = null, syncStatus = "Guardado", isSaved = exitAfter) } },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al guardar", syncStatus = "Error") } }
             )
         }

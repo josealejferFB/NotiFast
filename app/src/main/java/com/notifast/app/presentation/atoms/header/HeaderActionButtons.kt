@@ -14,8 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -101,17 +101,17 @@ fun HeaderHomeActions(
             }
         }
 
-        // Cloud sync indicator
+        // Storage & sync indicator (honest local storage vs cloud sync)
         val syncDescription = if (isCloudSynced) {
             stringResource(R.string.topbar_sync_synced_cd)
         } else {
-            stringResource(R.string.topbar_sync_offline_cd)
+            stringResource(R.string.topbar_local_storage_cd)
         }
 
         Icon(
-            imageVector = if (isCloudSynced) Icons.Default.CloudDone else Icons.Default.CloudOff,
+            imageVector = if (isCloudSynced) Icons.Default.CloudDone else Icons.Default.PhoneAndroid,
             contentDescription = syncDescription,
-            tint = if (isCloudSynced) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
+            tint = if (isCloudSynced) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .size(20.dp)

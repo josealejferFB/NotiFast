@@ -231,6 +231,7 @@
     <string name="topbar_avatar_cd">Perfil de usuario de %1$s. Toca para ver y editar tu perfil.</string>
     <string name="topbar_sync_synced_cd">Nube sincronizada correctamente</string>
     <string name="topbar_sync_offline_cd">Modo sin conexión o sincronización pendiente</string>
+    <string name="topbar_local_storage_cd">Almacenado localmente en tu dispositivo</string>
     <string name="topbar_sync_syncing_cd">Sincronizando con la nube…</string>
     <string name="topbar_notifications_cd">Notificaciones académicas</string>
     <string name="topbar_back_cd">Regresar</string>
@@ -522,7 +523,7 @@
     <string name="import_conflict_cancel">Cancelar</string>
     <string name="import_scan_camera_btn">Escanear QR con Cámara</string>
     <string name="import_scan_or_paste">O pega el código de texto</string>
-    <string name="import_scanner_error">No se pudo abrir el escáner de cámara</string>
+    <string name="import_scanner_error">No se pudo abrir el escáner. Puedes pegar el código de texto manualmente.</string>
 
     <!-- Local Onboarding (Fase 3.5 Offline-First) -->
     <string name="onboarding_welcome_title">Bienvenido a NotiFast</string>

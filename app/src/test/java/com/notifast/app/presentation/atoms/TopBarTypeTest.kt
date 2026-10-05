@@ -42,6 +42,20 @@ class TopBarTypeTest {
     }
 
     @Test
+    fun `home top bar contract preserves isCloudSynced false for local offline storage`() {
+        val defaultHome = TopBarType.Home(
+            firstName = "Ana",
+            email = "ana@universidad.edu",
+            profilePictureUrl = null,
+            onProfileClick = {}
+        )
+        assertTrue(defaultHome.isCloudSynced)
+
+        val offlineHome = defaultHome.copy(isCloudSynced = false)
+        assertFalse(offlineHome.isCloudSynced)
+    }
+
+    @Test
     fun `detail top bar contract supports subtitle and back action`() {
         var backClicked = false
 

@@ -13,7 +13,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.net.Uri
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -79,6 +81,26 @@ class EditNoteViewModelTest {
         advanceUntilIdle()
 
         coVerify { noteRepository.updateNote("user_123", match { it.title == "Álgebra Lineal" }, null) }
+        assertTrue(viewModel.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `when saveNote succeeds with imageUri, resets imageUri to null in uiState`() = runTest {
+        val mockUri = mockk<Uri>()
+        coEvery { noteRepository.updateNote(any(), any(), mockUri) } returns Result.success(Unit)
+
+        val savedStateHandle = SavedStateHandle(mapOf("noteId" to "1"))
+        val viewModel = EditNoteViewModel(savedStateHandle, noteRepository, authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(EditNoteEvent.ImageSelected(mockUri))
+        assertEquals(mockUri, viewModel.uiState.value.imageUri)
+
+        viewModel.onEvent(EditNoteEvent.SaveClicked)
+        advanceUntilIdle()
+
+        coVerify { noteRepository.updateNote("user_123", any(), mockUri) }
+        assertNull(viewModel.uiState.value.imageUri)
         assertTrue(viewModel.uiState.value.isSaved)
     }
 }
