@@ -45,8 +45,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.foundation.layout.width
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
 
@@ -55,7 +53,7 @@ import com.notifast.app.presentation.theme.color.Ruby
 fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -68,8 +66,6 @@ fun EditProfileScreen(
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? -> selectedImageUri = uri }
-
-    var showLogoutDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
@@ -165,38 +161,8 @@ fun EditProfileScreen(
                         Text("Actualizar Perfil", fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                androidx.compose.material3.OutlinedButton(
-                    onClick = { showLogoutDialog = true },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-                ) {
-                    Icon(Icons.Default.ExitToApp, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Cerrar sesión", fontWeight = FontWeight.Bold)
-                }
             }
         }
     }
-
-    if (showLogoutDialog) {
-        com.notifast.app.presentation.atoms.NotiFastDialog(
-            title = "¿Cerrar Sesión?",
-            message = "¿Estás seguro de que deseas salir de tu cuenta de NotiFast?",
-            confirmText = "Cerrar Sesión",
-            dismissText = "Cancelar",
-            confirmColor = Ruby,
-            confirmWeight = FontWeight.Bold,
-            onConfirm = {
-                showLogoutDialog = false
-                onLogout()
-            },
-            onDismiss = { showLogoutDialog = false }
-        )
-    }
-    }
+}
 }

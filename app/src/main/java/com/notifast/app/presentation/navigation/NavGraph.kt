@@ -27,16 +27,21 @@ import androidx.compose.runtime.setValue
 import com.notifast.app.presentation.feature.search.GlobalSearchBottomSheet
 import com.notifast.app.presentation.atoms.NotiFastBottomNav
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import com.notifast.app.presentation.feature.addnote.AddNoteScreen
 import com.notifast.app.presentation.feature.addsubject.AddSubjectScreen
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
-import com.notifast.app.presentation.feature.auth.LoginScreen
 import com.notifast.app.presentation.feature.editnote.EditNoteScreen
 import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
 import com.notifast.app.presentation.feature.editprofile.EditProfileScreen
 import com.notifast.app.presentation.feature.grades.GradesScreen
 import com.notifast.app.presentation.feature.main.MainViewModel
 import com.notifast.app.presentation.feature.notes.NotesScreen
+import com.notifast.app.presentation.feature.onboarding.OnboardingScreen
 import com.notifast.app.presentation.feature.schedules.SchedulesScreen
 import com.notifast.app.presentation.feature.settings.SettingsScreen
 import com.notifast.app.presentation.feature.subjectdetail.SubjectDetailScreen
@@ -63,11 +68,13 @@ fun MainContent() {
     val currentDestination = navBackStackEntry?.destination
     var showGlobalSearchSheet by remember { mutableStateOf(false) }
 
+    val startDestination = if (authState == true) Screen.Notes.route else Screen.Onboarding.route
+
     LaunchedEffect(authState) {
         if (authState == true) {
-            navController.navigate(Screen.Notes.route) {
-                popUpTo(0) { inclusive = true }
-            }
+            navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
+        } else if (authState == false) {
+            navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } }
         }
     }
 
@@ -83,9 +90,7 @@ fun MainContent() {
                     currentRoute = currentDestination?.route,
                     onItemClick = { screen ->
                         navController.navigate(screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -96,19 +101,12 @@ fun MainContent() {
     ) {
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route
+            startDestination = startDestination
         ) {
-            composable(Screen.Login.route) {
-                LoginScreen(
-                    onLoginSuccess = {
-                        navController.navigate(Screen.Notes.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
-                    },
-                    onSignUpSuccess = {
-                        navController.navigate(Screen.Notes.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
+            composable(Screen.Onboarding.route) {
+                OnboardingScreen(
+                    onOnboardingComplete = {
+                        navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
                     }
                 )
             }
@@ -138,18 +136,8 @@ fun MainContent() {
             composable(
                 route = Screen.EditNote.route,
                 arguments = listOf(navArgument("noteId") { type = NavType.StringType }),
-                enterTransition = {
-                    androidx.compose.animation.slideInVertically(
-                        initialOffsetY = { it },
-                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 400f)
-                    ) + androidx.compose.animation.fadeIn()
-                },
-                exitTransition = {
-                    androidx.compose.animation.slideOutVertically(
-                        targetOffsetY = { it },
-                        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 400f)
-                    ) + androidx.compose.animation.fadeOut()
-                }
+                enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeIn() },
+                exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeOut() }
             ) {
                 EditNoteScreen(
                     onBackClick = { navController.popBackStack() },
@@ -159,9 +147,7 @@ fun MainContent() {
             composable(Screen.AddSubject.route) {
                 AddSubjectScreen(
                     onSubjectCreated = { name ->
-                        navController.navigate(Screen.SubjectDetail.createRoute(name)) {
-                            popUpTo(Screen.Notes.route)
-                        }
+                        navController.navigate(Screen.SubjectDetail.createRoute(name)) { popUpTo(Screen.Notes.route) }
                     },
                     onBackClick = { navController.popBackStack() }
                 )
@@ -212,21 +198,13 @@ fun MainContent() {
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
-                    onLogout = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = { navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } } }
                 )
             }
             composable(Screen.EditProfile.route) {
                 EditProfileScreen(
                     onBack = { navController.popBackStack() },
-                    onLogout = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = { navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } } }
                 )
             }
             composable(

@@ -13,6 +13,7 @@ sealed class Screen(
     val title: String = "",
     val icon: ImageVector? = null
 ) {
+    data object Onboarding : Screen("onboarding")
     data object Login : Screen("login")
 
     data object Notes : Screen("notes", "Apuntes", Icons.AutoMirrored.Filled.MenuBook)

@@ -347,7 +347,7 @@
     <string name="settings_about_logout_title">Cerrar Sesión</string>
     <string name="settings_about_logout_subtitle">Finalizar sesión en este dispositivo</string>
     <string name="settings_dialog_logout_title">¿Cerrar Sesión?</string>
-    <string name="settings_dialog_logout_message">¿Estás seguro de que deseas salir de tu cuenta de NotiFast? Tus datos sincronizados permanecerán seguros en la nube.</string>
+    <string name="settings_dialog_logout_message">¿Estás seguro de que deseas salir de tu cuenta de NotiFast? Tus datos permanecerán guardados en este dispositivo.</string>
     <string name="settings_dialog_logout_confirm">Cerrar Sesión</string>
     <string name="settings_about_author_label">Desarrollador / Autor:</string>
     <string name="settings_about_author_name">José Alejandro Fernández</string>
