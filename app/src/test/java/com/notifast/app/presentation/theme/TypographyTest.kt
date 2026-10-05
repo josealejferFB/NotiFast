@@ -59,4 +59,17 @@ class TypographyTest {
         assertTrue(Typography.headlineLarge.letterSpacing.value < 0f)
         assertTrue(Typography.headlineMedium.letterSpacing.value < 0f)
     }
+
+    @Test
+    fun `typography scales are configured and non-null without network font provider`() {
+        val displayLarge = Typography.displayLarge
+        val bodyLarge = Typography.bodyLarge
+        val monoAcademic = Typography.monoAcademic
+
+        assertNotNull(displayLarge)
+        assertNotNull(bodyLarge)
+        assertNotNull(monoAcademic)
+        assertEquals("tnum", monoAcademic.fontFeatureSettings)
+    }
 }
+

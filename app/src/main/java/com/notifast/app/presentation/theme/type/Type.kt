@@ -2,38 +2,28 @@ package com.notifast.app.presentation.theme.type
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 
 // ============================================================================
-// GOOGLE FONTS PROVIDER & FAMILIES (WITH RESILIENT SYSTEM FALLBACKS)
+// OFFLINE BUNDLED FONT FAMILIES (100% LOCAL STORAGE & NO NETWORK DEPENDENCY)
 // ============================================================================
 
-val fontProvider = GoogleFont.Provider(
-    providerAuthority = "com.google.android.gms.fonts",
-    providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs
-)
-
-val PlusJakartaSansName = GoogleFont("Plus Jakarta Sans")
-val JetBrainsMonoName = GoogleFont("JetBrains Mono")
-
 val PlusJakartaSansFamily = FontFamily(
-    Font(googleFont = PlusJakartaSansName, fontProvider = fontProvider, weight = FontWeight.Normal),
-    Font(googleFont = PlusJakartaSansName, fontProvider = fontProvider, weight = FontWeight.Medium),
-    Font(googleFont = PlusJakartaSansName, fontProvider = fontProvider, weight = FontWeight.SemiBold),
-    Font(googleFont = PlusJakartaSansName, fontProvider = fontProvider, weight = FontWeight.Bold)
+    Font(R.font.plus_jakarta_sans_regular, FontWeight.Normal),
+    Font(R.font.plus_jakarta_sans_medium, FontWeight.Medium),
+    Font(R.font.plus_jakarta_sans_semibold, FontWeight.SemiBold),
+    Font(R.font.plus_jakarta_sans_bold, FontWeight.Bold)
 )
 
 val JetBrainsMonoFamily = FontFamily(
-    Font(googleFont = JetBrainsMonoName, fontProvider = fontProvider, weight = FontWeight.Normal),
-    Font(googleFont = JetBrainsMonoName, fontProvider = fontProvider, weight = FontWeight.Medium),
-    Font(googleFont = JetBrainsMonoName, fontProvider = fontProvider, weight = FontWeight.SemiBold),
-    Font(googleFont = JetBrainsMonoName, fontProvider = fontProvider, weight = FontWeight.Bold)
+    Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
+    Font(R.font.jetbrains_mono_medium, FontWeight.Medium),
+    Font(R.font.jetbrains_mono_semibold, FontWeight.SemiBold),
+    Font(R.font.jetbrains_mono_bold, FontWeight.Bold)
 )
 
 // ============================================================================
