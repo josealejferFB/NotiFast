@@ -2,10 +2,10 @@ package com.notifast.app.di
 
 import com.notifast.app.data.analytics.FirebaseAnalyticsTracker
 import com.notifast.app.data.repository.AuthRepositoryImpl
-import com.notifast.app.data.repository.EvaluationRepositoryImpl
 import com.notifast.app.data.repository.ImageRepositoryImpl
-import com.notifast.app.data.repository.NoteRepositoryImpl
-import com.notifast.app.data.repository.ScheduleRepositoryImpl
+import com.notifast.app.data.repository.LocalEvaluationRepositoryImpl
+import com.notifast.app.data.repository.LocalNoteRepositoryImpl
+import com.notifast.app.data.repository.LocalScheduleRepositoryImpl
 import com.notifast.app.data.repository.UserPrefsRepositoryImpl
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
@@ -30,11 +30,11 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindNoteRepository(impl: NoteRepositoryImpl): NoteRepository
+    abstract fun bindNoteRepository(impl: LocalNoteRepositoryImpl): NoteRepository
 
     @Binds
     @Singleton
-    abstract fun bindEvaluationRepository(impl: EvaluationRepositoryImpl): EvaluationRepository
+    abstract fun bindEvaluationRepository(impl: LocalEvaluationRepositoryImpl): EvaluationRepository
 
     @Binds
     @Singleton
@@ -42,7 +42,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepository
+    abstract fun bindScheduleRepository(impl: LocalScheduleRepositoryImpl): ScheduleRepository
 
     @Binds
     @Singleton
