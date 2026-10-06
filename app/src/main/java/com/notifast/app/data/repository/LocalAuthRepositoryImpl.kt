@@ -81,17 +81,87 @@ class LocalAuthRepositoryImpl @Inject constructor(
         profileImageUri: Uri?
     ): Result<String> {
         return try {
-            val uid = UUID.randomUUID().toString()
-            var profilePictureUrl: String? = null
-            if (profileImageUri != null) {
-                val uploadResult = imageRepository.uploadProfileImage(uid, profileImageUri)
-                if (uploadResult.isSuccess) {
-                    profilePictureUrl = uploadResult.getOrNull()
-                }
+            // Logout must not orphan data: reuse the existing local user if present.
+            val existing = userDao.getAllUsers().firstOrNull()
+            if (existing != null) {
+                return activateExistingUser(existing, firstName, lastName, profileImageUri)
             }
+            insertNewUser(firstName, lastName, profileImageUri)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating local profile", e)
+            Result.failure(e)
+        }
+    }
 
-            val now = System.currentTimeMillis()
-            val userEntity = UserEntity(
+    override suspend fun createFreshLocalProfile(
+        firstName: String,
+        lastName: String,
+        profileImageUri: Uri?
+    ): Result<String> {
+        return try {
+            userDao.getAllUsers().forEach { userDao.deleteUser(it.uid) }
+            insertNewUser(firstName, lastName, profileImageUri)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating fresh local profile", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getLocalUsers(): List<com.notifast.app.data.model.User> {
+        return userDao.getAllUsers().map {
+            com.notifast.app.data.model.User(
+                uid = it.uid,
+                email = it.email,
+                firstName = it.firstName,
+                lastName = it.lastName,
+                profilePictureUrl = it.profilePictureUrl
+            )
+        }
+    }
+
+    private suspend fun activateExistingUser(
+        existing: UserEntity,
+        firstName: String,
+        lastName: String,
+        profileImageUri: Uri?
+    ): Result<String> {
+        var profilePictureUrl = existing.profilePictureUrl
+        if (profileImageUri != null) {
+            val uploadResult = imageRepository.uploadProfileImage(existing.uid, profileImageUri)
+            if (uploadResult.isSuccess) {
+                profilePictureUrl = uploadResult.getOrNull()
+            }
+        }
+        val updated = existing.copy(
+            firstName = firstName,
+            lastName = lastName,
+            profilePictureUrl = profilePictureUrl,
+            updatedAt = Date()
+        )
+        userDao.updateUser(updated)
+        dataStore.edit { prefs -> prefs[keyActiveUserId] = existing.uid }
+        cachedUserId.set(existing.uid)
+        _authState.value = true
+        return Result.success(existing.uid)
+    }
+
+    private suspend fun insertNewUser(
+        firstName: String,
+        lastName: String,
+        profileImageUri: Uri?
+    ): Result<String> {
+        val uid = UUID.randomUUID().toString()
+        var profilePictureUrl: String? = null
+        if (profileImageUri != null) {
+            val uploadResult = imageRepository.uploadProfileImage(uid, profileImageUri)
+            if (uploadResult.isSuccess) {
+                profilePictureUrl = uploadResult.getOrNull()
+            }
+        }
+
+        val now = System.currentTimeMillis()
+        userDao.insertUser(
+            UserEntity(
                 uid = uid,
                 email = "$uid@local.notifast",
                 firstName = firstName,
@@ -100,19 +170,12 @@ class LocalAuthRepositoryImpl @Inject constructor(
                 createdAtTimestamp = now,
                 updatedAtTimestamp = now
             )
-            userDao.insertUser(userEntity)
+        )
 
-            dataStore.edit { prefs ->
-                prefs[keyActiveUserId] = uid
-            }
-            cachedUserId.set(uid)
-            _authState.value = true
-
-            Result.success(uid)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error creating local profile", e)
-            Result.failure(e)
-        }
+        dataStore.edit { prefs -> prefs[keyActiveUserId] = uid }
+        cachedUserId.set(uid)
+        _authState.value = true
+        return Result.success(uid)
     }
 
     override suspend fun getUserProfile(uid: String): Result<User> {
@@ -185,23 +248,5 @@ class LocalAuthRepositoryImpl @Inject constructor(
             cachedUserId.set(null)
             _authState.value = false
         }
-    }
-
-    override suspend fun login(email: String, password: String): Result<String> {
-        return Result.failure(UnsupportedOperationException("Remote authentication is disabled in offline-first mode"))
-    }
-
-    override suspend fun signUp(
-        email: String,
-        password: String,
-        firstName: String,
-        lastName: String,
-        profileImageUri: Uri?
-    ): Result<String> {
-        return Result.failure(UnsupportedOperationException("Remote authentication is disabled in offline-first mode"))
-    }
-
-    override suspend fun signInWithGoogle(idToken: String): Result<String> {
-        return Result.failure(UnsupportedOperationException("Remote authentication is disabled in offline-first mode"))
     }
 }

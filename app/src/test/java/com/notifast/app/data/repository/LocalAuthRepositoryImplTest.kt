@@ -195,18 +195,36 @@ class LocalAuthRepositoryImplTest {
     }
 
     @Test
-    fun `legacy remote methods return UnsupportedOperationException`() = runTest(testDispatcher) {
-        val loginResult = repository.login("user@mail.com", "pass")
-        assertTrue(loginResult.isFailure)
-        assertTrue(loginResult.exceptionOrNull() is UnsupportedOperationException)
+    fun `createLocalProfile reuses existing user after logout`() = runTest(testDispatcher) {
+        val existing = UserEntity(uid = "user-a", firstName = "Lucía", lastName = "Vieja")
+        coEvery { userDao.getAllUsers() } returns listOf(existing)
+        coEvery { userDao.updateUser(any()) } returns 1
+        val prefs = mockk<Preferences>(relaxed = true)
+        every { dataStore.data } returns flowOf(prefs)
+        coEvery { dataStore.updateData(any()) } returns prefs
 
-        val signUpResult = repository.signUp("user@mail.com", "pass", "A", "B", null)
-        assertTrue(signUpResult.isFailure)
-        assertTrue(signUpResult.exceptionOrNull() is UnsupportedOperationException)
+        val result = repository.createLocalProfile("Ana", "Nueva", null)
 
-        val googleResult = repository.signInWithGoogle("token")
-        assertTrue(googleResult.isFailure)
-        assertTrue(googleResult.exceptionOrNull() is UnsupportedOperationException)
+        assertEquals("user-a", result.getOrNull())
+        coVerify(exactly = 0) { userDao.insertUser(any()) }
+        coVerify { userDao.updateUser(match { it.uid == "user-a" && it.firstName == "Ana" }) }
+    }
+
+    @Test
+    fun `createFreshLocalProfile wipes then creates`() = runTest(testDispatcher) {
+        val existing = UserEntity(uid = "user-a")
+        coEvery { userDao.getAllUsers() } returns listOf(existing) andThen emptyList()
+        coEvery { userDao.deleteUser("user-a") } returns 1
+        coEvery { userDao.insertUser(any()) } returns 1L
+        val prefs = mockk<Preferences>(relaxed = true)
+        every { dataStore.data } returns flowOf(prefs)
+        coEvery { dataStore.updateData(any()) } returns prefs
+
+        val result = repository.createFreshLocalProfile("Ana", "Nueva", null)
+
+        assertTrue(result.isSuccess)
+        coVerify { userDao.deleteUser("user-a") }
+        coVerify { userDao.insertUser(any()) }
     }
 
     @Test

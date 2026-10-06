@@ -7,15 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface AuthRepository {
     val authState: StateFlow<Boolean?>
 
-    suspend fun login(email: String, password: String): Result<String>
-    suspend fun signUp(
-        email: String,
-        password: String,
-        firstName: String,
-        lastName: String,
-        profileImageUri: Uri?
-    ): Result<String>
-    suspend fun signInWithGoogle(idToken: String): Result<String>
     suspend fun logout()
     suspend fun getCurrentUserId(): String?
     suspend fun getUserProfile(uid: String): Result<User>
@@ -25,9 +16,17 @@ interface AuthRepository {
         lastName: String,
         profileImageUri: Uri?
     ): Result<Unit>
+    /** Reuses the existing local user if present (logout must not orphan data). */
     suspend fun createLocalProfile(
         firstName: String,
         lastName: String,
         profileImageUri: Uri?
     ): Result<String>
+    /** Creates a brand-new profile after wiping all local data. */
+    suspend fun createFreshLocalProfile(
+        firstName: String,
+        lastName: String,
+        profileImageUri: Uri?
+    ): Result<String>
+    suspend fun getLocalUsers(): List<User>
 }
