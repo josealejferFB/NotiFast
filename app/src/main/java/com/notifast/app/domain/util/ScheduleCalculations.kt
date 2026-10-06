@@ -9,13 +9,7 @@ import com.notifast.app.presentation.feature.schedules.WeeklySubjectMetric
 
 object ScheduleCalculations {
 
-    fun timeToMinutes(timeStr: String): Int {
-        val parts = timeStr.trim().split(":")
-        if (parts.size < 2) return 0
-        val h = parts[0].toIntOrNull() ?: 0
-        val m = parts[1].toIntOrNull() ?: 0
-        return h * 60 + m
-    }
+    fun timeToMinutes(timeStr: String): Int = TimeParser.toMinutes(timeStr) ?: 0
 
     fun calculateLiveClassStatus(todaySchedules: List<Schedule>, currentTimeStr: String): LiveClassStatus {
         if (todaySchedules.isEmpty()) return LiveClassStatus.NoClassesToday
@@ -96,13 +90,9 @@ object ScheduleCalculations {
         val conflicted = mutableSetOf<Schedule>()
         for (i in 0 until daySchedules.size - 1) {
             val a = daySchedules[i]
-            val aStart = timeToMinutes(a.startTime)
-            val aEnd = timeToMinutes(a.endTime)
             for (j in i + 1 until daySchedules.size) {
                 val b = daySchedules[j]
-                val bStart = timeToMinutes(b.startTime)
-                val bEnd = timeToMinutes(b.endTime)
-                if (maxOf(aStart, bStart) < minOf(aEnd, bEnd)) {
+                if (TimeParser.overlaps(a.startTime, a.endTime, b.startTime, b.endTime)) {
                     conflicted.add(a)
                     conflicted.add(b)
                 }

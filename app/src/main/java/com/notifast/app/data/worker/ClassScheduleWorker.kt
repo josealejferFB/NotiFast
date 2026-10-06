@@ -33,15 +33,12 @@ class ClassScheduleWorker @AssistedInject constructor(
         val startTime = inputData.getString(KEY_START_TIME) ?: ""
         val classroom = inputData.getString(KEY_CLASSROOM) ?: ""
 
-        val userId = authRepository.getCurrentUserId()
-        if (userId != null) {
-            val schedules = scheduleRepository.getSchedules(userId).first()
-            val schedule = schedules.find { it.id == scheduleId }
-            if (schedule == null) return Result.success()
+        val userId = authRepository.getCurrentUserId() ?: return Result.success()
+        val schedules = scheduleRepository.getSchedules(userId).first()
+        val schedule = schedules.find { it.id == scheduleId } ?: return Result.success()
 
-            // Reprogramar para la semana siguiente
-            scheduleClassAlertUseCase(schedule)
-        }
+        // Re-arm for next week before notifying
+        scheduleClassAlertUseCase(schedule)
 
         notificationSender.sendClassNotification(
             notificationId = scheduleId.hashCode(),
