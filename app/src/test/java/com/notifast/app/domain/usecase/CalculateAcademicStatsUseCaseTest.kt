@@ -202,4 +202,44 @@ class CalculateAcademicStatsUseCaseTest {
         assertEquals(GradePolicy.remainingWeight(evals), stats.subjectHealthList.first().remainingWeight, 0.01)
         assertEquals(45.0, stats.subjectHealthList.first().remainingWeight, 0.01)
     }
+
+    @Test
+    fun `globalAverage is weighted over all evaluations not average of subject averages`() {
+        // Subject A: 20/20 weight 10; Subject B: 5/20 weight 90 → not (20+5)/2
+        val subjects = listOf(
+            SubjectData(name = "A", colorHex = "#000"),
+            SubjectData(name = "B", colorHex = "#111")
+        )
+        val evals = listOf(
+            Evaluation(subjectName = "A", grade = 20.0, weight = 10.0, isPresented = true, gradeScaleId = "0-20"),
+            Evaluation(subjectName = "B", grade = 5.0, weight = 90.0, isPresented = true, gradeScaleId = "0-20")
+        )
+        val stats = CalculateAcademicStatsUseCase()(evals, subjects, emptyList(), GradeScale.SCALE_0_20)
+        assertEquals(6.5, stats.globalAverage, 0.01) // (20*10 + 5*90)/100 = 6.5
+    }
+
+    @Test
+    fun `grade distribution uses custom minPassing for regular vs atRisk bands`() {
+        val evaluations = listOf(
+            Evaluation(id = "1", subjectName = "A", grade = 8.0, isPresented = true, gradeScaleId = "0-20"),
+            Evaluation(id = "2", subjectName = "B", grade = 5.0, isPresented = true, gradeScaleId = "0-20")
+        )
+        val subjects = listOf(SubjectData(name = "A"), SubjectData(name = "B"))
+
+        // Default minPassing 11.0: both bands fall under atRisk
+        val defaultStats = useCase(evaluations, subjects, emptyList(), GradeScale.SCALE_0_20)
+        assertEquals(0, defaultStats.gradeDistribution.regularCount)
+        assertEquals(2, defaultStats.gradeDistribution.atRiskCount)
+
+        // Custom minPassing 6.0: 8 → regular, 5 → atRisk
+        val customStats = useCase(
+            evaluations,
+            subjects,
+            emptyList(),
+            GradeScale.SCALE_0_20,
+            customMinPassingGrade = 6.0
+        )
+        assertEquals(1, customStats.gradeDistribution.regularCount)
+        assertEquals(1, customStats.gradeDistribution.atRiskCount)
+    }
 }

@@ -7,13 +7,24 @@ import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.model.GradePolicy
 import com.notifast.app.domain.model.GradeScale
-import com.notifast.app.domain.repository.*
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.CancelAlertUseCase
 import com.notifast.app.domain.usecase.CalculateRequiredGradeUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import com.notifast.app.domain.usecase.ExportSubjectPackageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
@@ -29,7 +40,7 @@ class SubjectDetailViewModel @Inject constructor(
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
     private val calculateRequiredGradeUseCase: CalculateRequiredGradeUseCase,
     val exportSubjectPackageUseCase: ExportSubjectPackageUseCase,
-    private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase? = null
+    private val cancelAlertUseCase: CancelAlertUseCase? = null
 ) : ViewModel() {
 
     private val subjectName: String = checkNotNull(savedStateHandle["subjectName"])
@@ -38,9 +49,10 @@ class SubjectDetailViewModel @Inject constructor(
 
     // Single source of filter/UI inputs lives inside UiState (MVI). These private
     // flows only fan-in to one combine without being exposed as parallel state.
+    // targetGradeOverride=null → simulator target follows the active scale minPassing.
     private val filterInputs = MutableStateFlow(
         FilterData(
-            targetGrade = 6.0,
+            targetGradeOverride = null,
             quadrant = SubjectQuadrant.PANORAMA,
             query = "",
             tag = null
@@ -61,13 +73,20 @@ class SubjectDetailViewModel @Inject constructor(
             }
             _uiState.update { it.copy(userId = userId, isLoading = true) }
 
+            val gradePrefs = combine(
+                userPrefsRepository.defaultGradeScaleFlow,
+                userPrefsRepository.minPassingGradeFlow
+            ) { scaleId, minPassing -> ScalePrefs(scaleId, minPassing) }
+
             val dataFlow = combine(
                 noteRepository.getNotesBySubject(userId, subjectName),
                 evaluationRepository.getEvaluations(userId),
                 scheduleRepository.getSchedules(userId),
                 noteRepository.getSubjects(userId),
-                userPrefsRepository.defaultGradeScaleFlow
-            ) { notes, evals, schedules, subjects, scaleId -> DomainData(notes, evals, schedules, subjects, scaleId) }
+                gradePrefs
+            ) { notes, evals, schedules, subjects, prefs ->
+                DomainData(notes, evals, schedules, subjects, prefs.scaleId, prefs.minPassing)
+            }
 
             combine(dataFlow, filterInputs) { domain, filter ->
                 val subjectEvals = domain.evaluations.filter { it.subjectName.equals(subjectName, ignoreCase = true) }
@@ -75,6 +94,13 @@ class SubjectDetailViewModel @Inject constructor(
                 val subjectData = domain.subjects.find { it.name.equals(subjectName, ignoreCase = true) }
                     ?: SubjectData(name = subjectName)
                 val scale = GradeScale.fromId(domain.scaleId)
+                val customMinPassing = domain.minPassing.toDouble().takeIf {
+                    it > scale.minGrade && it <= scale.maxGrade
+                }
+                val minPassing = GradePolicy.resolveMinPassing(scale, customMinPassing)
+                val targetGrade = filter.targetGradeOverride
+                    ?.let { GradePolicy.clampGrade(it, scale) }
+                    ?: minPassing
 
                 val avg = calculateWeightedAverageUseCase(subjectEvals, scale)
                 val upcoming = subjectEvals.filter { !it.isPresented && it.date != null }.sortedBy { it.date }.take(5)
@@ -121,8 +147,14 @@ class SubjectDetailViewModel @Inject constructor(
                         pendingWeight = pendWeight,
                         availableWeight = (100.0 - totalWeight).coerceAtLeast(0.0),
                         gradeScale = scale,
-                        targetGrade = filter.targetGrade,
-                        simulationResult = calculateRequiredGradeUseCase(subjectEvals, filter.targetGrade, scale),
+                        minPassingGrade = minPassing,
+                        targetGrade = targetGrade,
+                        simulationResult = calculateRequiredGradeUseCase(
+                            evaluations = subjectEvals,
+                            targetGrade = targetGrade,
+                            scale = scale,
+                            minPassingGrade = minPassing
+                        ),
                         classroom = firstSchedule?.classroom.orEmpty(),
                         teacher = firstSchedule?.teacher.orEmpty(),
                         modality = firstSchedule?.modality ?: Schedule.MODALITY_PRESENCIAL,
@@ -158,7 +190,7 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.SaveGrade -> saveGrade(event.evaluationId, event.grade, event.isPresented)
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
             is SubjectDetailEvent.DeleteSchedule -> deleteSchedule(event.schedule)
-            is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGrade = event.targetGrade) }
+            is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGradeOverride = event.targetGrade) }
             is SubjectDetailEvent.SetGradeScale -> viewModelScope.launch { userPrefsRepository.setDefaultGradeScale(event.scale.id) }
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
@@ -207,6 +239,21 @@ class SubjectDetailViewModel @Inject constructor(
         }
     }
 
-    private data class DomainData(val notes: List<Note>, val evaluations: List<Evaluation>, val schedules: List<Schedule>, val subjects: List<SubjectData>, val scaleId: String)
-    private data class FilterData(val targetGrade: Double, val quadrant: SubjectQuadrant, val query: String, val tag: String?)
+    private data class DomainData(
+        val notes: List<Note>,
+        val evaluations: List<Evaluation>,
+        val schedules: List<Schedule>,
+        val subjects: List<SubjectData>,
+        val scaleId: String,
+        val minPassing: Float
+    )
+
+    private data class ScalePrefs(val scaleId: String, val minPassing: Float)
+
+    private data class FilterData(
+        val targetGradeOverride: Double?,
+        val quadrant: SubjectQuadrant,
+        val query: String,
+        val tag: String?
+    )
 }

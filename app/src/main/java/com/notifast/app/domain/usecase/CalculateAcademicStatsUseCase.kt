@@ -9,7 +9,6 @@ import com.notifast.app.domain.model.GradePolicy
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.domain.model.SubjectHealthStatus
-import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -58,15 +57,13 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         } else 0.0
 
         val evaluatedSubjects = subjectHealthList.filter { it.evaluatedWeight > 0 }
-        val globalAverage = if (evaluatedSubjects.isNotEmpty()) {
-            evaluatedSubjects.map { it.currentAverage }.average()
-        } else 0.0
+        val globalAverage = GradePolicy.weightedAverage(evaluations, gradeScale) ?: 0.0
 
         val bestSubject = evaluatedSubjects.maxByOrNull { it.currentAverage }
         val lowestSubject = evaluatedSubjects.minByOrNull { it.currentAverage }
 
-        val gradeDistribution = calculateDistribution(evaluations, gradeScale)
-        val recommendations = generateRecommendations(atRiskSubjects)
+        val gradeDistribution = calculateDistribution(evaluations, gradeScale, minPassingGrade)
+        val recommendations = generateRecommendations(atRiskSubjects, gradeScale)
 
         return AcademicStats(
             globalAverage = globalAverage,
@@ -149,7 +146,8 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
 
     private fun calculateDistribution(
         evaluations: List<Evaluation>,
-        gradeScale: GradeScale
+        gradeScale: GradeScale,
+        minPassingGrade: Double
     ): GradeBandDistribution {
         val graded = evaluations.filter { GradePolicy.countsForAverage(it) }
             .map { GradePolicy.toDisplayGrade(it, gradeScale) }
@@ -162,7 +160,6 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
 
         val minGrade = gradeScale.minGrade
         val maxGrade = gradeScale.maxGrade
-        val minPassingGrade = gradeScale.minPassingGrade
         val excellentThreshold = minGrade + (maxGrade - minGrade) * 0.90
         val goodThreshold = minGrade + (maxGrade - minGrade) * 0.70
 
@@ -184,13 +181,16 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         )
     }
 
-    private fun generateRecommendations(atRiskSubjects: List<SubjectAcademicHealth>): List<String> {
+    private fun generateRecommendations(
+        atRiskSubjects: List<SubjectAcademicHealth>,
+        gradeScale: GradeScale
+    ): List<String> {
         return atRiskSubjects.map { subject ->
             if (subject.status == SubjectHealthStatus.CRITICAL_FAIL) {
                 "En ${subject.subjectName} la meta mínima ya no es alcanzable. Consulta opciones de recuperación académica."
             } else {
-                val neededStr = String.format(Locale.US, "%.1f", subject.minGradeNeededToPass)
-                val remStr = String.format(Locale.US, "%.0f", subject.remainingWeight)
+                val neededStr = gradeScale.formatGrade(subject.minGradeNeededToPass)
+                val remStr = gradeScale.formatGrade(subject.remainingWeight)
                 "En ${subject.subjectName} necesitas promediar $neededStr en el $remStr% restante para aprobar."
             }
         }

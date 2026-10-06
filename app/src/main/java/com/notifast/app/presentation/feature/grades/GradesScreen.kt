@@ -123,7 +123,8 @@ fun GradesScreen(
                             item {
                                 AcademicAnalyticsContent(
                                     stats = uiState.academicStats,
-                                    gradeScale = uiState.gradeScale
+                                    gradeScale = uiState.gradeScale,
+                                    minPassingGrade = uiState.minPassingGrade
                                 )
                             }
                         }

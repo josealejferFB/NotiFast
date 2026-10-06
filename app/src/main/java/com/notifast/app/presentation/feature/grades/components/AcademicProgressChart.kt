@@ -40,6 +40,7 @@ import java.util.Locale
 fun AcademicProgressChart(
     subjects: List<SubjectAcademicHealth>,
     gradeScale: GradeScale,
+    minPassingGrade: Double = gradeScale.minPassingGrade,
     modifier: Modifier = Modifier
 ) {
     val isDark = isSystemInDarkTheme()
@@ -53,7 +54,7 @@ fun AcademicProgressChart(
     val outlineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
     val textMutedColor = MaterialTheme.colorScheme.onSurfaceVariant
     val passingLineColor = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
-    val passingGrade = gradeScale.minPassingGrade
+    val passingGrade = minPassingGrade
     val maxGrade = gradeScale.maxGrade
 
     NotiFastCard(

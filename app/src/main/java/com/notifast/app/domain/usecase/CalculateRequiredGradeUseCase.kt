@@ -31,7 +31,8 @@ class CalculateRequiredGradeUseCase @Inject constructor() {
     operator fun invoke(
         evaluations: List<Evaluation>,
         targetGrade: Double,
-        scale: GradeScale = GradeScale.SCALE_0_10
+        scale: GradeScale = GradeScale.SCALE_0_10,
+        minPassingGrade: Double = scale.minPassingGrade
     ): RequiredGradeResult {
         val currentAccumulated = GradePolicy.accumulatedPoints(evaluations, scale)
         val remainingWeight = GradePolicy.remainingWeight(evaluations)
@@ -60,7 +61,7 @@ class CalculateRequiredGradeUseCase @Inject constructor() {
         val requiredGrade = (neededPoints / remainingWeight) * 100.0
 
         val status = when {
-            requiredGrade <= scale.minPassingGrade -> SimulatorStatus.ACHIEVABLE
+            requiredGrade <= minPassingGrade -> SimulatorStatus.ACHIEVABLE
             requiredGrade <= scale.maxGrade -> SimulatorStatus.AT_RISK
             else -> SimulatorStatus.IMPOSSIBLE
         }

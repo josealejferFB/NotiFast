@@ -32,6 +32,7 @@ import java.util.Locale
 fun AcademicAnalyticsContent(
     stats: AcademicStats,
     gradeScale: GradeScale,
+    minPassingGrade: Double = gradeScale.minPassingGrade,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -44,7 +45,8 @@ fun AcademicAnalyticsContent(
         // Progress by Subject Chart
         AcademicProgressChart(
             subjects = stats.subjectHealthList,
-            gradeScale = gradeScale
+            gradeScale = gradeScale,
+            minPassingGrade = minPassingGrade
         )
 
         // Grade Distribution Histogram

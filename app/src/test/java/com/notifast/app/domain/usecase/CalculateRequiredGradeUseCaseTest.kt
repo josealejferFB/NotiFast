@@ -93,4 +93,42 @@ class CalculateRequiredGradeUseCaseTest {
         assertEquals(SimulatorStatus.NO_PENDING_EVALUATIONS, result.status)
         assertNull(result.requiredGrade)
     }
+
+    @Test
+    fun `ACHIEVABLE uses custom minPassing not scale default`() {
+        // Grade 10 recorded on default 0-10, displayed on 0-20 → 20. Weight 50% → accumulated 10.
+        // Target 11. Remaining 50% → required = 2.0
+        val evals = listOf(
+            Evaluation(id = "1", grade = 10.0, weight = 50.0, isPresented = true),
+            Evaluation(id = "2", grade = null, weight = 50.0, isPresented = false)
+        )
+        val result = CalculateRequiredGradeUseCase()(
+            evals, targetGrade = 11.0, scale = GradeScale.SCALE_0_20, minPassingGrade = 10.0
+        )
+        // required 2.0 <= custom minPassing 10.0 → ACHIEVABLE
+        assertEquals(SimulatorStatus.ACHIEVABLE, result.status)
+        assertEquals(2.0, result.requiredGrade ?: 0.0, 0.01)
+    }
+
+    @Test
+    fun `status honors custom minPassing when it differs from scale default`() {
+        // required = 10.5 on 0-20: between custom min 10.0 and scale default 11.0
+        // grade 11.5 weight 50% → accumulated 5.75; target 11 → needed 5.25; required 10.5
+        val evals = listOf(
+            Evaluation(id = "1", grade = 11.5, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
+            Evaluation(id = "2", grade = null, weight = 50.0, isPresented = false, gradeScaleId = "0-20")
+        )
+        val withCustom = CalculateRequiredGradeUseCase()(
+            evals, targetGrade = 11.0, scale = GradeScale.SCALE_0_20, minPassingGrade = 10.0
+        )
+        assertEquals(10.5, withCustom.requiredGrade ?: 0.0, 0.01)
+        // 10.5 > custom 10.0 → AT_RISK (stricter custom minPassing is honored)
+        assertEquals(SimulatorStatus.AT_RISK, withCustom.status)
+
+        val withScaleDefault = CalculateRequiredGradeUseCase()(
+            evals, targetGrade = 11.0, scale = GradeScale.SCALE_0_20
+        )
+        // 10.5 <= scale default 11.0 → ACHIEVABLE without custom override
+        assertEquals(SimulatorStatus.ACHIEVABLE, withScaleDefault.status)
+    }
 }

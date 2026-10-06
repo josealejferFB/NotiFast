@@ -69,6 +69,8 @@ class SubjectDetailViewModelTest {
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(sampleEvaluations)
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(sampleSchedules)
         coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+        // 0.0 is invalid for any active scale → falls back to scale.minPassingGrade
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
     }
 
     private fun createViewModel(): SubjectDetailViewModel {
@@ -84,6 +86,29 @@ class SubjectDetailViewModelTest {
             calculateRequiredGradeUseCase,
             exportSubjectPackageUseCase
         )
+    }
+
+    @Test
+    fun `initializes targetGrade to active scale minPassing not hardcoded 6`() = runTest {
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(11.0, viewModel.uiState.value.targetGrade, 0.01)
+    }
+
+    @Test
+    fun `uses custom minPassing for targetGrade and simulator status`() = runTest {
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(5.0f)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(5.0, state.targetGrade, 0.01)
+        // accumulated 3.2; needed 1.8 on 40% remaining → required 4.5 <= custom min 5.0 → ACHIEVABLE
+        assertEquals(4.5, state.simulationResult?.requiredGrade ?: 0.0, 0.01)
+        assertEquals(SimulatorStatus.ACHIEVABLE, state.simulationResult?.status)
     }
 
     @Test
