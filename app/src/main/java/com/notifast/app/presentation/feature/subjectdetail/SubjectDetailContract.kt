@@ -63,6 +63,5 @@ sealed interface SubjectDetailEvent {
     data class DeleteEvaluation(val evaluationId: String) : SubjectDetailEvent
     data class DeleteSchedule(val schedule: Schedule) : SubjectDetailEvent
     data class UpdateTargetGrade(val targetGrade: Double) : SubjectDetailEvent
-    data class SetGradeScale(val scale: GradeScale) : SubjectDetailEvent
     data object ClearError : SubjectDetailEvent
 }

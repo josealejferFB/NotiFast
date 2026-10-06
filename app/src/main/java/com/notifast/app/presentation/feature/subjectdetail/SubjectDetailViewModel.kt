@@ -191,7 +191,6 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
             is SubjectDetailEvent.DeleteSchedule -> deleteSchedule(event.schedule)
             is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGradeOverride = event.targetGrade) }
-            is SubjectDetailEvent.SetGradeScale -> viewModelScope.launch { userPrefsRepository.setDefaultGradeScale(event.scale.id) }
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }

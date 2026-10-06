@@ -50,7 +50,7 @@ fun SettingsGradeScaleDialog(
     val currentScaleObj = GradeScale.fromId(currentScale)
     val currentMax = currentScaleObj.maxGrade.toFloat()
     // 0f means "use scale default" (D16/D17); out-of-range stored values also fall back.
-    val initialPassing = currentPassingGrade.takeIf { it in 0f..currentMax }
+    val initialPassing = currentPassingGrade.takeIf { it != 0f && it in 0f..currentMax }
         ?: currentScaleObj.minPassingGrade.toFloat()
 
     var selectedScale by remember { mutableStateOf(currentScale) }

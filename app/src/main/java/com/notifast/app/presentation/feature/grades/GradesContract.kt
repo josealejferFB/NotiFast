@@ -36,6 +36,5 @@ sealed interface GradesEvent {
     data object LoadData : GradesEvent
     data class SelectTab(val tab: GradesTab) : GradesEvent
     data class UpdateGrade(val evaluationId: String, val grade: Double?, val isPresented: Boolean) : GradesEvent
-    data class SetGradeScale(val scale: GradeScale) : GradesEvent
     data object ClearError : GradesEvent
 }

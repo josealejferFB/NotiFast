@@ -119,11 +119,6 @@ class GradesViewModel @Inject constructor(
             is GradesEvent.LoadData -> loadData()
             is GradesEvent.SelectTab -> _uiState.update { it.copy(selectedTab = event.tab) }
             is GradesEvent.UpdateGrade -> updateGrade(event.evaluationId, event.grade, event.isPresented)
-            is GradesEvent.SetGradeScale -> {
-                viewModelScope.launch {
-                    userPrefsRepository.setDefaultGradeScale(event.scale.id)
-                }
-            }
             is GradesEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
