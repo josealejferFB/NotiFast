@@ -105,4 +105,23 @@ object GradePolicy {
 
     fun clampGrade(grade: Double, scale: GradeScale): Double =
         grade.coerceIn(scale.minGrade, scale.maxGrade)
+
+    fun convertGrade(grade: Double, from: GradeScale, to: GradeScale): Double {
+        if (from == to) return to.roundGrade(grade)
+        if (from.maxGrade <= 0.0) return to.roundGrade(grade)
+        val raw = grade / from.maxGrade * to.maxGrade
+        return to.roundGrade(raw)
+    }
+
+    fun convertEvaluations(evals: List<Evaluation>, target: GradeScale): List<Evaluation> =
+        evals.map { e ->
+            val src = GradeScale.fromId(e.gradeScaleId)
+            e.copy(
+                grade = e.grade?.let { convertGrade(it, src, target) },
+                gradeScaleId = target.id
+            )
+        }
+
+    fun convertPassingGrade(value: Double, from: GradeScale, to: GradeScale): Double =
+        convertGrade(value, from, to)
 }

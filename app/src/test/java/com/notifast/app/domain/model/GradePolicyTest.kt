@@ -222,4 +222,48 @@ class GradePolicyTest {
     }
 
     // endregion
+
+    // region convert (D5 rev / D15)
+
+    @Test
+    fun `convertGrade 0-10 to 0-20 keeps one decimal`() {
+        assertEquals(14.6, GradePolicy.convertGrade(7.3, GradeScale.SCALE_0_10, GradeScale.SCALE_0_20), 0.001)
+    }
+
+    @Test
+    fun `convertGrade 0-20 to 0-100 is integer`() {
+        assertEquals(75.0, GradePolicy.convertGrade(15.0, GradeScale.SCALE_0_20, GradeScale.SCALE_0_100), 0.001)
+    }
+
+    @Test
+    fun `convertGrade 0-10 to letter GPA`() {
+        assertEquals(3.0, GradePolicy.convertGrade(7.5, GradeScale.SCALE_0_10, GradeScale.SCALE_LETTER), 0.001)
+    }
+
+    @Test
+    fun `convertEvaluations uses each evaluation own scale not a single from`() {
+        val evals = listOf(
+            eval("q", grade = 15.0, presented = true, weight = 50.0, scaleId = "0-20"),
+            eval("c", grade = 7.5, presented = true, weight = 50.0, scaleId = "0-10")
+        )
+        val converted = GradePolicy.convertEvaluations(evals, GradeScale.SCALE_0_100)
+        assertEquals(75.0, converted[0].grade!!, 0.001)
+        assertEquals(75.0, converted[1].grade!!, 0.001)
+        assertTrue(converted.all { it.gradeScaleId == "0-100" })
+    }
+
+    @Test
+    fun `convertEvaluations pending only restamps scale id`() {
+        val evals = listOf(eval("p", grade = null, presented = false, scaleId = "0-10"))
+        val converted = GradePolicy.convertEvaluations(evals, GradeScale.SCALE_0_20)
+        assertNull(converted[0].grade)
+        assertEquals("0-20", converted[0].gradeScaleId)
+    }
+
+    @Test
+    fun `convertPassingGrade 0-10 to 0-20`() {
+        assertEquals(12.0, GradePolicy.convertPassingGrade(6.0, GradeScale.SCALE_0_10, GradeScale.SCALE_0_20), 0.001)
+    }
+
+    // endregion
 }
