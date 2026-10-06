@@ -8,7 +8,7 @@ enum class GradeScale(
     val minPassingGrade: Double
 ) {
     SCALE_0_10("0-10", "Escala 0 - 10", 0.0, 10.0, 6.0),
-    SCALE_0_20("0-20", "Escala 0 - 20", 0.0, 20.0, 10.0),
+    SCALE_0_20("0-20", "Escala 0 - 20", 0.0, 20.0, 11.0),
     SCALE_0_100("0-100", "Escala 0 - 100", 0.0, 100.0, 60.0),
     SCALE_LETTER("A-F", "Escala Letras (A - F)", 0.0, 4.0, 2.0);
 

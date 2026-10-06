@@ -45,16 +45,16 @@ class CalculateAcademicStatsUseCaseTest {
             SubjectData(name = "Historia")
         )
         val evaluations = listOf(
-            // Mate: 20 con 50% + pendiente 50% → acumula 10 ≥ 10 → APPROVED
+            // Mate: 20 con 50% + pendiente 50% → acumula 10 < 11 → ON_TRACK (avg 20 ≥ 11)
             Evaluation(id = "m1", subjectName = "Matemáticas", grade = 20.0, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "m2", subjectName = "Matemáticas", weight = 50.0, isPresented = false),
-            // Física: 8 con 50% + pendiente 50% → acumula 4, necesita 6 en 50% → 12.0 ≤ 20 → AT_RISK
+            // Física: 8 con 50% + pendiente 50% → acumula 4, necesita 7 en 50% → 14.0 ≤ 20 → AT_RISK
             Evaluation(id = "f1", subjectName = "Física", grade = 8.0, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "f2", subjectName = "Física", weight = 50.0, isPresented = false),
-            // Química: 0 con 60% + pendiente 40% → acumula 0, necesita 10 en 40% → 25 > 20 → CRITICAL_FAIL
+            // Química: 0 con 60% + pendiente 40% → acumula 0, necesita 11 en 40% → 27.5 > 20 → CRITICAL_FAIL
             Evaluation(id = "q1", subjectName = "Química", grade = 0.0, weight = 60.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "q2", subjectName = "Química", weight = 40.0, isPresented = false),
-            // Historia: 14 con 50% + pendiente 50% → acumula 7, necesita 3 en 50% → 6.0 ≤ 20, avg 14 ≥ 10 → ON_TRACK
+            // Historia: 14 con 50% + pendiente 50% → acumula 7, necesita 4 en 50% → 8.0 ≤ 20, avg 14 ≥ 11 → ON_TRACK
             Evaluation(id = "h1", subjectName = "Historia", grade = 14.0, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "h2", subjectName = "Historia", weight = 50.0, isPresented = false)
         )
@@ -67,13 +67,13 @@ class CalculateAcademicStatsUseCaseTest {
         )
 
         val mate = stats.subjectHealthList.first { it.subjectName == "Matemáticas" }
-        assertEquals(SubjectHealthStatus.APPROVED, mate.status)
+        assertEquals(SubjectHealthStatus.ON_TRACK, mate.status)
         assertEquals(50.0, mate.remainingWeight, 0.01)
 
         val fisica = stats.subjectHealthList.first { it.subjectName == "Física" }
         assertEquals(SubjectHealthStatus.AT_RISK, fisica.status)
         assertEquals(50.0, fisica.remainingWeight, 0.01)
-        assertEquals(12.0, fisica.minGradeNeededToPass, 0.01)
+        assertEquals(14.0, fisica.minGradeNeededToPass, 0.01)
 
         val quimica = stats.subjectHealthList.first { it.subjectName == "Química" }
         assertEquals(SubjectHealthStatus.CRITICAL_FAIL, quimica.status)
