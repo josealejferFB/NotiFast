@@ -83,7 +83,7 @@ fun NoteAttachmentPreview(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Eliminar imagen",
+                            contentDescription = stringResource(R.string.btn_delete_image),
                             tint = Color.White,
                             modifier = Modifier.size(16.dp)
                         )

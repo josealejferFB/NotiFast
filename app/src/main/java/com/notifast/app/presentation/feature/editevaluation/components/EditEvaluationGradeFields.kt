@@ -55,12 +55,12 @@ fun EditEvaluationGradeFields(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Evaluación Presentada",
+                    text = stringResource(R.string.eval_presented_label),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Activa para ingresar la nota obtenida",
+                    text = stringResource(R.string.eval_presented_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -88,7 +88,7 @@ fun EditEvaluationGradeFields(
         NotiFastFormField(
             value = weight,
             onValueChange = onWeightChange,
-            label = "Ponderación / Peso % (ej. 20)",
+            label = stringResource(R.string.eval_weight_label),
             leadingIcon = Icons.Default.Scale,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )

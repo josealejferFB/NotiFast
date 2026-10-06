@@ -554,4 +554,17 @@
     <string name="grades_status_evaluated">Evaluada</string>
     <string name="grades_status_pending">Pendiente</string>
     <string name="edit_eval_grade_range_label">Calificación obtenida (%1$s - %2$s)</string>
+    <string name="btn_delete_image">Eliminar imagen</string>
+    <string name="eval_grade_obtained_label">Nota Obtenida</string>
+    <string name="eval_presented_label">Evaluación Presentada</string>
+    <string name="eval_presented_hint">Activa para ingresar la nota obtenida</string>
+    <string name="eval_weight_label">Ponderación / Peso % (ej. 20)</string>
+    <string name="search_badge_subject">Materia</string>
+    <string name="search_badge_note">Apunte</string>
+    <string name="search_badge_evaluation">Evaluación</string>
+    <string name="search_badge_schedule">Horario</string>
+    <string name="search_subtitle_subject">Asignatura académica</string>
+    <string name="search_title_untitled_note">Apunte sin título</string>
+    <string name="search_title_evaluation">Evaluación</string>
+    <string name="search_title_class">Clase de %1$s</string>
 </resources>

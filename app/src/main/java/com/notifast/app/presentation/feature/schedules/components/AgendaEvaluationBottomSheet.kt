@@ -126,7 +126,7 @@ fun AgendaEvaluationBottomSheet(
             Spacer(modifier = Modifier.height(14.dp))
             DetailRow(
                 icon = Icons.Default.Event,
-                label = "Nota Obtenida",
+                label = stringResource(R.string.eval_grade_obtained_label),
                 content = "${eval.grade}/20",
                 color = MaterialTheme.colorScheme.primary,
                 isMono = true

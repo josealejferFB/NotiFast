@@ -129,7 +129,7 @@ fun NoteEstheticCard(
                     Row {
                         IconButton(
                             onClick = {
-                                val md = "# ${note.title}\n\n**Materia:** ${note.subject}\n**Etiquetas:** ${note.tags.joinToString(", ")}\n\n${note.content}"
+                                val md = com.notifast.app.domain.usecase.ExportNoteMarkdownUseCase()(note)
                                 clipboardManager.setText(AnnotatedString(md))
                                 Toast.makeText(context, context.getString(R.string.notes_copied_markdown_toast), Toast.LENGTH_SHORT).show()
                             },

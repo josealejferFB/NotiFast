@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
+import com.notifast.app.domain.usecase.ExportNoteMarkdownUseCase
 import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastMarkdown
 
@@ -51,16 +52,17 @@ fun NoteDetailExpandable(
     onEdit: () -> Unit
 ) {
     val context = LocalContext.current
+    val exportChooserTitle = stringResource(R.string.notes_export_markdown)
+    val exportLabel = stringResource(R.string.notes_export_markdown)
 
     val exportMarkdown = {
+        val fullText = ExportNoteMarkdownUseCase()(note)
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, note.title)
-            val tagsText = if (note.tags.isNotEmpty()) "\nTags: ${note.tags.joinToString(", ") { "#$it" }}" else ""
-            val fullText = "# ${note.title}\n**Materia:** ${note.subject}$tagsText\n\n${note.content}"
             putExtra(Intent.EXTRA_TEXT, fullText)
         }
-        context.startActivity(Intent.createChooser(shareIntent, "Exportar Apunte"))
+        context.startActivity(Intent.createChooser(shareIntent, exportChooserTitle))
     }
 
     Card(
@@ -115,7 +117,7 @@ fun NoteDetailExpandable(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Exportar",
+                                text = exportLabel,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary

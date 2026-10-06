@@ -146,7 +146,7 @@ fun GradeRevampDialog(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text("Guardar", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_save), fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

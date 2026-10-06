@@ -65,6 +65,19 @@ Auditoría transversal con systematic debugging y journeys de usuario. Suite 260
 ### Nota para usuarios
 Los promedios pueden **cambiar de valor** respecto a versiones anteriores: antes cada pestaña usaba una fórmula distinta. Ahora el número es único y coherente en toda la app.
 
+### Cierre de verificación (smoke en dispositivo SM_A065M)
+- Migración Room 1→2 validada (`user_version=2`, índices exactos).
+- Bottom nav restaurada y con transparencia sobre el fondo de estudio.
+- `minPassingGrade` ya no aplica umbral 0-20 a escalas 0-10 (todas las materias parecían “meta inalcanzable”).
+- Datos mock cargados: 5 materias, 8 apuntes, 15 evals (incl. escala 0-20), 7 horarios (1 virtual).
+- Flujos verificados en UI: Home (métricas/hero/tags), Agenda (live status, evaluaciones, ventana libre, virtual), Calificaciones (promedios + detalle Evaluada/Pendiente), Analíticas (alertas y recomendaciones con matemática correcta: *“promediar 6.3 en el 60% restante”*).
+- T9: `ExportNoteMarkdownUseCase`, strings de grade dialog / search / eval fields localizados.
+
+### Pendiente conocido (no bloqueante)
+- El promedio global de Grades mezcla escalas (una nota 15/20 con notas /10). Unificar exige normalizar a escala o promediar solo por materia.
+- Strings de fallback en ViewModels (solo visibles si `e.message` viene nulo desde repo).
+- Smoke de import P2P / logout→continuar no automatizado.
+
 ---
 
 ## 🎨 Resumen de Logros — NotiFast 3.0: Tactile Papercraft / Studio Notebook (100% Completado)

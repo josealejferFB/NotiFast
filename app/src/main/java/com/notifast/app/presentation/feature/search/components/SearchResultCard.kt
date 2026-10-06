@@ -30,9 +30,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.notifast.app.R
 import com.notifast.app.domain.model.search.SearchResultItem
 import com.notifast.app.domain.model.search.SearchResultType
 import com.notifast.app.presentation.theme.ThemeUtils
@@ -46,10 +48,10 @@ fun SearchResultCard(
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
     val subjectColor = ThemeUtils.getAccessibleColor(item.subjectColorHex, isDark)
     val (typeIcon, typeLabel) = when (item.type) {
-        SearchResultType.SUBJECT -> Icons.Default.Class to "Materia"
-        SearchResultType.NOTE -> Icons.AutoMirrored.Filled.MenuBook to "Apunte"
-        SearchResultType.EVALUATION -> Icons.Default.Quiz to "Evaluación"
-        SearchResultType.SCHEDULE -> Icons.Default.Assignment to "Horario"
+        SearchResultType.SUBJECT -> Icons.Default.Class to stringResource(R.string.search_badge_subject)
+        SearchResultType.NOTE -> Icons.AutoMirrored.Filled.MenuBook to stringResource(R.string.search_badge_note)
+        SearchResultType.EVALUATION -> Icons.Default.Quiz to stringResource(R.string.search_badge_evaluation)
+        SearchResultType.SCHEDULE -> Icons.Default.Assignment to stringResource(R.string.search_badge_schedule)
     }
 
     Surface(
