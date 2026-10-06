@@ -71,16 +71,21 @@ fun MainContent() {
     val startDestination = if (authState == true) Screen.Notes.route else Screen.Onboarding.route
 
     LaunchedEffect(authState) {
-        if (authState == true) {
-            navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
-        } else if (authState == false) {
-            navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } }
+        val currentRoute = navController.currentDestination?.route
+        when {
+            authState == true && currentRoute != null && currentRoute != Screen.Notes.route -> {
+                navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
+            }
+            authState == false && currentRoute != null && currentRoute != Screen.Onboarding.route -> {
+                navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } }
+            }
         }
     }
 
-    val showBottomBar = Screen.bottomNavItems.any { screen ->
-        currentDestination?.hierarchy?.any { it.route == screen.route } == true
-    }
+    val bottomNavRoutes = remember { Screen.bottomNavItems.mapNotNull { it?.route } }
+    val showBottomBar = currentDestination?.hierarchy?.any { dest ->
+        dest.route != null && dest.route in bottomNavRoutes
+    } == true
 
     Scaffold(
         bottomBar = {
