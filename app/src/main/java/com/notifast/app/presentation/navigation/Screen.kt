@@ -50,6 +50,12 @@ sealed class Screen(
     data object EditProfile : Screen("edit_profile")
 
     companion object {
-        val bottomNavItems = listOf(Notes, Schedules, Grades, Settings)
+        /**
+         * Lazy getter: a `val` initialized inside the companion of a sealed class
+         * that references its own `data object` subclasses can capture them before
+         * their init finishes (empty routes / null icons). A `get()` defers lookup.
+         */
+        val bottomNavItems: List<Screen>
+            get() = listOf(Notes, Schedules, Grades, Settings)
     }
 }

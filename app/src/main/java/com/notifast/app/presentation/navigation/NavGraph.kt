@@ -82,17 +82,18 @@ fun MainContent() {
         }
     }
 
-    val bottomNavRoutes = remember { Screen.bottomNavItems.mapNotNull { it?.route } }
-    val showBottomBar = currentDestination?.hierarchy?.any { dest ->
-        dest.route != null && dest.route in bottomNavRoutes
-    } == true
+    val bottomNavRoutes = Screen.bottomNavItems.map { it.route }
+    val currentRoute = currentDestination?.route
+    val showBottomBar = bottomNavRoutes.any { tabRoute ->
+        currentRoute == tabRoute || currentRoute?.startsWith("$tabRoute/") == true
+    }
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
                 NotiFastBottomNav(
                     items = Screen.bottomNavItems,
-                    currentRoute = currentDestination?.route,
+                    currentRoute = currentRoute,
                     onItemClick = { screen ->
                         navController.navigate(screen.route) {
                             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -103,10 +104,11 @@ fun MainContent() {
                 )
             }
         }
-    ) {
+    ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Onboarding.route) {
                 OnboardingScreen(
