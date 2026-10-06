@@ -15,13 +15,15 @@ interface NoteRepository {
         content: String,
         imageUri: Uri?,
         tags: List<String> = emptyList()
-    ): Result<Unit>
+    ): Result<String>
     suspend fun addSubject(
         userId: String,
         subjectName: String,
         icon: String = "📚",
-        colorHex: String = ""
-    ): Result<Unit>
+        colorHex: String = "",
+        cycle: String = ""
+    ): Result<String>
+    suspend fun updateSubject(userId: String, subject: SubjectData): Result<Unit>
     suspend fun deleteNote(userId: String, note: Note): Result<Unit>
     suspend fun updateNote(userId: String, note: Note, imageUri: Uri?): Result<Unit>
     fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>>

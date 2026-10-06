@@ -26,6 +26,9 @@ interface EvaluationDao {
     @Query("DELETE FROM evaluations WHERE userId = :userId AND subjectName = :subjectName")
     suspend fun deleteEvaluationsBySubject(userId: String, subjectName: String): Int
 
+    @Query("DELETE FROM evaluations WHERE userId = :userId AND subjectId = :subjectId")
+    suspend fun deleteEvaluationsBySubjectId(userId: String, subjectId: String): Int
+
     @Query("DELETE FROM evaluations WHERE userId = :userId")
     suspend fun deleteEvaluationsByUserId(userId: String): Int
 
@@ -34,6 +37,9 @@ interface EvaluationDao {
 
     @Query("SELECT * FROM evaluations WHERE userId = :userId AND subjectName = :subjectName ORDER BY date ASC")
     fun getEvaluationsBySubject(userId: String, subjectName: String): Flow<List<EvaluationEntity>>
+
+    @Query("SELECT * FROM evaluations WHERE userId = :userId AND subjectId = :subjectId ORDER BY date ASC")
+    fun getEvaluationsBySubjectId(userId: String, subjectId: String): Flow<List<EvaluationEntity>>
 
     @Query("SELECT * FROM evaluations WHERE userId = :userId AND id = :evalId LIMIT 1")
     fun getEvaluationById(userId: String, evalId: String): Flow<EvaluationEntity?>

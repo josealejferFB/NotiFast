@@ -26,6 +26,9 @@ interface NoteDao {
     @Query("DELETE FROM notes WHERE userId = :userId AND subject = :subject")
     suspend fun deleteNotesBySubject(userId: String, subject: String): Int
 
+    @Query("DELETE FROM notes WHERE userId = :userId AND subjectId = :subjectId")
+    suspend fun deleteNotesBySubjectId(userId: String, subjectId: String): Int
+
     @Query("DELETE FROM notes WHERE userId = :userId")
     suspend fun deleteNotesByUserId(userId: String): Int
 
@@ -34,6 +37,9 @@ interface NoteDao {
 
     @Query("SELECT * FROM notes WHERE userId = :userId AND subject = :subject ORDER BY timestamp DESC")
     fun getNotesBySubject(userId: String, subject: String): Flow<List<NoteEntity>>
+
+    @Query("SELECT * FROM notes WHERE userId = :userId AND subjectId = :subjectId ORDER BY timestamp DESC")
+    fun getNotesBySubjectId(userId: String, subjectId: String): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes WHERE userId = :userId AND id = :noteId LIMIT 1")
     suspend fun getNoteById(userId: String, noteId: String): NoteEntity?

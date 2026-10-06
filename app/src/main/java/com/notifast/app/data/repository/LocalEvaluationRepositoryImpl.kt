@@ -23,9 +23,7 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
 ) : EvaluationRepository {
 
     override fun getEvaluations(userId: String): Flow<List<Evaluation>> {
-        return evaluationDao.getEvaluations(userId).map { list ->
-            list.map { it.toDomain() }
-        }
+        return evaluationDao.getEvaluations(userId).map { list -> list.map { it.toDomain() } }
     }
 
     override fun getEvaluation(userId: String, evaluationId: String): Flow<Evaluation?> {
@@ -36,36 +34,40 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
         userId: String,
         evaluation: Evaluation,
         imageUri: Uri?
-    ): Result<Unit> {
+    ): Result<String> {
         return try {
             var imageUrl = evaluation.imageUrl
             if (imageUri != null) {
                 val uploadResult = imageRepository.uploadNoteImage(userId, imageUri)
-                if (uploadResult.isSuccess) {
-                    imageUrl = uploadResult.getOrNull()
+                if (uploadResult.isFailure) {
+                    return Result.failure(uploadResult.exceptionOrNull() ?: Exception("No se pudo subir la imagen"))
                 }
+                imageUrl = uploadResult.getOrNull()
             }
             val evalId = if (evaluation.id.isBlank()) UUID.randomUUID().toString() else evaluation.id
             val now = Date()
-            val entity = EvaluationEntity(
-                id = evalId,
-                userId = userId,
-                subjectName = evaluation.subjectName,
-                title = evaluation.title,
-                description = evaluation.description,
-                date = evaluation.date,
-                noteIds = evaluation.noteIds,
-                imageUrl = imageUrl,
-                quickTips = evaluation.quickTips,
-                type = evaluation.type,
-                grade = evaluation.grade,
-                weight = evaluation.weight,
-                isPresented = evaluation.isPresented,
-                createdAt = evaluation.createdAt ?: now,
-                updatedAt = now
+            evaluationDao.insertEvaluation(
+                EvaluationEntity(
+                    id = evalId,
+                    userId = userId,
+                    subjectId = evaluation.subjectId,
+                    subjectName = evaluation.subjectName,
+                    title = evaluation.title,
+                    description = evaluation.description,
+                    date = evaluation.date,
+                    noteIds = evaluation.noteIds,
+                    imageUrl = imageUrl,
+                    quickTips = evaluation.quickTips,
+                    type = evaluation.type,
+                    grade = evaluation.grade,
+                    weight = evaluation.weight,
+                    isPresented = evaluation.isPresented,
+                    gradeScaleId = evaluation.gradeScaleId,
+                    createdAt = evaluation.createdAt ?: now,
+                    updatedAt = now
+                )
             )
-            evaluationDao.insertEvaluation(entity)
-            Result.success(Unit)
+            Result.success(evalId)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add evaluation '${evaluation.title}' for user $userId", e)
             Result.failure(e)
@@ -82,17 +84,18 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
             var imageUrl = evaluation.imageUrl
             if (imageUri != null) {
                 val uploadResult = imageRepository.uploadNoteImage(userId, imageUri)
-                if (uploadResult.isSuccess) {
-                    val newUrl = uploadResult.getOrNull()
-                    existing?.imageUrl?.takeIf { it.isNotBlank() && it != newUrl }?.let { oldUrl ->
-                        try {
-                            imageRepository.deleteImage(oldUrl)
-                        } catch (e: Exception) {
-                            Log.w(TAG, "Failed to delete old evaluation image $oldUrl", e)
-                        }
-                    }
-                    imageUrl = newUrl
+                if (uploadResult.isFailure) {
+                    return Result.failure(uploadResult.exceptionOrNull() ?: Exception("No se pudo subir la imagen"))
                 }
+                val newUrl = uploadResult.getOrNull()
+                existing?.imageUrl?.takeIf { it.isNotBlank() && it != newUrl }?.let { oldUrl ->
+                    try {
+                        imageRepository.deleteImage(oldUrl)
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to delete old evaluation image $oldUrl", e)
+                    }
+                }
+                imageUrl = newUrl
             } else if (imageUrl.isNullOrEmpty() && !existing?.imageUrl.isNullOrEmpty()) {
                 try {
                     imageRepository.deleteImage(existing!!.imageUrl!!)
@@ -101,24 +104,27 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
                 }
             }
 
-            val entity = EvaluationEntity(
-                id = evaluation.id,
-                userId = userId,
-                subjectName = evaluation.subjectName,
-                title = evaluation.title,
-                description = evaluation.description,
-                date = evaluation.date,
-                noteIds = evaluation.noteIds,
-                imageUrl = imageUrl,
-                quickTips = evaluation.quickTips,
-                type = evaluation.type,
-                grade = evaluation.grade,
-                weight = evaluation.weight,
-                isPresented = evaluation.isPresented,
-                createdAt = evaluation.createdAt ?: existing?.createdAt ?: Date(),
-                updatedAt = Date()
+            evaluationDao.updateEvaluation(
+                EvaluationEntity(
+                    id = evaluation.id,
+                    userId = userId,
+                    subjectId = evaluation.subjectId.ifBlank { existing?.subjectId ?: "" },
+                    subjectName = evaluation.subjectName,
+                    title = evaluation.title,
+                    description = evaluation.description,
+                    date = evaluation.date,
+                    noteIds = evaluation.noteIds,
+                    imageUrl = imageUrl,
+                    quickTips = evaluation.quickTips,
+                    type = evaluation.type,
+                    grade = evaluation.grade,
+                    weight = evaluation.weight,
+                    isPresented = evaluation.isPresented,
+                    gradeScaleId = evaluation.gradeScaleId,
+                    createdAt = evaluation.createdAt ?: existing?.createdAt ?: Date(),
+                    updatedAt = Date()
+                )
             )
-            evaluationDao.updateEvaluation(entity)
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update evaluation '${evaluation.id}'", e)
@@ -146,6 +152,7 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
     private fun EvaluationEntity.toDomain(): Evaluation = Evaluation(
         id = id,
         userId = userId,
+        subjectId = subjectId,
         subjectName = subjectName,
         title = title,
         description = description,
@@ -157,6 +164,7 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
         grade = grade,
         weight = weight,
         isPresented = isPresented,
+        gradeScaleId = gradeScaleId,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

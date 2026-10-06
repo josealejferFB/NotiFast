@@ -156,19 +156,20 @@ class EntityDataClassesTest {
         assertEquals("Prof. Euler", sched1.teacher)
 
         val sched2 = ScheduleEntity(
-            "s2",
-            "u1",
-            "Física",
-            "virtual",
-            2,
-            "10:00",
-            "12:00",
-            "",
-            "Prof. Newton",
-            "https://meet.google.com/abc-defg-hij",
-            0xFF3B9797L,
-            1000L,
-            1000L
+            id = "s2",
+            userId = "u1",
+            subjectId = "sub2",
+            subjectName = "Física",
+            modality = "virtual",
+            dayOfWeek = 2,
+            startTime = "10:00",
+            endTime = "12:00",
+            classroom = "",
+            teacher = "Prof. Newton",
+            meetingUrl = "https://meet.google.com/abc-defg-hij",
+            color = 0xFF3B9797L,
+            createdAt = java.util.Date(1000L),
+            updatedAt = java.util.Date(1000L)
         )
         assertEquals("s2", sched2.id)
         assertEquals("virtual", sched2.modality)

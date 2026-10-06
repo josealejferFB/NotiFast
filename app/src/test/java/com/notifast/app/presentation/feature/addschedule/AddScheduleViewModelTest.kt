@@ -74,7 +74,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when saving with valid data, calls repository addSchedule and sets isSaved`() = runTest {
-        coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success(Unit)
+        coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success("sch-1")
 
         val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
         advanceUntilIdle()

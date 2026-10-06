@@ -5,6 +5,7 @@ import java.util.Date
 data class Evaluation(
     val id: String = "",
     val userId: String = "",
+    val subjectId: String = "",
     val subjectName: String = "",
     val title: String = "",
     val description: String = "",
@@ -16,6 +17,8 @@ data class Evaluation(
     val grade: Double? = null,
     val weight: Double? = null,
     val isPresented: Boolean = false,
+    /** Scale this grade was recorded under (D5) — not the app default. */
+    val gradeScaleId: String = "0-10",
     val createdAt: Date? = null,
     val updatedAt: Date? = null
 )

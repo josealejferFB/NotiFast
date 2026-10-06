@@ -1,7 +1,6 @@
 package com.notifast.app.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.Date
@@ -10,6 +9,7 @@ import java.util.Date
     tableName = "schedules",
     indices = [
         Index(value = ["userId"]),
+        Index(value = ["subjectId"]),
         Index(value = ["dayOfWeek"])
     ]
 )
@@ -17,6 +17,7 @@ data class ScheduleEntity(
     @PrimaryKey
     val id: String = "",
     val userId: String = "",
+    val subjectId: String = "",
     val subjectName: String = "",
     val modality: String = "presencial",
     val dayOfWeek: Int = 0,
@@ -29,7 +30,6 @@ data class ScheduleEntity(
     val createdAt: Date? = null,
     val updatedAt: Date? = null
 ) {
-    @Ignore
     constructor(
         id: String,
         userId: String,
@@ -47,6 +47,7 @@ data class ScheduleEntity(
     ) : this(
         id = id,
         userId = userId,
+        subjectId = "",
         subjectName = subjectName,
         modality = modality,
         dayOfWeek = dayOfWeek,

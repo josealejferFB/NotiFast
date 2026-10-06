@@ -20,32 +20,33 @@ class LocalScheduleRepositoryImpl @Inject constructor(
 ) : ScheduleRepository {
 
     override fun getSchedules(userId: String): Flow<List<Schedule>> {
-        return scheduleDao.getSchedules(userId).map { list ->
-            list.map { it.toDomain() }
-        }
+        return scheduleDao.getSchedules(userId).map { list -> list.map { it.toDomain() } }
     }
 
-    override suspend fun addSchedule(userId: String, schedule: Schedule): Result<Unit> {
+    override suspend fun addSchedule(userId: String, schedule: Schedule): Result<String> {
         return try {
+            validate(schedule)?.let { return Result.failure(it) }
             val id = if (schedule.id.isBlank()) UUID.randomUUID().toString() else schedule.id
             val now = Date()
-            val entity = ScheduleEntity(
-                id = id,
-                userId = userId,
-                subjectName = schedule.subjectName,
-                modality = schedule.modality,
-                dayOfWeek = schedule.dayOfWeek,
-                startTime = schedule.startTime,
-                endTime = schedule.endTime,
-                classroom = schedule.classroom,
-                teacher = schedule.teacher,
-                meetingUrl = schedule.meetingUrl,
-                color = schedule.color,
-                createdAt = schedule.createdAt ?: now,
-                updatedAt = now
+            scheduleDao.insertSchedule(
+                ScheduleEntity(
+                    id = id,
+                    userId = userId,
+                    subjectId = schedule.subjectId,
+                    subjectName = schedule.subjectName,
+                    modality = schedule.modality,
+                    dayOfWeek = schedule.dayOfWeek,
+                    startTime = schedule.startTime,
+                    endTime = schedule.endTime,
+                    classroom = schedule.classroom,
+                    teacher = schedule.teacher,
+                    meetingUrl = schedule.meetingUrl,
+                    color = schedule.color,
+                    createdAt = schedule.createdAt ?: now,
+                    updatedAt = now
+                )
             )
-            scheduleDao.insertSchedule(entity)
-            Result.success(Unit)
+            Result.success(id)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add schedule for '${schedule.subjectName}' for user $userId", e)
             Result.failure(e)
@@ -54,23 +55,26 @@ class LocalScheduleRepositoryImpl @Inject constructor(
 
     override suspend fun updateSchedule(userId: String, schedule: Schedule): Result<Unit> {
         return try {
-            val now = Date()
-            val entity = ScheduleEntity(
-                id = schedule.id,
-                userId = userId,
-                subjectName = schedule.subjectName,
-                modality = schedule.modality,
-                dayOfWeek = schedule.dayOfWeek,
-                startTime = schedule.startTime,
-                endTime = schedule.endTime,
-                classroom = schedule.classroom,
-                teacher = schedule.teacher,
-                meetingUrl = schedule.meetingUrl,
-                color = schedule.color,
-                createdAt = schedule.createdAt ?: now,
-                updatedAt = now
+            validate(schedule)?.let { return Result.failure(it) }
+            val existing = scheduleDao.getScheduleById(userId, schedule.id)
+            scheduleDao.updateSchedule(
+                ScheduleEntity(
+                    id = schedule.id,
+                    userId = userId,
+                    subjectId = schedule.subjectId.ifBlank { existing?.subjectId ?: "" },
+                    subjectName = schedule.subjectName,
+                    modality = schedule.modality,
+                    dayOfWeek = schedule.dayOfWeek,
+                    startTime = schedule.startTime,
+                    endTime = schedule.endTime,
+                    classroom = schedule.classroom,
+                    teacher = schedule.teacher,
+                    meetingUrl = schedule.meetingUrl,
+                    color = schedule.color,
+                    createdAt = schedule.createdAt ?: existing?.createdAt ?: Date(),
+                    updatedAt = Date()
+                )
             )
-            scheduleDao.updateSchedule(entity)
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update schedule '${schedule.id}'", e)
@@ -88,9 +92,20 @@ class LocalScheduleRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun validate(schedule: Schedule): Exception? {
+        if (schedule.dayOfWeek !in 0..6) {
+            return Exception("Día de la semana inválido")
+        }
+        if (schedule.startTime.isBlank() || schedule.endTime.isBlank()) {
+            return Exception("Horario incompleto")
+        }
+        return null
+    }
+
     private fun ScheduleEntity.toDomain(): Schedule = Schedule(
         id = id,
         userId = userId,
+        subjectId = subjectId,
         subjectName = subjectName,
         modality = modality,
         dayOfWeek = dayOfWeek,

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface EvaluationRepository {
     fun getEvaluations(userId: String): Flow<List<Evaluation>>
     fun getEvaluation(userId: String, evaluationId: String): Flow<Evaluation?>
-    suspend fun addEvaluation(userId: String, evaluation: Evaluation, imageUri: Uri?): Result<Unit>
+    suspend fun addEvaluation(userId: String, evaluation: Evaluation, imageUri: Uri?): Result<String>
     suspend fun updateEvaluation(userId: String, evaluation: Evaluation, imageUri: Uri?): Result<Unit>
     suspend fun deleteEvaluation(userId: String, evaluation: Evaluation): Result<Unit>
 }

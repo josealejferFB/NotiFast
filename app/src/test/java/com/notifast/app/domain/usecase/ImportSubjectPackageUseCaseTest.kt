@@ -41,10 +41,10 @@ class ImportSubjectPackageUseCaseTest {
 
     @Before
     fun setUp() {
-        coEvery { noteRepository.addSubject(any(), any(), any(), any()) } returns Result.success(Unit)
-        coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success(Unit)
-        coEvery { evaluationRepository.addEvaluation(any(), any(), any()) } returns Result.success(Unit)
-        coEvery { noteRepository.addNote(any(), any(), any(), any(), any(), any()) } returns Result.success(Unit)
+        coEvery { noteRepository.addSubject(any(), any(), any(), any()) } returns Result.success("sub-1")
+        coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success("sch-1")
+        coEvery { evaluationRepository.addEvaluation(any(), any(), any()) } returns Result.success("ev-1")
+        coEvery { noteRepository.addNote(any(), any(), any(), any(), any(), any()) } returns Result.success("note-1")
 
         importSubjectPackageUseCase = ImportSubjectPackageUseCase(
             noteRepository = noteRepository,

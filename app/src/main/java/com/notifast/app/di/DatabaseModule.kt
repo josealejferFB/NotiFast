@@ -8,6 +8,7 @@ import com.notifast.app.data.local.dao.NoteDao
 import com.notifast.app.data.local.dao.ScheduleDao
 import com.notifast.app.data.local.dao.SubjectDao
 import com.notifast.app.data.local.dao.UserDao
+import com.notifast.app.data.local.migrations.NotiFastMigrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +27,7 @@ object DatabaseModule {
             context,
             NotiFastDatabase::class.java,
             "notifast.db"
-        ).fallbackToDestructiveMigration(dropAllTables = true).build()
+        ).addMigrations(NotiFastMigrations.MIGRATION_1_2).build()
     }
 
     @Provides

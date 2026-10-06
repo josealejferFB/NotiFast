@@ -93,7 +93,7 @@ class AddSubjectViewModelTest {
 
     @Test
     fun `when saving valid subject, calls repository and marks isSaved`() = runTest {
-        coEvery { noteRepository.addSubject("user_test_456", "Química General", "Science", "#047857") } returns Result.success(Unit)
+        coEvery { noteRepository.addSubject("user_test_456", "Química General", "Science", "#047857") } returns Result.success("sub-1")
 
         val viewModel = AddSubjectViewModel(noteRepository, authRepository)
         advanceUntilIdle()

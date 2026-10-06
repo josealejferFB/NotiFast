@@ -5,6 +5,7 @@ import java.util.Date
 data class Note(
     val id: String = "",
     val userId: String = "",
+    val subjectId: String = "",
     val subject: String = "",
     val title: String = "",
     val content: String = "",

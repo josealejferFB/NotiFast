@@ -1,7 +1,6 @@
 package com.notifast.app.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.Date
@@ -10,13 +9,14 @@ import java.util.Date
     tableName = "notes",
     indices = [
         Index(value = ["userId"]),
-        Index(value = ["subject"])
+        Index(value = ["subjectId"])
     ]
 )
 data class NoteEntity(
     @PrimaryKey
     val id: String = "",
     val userId: String = "",
+    val subjectId: String = "",
     val subject: String = "",
     val title: String = "",
     val content: String = "",
@@ -25,7 +25,6 @@ data class NoteEntity(
     val timestamp: Date? = null,
     val updatedAt: Date? = null
 ) {
-    @Ignore
     constructor(
         id: String,
         userId: String,
@@ -39,6 +38,7 @@ data class NoteEntity(
     ) : this(
         id = id,
         userId = userId,
+        subjectId = "",
         subject = subject,
         title = title,
         content = content,

@@ -62,7 +62,7 @@ class AddNoteViewModelTest {
 
     @Test
     fun `when saving note with tags, calls repository addNote with tags`() = runTest {
-        coEvery { noteRepository.addNote("user_123", "Matemáticas", "Derivadas", "Contenido", any(), listOf("Examen")) } returns Result.success(Unit)
+        coEvery { noteRepository.addNote("user_123", "Matemáticas", "Derivadas", "Contenido", any(), listOf("Examen")) } returns Result.success("note-1")
 
         val viewModel = AddNoteViewModel(noteRepository, authRepository)
         advanceUntilIdle()

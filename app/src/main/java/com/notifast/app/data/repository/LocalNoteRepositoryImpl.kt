@@ -35,14 +35,20 @@ class LocalNoteRepositoryImpl @Inject constructor(
 ) : NoteRepository {
 
     override fun getNotes(userId: String): Flow<List<Note>> {
-        return noteDao.getNotes(userId).map { list ->
-            list.map { it.toDomain() }
-        }
+        return noteDao.getNotes(userId).map { list -> list.map { it.toDomain() } }
     }
 
     override fun getSubjects(userId: String): Flow<List<SubjectData>> {
         return subjectDao.getSubjects(userId).map { list ->
-            list.map { SubjectData(name = it.name, icon = it.icon, colorHex = it.colorHex) }
+            list.map {
+                SubjectData(
+                    id = it.id,
+                    name = it.name,
+                    icon = it.icon,
+                    colorHex = it.colorHex,
+                    cycle = it.cycle
+                )
+            }
         }
     }
 
@@ -53,30 +59,35 @@ class LocalNoteRepositoryImpl @Inject constructor(
         content: String,
         imageUri: Uri?,
         tags: List<String>
-    ): Result<Unit> {
+    ): Result<String> {
         return try {
+            val subjectEntity = subjectDao.getSubjectByName(userId, subject)
+                ?: return Result.failure(Exception("La materia no existe"))
             var imageUrl: String? = null
             if (imageUri != null) {
                 val uploadResult = imageRepository.uploadNoteImage(userId, imageUri)
-                if (uploadResult.isSuccess) {
-                    imageUrl = uploadResult.getOrNull()
+                if (uploadResult.isFailure) {
+                    return Result.failure(uploadResult.exceptionOrNull() ?: Exception("No se pudo subir la imagen"))
                 }
+                imageUrl = uploadResult.getOrNull()
             }
             val noteId = UUID.randomUUID().toString()
             val now = Date()
-            val entity = NoteEntity(
-                id = noteId,
-                userId = userId,
-                subject = subject,
-                title = title,
-                content = content,
-                imageUrl = imageUrl,
-                tags = tags,
-                timestamp = now,
-                updatedAt = now
+            noteDao.insertNote(
+                NoteEntity(
+                    id = noteId,
+                    userId = userId,
+                    subjectId = subjectEntity.id,
+                    subject = subject,
+                    title = title,
+                    content = content,
+                    imageUrl = imageUrl,
+                    tags = tags,
+                    timestamp = now,
+                    updatedAt = now
+                )
             )
-            noteDao.insertNote(entity)
-            Result.success(Unit)
+            Result.success(noteId)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add note '$title' for user $userId", e)
             Result.failure(e)
@@ -87,24 +98,48 @@ class LocalNoteRepositoryImpl @Inject constructor(
         userId: String,
         subjectName: String,
         icon: String,
-        colorHex: String
-    ): Result<Unit> {
+        colorHex: String,
+        cycle: String
+    ): Result<String> {
         return try {
             val existing = subjectDao.getSubjectByName(userId, subjectName)
             if (existing != null) {
                 return Result.failure(Exception("La materia ya existe"))
             }
-            val entity = SubjectEntity(
-                userId = userId,
-                name = subjectName,
-                icon = icon,
-                colorHex = colorHex,
-                createdAt = Date()
+            val subjectId = UUID.randomUUID().toString()
+            subjectDao.insertSubject(
+                SubjectEntity(
+                    userId = userId,
+                    id = subjectId,
+                    name = subjectName,
+                    icon = icon,
+                    colorHex = colorHex,
+                    cycle = cycle,
+                    createdAt = Date()
+                )
             )
-            subjectDao.insertSubject(entity)
-            Result.success(Unit)
+            Result.success(subjectId)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add subject '$subjectName' for user $userId", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateSubject(userId: String, subject: SubjectData): Result<Unit> {
+        return try {
+            val existing = subjectDao.getSubjectById(userId, subject.id)
+                ?: return Result.failure(Exception("La materia no existe"))
+            subjectDao.updateSubject(
+                existing.copy(
+                    name = subject.name,
+                    icon = subject.icon,
+                    colorHex = subject.colorHex,
+                    cycle = subject.cycle
+                )
+            )
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update subject '${subject.id}'", e)
             Result.failure(e)
         }
     }
@@ -136,17 +171,18 @@ class LocalNoteRepositoryImpl @Inject constructor(
             var imageUrl = note.imageUrl
             if (imageUri != null) {
                 val uploadResult = imageRepository.uploadNoteImage(userId, imageUri)
-                if (uploadResult.isSuccess) {
-                    val newUrl = uploadResult.getOrNull()
-                    existing?.imageUrl?.takeIf { it.isNotBlank() && it != newUrl }?.let { oldUrl ->
-                        try {
-                            imageRepository.deleteImage(oldUrl)
-                        } catch (e: Exception) {
-                            Log.w(TAG, "Failed to delete old image $oldUrl", e)
-                        }
-                    }
-                    imageUrl = newUrl
+                if (uploadResult.isFailure) {
+                    return Result.failure(uploadResult.exceptionOrNull() ?: Exception("No se pudo subir la imagen"))
                 }
+                val newUrl = uploadResult.getOrNull()
+                existing?.imageUrl?.takeIf { it.isNotBlank() && it != newUrl }?.let { oldUrl ->
+                    try {
+                        imageRepository.deleteImage(oldUrl)
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to delete old image $oldUrl", e)
+                    }
+                }
+                imageUrl = newUrl
             } else if (imageUrl.isNullOrEmpty() && !existing?.imageUrl.isNullOrEmpty()) {
                 try {
                     imageRepository.deleteImage(existing!!.imageUrl!!)
@@ -155,18 +191,26 @@ class LocalNoteRepositoryImpl @Inject constructor(
                 }
             }
 
-            val entity = NoteEntity(
-                id = note.id,
-                userId = userId,
-                subject = note.subject,
-                title = note.title,
-                content = note.content,
-                imageUrl = imageUrl,
-                tags = note.tags,
-                timestamp = note.timestamp ?: existing?.timestamp ?: Date(),
-                updatedAt = Date()
+            val subjectId = if (note.subjectId.isNotBlank()) {
+                note.subjectId
+            } else {
+                subjectDao.getSubjectByName(userId, note.subject)?.id ?: ""
+            }
+
+            noteDao.updateNote(
+                NoteEntity(
+                    id = note.id,
+                    userId = userId,
+                    subjectId = subjectId,
+                    subject = note.subject,
+                    title = note.title,
+                    content = note.content,
+                    imageUrl = imageUrl,
+                    tags = note.tags,
+                    timestamp = note.timestamp ?: existing?.timestamp ?: Date(),
+                    updatedAt = Date()
+                )
             )
-            noteDao.updateNote(entity)
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update note '${note.id}'", e)
@@ -175,30 +219,44 @@ class LocalNoteRepositoryImpl @Inject constructor(
     }
 
     override fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>> {
-        return noteDao.getNotesBySubject(userId, subject).map { list ->
-            list.map { it.toDomain() }
-        }
+        return noteDao.getNotesBySubject(userId, subject).map { list -> list.map { it.toDomain() } }
     }
 
     override suspend fun deleteSubject(userId: String, subjectName: String): Result<Unit> {
         return try {
-            // Step 1: Collect orphan image URLs before deleting records
-            val notes = noteDao.getNotesBySubject(userId, subjectName).first()
-            val evals = evaluationDao.getEvaluationsBySubject(userId, subjectName).first()
+            val subject = subjectDao.getSubjectByName(userId, subjectName)
+            val subjectId = subject?.id ?: ""
+
+            val notes = if (subjectId.isNotBlank()) {
+                noteDao.getNotesBySubjectId(userId, subjectId).first()
+            } else {
+                noteDao.getNotesBySubject(userId, subjectName).first()
+            }
+            val evals = if (subjectId.isNotBlank()) {
+                evaluationDao.getEvaluationsBySubjectId(userId, subjectId).first()
+            } else {
+                evaluationDao.getEvaluationsBySubject(userId, subjectName).first()
+            }
 
             val orphanImages = mutableListOf<String>()
             notes.mapNotNull { it.imageUrl }.filter { it.isNotBlank() }.forEach { orphanImages.add(it) }
             evals.mapNotNull { it.imageUrl }.filter { it.isNotBlank() }.forEach { orphanImages.add(it) }
 
-            // Step 2: Atomic cascading deletion in Room transaction
             db.withTransaction {
-                noteDao.deleteNotesBySubject(userId, subjectName)
-                evaluationDao.deleteEvaluationsBySubject(userId, subjectName)
-                scheduleDao.deleteSchedulesBySubject(userId, subjectName)
-                subjectDao.deleteSubject(userId, subjectName)
+                if (subjectId.isNotBlank()) {
+                    noteDao.deleteNotesBySubjectId(userId, subjectId)
+                    evaluationDao.deleteEvaluationsBySubjectId(userId, subjectId)
+                    scheduleDao.deleteSchedulesBySubjectId(userId, subjectId)
+                    subjectDao.deleteSubjectById(userId, subjectId)
+                } else {
+                    // Legacy rows without subjectId still cascade by name (case-safe)
+                    noteDao.deleteNotesBySubject(userId, subjectName)
+                    evaluationDao.deleteEvaluationsBySubject(userId, subjectName)
+                    scheduleDao.deleteSchedulesBySubject(userId, subjectName)
+                    subjectDao.deleteSubject(userId, subjectName)
+                }
             }
 
-            // Step 3: Delete orphan images from disk after successful commit
             for (imageUrl in orphanImages) {
                 try {
                     imageRepository.deleteImage(imageUrl)
@@ -231,6 +289,7 @@ class LocalNoteRepositoryImpl @Inject constructor(
     private fun NoteEntity.toDomain(): Note = Note(
         id = id,
         userId = userId,
+        subjectId = subjectId,
         subject = subject,
         title = title,
         content = content,

@@ -26,6 +26,9 @@ interface ScheduleDao {
     @Query("DELETE FROM schedules WHERE userId = :userId AND subjectName = :subjectName")
     suspend fun deleteSchedulesBySubject(userId: String, subjectName: String): Int
 
+    @Query("DELETE FROM schedules WHERE userId = :userId AND subjectId = :subjectId")
+    suspend fun deleteSchedulesBySubjectId(userId: String, subjectId: String): Int
+
     @Query("DELETE FROM schedules WHERE userId = :userId")
     suspend fun deleteSchedulesByUserId(userId: String): Int
 
@@ -34,6 +37,9 @@ interface ScheduleDao {
 
     @Query("SELECT * FROM schedules WHERE userId = :userId AND dayOfWeek = :dayOfWeek ORDER BY startTime ASC")
     fun getSchedulesByDay(userId: String, dayOfWeek: Int): Flow<List<ScheduleEntity>>
+
+    @Query("SELECT * FROM schedules WHERE userId = :userId AND subjectId = :subjectId ORDER BY dayOfWeek ASC, startTime ASC")
+    fun getSchedulesBySubjectId(userId: String, subjectId: String): Flow<List<ScheduleEntity>>
 
     @Query("SELECT * FROM schedules WHERE userId = :userId AND id = :scheduleId LIMIT 1")
     suspend fun getScheduleById(userId: String, scheduleId: String): ScheduleEntity?
