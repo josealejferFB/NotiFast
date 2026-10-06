@@ -47,8 +47,9 @@ class AddScheduleViewModel @Inject constructor(
         when (event) {
             is AddScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
             is AddScheduleEvent.UpdateModality -> _uiState.update {
+                // Virtual classes still have a day/time slot (D10); only classroom vs meetingUrl differs
                 if (event.modality == Schedule.MODALITY_VIRTUAL) {
-                    it.copy(modality = event.modality, dayOfWeek = 0, startTime = "", endTime = "", classroom = "", conflictingSchedules = emptyList())
+                    it.copy(modality = event.modality, classroom = "", conflictingSchedules = emptyList())
                 } else {
                     it.copy(modality = event.modality, meetingUrl = "")
                 }
@@ -125,11 +126,9 @@ class AddScheduleViewModel @Inject constructor(
             _uiState.update { it.copy(error = "El nombre de la materia es requerido") }
             return
         }
-        if (state.modality == Schedule.MODALITY_PRESENCIAL) {
-            if (state.startTime.isBlank() || state.endTime.isBlank()) {
-                _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas") }
-                return
-            }
+        if (state.startTime.isBlank() || state.endTime.isBlank()) {
+            _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas") }
+            return
         }
 
         viewModelScope.launch {
@@ -158,10 +157,9 @@ class AddScheduleViewModel @Inject constructor(
             )
 
             scheduleRepository.addSchedule(userId, schedule).fold(
-                onSuccess = {
-                    if (schedule.modality == Schedule.MODALITY_PRESENCIAL) {
-                        scheduleClassAlertUseCase(schedule)
-                    }
+                onSuccess = { scheduleId ->
+                    // Virtual classes are scheduled slots too (D10) — alert both modalities
+                    scheduleClassAlertUseCase(schedule.copy(id = scheduleId))
                     _uiState.update { it.copy(isSaved = true, isSaving = false) }
                 },
                 onFailure = { e ->

@@ -73,7 +73,7 @@ class EditScheduleViewModel @Inject constructor(
             is EditScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
             is EditScheduleEvent.UpdateModality -> _uiState.update {
                 if (event.modality == Schedule.MODALITY_VIRTUAL) {
-                    it.copy(modality = event.modality, dayOfWeek = 0, startTime = "", endTime = "", classroom = "", conflictingSchedules = emptyList())
+                    it.copy(modality = event.modality, classroom = "", conflictingSchedules = emptyList())
                 } else {
                     it.copy(modality = event.modality, meetingUrl = "")
                 }
@@ -155,11 +155,9 @@ class EditScheduleViewModel @Inject constructor(
             _uiState.update { it.copy(error = "El nombre de la materia es requerido") }
             return
         }
-        if (state.modality == Schedule.MODALITY_PRESENCIAL) {
-            if (state.startTime.isBlank() || state.endTime.isBlank()) {
-                _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas") }
-                return
-            }
+        if (state.startTime.isBlank() || state.endTime.isBlank()) {
+            _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas") }
+            return
         }
 
         viewModelScope.launch {
@@ -190,11 +188,8 @@ class EditScheduleViewModel @Inject constructor(
 
             scheduleRepository.updateSchedule(userId, schedule).fold(
                 onSuccess = {
-                    if (schedule.modality == Schedule.MODALITY_PRESENCIAL) {
-                        scheduleClassAlertUseCase(schedule)
-                    } else {
-                        cancelAlertUseCase.cancelClassAlert(schedule.id)
-                    }
+                    // Virtual classes are scheduled slots too (D10)
+                    scheduleClassAlertUseCase(schedule)
                     _uiState.update { it.copy(isSaved = true, isSaving = false) }
                 },
                 onFailure = { e ->

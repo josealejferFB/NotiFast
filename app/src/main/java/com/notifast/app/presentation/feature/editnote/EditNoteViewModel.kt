@@ -111,16 +111,27 @@ class EditNoteViewModel @Inject constructor(
 
     private fun saveNote(exitAfter: Boolean = false) {
         val state = _uiState.value; val note = state.note ?: return
-        viewModelScope.launch {
+        // Tie the in-flight save to saveJob so SaveClicked can cancel a pending auto-save
+        saveJob?.cancel()
+        saveJob = viewModelScope.launch {
             val userId = authRepository.getCurrentUserId()
             if (userId == null) { _uiState.update { it.copy(error = "Usuario no autenticado", syncStatus = "Error") }; return@launch }
-            
+
             noteRepository.updateNote(
                 userId = userId,
                 note = note.copy(title = state.title, content = state.content, tags = state.tags),
                 imageUri = state.imageUri
             ).fold(
-                onSuccess = { _uiState.update { it.copy(imageUri = null, syncStatus = "Guardado", isSaved = exitAfter) } },
+                onSuccess = {
+                    _uiState.update { prev ->
+                        // A late auto-save must not clear isSaved after a manual save
+                        prev.copy(
+                            imageUri = null,
+                            syncStatus = "Guardado",
+                            isSaved = exitAfter || prev.isSaved
+                        )
+                    }
+                },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al guardar", syncStatus = "Error") } }
             )
         }

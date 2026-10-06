@@ -36,16 +36,29 @@ class SubjectDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SubjectDetailUiState(subjectName = subjectName))
     val uiState: StateFlow<SubjectDetailUiState> = _uiState.asStateFlow()
 
-    private val _targetGrade = MutableStateFlow(6.0)
-    private val _selectedQuadrant = MutableStateFlow(SubjectQuadrant.PANORAMA)
-    private val _searchQuery = MutableStateFlow("")
-    private val _selectedTag = MutableStateFlow<String?>(null)
+    // Single source of filter/UI inputs lives inside UiState (MVI). These private
+    // flows only fan-in to one combine without being exposed as parallel state.
+    private val filterInputs = MutableStateFlow(
+        FilterData(
+            targetGrade = 6.0,
+            quadrant = SubjectQuadrant.PANORAMA,
+            query = "",
+            tag = null
+        )
+    )
+
+    private var loadJob: kotlinx.coroutines.Job? = null
 
     init { loadData() }
 
     private fun loadData() {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
             _uiState.update { it.copy(userId = userId, isLoading = true) }
 
             val dataFlow = combine(
@@ -56,12 +69,11 @@ class SubjectDetailViewModel @Inject constructor(
                 userPrefsRepository.defaultGradeScaleFlow
             ) { notes, evals, schedules, subjects, scaleId -> DomainData(notes, evals, schedules, subjects, scaleId) }
 
-            val filterFlow = combine(_targetGrade, _selectedQuadrant, _searchQuery, _selectedTag) { tg, quad, q, tag -> FilterData(tg, quad, q, tag) }
-
-            combine(dataFlow, filterFlow) { domain, filter ->
-                val subjectEvals = domain.evaluations.filter { it.subjectName == subjectName }
-                val subjectSchedules = domain.schedules.filter { it.subjectName == subjectName }
-                val subjectData = domain.subjects.find { it.name == subjectName } ?: SubjectData(name = subjectName)
+            combine(dataFlow, filterInputs) { domain, filter ->
+                val subjectEvals = domain.evaluations.filter { it.subjectName.equals(subjectName, ignoreCase = true) }
+                val subjectSchedules = domain.schedules.filter { it.subjectName.equals(subjectName, ignoreCase = true) }
+                val subjectData = domain.subjects.find { it.name.equals(subjectName, ignoreCase = true) }
+                    ?: SubjectData(name = subjectName)
                 val scale = GradeScale.fromId(domain.scaleId)
 
                 val avg = calculateWeightedAverageUseCase(subjectEvals)
@@ -82,39 +94,44 @@ class SubjectDetailViewModel @Inject constructor(
                 val milestone = calculateMilestone(upcoming.firstOrNull(), subjectSchedules)
                 val firstSchedule = subjectSchedules.firstOrNull()
 
-                SubjectDetailUiState(
-                    userId = userId,
-                    isLoading = false,
-                    subjectName = subjectName,
-                    subjectIcon = subjectData.icon,
-                    subjectColorHex = subjectData.colorHex,
-                    selectedQuadrant = filter.quadrant,
-                    notes = domain.notes,
-                    filteredNotes = filteredNotes,
-                    searchQuery = filter.query,
-                    selectedTag = filter.tag,
-                    availableTags = allTags,
-                    evaluations = subjectEvals,
-                    schedules = subjectSchedules,
-                    averageGrade = avg?.let { kotlin.math.round(it * 10) / 10.0 },
-                    completedEvalCount = completed,
-                    pendingEvalCount = total - completed,
-                    upcomingEvaluations = upcoming,
-                    nextMilestone = milestone,
-                    progressPercent = if (total > 0) completed.toFloat() / total else 0f,
-                    totalAssignedWeight = totalWeight,
-                    evaluatedWeight = evalWeight,
-                    pendingWeight = pendWeight,
-                    availableWeight = (100.0 - totalWeight).coerceAtLeast(0.0),
-                    gradeScale = scale,
-                    targetGrade = filter.targetGrade,
-                    simulationResult = calculateRequiredGradeUseCase(subjectEvals, filter.targetGrade, scale),
-                    classroom = firstSchedule?.classroom.orEmpty(),
-                    teacher = firstSchedule?.teacher.orEmpty(),
-                    modality = firstSchedule?.modality ?: Schedule.MODALITY_PRESENCIAL,
-                    meetingUrl = firstSchedule?.meetingUrl
-                )
-            }.collect { state -> _uiState.value = state }
+                _uiState.update { prev ->
+                    prev.copy(
+                        userId = userId,
+                        isLoading = false,
+                        error = prev.error,
+                        subjectName = subjectName,
+                        subjectIcon = subjectData.icon,
+                        subjectColorHex = subjectData.colorHex,
+                        selectedQuadrant = filter.quadrant,
+                        notes = domain.notes,
+                        filteredNotes = filteredNotes,
+                        searchQuery = filter.query,
+                        selectedTag = filter.tag,
+                        availableTags = allTags,
+                        evaluations = subjectEvals,
+                        schedules = subjectSchedules,
+                        averageGrade = avg?.let { kotlin.math.round(it * 10) / 10.0 },
+                        completedEvalCount = completed,
+                        pendingEvalCount = total - completed,
+                        upcomingEvaluations = upcoming,
+                        nextMilestone = milestone,
+                        progressPercent = if (total > 0) completed.toFloat() / total else 0f,
+                        totalAssignedWeight = totalWeight,
+                        evaluatedWeight = evalWeight,
+                        pendingWeight = pendWeight,
+                        availableWeight = (100.0 - totalWeight).coerceAtLeast(0.0),
+                        gradeScale = scale,
+                        targetGrade = filter.targetGrade,
+                        simulationResult = calculateRequiredGradeUseCase(subjectEvals, filter.targetGrade, scale),
+                        classroom = firstSchedule?.classroom.orEmpty(),
+                        teacher = firstSchedule?.teacher.orEmpty(),
+                        modality = firstSchedule?.modality ?: Schedule.MODALITY_PRESENCIAL,
+                        meetingUrl = firstSchedule?.meetingUrl
+                    )
+                }
+            }.catch { e ->
+                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al cargar") }
+            }.collect { }
         }
     }
 
@@ -135,13 +152,13 @@ class SubjectDetailViewModel @Inject constructor(
     fun onEvent(event: SubjectDetailEvent) {
         when (event) {
             is SubjectDetailEvent.LoadData -> loadData()
-            is SubjectDetailEvent.SelectQuadrant -> _selectedQuadrant.value = event.quadrant
-            is SubjectDetailEvent.UpdateSearchQuery -> _searchQuery.value = event.query
-            is SubjectDetailEvent.SelectTag -> _selectedTag.value = event.tag
+            is SubjectDetailEvent.SelectQuadrant -> filterInputs.update { it.copy(quadrant = event.quadrant) }
+            is SubjectDetailEvent.UpdateSearchQuery -> filterInputs.update { it.copy(query = event.query) }
+            is SubjectDetailEvent.SelectTag -> filterInputs.update { it.copy(tag = event.tag) }
             is SubjectDetailEvent.SaveGrade -> saveGrade(event.evaluationId, event.grade, event.isPresented)
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
             is SubjectDetailEvent.DeleteSchedule -> deleteSchedule(event.schedule)
-            is SubjectDetailEvent.UpdateTargetGrade -> _targetGrade.value = event.targetGrade
+            is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGrade = event.targetGrade) }
             is SubjectDetailEvent.SetGradeScale -> viewModelScope.launch { userPrefsRepository.setDefaultGradeScale(event.scale.id) }
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
