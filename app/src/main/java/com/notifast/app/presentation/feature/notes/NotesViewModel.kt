@@ -43,6 +43,8 @@ class NotesViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     private val _selectedTag = MutableStateFlow<String?>(null)
 
+    private var loadJob: kotlinx.coroutines.Job? = null
+
     init {
         loadNotes()
         loadUserProfile()
@@ -64,8 +66,13 @@ class NotesViewModel @Inject constructor(
     }
 
     private fun loadNotes() {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
             _uiState.update { it.copy(userId = userId, isLoading = true, error = null) }
 
             val filterParamsFlow = combine(_currentFilter, _searchQuery, _selectedTag) { filter, query, tag ->
@@ -89,40 +96,26 @@ class NotesViewModel @Inject constructor(
                     kotlin.math.round(it * 10) / 10.0
                 }
 
-                NotesUiState(
-                    notes = filtered,
-                    rawNotes = notes,
-                    subjects = subjectNames,
-                    subjectInfos = subjectInfos,
-                    nextActivity = nextActivity,
-                    globalAverage = globalAverage,
-                    totalNotesCount = notes.size,
-                    totalSubjectsCount = subjects.size,
-                    currentFilter = filter,
-                    searchQuery = query,
-                    availableTags = availableTags,
-                    selectedTag = tag
-                )
+                _uiState.update { prev ->
+                    prev.copy(
+                        notes = filtered,
+                        rawNotes = notes,
+                        subjects = subjectNames,
+                        subjectInfos = subjectInfos,
+                        nextActivity = nextActivity,
+                        globalAverage = globalAverage,
+                        totalNotesCount = notes.size,
+                        totalSubjectsCount = subjects.size,
+                        currentFilter = filter,
+                        searchQuery = query,
+                        availableTags = availableTags,
+                        selectedTag = tag,
+                        isLoading = false
+                    )
+                }
             }.catch { e ->
                 _uiState.update { it.copy(error = e.message ?: "Error al cargar notas", isLoading = false) }
-            }.collect { newState ->
-                _uiState.update { it.copy(
-                    notes = newState.notes,
-                    rawNotes = newState.rawNotes,
-                    subjects = newState.subjects,
-                    subjectInfos = newState.subjectInfos,
-                    nextActivity = newState.nextActivity,
-                    globalAverage = newState.globalAverage,
-                    totalNotesCount = newState.totalNotesCount,
-                    totalSubjectsCount = newState.totalSubjectsCount,
-                    currentFilter = newState.currentFilter,
-                    searchQuery = newState.searchQuery,
-                    availableTags = newState.availableTags,
-                    selectedTag = newState.selectedTag,
-                    isLoading = false,
-                    error = newState.error
-                ) }
-            }
+            }.collect { }
         }
     }
 
@@ -132,33 +125,56 @@ class NotesViewModel @Inject constructor(
         subjects: List<SubjectData>
     ): NextActivity {
         val subjectColorMap = subjects.associate { it.name to it.colorHex }
-        val todayDayOfWeek = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)
+        val nowCal = java.util.Calendar.getInstance()
+        val todayDayOfWeek = nowCal.get(java.util.Calendar.DAY_OF_WEEK) - 1
+        val nowMinutes = nowCal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + nowCal.get(java.util.Calendar.MINUTE)
+
         val todaySchedules = schedules
             .filter { it.dayOfWeek == todayDayOfWeek }
-            .sortedBy { it.startTime }
+            .sortedBy { com.notifast.app.domain.util.TimeParser.toMinutes(it.startTime) ?: 0 }
 
-        if (todaySchedules.isNotEmpty()) {
-            val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-            val upcomingClass = todaySchedules.firstOrNull { it.endTime >= now } ?: todaySchedules.first()
+        val ongoingOrNextToday = todaySchedules.firstOrNull { sched ->
+            val end = com.notifast.app.domain.util.TimeParser.toMinutes(sched.endTime) ?: 0
+            end > nowMinutes
+        }
+        if (ongoingOrNextToday != null) {
             return NextActivity.ClassActivity(
-                schedule = upcomingClass,
-                colorHex = subjectColorMap[upcomingClass.subjectName].orEmpty()
+                schedule = ongoingOrNextToday,
+                colorHex = subjectColorMap[ongoingOrNextToday.subjectName].orEmpty()
             )
         }
 
+        // No more classes today → look ahead 7 days for the next class
+        val nextClass = (1..7).firstNotNullOfOrNull { offset ->
+            val day = (todayDayOfWeek + offset) % 7
+            schedules.filter { it.dayOfWeek == day }
+                .minByOrNull { com.notifast.app.domain.util.TimeParser.toMinutes(it.startTime) ?: Int.MAX_VALUE }
+        }
         val upcomingEval = evaluations
             .filter { !it.isPresented && it.date != null }
             .sortedBy { it.date }
             .firstOrNull()
 
-        if (upcomingEval != null) {
-            return NextActivity.EvaluationActivity(
-                evaluation = upcomingEval,
-                colorHex = subjectColorMap[upcomingEval.subjectName].orEmpty()
-            )
-        }
+        val nextClassTime = nextClass?.let {
+            val day = it.dayOfWeek
+            val daysAhead = (day - todayDayOfWeek + 7) % 7
+            daysAhead * 24 * 60 + (com.notifast.app.domain.util.TimeParser.toMinutes(it.startTime) ?: 0)
+        } ?: Int.MAX_VALUE
+        val evalTime = upcomingEval?.date?.time ?: Long.MAX_VALUE
 
-        return NextActivity.FreeDay
+        return when {
+            upcomingEval != null && (nextClass == null || evalTime <= System.currentTimeMillis() + nextClassTime * 60_000L) ->
+                NextActivity.EvaluationActivity(
+                    evaluation = upcomingEval,
+                    colorHex = subjectColorMap[upcomingEval.subjectName].orEmpty()
+                )
+            nextClass != null ->
+                NextActivity.ClassActivity(
+                    schedule = nextClass,
+                    colorHex = subjectColorMap[nextClass.subjectName].orEmpty()
+                )
+            else -> NextActivity.FreeDay
+        }
     }
 
     private fun computeSubjectInfos(
@@ -204,8 +220,8 @@ class NotesViewModel @Inject constructor(
             }
         }
         return when (filter) {
-            NoteFilter.RECIENTES -> filtered.sortedByDescending { it.timestamp }.groupBy { it.subject }
-            NoteFilter.ANTIGUAS -> filtered.sortedBy { it.timestamp ?: Date() }.groupBy { it.subject }
+            NoteFilter.RECIENTES -> filtered.sortedByDescending { it.timestamp?.time ?: 0L }.groupBy { it.subject }
+            NoteFilter.ANTIGUAS -> filtered.sortedBy { it.timestamp?.time ?: Long.MAX_VALUE }.groupBy { it.subject }
             NoteFilter.POR_MATERIA -> filtered.groupBy { it.subject }
         }
     }
