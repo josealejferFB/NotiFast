@@ -76,7 +76,7 @@ class SubjectDetailViewModel @Inject constructor(
                     ?: SubjectData(name = subjectName)
                 val scale = GradeScale.fromId(domain.scaleId)
 
-                val avg = calculateWeightedAverageUseCase(subjectEvals)
+                val avg = calculateWeightedAverageUseCase(subjectEvals, scale)
                 val upcoming = subjectEvals.filter { !it.isPresented && it.date != null }.sortedBy { it.date }.take(5)
                 val completed = subjectEvals.count { it.isPresented }
                 val total = subjectEvals.size

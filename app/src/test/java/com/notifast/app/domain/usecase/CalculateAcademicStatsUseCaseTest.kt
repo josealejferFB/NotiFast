@@ -46,16 +46,16 @@ class CalculateAcademicStatsUseCaseTest {
         )
         val evaluations = listOf(
             // Mate: 20 con 50% + pendiente 50% → acumula 10 ≥ 10 → APPROVED
-            Evaluation(id = "m1", subjectName = "Matemáticas", grade = 20.0, weight = 50.0, isPresented = true),
+            Evaluation(id = "m1", subjectName = "Matemáticas", grade = 20.0, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "m2", subjectName = "Matemáticas", weight = 50.0, isPresented = false),
             // Física: 8 con 50% + pendiente 50% → acumula 4, necesita 6 en 50% → 12.0 ≤ 20 → AT_RISK
-            Evaluation(id = "f1", subjectName = "Física", grade = 8.0, weight = 50.0, isPresented = true),
+            Evaluation(id = "f1", subjectName = "Física", grade = 8.0, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "f2", subjectName = "Física", weight = 50.0, isPresented = false),
             // Química: 0 con 60% + pendiente 40% → acumula 0, necesita 10 en 40% → 25 > 20 → CRITICAL_FAIL
-            Evaluation(id = "q1", subjectName = "Química", grade = 0.0, weight = 60.0, isPresented = true),
+            Evaluation(id = "q1", subjectName = "Química", grade = 0.0, weight = 60.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "q2", subjectName = "Química", weight = 40.0, isPresented = false),
             // Historia: 14 con 50% + pendiente 50% → acumula 7, necesita 3 en 50% → 6.0 ≤ 20, avg 14 ≥ 10 → ON_TRACK
-            Evaluation(id = "h1", subjectName = "Historia", grade = 14.0, weight = 50.0, isPresented = true),
+            Evaluation(id = "h1", subjectName = "Historia", grade = 14.0, weight = 50.0, isPresented = true, gradeScaleId = "0-20"),
             Evaluation(id = "h2", subjectName = "Historia", weight = 50.0, isPresented = false)
         )
 
@@ -127,12 +127,12 @@ class CalculateAcademicStatsUseCaseTest {
     @Test
     fun `calculates grade band distribution only from counted evaluations`() {
         val evaluations = listOf(
-            Evaluation(id = "1", subjectName = "A", grade = 19.0, isPresented = true),
-            Evaluation(id = "2", subjectName = "A", grade = 15.0, isPresented = true),
-            Evaluation(id = "3", subjectName = "B", grade = 11.0, isPresented = true),
-            Evaluation(id = "4", subjectName = "C", grade = 7.0, isPresented = true),
+            Evaluation(id = "1", subjectName = "A", grade = 19.0, isPresented = true, gradeScaleId = "0-20"),
+            Evaluation(id = "2", subjectName = "A", grade = 15.0, isPresented = true, gradeScaleId = "0-20"),
+            Evaluation(id = "3", subjectName = "B", grade = 11.0, isPresented = true, gradeScaleId = "0-20"),
+            Evaluation(id = "4", subjectName = "C", grade = 7.0, isPresented = true, gradeScaleId = "0-20"),
             // not counted (not presented)
-            Evaluation(id = "5", subjectName = "C", grade = 20.0, isPresented = false)
+            Evaluation(id = "5", subjectName = "C", grade = 20.0, isPresented = false, gradeScaleId = "0-20")
         )
         val subjects = listOf(SubjectData(name = "A"), SubjectData(name = "B"), SubjectData(name = "C"))
 
@@ -172,7 +172,7 @@ class CalculateAcademicStatsUseCaseTest {
     fun `supports scale 0-100 and custom min passing grade`() {
         val subjects = listOf(SubjectData(name = "Inglés"))
         val evaluations = listOf(
-            Evaluation(id = "e1", subjectName = "Inglés", grade = 55.0, weight = 50.0, isPresented = true),
+            Evaluation(id = "e1", subjectName = "Inglés", grade = 55.0, weight = 50.0, isPresented = true, gradeScaleId = "0-100"),
             Evaluation(id = "e2", subjectName = "Inglés", weight = 50.0, isPresented = false)
         )
 

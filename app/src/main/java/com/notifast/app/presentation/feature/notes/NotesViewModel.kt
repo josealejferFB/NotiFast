@@ -91,7 +91,10 @@ class NotesViewModel @Inject constructor(
                 val subjectInfos = computeSubjectInfos(notes, subjects, evaluations)
                 val subjectNames = subjects.map { it.name }
                 val nextActivity = computeNextActivity(schedules, evaluations, subjects)
-                val globalAverage = calculateWeightedAverageUseCase(evaluations)?.let {
+                val globalAverage = calculateWeightedAverageUseCase(
+                    evaluations,
+                    com.notifast.app.domain.model.GradeScale.SCALE_0_10
+                )?.let {
                     kotlin.math.round(it * 10) / 10.0
                 }
 
@@ -183,7 +186,10 @@ class NotesViewModel @Inject constructor(
         return subjects.map { subject ->
             val subjectNotes = notes.filter { it.subject == subject.name }
             val subjectEvals = evaluations.filter { it.subjectName == subject.name }
-            val avg = calculateWeightedAverageUseCase(subjectEvals)
+            val avg = calculateWeightedAverageUseCase(
+                subjectEvals,
+                com.notifast.app.domain.model.GradeScale.SCALE_0_10
+            )
             val upcoming = subjectEvals
                 .filter { !it.isPresented && it.date != null }
                 .sortedBy { it.date }

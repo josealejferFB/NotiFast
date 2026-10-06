@@ -33,7 +33,7 @@ class CalculateRequiredGradeUseCase @Inject constructor() {
         targetGrade: Double,
         scale: GradeScale = GradeScale.SCALE_0_10
     ): RequiredGradeResult {
-        val currentAccumulated = GradePolicy.accumulatedPoints(evaluations)
+        val currentAccumulated = GradePolicy.accumulatedPoints(evaluations, scale)
         val remainingWeight = GradePolicy.remainingWeight(evaluations)
 
         if (currentAccumulated >= targetGrade) {

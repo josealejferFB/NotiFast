@@ -44,25 +44,36 @@ object GradePolicy {
         }
     }
 
-    fun weightedAverage(evals: List<Evaluation>): Double? {
+    /**
+     * Converts a grade to the display scale using the evaluation's own scale (D5).
+     * 15 in 0-20 → 7.5 in 0-10 → 75 in 0-100.
+     */
+    fun toDisplayGrade(e: Evaluation, displayScale: GradeScale): Double {
+        val grade = e.grade ?: 0.0
+        val src = GradeScale.fromId(e.gradeScaleId)
+        if (src.maxGrade <= 0.0) return grade
+        return grade / src.maxGrade * displayScale.maxGrade
+    }
+
+    fun weightedAverage(evals: List<Evaluation>, displayScale: GradeScale = GradeScale.SCALE_0_10): Double? {
         val weights = effectiveWeights(evals)
         var weightedSum = 0.0
         var totalWeight = 0.0
         evals.forEachIndexed { i, e ->
             if (countsForAverage(e)) {
-                weightedSum += (e.grade ?: 0.0) * weights[i]
+                weightedSum += toDisplayGrade(e, displayScale) * weights[i]
                 totalWeight += weights[i]
             }
         }
         return if (totalWeight > 0.0) weightedSum / totalWeight else null
     }
 
-    fun accumulatedPoints(evals: List<Evaluation>): Double {
+    fun accumulatedPoints(evals: List<Evaluation>, displayScale: GradeScale = GradeScale.SCALE_0_10): Double {
         val weights = effectiveWeights(evals)
         var points = 0.0
         evals.forEachIndexed { i, e ->
             if (countsForAverage(e)) {
-                points += (e.grade ?: 0.0) * (weights[i] / 100.0)
+                points += toDisplayGrade(e, displayScale) * (weights[i] / 100.0)
             }
         }
         return points

@@ -79,12 +79,12 @@ class GradesViewModel @Inject constructor(
                 val customMin = minPassing.toDouble().takeIf {
                     it > scale.minGrade && it <= scale.maxGrade
                 }
-                val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
+                val globalAverage = calculateWeightedAverageUseCase(evaluations, scale) ?: 0.0
                 val subjectGrades = evalsBySubject.map { (subject, evals) ->
                     SubjectGradeInfo(
                         subject = subject,
                         evaluations = evals,
-                        average = calculateWeightedAverageUseCase(evals) ?: 0.0
+                        average = calculateWeightedAverageUseCase(evals, scale) ?: 0.0
                     )
                 }.sortedBy { it.subject }
 

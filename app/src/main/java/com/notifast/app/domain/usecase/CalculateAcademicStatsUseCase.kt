@@ -39,7 +39,8 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
                 allEvaluations = evaluations,
                 allSchedules = schedules,
                 minPassingGrade = minPassingGrade,
-                maxGrade = maxGrade
+                maxGrade = maxGrade,
+                gradeScale = gradeScale
             )
         }
 
@@ -64,7 +65,7 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         val bestSubject = evaluatedSubjects.maxByOrNull { it.currentAverage }
         val lowestSubject = evaluatedSubjects.minByOrNull { it.currentAverage }
 
-        val gradeDistribution = calculateDistribution(evaluations, minPassingGrade, maxGrade, minGrade)
+        val gradeDistribution = calculateDistribution(evaluations, gradeScale)
         val recommendations = generateRecommendations(atRiskSubjects)
 
         return AcademicStats(
@@ -87,7 +88,8 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         allEvaluations: List<Evaluation>,
         allSchedules: List<Schedule>,
         minPassingGrade: Double,
-        maxGrade: Double
+        maxGrade: Double,
+        gradeScale: GradeScale
     ): SubjectAcademicHealth {
         val subjectEvals = allEvaluations.filter { it.subjectName.equals(subject.name, ignoreCase = true) }
         val subjectSchedules = allSchedules.filter { it.subjectName.equals(subject.name, ignoreCase = true) }
@@ -98,8 +100,8 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
 
         val evaluatedWeight = GradePolicy.evaluatedWeight(subjectEvals)
         val remainingWeight = GradePolicy.remainingWeight(subjectEvals)
-        val accumulatedPoints = GradePolicy.accumulatedPoints(subjectEvals)
-        val currentAverage = GradePolicy.weightedAverage(subjectEvals) ?: 0.0
+        val accumulatedPoints = GradePolicy.accumulatedPoints(subjectEvals, gradeScale)
+        val currentAverage = GradePolicy.weightedAverage(subjectEvals, gradeScale) ?: 0.0
 
         val pointsNeeded = (minPassingGrade - accumulatedPoints).coerceAtLeast(0.0)
         val minGradeNeeded = if (accumulatedPoints >= minPassingGrade) {
@@ -147,11 +149,10 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
 
     private fun calculateDistribution(
         evaluations: List<Evaluation>,
-        minPassingGrade: Double,
-        maxGrade: Double,
-        minGrade: Double
+        gradeScale: GradeScale
     ): GradeBandDistribution {
-        val graded = evaluations.filter { GradePolicy.countsForAverage(it) }.mapNotNull { it.grade }
+        val graded = evaluations.filter { GradePolicy.countsForAverage(it) }
+            .map { GradePolicy.toDisplayGrade(it, gradeScale) }
         if (graded.isEmpty()) return GradeBandDistribution()
 
         var excellent = 0
@@ -159,6 +160,9 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         var regular = 0
         var atRisk = 0
 
+        val minGrade = gradeScale.minGrade
+        val maxGrade = gradeScale.maxGrade
+        val minPassingGrade = gradeScale.minPassingGrade
         val excellentThreshold = minGrade + (maxGrade - minGrade) * 0.90
         val goodThreshold = minGrade + (maxGrade - minGrade) * 0.70
 

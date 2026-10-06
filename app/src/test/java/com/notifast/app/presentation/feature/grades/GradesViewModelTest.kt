@@ -42,7 +42,7 @@ class GradesViewModelTest {
         SubjectData(name = "Matemáticas", colorHex = "#3B9797")
     )
     private val sampleEvaluations = listOf(
-        Evaluation(id = "1", subjectName = "Matemáticas", title = "Parcial 1", isPresented = true, grade = 14.0, weight = 100.0)
+        Evaluation(id = "1", subjectName = "Matemáticas", title = "Parcial 1", isPresented = true, grade = 14.0, weight = 100.0, gradeScaleId = "0-20")
     )
     private val sampleSchedules = listOf(
         Schedule(id = "s1", subjectName = "Matemáticas", dayOfWeek = 1, startTime = "08:00", endTime = "10:00")

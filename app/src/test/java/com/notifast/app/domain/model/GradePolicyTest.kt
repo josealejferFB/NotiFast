@@ -13,13 +13,50 @@ class GradePolicyTest {
         id: String,
         grade: Double? = null,
         presented: Boolean = false,
-        weight: Double? = null
+        weight: Double? = null,
+        scaleId: String = "0-10"
     ) = Evaluation(
         id = id,
         grade = grade,
         isPresented = presented,
-        weight = weight
+        weight = weight,
+        gradeScaleId = scaleId
     )
+
+    // region cross-scale normalization (D5 display)
+
+    @Test
+    fun `toDisplayGrade converts 0-20 grade into 0-10`() {
+        val e = eval("1", grade = 15.0, presented = true, scaleId = "0-20")
+        assertEquals(7.5, GradePolicy.toDisplayGrade(e, GradeScale.SCALE_0_10), 0.001)
+    }
+
+    @Test
+    fun `toDisplayGrade converts 0-10 grade into 0-100`() {
+        val e = eval("1", grade = 8.0, presented = true, scaleId = "0-10")
+        assertEquals(80.0, GradePolicy.toDisplayGrade(e, GradeScale.SCALE_0_100), 0.001)
+    }
+
+    @Test
+    fun `global average does not mix raw scales`() {
+        // Química 15/20 (=7.5/10) + Cálculo 8/10 → display 0-10 average 7.75
+        val evals = listOf(
+            eval("q", grade = 15.0, presented = true, weight = 50.0, scaleId = "0-20"),
+            eval("c", grade = 8.0, presented = true, weight = 50.0, scaleId = "0-10")
+        )
+        assertEquals(7.75, GradePolicy.weightedAverage(evals, GradeScale.SCALE_0_10)!!, 0.01)
+    }
+
+    @Test
+    fun `accumulatedPoints uses display scale`() {
+        val evals = listOf(
+            eval("q", grade = 15.0, presented = true, weight = 50.0, scaleId = "0-20")
+        )
+        // 7.5 * 0.5 = 3.75 in 0-10
+        assertEquals(3.75, GradePolicy.accumulatedPoints(evals, GradeScale.SCALE_0_10), 0.01)
+    }
+
+    // endregion
 
     // region countsForAverage / isPending
 
