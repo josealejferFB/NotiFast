@@ -26,9 +26,9 @@ fun SettingsDialogDispatcher(
             SettingsGradeScaleDialog(
                 currentScale = uiState.defaultGradeScale,
                 currentPassingGrade = uiState.minPassingGrade,
-                onConfirm = { scale, passingGrade ->
-                    onEvent(SettingsEvent.SetDefaultGradeScale(scale))
-                    onEvent(SettingsEvent.SetMinPassingGrade(passingGrade))
+                evaluationsWithGradeCount = uiState.evaluationsWithGradeCount,
+                onConfirm = { scaleId, passingGrade ->
+                    onEvent(SettingsEvent.ChangeGradeScale(scaleId, passingGrade))
                 },
                 onDismiss = { onEvent(SettingsEvent.DismissDialog) }
             )

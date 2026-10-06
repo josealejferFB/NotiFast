@@ -1,30 +1,39 @@
 package com.notifast.app.presentation.feature.settings
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.ConvertGradeScaleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository,
+    private val evaluationRepository: EvaluationRepository,
+    private val convertGradeScaleUseCase: ConvertGradeScaleUseCase,
     private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private companion object {
+        const val TAG = "SettingsViewModel"
+        const val ERROR_GRADE_SCALE = "No se pudo actualizar la escala de calificación"
+    }
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -33,6 +42,7 @@ class SettingsViewModel @Inject constructor(
         loadProfile()
         observePreferences()
         calculateCacheSize()
+        loadConvertibleEvaluationCount()
     }
 
     private fun loadProfile() {
@@ -120,33 +130,33 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun loadConvertibleEvaluationCount() {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            runCatching {
+                evaluationRepository.getEvaluations(userId).first().count { it.grade != null }
+            }.onSuccess { count ->
+                _uiState.update { it.copy(evaluationsWithGradeCount = count) }
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to load evaluations for grade-scale preview", e)
+            }
+        }
+    }
+
     private fun calculateCacheSize() {
         viewModelScope.launch(Dispatchers.IO) {
-            val totalBytes = getFolderSize(context.cacheDir) + getFolderSize(context.codeCacheDir)
-            val formatted = formatBytesToMb(totalBytes)
+            val totalBytes = SettingsCacheSupport.folderSize(context.cacheDir) +
+                SettingsCacheSupport.folderSize(context.codeCacheDir)
+            val formatted = SettingsCacheSupport.formatBytesToMb(totalBytes)
             _uiState.update { it.copy(cacheSizeBytes = totalBytes, cacheSizeFormatted = formatted) }
         }
     }
 
-    private fun getFolderSize(dir: File?): Long {
-        if (dir == null || !dir.exists()) return 0L
-        var size = 0L
-        dir.listFiles()?.forEach { file ->
-            size += if (file.isDirectory) getFolderSize(file) else file.length()
-        }
-        return size
-    }
-
-    private fun formatBytesToMb(bytes: Long): String {
-        val mb = bytes.toDouble() / (1024.0 * 1024.0)
-        return String.format(Locale.US, "%.1f MB", mb)
-    }
-
     private fun clearCache() {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteFolderContents(context.cacheDir)
-            val remainingBytes = getFolderSize(context.cacheDir)
-            val formatted = formatBytesToMb(remainingBytes)
+            SettingsCacheSupport.deleteFolderContents(context.cacheDir)
+            val remainingBytes = SettingsCacheSupport.folderSize(context.cacheDir)
+            val formatted = SettingsCacheSupport.formatBytesToMb(remainingBytes)
             _uiState.update {
                 it.copy(
                     cacheSizeBytes = remainingBytes,
@@ -157,11 +167,34 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun deleteFolderContents(dir: File?) {
-        if (dir == null || !dir.exists()) return
-        dir.listFiles()?.forEach { file ->
-            if (file.isDirectory) deleteFolderContents(file)
-            file.delete()
+    private fun changeGradeScale(targetScaleId: String, newPassing: Float) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val currentScale = GradeScale.fromId(_uiState.value.defaultGradeScale)
+            val target = GradeScale.fromId(targetScaleId)
+            val custom = _uiState.value.minPassingGrade.takeIf { it != 0f }?.toDouble()
+            val evals = evaluationRepository.getEvaluations(userId).first()
+            val result = convertGradeScaleUseCase(evals, target, currentScale, custom)
+            evaluationRepository.updateEvaluations(userId, result.convertedEvaluations).onFailure { e ->
+                Log.e(TAG, "Failed to rewrite evaluations on grade scale change", e)
+                _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
+                return@launch
+            }
+            userPrefsRepository.setDefaultGradeScale(target.id).onFailure { e ->
+                Log.e(TAG, "Failed to persist default grade scale", e)
+            }
+            userPrefsRepository.setMinPassingGrade(newPassing).onFailure { e ->
+                Log.e(TAG, "Failed to persist min passing grade", e)
+            }
+            _uiState.update {
+                it.copy(
+                    defaultGradeScale = target.id,
+                    minPassingGrade = newPassing,
+                    lastConvertedCount = result.convertedCount,
+                    lastScaleLabel = target.label,
+                    error = null
+                )
+            }
         }
     }
 
@@ -192,15 +225,15 @@ class SettingsViewModel @Inject constructor(
                 userPrefsRepository.setDailySummaryEnabled(event.enabled)
                 rescheduleAllAlertsUseCase()
             }
-            is SettingsEvent.SetDefaultGradeScale -> viewModelScope.launch { userPrefsRepository.setDefaultGradeScale(event.scale) }
-            is SettingsEvent.SetMinPassingGrade -> viewModelScope.launch { userPrefsRepository.setMinPassingGrade(event.grade) }
+            is SettingsEvent.ChangeGradeScale -> changeGradeScale(event.targetScaleId, event.minPassingGrade)
             is SettingsEvent.SetActiveAcademicCycle -> viewModelScope.launch { userPrefsRepository.setActiveAcademicCycle(event.cycle) }
             is SettingsEvent.SetFirstDayOfWeek -> viewModelScope.launch { userPrefsRepository.setFirstDayOfWeek(event.day) }
             is SettingsEvent.ClearCache -> clearCache()
-            is SettingsEvent.ClearCache -> clearCache()
             is SettingsEvent.OpenDialog -> _uiState.update { it.copy(activeDialog = event.dialog) }
             is SettingsEvent.DismissDialog -> _uiState.update { it.copy(activeDialog = null) }
-            is SettingsEvent.ClearSnackbar -> _uiState.update { it.copy(snackbarMessage = null) }
+            is SettingsEvent.ClearSnackbar -> _uiState.update {
+                it.copy(snackbarMessage = null, error = null, lastScaleLabel = null)
+            }
             is SettingsEvent.Logout -> logout()
         }
     }

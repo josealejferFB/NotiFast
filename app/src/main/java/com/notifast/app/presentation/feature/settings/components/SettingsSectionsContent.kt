@@ -30,9 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.feature.settings.SettingsDialogType
 import com.notifast.app.presentation.feature.settings.SettingsEvent
 import com.notifast.app.presentation.feature.settings.SettingsUiState
+import com.notifast.app.presentation.util.GradeFormatters
 
 @Composable
 fun SettingsSectionsContent(
@@ -135,13 +137,19 @@ fun SettingsSectionsContent(
             title = stringResource(R.string.settings_section_academic),
             icon = Icons.Default.School
         ) {
+            val scale = GradeScale.fromId(uiState.defaultGradeScale)
+            val effectivePassing = if (uiState.minPassingGrade == 0f) {
+                scale.minPassingGrade.toFloat()
+            } else {
+                uiState.minPassingGrade
+            }
             val scaleDesc = when (uiState.defaultGradeScale) {
                 "0-10" -> stringResource(R.string.settings_academic_scale_decimal)
                 "0-100" -> stringResource(R.string.settings_academic_scale_percent)
+                "A-F" -> stringResource(R.string.settings_academic_scale_letters)
                 else -> stringResource(R.string.settings_academic_scale_vigesimal)
             }
-            val passingText = if (uiState.defaultGradeScale == "0-100") "%.0f%%".format(uiState.minPassingGrade)
-            else "%.1f".format(uiState.minPassingGrade)
+            val passingText = GradeFormatters.passing(effectivePassing.toDouble(), scale)
 
             SettingsRowItem(
                 title = stringResource(R.string.settings_academic_scale_title),

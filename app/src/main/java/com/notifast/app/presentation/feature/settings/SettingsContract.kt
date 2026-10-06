@@ -29,6 +29,10 @@ data class SettingsUiState(
     val dailySummaryEnabled: Boolean = false,
     val defaultGradeScale: String = "0-20",
     val minPassingGrade: Float = 11.0f,
+    val evaluationsWithGradeCount: Int = 0,
+    val lastConvertedCount: Int = 0,
+    val lastScaleLabel: String? = null,
+    val error: String? = null,
     val activeAcademicCycle: String = "2026-I",
     val firstDayOfWeek: String = "MONDAY",
     val cacheSizeBytes: Long = 0L,
@@ -49,8 +53,7 @@ sealed interface SettingsEvent {
     data class SetEvalAlertsEnabled(val enabled: Boolean) : SettingsEvent
     data class SetEvalAlertDays(val days: Int) : SettingsEvent
     data class SetDailySummaryEnabled(val enabled: Boolean) : SettingsEvent
-    data class SetDefaultGradeScale(val scale: String) : SettingsEvent
-    data class SetMinPassingGrade(val grade: Float) : SettingsEvent
+    data class ChangeGradeScale(val targetScaleId: String, val minPassingGrade: Float) : SettingsEvent
     data class SetActiveAcademicCycle(val cycle: String) : SettingsEvent
     data class SetFirstDayOfWeek(val day: String) : SettingsEvent
     data object ClearCache : SettingsEvent

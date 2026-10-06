@@ -1,9 +1,12 @@
 package com.notifast.app.presentation.feature.settings
 
 import android.content.Context
+import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.User
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.ConvertGradeScaleUseCase
 import com.notifast.app.util.MainDispatcherRule
 import com.notifast.app.util.TestDataFactory
 import io.mockk.coEvery
@@ -31,6 +34,8 @@ class SettingsViewModelTest {
 
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
+    private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
+    private val convertGradeScaleUseCase = ConvertGradeScaleUseCase()
     private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
     private val cacheDir: File = mockk(relaxed = true)
@@ -42,10 +47,20 @@ class SettingsViewModelTest {
         email = "jose@notifast.app"
     )
 
+    private fun createSettingsViewModel(): SettingsViewModel =
+        SettingsViewModel(
+            authRepository = authRepository,
+            userPrefsRepository = userPrefsRepository,
+            evaluationRepository = evaluationRepository,
+            convertGradeScaleUseCase = convertGradeScaleUseCase,
+            rescheduleAllAlertsUseCase = rescheduleAllAlertsUseCase,
+            context = context
+        )
+
     @Before
     fun setUp() {
         coEvery { authRepository.getCurrentUserId() } returns "test_user_id"
-        coEvery { authRepository.getUserProfile("test_user_id") } returns Result.success(sampleUser)
+        coEvery { authRepository.getUserProfile(any()) } returns Result.success(sampleUser)
 
         coEvery { userPrefsRepository.isDarkModeFlow } returns flowOf(null)
         coEvery { userPrefsRepository.themeAccentFlow } returns flowOf("aqua")
@@ -60,13 +75,18 @@ class SettingsViewModelTest {
         coEvery { userPrefsRepository.activeAcademicCycleFlow } returns flowOf("2026-I")
         coEvery { userPrefsRepository.firstDayOfWeekFlow } returns flowOf("MONDAY")
 
+        coEvery { evaluationRepository.getEvaluations(any()) } returns flowOf(emptyList())
+        coEvery { evaluationRepository.updateEvaluations(any(), any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setDefaultGradeScale(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setMinPassingGrade(any()) } returns Result.success(Unit)
+
         every { context.cacheDir } returns cacheDir
         every { cacheDir.listFiles() } returns emptyArray()
     }
 
     @Test
     fun `when initialized, loads user profile and observes all preferences correctly`() = runTest {
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
+        val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -90,7 +110,7 @@ class SettingsViewModelTest {
     fun `when SetDarkMode event received, delegates to UserPrefsRepository`() = runTest {
         coEvery { userPrefsRepository.setDarkMode(true) } returns Result.success(Unit)
 
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
+        val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.SetDarkMode(true))
@@ -100,34 +120,32 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `when SetDefaultGradeScale event received, delegates to UserPrefsRepository`() = runTest {
-        coEvery { userPrefsRepository.setDefaultGradeScale("0-10") } returns Result.success(Unit)
+    fun `ChangeGradeScale converts evaluations and prefs atomically`() = runTest {
+        val evals = listOf(
+            Evaluation(id = "1", grade = 15.0, isPresented = true, weight = 100.0, gradeScaleId = "0-20")
+        )
+        coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(evals)
+        coEvery { evaluationRepository.updateEvaluations(any(), any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setDefaultGradeScale(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setMinPassingGrade(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(6.0f)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")
 
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
+        val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
-        viewModel.onEvent(SettingsEvent.SetDefaultGradeScale("0-10"))
+        viewModel.onEvent(SettingsEvent.ChangeGradeScale("0-100", 60f))
         advanceUntilIdle()
 
-        coVerify { userPrefsRepository.setDefaultGradeScale("0-10") }
-    }
-
-    @Test
-    fun `when SetMinPassingGrade event received, delegates to UserPrefsRepository`() = runTest {
-        coEvery { userPrefsRepository.setMinPassingGrade(13.0f) } returns Result.success(Unit)
-
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
-        advanceUntilIdle()
-
-        viewModel.onEvent(SettingsEvent.SetMinPassingGrade(13.0f))
-        advanceUntilIdle()
-
-        coVerify { userPrefsRepository.setMinPassingGrade(13.0f) }
+        coVerify { evaluationRepository.updateEvaluations("user_123", match { it.single().grade == 75.0 }) }
+        coVerify { userPrefsRepository.setDefaultGradeScale("0-100") }
+        coVerify { userPrefsRepository.setMinPassingGrade(60f) }
     }
 
     @Test
     fun `when OpenDialog and DismissDialog events received, updates activeDialog state`() = runTest {
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
+        val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.OpenDialog(SettingsDialogType.THEME))
@@ -139,7 +157,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when Logout event received, calls authRepository logout and sets isLoggedOut`() = runTest {
-        val viewModel = SettingsViewModel(authRepository, userPrefsRepository, rescheduleAllAlertsUseCase, context)
+        val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(SettingsEvent.Logout)

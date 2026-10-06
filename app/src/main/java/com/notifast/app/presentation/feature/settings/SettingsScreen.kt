@@ -40,11 +40,32 @@ fun SettingsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    val lastScaleLabel = uiState.lastScaleLabel
+    val lastConvertedCount = uiState.lastConvertedCount
+    val gradeScaleConvertedSnack = stringResource(
+        R.string.settings_grade_scale_converted_snack,
+        lastConvertedCount,
+        lastScaleLabel ?: ""
+    )
+    val gradeScaleChangedSnack = stringResource(
+        R.string.settings_grade_scale_changed_snack,
+        lastScaleLabel ?: ""
+    )
+
     LaunchedEffect(uiState.isLoggedOut) {
         if (uiState.isLoggedOut) onLogout()
     }
 
-    LaunchedEffect(uiState.snackbarMessage) {
+    LaunchedEffect(uiState.snackbarMessage, uiState.error, lastScaleLabel, lastConvertedCount) {
+        if (lastScaleLabel != null) {
+            val message = if (lastConvertedCount > 0) gradeScaleConvertedSnack else gradeScaleChangedSnack
+            snackbarHostState.showSnackbar(message)
+            viewModel.onEvent(SettingsEvent.ClearSnackbar)
+        }
+        uiState.error?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.onEvent(SettingsEvent.ClearSnackbar)
+        }
         uiState.snackbarMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
             viewModel.onEvent(SettingsEvent.ClearSnackbar)

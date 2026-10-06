@@ -33,23 +33,57 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradePolicy
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.util.GradeFormatters
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsGradeScaleDialog(
     currentScale: String,
     currentPassingGrade: Float,
+    evaluationsWithGradeCount: Int,
     onConfirm: (scale: String, passingGrade: Float) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedScale by remember { mutableStateOf(currentScale) }
-    var passingGrade by remember { mutableFloatStateOf(currentPassingGrade) }
+    val currentScaleObj = GradeScale.fromId(currentScale)
+    val currentMax = currentScaleObj.maxGrade.toFloat()
+    // 0f means "use scale default" (D16/D17); out-of-range stored values also fall back.
+    val initialPassing = currentPassingGrade.takeIf { it in 0f..currentMax }
+        ?: currentScaleObj.minPassingGrade.toFloat()
 
-    val (maxRange, defaultPassing, stepSize) = when (selectedScale) {
+    var selectedScale by remember { mutableStateOf(currentScale) }
+    var passingGrade by remember { mutableFloatStateOf(initialPassing) }
+
+    val (maxRange, _, stepSize) = when (selectedScale) {
         "0-10" -> Triple(10f, 6.0f, 0.5f)
-        "0-100" -> Triple(100f, 70.0f, 5.0f)
+        "0-100" -> Triple(100f, 60.0f, 5.0f)
+        "A-F" -> Triple(4f, 2.0f, 0.1f)
         else -> Triple(20f, 11.0f, 0.5f)
+    }
+
+    fun selectScale(newScaleId: String) {
+        if (newScaleId == selectedScale) return
+        val from = GradeScale.fromId(selectedScale)
+        val to = GradeScale.fromId(newScaleId)
+        val converted = GradePolicy.convertPassingGrade(passingGrade.toDouble(), from, to)
+        selectedScale = newScaleId
+        passingGrade = converted.toFloat().coerceIn(0f, maxRangeFor(newScaleId))
+    }
+
+    val selectedScaleObj = GradeScale.fromId(selectedScale)
+    val currentMinFormatted = GradeFormatters.passing(initialPassing.toDouble(), currentScaleObj)
+    val newMinFormatted = GradeFormatters.passing(passingGrade.toDouble(), selectedScaleObj)
+    val previewText = if (evaluationsWithGradeCount > 0) {
+        stringResource(
+            R.string.settings_grade_scale_convert_preview,
+            evaluationsWithGradeCount,
+            currentMinFormatted,
+            newMinFormatted
+        )
+    } else {
+        stringResource(R.string.settings_grade_scale_convert_none, currentMinFormatted, newMinFormatted)
     }
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
@@ -77,33 +111,39 @@ fun SettingsGradeScaleDialog(
                     title = stringResource(R.string.settings_academic_scale_vigesimal),
                     subtitle = stringResource(R.string.settings_academic_scale_vigesimal_desc),
                     isSelected = selectedScale == "0-20",
-                    onClick = {
-                        selectedScale = "0-20"
-                        passingGrade = 11.0f
-                    }
+                    onClick = { selectScale("0-20") }
                 )
 
                 GradeScaleOptionItem(
                     title = stringResource(R.string.settings_academic_scale_decimal),
                     subtitle = stringResource(R.string.settings_academic_scale_decimal_desc),
                     isSelected = selectedScale == "0-10",
-                    onClick = {
-                        selectedScale = "0-10"
-                        passingGrade = 6.0f
-                    }
+                    onClick = { selectScale("0-10") }
                 )
 
                 GradeScaleOptionItem(
                     title = stringResource(R.string.settings_academic_scale_percent),
                     subtitle = stringResource(R.string.settings_academic_scale_percent_desc),
                     isSelected = selectedScale == "0-100",
-                    onClick = {
-                        selectedScale = "0-100"
-                        passingGrade = 70.0f
-                    }
+                    onClick = { selectScale("0-100") }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                GradeScaleOptionItem(
+                    title = stringResource(R.string.settings_academic_scale_letters),
+                    subtitle = stringResource(R.string.settings_academic_scale_letters_desc),
+                    isSelected = selectedScale == "A-F",
+                    onClick = { selectScale("A-F") }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = previewText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -117,7 +157,7 @@ fun SettingsGradeScaleDialog(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = if (selectedScale == "0-100") "%.0f%%".format(passingGrade) else "%.1f".format(passingGrade),
+                        text = GradeFormatters.passing(passingGrade.toDouble(), selectedScaleObj),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.primary
@@ -147,6 +187,13 @@ fun SettingsGradeScaleDialog(
             }
         }
     }
+}
+
+private fun maxRangeFor(scaleId: String): Float = when (scaleId) {
+    "0-10" -> 10f
+    "0-100" -> 100f
+    "A-F" -> 4f
+    else -> 20f
 }
 
 @Composable
