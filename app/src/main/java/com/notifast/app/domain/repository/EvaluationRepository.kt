@@ -9,5 +9,6 @@ interface EvaluationRepository {
     fun getEvaluation(userId: String, evaluationId: String): Flow<Evaluation?>
     suspend fun addEvaluation(userId: String, evaluation: Evaluation, imageUri: Uri?): Result<String>
     suspend fun updateEvaluation(userId: String, evaluation: Evaluation, imageUri: Uri?): Result<Unit>
+    suspend fun updateEvaluations(userId: String, evaluations: List<Evaluation>): Result<Unit>
     suspend fun deleteEvaluation(userId: String, evaluation: Evaluation): Result<Unit>
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.notifast.app.data.local.entity.EvaluationEntity
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,11 @@ interface EvaluationDao {
 
     @Update
     suspend fun updateEvaluation(eval: EvaluationEntity): Int
+
+    @Transaction
+    suspend fun updateEvaluations(evals: List<EvaluationEntity>) {
+        evals.forEach { updateEvaluation(it) }
+    }
 
     @Query("DELETE FROM evaluations WHERE userId = :userId AND id = :evalId")
     suspend fun deleteEvaluationById(userId: String, evalId: String): Int

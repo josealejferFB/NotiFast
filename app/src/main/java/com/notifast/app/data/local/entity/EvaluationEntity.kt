@@ -48,7 +48,8 @@ data class EvaluationEntity(
         weight: Double?,
         isPresented: Boolean,
         createdAtMillis: Long?,
-        updatedAtMillis: Long?
+        updatedAtMillis: Long?,
+        gradeScaleId: String = "0-10"
     ) : this(
         id = id,
         userId = userId,
@@ -64,7 +65,7 @@ data class EvaluationEntity(
         grade = grade,
         weight = weight,
         isPresented = isPresented,
-        gradeScaleId = "0-10",
+        gradeScaleId = gradeScaleId,
         createdAt = createdAtMillis?.let { Date(it) },
         updatedAt = updatedAtMillis?.let { Date(it) }
     )

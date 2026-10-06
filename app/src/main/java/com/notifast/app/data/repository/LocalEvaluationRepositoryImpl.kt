@@ -105,22 +105,9 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
             }
 
             evaluationDao.updateEvaluation(
-                EvaluationEntity(
-                    id = evaluation.id,
-                    userId = userId,
+                evaluation.toEntity(userId).copy(
                     subjectId = evaluation.subjectId.ifBlank { existing?.subjectId ?: "" },
-                    subjectName = evaluation.subjectName,
-                    title = evaluation.title,
-                    description = evaluation.description,
-                    date = evaluation.date,
-                    noteIds = evaluation.noteIds,
                     imageUrl = imageUrl,
-                    quickTips = evaluation.quickTips,
-                    type = evaluation.type,
-                    grade = evaluation.grade,
-                    weight = evaluation.weight,
-                    isPresented = evaluation.isPresented,
-                    gradeScaleId = evaluation.gradeScaleId,
                     createdAt = evaluation.createdAt ?: existing?.createdAt ?: Date(),
                     updatedAt = Date()
                 )
@@ -128,6 +115,19 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update evaluation '${evaluation.id}'", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateEvaluations(
+        userId: String,
+        evaluations: List<Evaluation>
+    ): Result<Unit> {
+        return try {
+            evaluationDao.updateEvaluations(evaluations.map { it.toEntity(userId) })
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to batch update ${evaluations.size} evaluations", e)
             Result.failure(e)
         }
     }
@@ -150,6 +150,26 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
     }
 
     private fun EvaluationEntity.toDomain(): Evaluation = Evaluation(
+        id = id,
+        userId = userId,
+        subjectId = subjectId,
+        subjectName = subjectName,
+        title = title,
+        description = description,
+        date = date,
+        noteIds = noteIds,
+        imageUrl = imageUrl,
+        quickTips = quickTips,
+        type = type,
+        grade = grade,
+        weight = weight,
+        isPresented = isPresented,
+        gradeScaleId = gradeScaleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
+
+    private fun Evaluation.toEntity(userId: String): EvaluationEntity = EvaluationEntity(
         id = id,
         userId = userId,
         subjectId = subjectId,
