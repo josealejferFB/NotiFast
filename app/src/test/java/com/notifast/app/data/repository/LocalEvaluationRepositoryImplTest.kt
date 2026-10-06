@@ -143,8 +143,6 @@ class LocalEvaluationRepositoryImplTest {
 
     @Test
     fun `updateEvaluations batch updates all rows`() = runTest {
-        val e1 = EvaluationEntity(id = "a", userId = "u1", title = "A", grade = 7.5, gradeScaleId = "0-10", isPresented = true)
-        val e2 = EvaluationEntity(id = "b", userId = "u1", title = "B", grade = 15.0, gradeScaleId = "0-20", isPresented = true)
         coEvery { evaluationDao.updateEvaluations(any()) } returns Unit
 
         val result = repository.updateEvaluations(

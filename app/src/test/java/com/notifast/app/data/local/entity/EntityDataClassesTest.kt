@@ -136,7 +136,8 @@ class EntityDataClassesTest {
 
     @Test
     fun `EvaluationEntity secondary constructor preserves gradeScaleId`() {
-        val entity = EvaluationEntity(
+        // Non-default scale via secondary ctor — must not be force-hardcoded to "0-10"
+        val withScale = EvaluationEntity(
             id = "e1",
             userId = "u1",
             subjectName = "M",
@@ -150,15 +151,24 @@ class EntityDataClassesTest {
             grade = 15.0,
             weight = 50.0,
             isPresented = true,
+            gradeScaleId = "0-20",
             createdAtMillis = null,
             updatedAtMillis = null
         )
-        // If secondary ctor has default param gradeScaleId it must not force "0-10" when passed
-        val withScale = entity.copy(gradeScaleId = "0-20")
         assertEquals("0-20", withScale.gradeScaleId)
-        // Secondary constructor path used by legacy tests must allow explicit scale:
-        val legacy = EvaluationEntity(
+
+        // Default path (omitted scale) still yields "0-10"
+        val defaultScale = EvaluationEntity(
             id = "e2", userId = "u1", subjectName = "M", title = "T", description = "",
+            dateMillis = null, noteIds = emptyList(), imageUrl = null, quickTips = "",
+            type = "EXAM", grade = 7.5, weight = null, isPresented = true,
+            createdAtMillis = null, updatedAtMillis = null
+        )
+        assertEquals("0-10", defaultScale.gradeScaleId)
+
+        // Explicit default scale via secondary ctor
+        val legacy = EvaluationEntity(
+            id = "e3", userId = "u1", subjectName = "M", title = "T", description = "",
             dateMillis = null, noteIds = emptyList(), imageUrl = null, quickTips = "",
             type = "EXAM", grade = 7.5, weight = null, isPresented = true,
             gradeScaleId = "0-10",
