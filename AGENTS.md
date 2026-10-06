@@ -75,7 +75,7 @@ Todo agente operando en este repositorio debe aplicar sin excepción estos 5 pil
 El proyecto implementa **Clean Architecture** estricta dividida en tres capas principales:
 
 ```
-app/src/main/java/com/example/notifast/
+app/src/main/java/com/notifast/app/
 ├── data/                    # CAPA DE DATOS
 │   ├── model/               # Data classes inmutables (Note, Evaluation, Schedule, User, SubjectData, etc.)
 │   └── repository/          # Implementaciones de repositorios (Firebase Firestore, Storage, Auth)

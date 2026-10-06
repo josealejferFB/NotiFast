@@ -15,9 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastFormField
 import com.notifast.app.presentation.atoms.NotiFastImagePickerField
 
@@ -31,8 +34,19 @@ fun EditEvaluationGradeFields(
     weight: String,
     onWeightChange: (String) -> Unit,
     existingImageUrl: String?,
-    onImageSelected: (Uri?) -> Unit
+    onImageSelected: (Uri?) -> Unit,
+    gradeScale: GradeScale = GradeScale.SCALE_0_10
 ) {
+    val gradeRangeLabel = stringResource(
+        R.string.edit_eval_grade_range_label,
+        gradeScale.minGrade.toString(),
+        gradeScale.maxGrade.toString()
+    )
+    val gradeRangeError = stringResource(
+        R.string.grades_dialog_grade_range,
+        gradeScale.minGrade.toString(),
+        gradeScale.maxGrade.toString()
+    )
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -61,11 +75,11 @@ fun EditEvaluationGradeFields(
             NotiFastFormField(
                 value = grade,
                 onValueChange = onGradeChange,
-                label = "Calificación obtenida (0.0 - 10.0)",
+                label = gradeRangeLabel,
                 leadingIcon = Icons.Default.Star,
                 isError = isGradeInvalid,
                 supportingText = if (isGradeInvalid) {
-                    { Text("La nota debe estar entre 0.0 y 10.0", color = MaterialTheme.colorScheme.error) }
+                    { Text(gradeRangeError, color = MaterialTheme.colorScheme.error) }
                 } else null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )

@@ -95,7 +95,11 @@ fun GradesScreen(
                     when (uiState.selectedTab) {
                         GradesTab.SUBJECTS -> {
                             item {
-                                MainAverageDashboard(generalAverage = uiState.globalAverage)
+                                MainAverageDashboard(
+                                    generalAverage = uiState.globalAverage,
+                                    gradeScale = uiState.gradeScale,
+                                    minPassingGrade = uiState.minPassingGrade
+                                )
                             }
 
                             if (uiState.subjectGrades.isEmpty()) {

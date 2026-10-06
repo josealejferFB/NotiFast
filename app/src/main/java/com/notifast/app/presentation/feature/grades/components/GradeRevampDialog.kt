@@ -45,6 +45,12 @@ fun GradeRevampDialog(
     onSave: (String, Double?, Boolean) -> Unit
 ) {
     val scale = GradeScale.fromId(evaluation.gradeScaleId)
+    val invalidGradeMsg = stringResource(R.string.grades_dialog_grade_invalid)
+    val gradeRangeMsg = stringResource(
+        R.string.grades_dialog_grade_range,
+        scale.minGrade.toString(),
+        scale.maxGrade.toString()
+    )
     var grade by remember {
         mutableStateOf(evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "")
     }
@@ -57,7 +63,7 @@ fun GradeRevampDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         title = {
             Text(
-                "Registrar Resultado",
+                stringResource(R.string.grades_dialog_title),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -80,7 +86,15 @@ fun GradeRevampDialog(
                             isPresented = true
                         }
                     },
-                    label = { Text("Nota (${scale.minGrade} - ${scale.maxGrade})") },
+                    label = {
+                        Text(
+                            stringResource(
+                                R.string.grades_dialog_grade_label,
+                                scale.minGrade.toString(),
+                                scale.maxGrade.toString()
+                            )
+                        )
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = error != null,
                     supportingText = error?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
@@ -101,7 +115,7 @@ fun GradeRevampDialog(
                         colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                     )
                     Text(
-                        "Marcar como evaluada",
+                        stringResource(R.string.grades_dialog_mark_presented),
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -117,9 +131,8 @@ fun GradeRevampDialog(
                     } else {
                         val g = grade.toDoubleOrNull()
                         when {
-                            g == null -> error = "Nota inválida"
-                            !GradePolicy.validateGrade(g, scale) ->
-                                error = "La nota debe estar entre ${scale.minGrade} y ${scale.maxGrade}"
+                            g == null -> error = invalidGradeMsg
+                            !GradePolicy.validateGrade(g, scale) -> error = gradeRangeMsg
                             else -> {
                                 onSave(evaluation.id, g, isPresented)
                                 onDismiss()

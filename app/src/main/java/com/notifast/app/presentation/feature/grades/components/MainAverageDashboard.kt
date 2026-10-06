@@ -19,10 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.notifast.app.domain.util.GradeConstants
+import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
 import java.util.Locale
 
@@ -31,7 +33,11 @@ import java.util.Locale
  * Features JetBrains Mono tabular digits and hairline borders.
  */
 @Composable
-fun MainAverageDashboard(generalAverage: Double) {
+fun MainAverageDashboard(
+    generalAverage: Double,
+    gradeScale: GradeScale = GradeScale.SCALE_0_10,
+    minPassingGrade: Double = gradeScale.minPassingGrade
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -46,7 +52,7 @@ fun MainAverageDashboard(generalAverage: Double) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "PROMEDIO GLOBAL",
+                text = stringResource(R.string.grades_average_global),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp,
@@ -66,7 +72,7 @@ fun MainAverageDashboard(generalAverage: Double) {
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            val maxScale = GradeConstants.MAX_GRADE.toFloat()
+            val maxScale = gradeScale.maxGrade.toFloat()
             val progress = (generalAverage.toFloat() / maxScale).coerceIn(0f, 1f)
 
             LinearProgressIndicator(
@@ -81,10 +87,11 @@ fun MainAverageDashboard(generalAverage: Double) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            val threshold = GradeConstants.PASSING_THRESHOLD
-            val isPassing = generalAverage >= threshold
+            val isPassing = generalAverage >= minPassingGrade
             Text(
-                text = if (isPassing) "¡Excelente rendimiento académico!" else "¡Sigue esforzándote!",
+                text = stringResource(
+                    if (isPassing) R.string.grades_average_excellent else R.string.grades_average_keep_going
+                ),
                 color = if (isPassing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold

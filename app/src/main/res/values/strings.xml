@@ -533,4 +533,25 @@
     <string name="onboarding_start_button">Comenzar mi Cuaderno</string>
     <string name="onboarding_avatar_hint">Toca para añadir una foto a tu perfil</string>
     <string name="onboarding_error_name_required">Por favor escribe tu nombre para continuar</string>
+
+    <!-- Sanitización: strings de errores y diálogos de notas -->
+    <string name="error_generic">Ocurrió un error</string>
+    <string name="error_user_not_authenticated">Usuario no autenticado</string>
+    <string name="error_load_data">Error al cargar datos</string>
+    <string name="error_save">Error al guardar</string>
+    <string name="error_delete">Error al eliminar</string>
+    <string name="sync_saving">Guardando…</string>
+    <string name="sync_saved">Guardado</string>
+    <string name="sync_error">Error</string>
+    <string name="grades_dialog_title">Registrar Resultado</string>
+    <string name="grades_dialog_grade_label">Nota (%1$s - %2$s)</string>
+    <string name="grades_dialog_mark_presented">Marcar como evaluada</string>
+    <string name="grades_dialog_grade_invalid">Nota inválida</string>
+    <string name="grades_dialog_grade_range">La nota debe estar entre %1$s y %2$s</string>
+    <string name="grades_average_global">PROMEDIO GLOBAL</string>
+    <string name="grades_average_excellent">¡Excelente rendimiento académico!</string>
+    <string name="grades_average_keep_going">¡Sigue esforzándote!</string>
+    <string name="grades_status_evaluated">Evaluada</string>
+    <string name="grades_status_pending">Pendiente</string>
+    <string name="edit_eval_grade_range_label">Calificación obtenida (%1$s - %2$s)</string>
 </resources>

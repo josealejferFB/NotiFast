@@ -33,6 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.notifast.app.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -163,7 +165,9 @@ fun EvaluationDetailRow(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = if (evaluation.isPresented) "Evaluada" else "Pendiente",
+                    text = stringResource(
+                        if (evaluation.isPresented) R.string.grades_status_evaluated else R.string.grades_status_pending
+                    ),
                     fontSize = 11.sp,
                     color = if (evaluation.isPresented) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )

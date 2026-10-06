@@ -17,11 +17,53 @@ Fase 2.1: Ergonomía Forms         [██████████████�
 Sprint Design 3.0: Tactile Studio [████████████████] 100% (3/3 Sprints) ✅
 Fase 3: Features Avanzadas        [████████████████] 100% (18/18 tareas) ✅
 Fase 3.5: Offline-First Local     [████████████████] 100% (9/9 tareas) ✅
+Fase 3.6: Sanitización Lógica     [████████████████] 100% (10/10 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  78.5% (84/107 tareas)
+PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  79.5% (94/107 tareas)
 ```
+
+---
+
+## 🧼 Fase 3.6: Sanitización de Lógica de Negocio (100% — Oct 2026)
+
+Auditoría transversal con systematic debugging y journeys de usuario. Suite 260/260 tests unitarios, `assembleDebug` OK.
+
+### Decisiones de negocio cerradas
+- **D1–D2:** `GradePolicy` única fórmula de notas/pesos. Cuenta solo `isPresented && grade != null`. Presentada sin nota no baja el promedio.
+- **D3:** Pesos % de 100; `ValidateEvaluationWeightsUseCase` bloquea Σ > 100%.
+- **D4:** Umbrales = `GradeScale` + `customMinPassingGrade` del usuario (antes el setting estaba muerto).
+- **D5:** `Evaluation.gradeScaleId` — cambiar la escala default no reinterpreta notas guardadas.
+- **D6:** `remainingWeight` = peso real de pendientes (eliminado el fantasma `100 − evaluated`).
+- **D7:** `subjectId` UUID estable; rename no rompe joins.
+- **D8:** `SubjectData.cycle` (ciclo académico) en el modelo.
+- **D9:** Alertas se cancelan al tener nota **o** marcar presentada.
+- **D10:** Clases virtuales tienen día/hora y alerta (antes forzaban domingo sin aviso).
+
+### Bugs críticos cerrados
+1. 3 fórmulas de promedio incoherentes entre pestañas → una sola (`GradePolicy`).
+2. Alertas programadas con `id=""` (UUID se generaba dentro del repo y no volvía) → `Result<String>`.
+3. Logout creaba un usuario nuevo → datos huérfanos. `createLocalProfile` reutiliza el perfil.
+4. Grade entry bloqueada a 0–10 con escala 0-20/0-100.
+5. Cascade delete case-sensitive dejaba notas/evals huérfanas → por `subjectId`.
+6. Import OVERWRITE hacía merge con duplicados + fechas con `Z` literal (timezone shift).
+7. `isLoading` stuck con `userId` nulo / eval no encontrada.
+8. Double-collector en `LoadNotes`/`LoadData`.
+9. Raza auto-save vs SaveClicked en EditNote (navegación perdida).
+10. Clase inminente de hoy se saltaba a la semana siguiente (`minutesInAdvance`).
+11. `ClassScheduleWorker` notificaba sin userId y mataba la cadena semanal.
+12. `nextActivity` mostraba clases ya terminadas.
+13. Room usaba `fallbackToDestructiveMigration` → migración real 1→2.
+
+### Código muerto eliminado (~1.5k LOC)
+- 3 repos Firestore sin bindear + `FirebaseAuthDataSource`.
+- `DeleteSubjectCascadeUseCase`, `GetSubjectDetailUseCase`, `GetNotesWithSubjectInfoUseCase`.
+- Login (email/Google) — inalcanzable y siempre fallaba en offline-first.
+- 8 componentes notes muertos, 2 átomos sin uso, `OfflineArchitectureBoundaryTest` stale.
+
+### Nota para usuarios
+Los promedios pueden **cambiar de valor** respecto a versiones anteriores: antes cada pestaña usaba una fórmula distinta. Ahora el número es único y coherente en toda la app.
 
 ---
 
@@ -224,6 +266,12 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
     - Validación de que ningún archivo de presentación, dominio o datos locales importe `com.google.firebase.firestore`.
     - Validación de que ningún archivo de presentación o dominio importe `com.google.firebase.auth`.
   * Verificación completa: 237 pruebas unitarias en 46 suites pasando exitosamente (`testDebugUnitTest`) y compilación APK completa aprobada (`assembleDebug`).
+
+- [x] **Hotfix: Crash en segundo inicio de app (NPE en NavGraph bottomNav computation)**
+  * **Bug:** La app crasheaba con `NullPointerException: Screen.getRoute() on null` al reabrirla. La causa raíz estaba en la evaluación de `showBottomBar` en `NavGraph.kt:85-87` — el lambda anidado `Screen.bottomNavItems.any { screen -> ... screen.route }` accedía a un `Screen` null durante la recomposición al evaluar `currentDestination?.hierarchy?.any { it.route == screen.route }`.
+  * **Fix:** Se reestructuró la evaluación para pre-computar `bottomNavRoutes` con `mapNotNull { it?.route }` y usar `dest.route in bottomNavRoutes` — eliminando el acceso anidado a `Screen.route` dentro del lambda de `hierarchy.any`.
+  * **Archivo:** `presentation/navigation/NavGraph.kt:85-88`
+  * **Verificación:** `assembleDebug` ✅ + `testDebugUnitTest` ✅ + installDebug + launch en dispositivo ✅ (1er y 2do inicio sin crash)
 
 ---
 
