@@ -567,4 +567,12 @@
     <string name="search_title_untitled_note">Apunte sin título</string>
     <string name="search_title_evaluation">Evaluación</string>
     <string name="search_title_class">Clase de %1$s</string>
+    <string name="settings_academic_scale_letters">Letras (A - F)</string>
+    <string name="settings_academic_scale_letters_desc">Escala tipo GPA / USA</string>
+    <string name="eval_grade_scale_hint">Usando escala %1$s. Puedes cambiarla en Ajustes → Escala académica.</string>
+    <string name="settings_grade_scale_convert_preview">Se convertirán %1$d notas · Mínimo %2$s → %3$s</string>
+    <string name="settings_grade_scale_convert_none">Sin notas que convertir · Mínimo %1$s → %2$s</string>
+    <string name="settings_grade_scale_converted_snack">%1$d notas convertidas a %2$s</string>
+    <string name="settings_grade_scale_changed_snack">Escala actualizada a %1$s</string>
+    <string name="settings_academic_passing_default">Por defecto (%1$s)</string>
 </resources>
