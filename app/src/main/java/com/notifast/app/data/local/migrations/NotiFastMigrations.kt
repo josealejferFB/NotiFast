@@ -6,8 +6,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 /**
  * v1 → v2: stable subjectId, academic cycle, per-evaluation grade scale (D5, D7, D8).
  *
- * Subjects table is rebuilt so `id` becomes part of the primary key and rename works.
- * Children are linked by name (COLLATE NOCASE) during the migration only.
+ * Tables are rebuilt so the resulting schema (columns, PKs, indices) matches
+ * exactly what Room generates for the v2 entities. Extra leftover indices from
+ * v1 cause Room 2.7 schema validation to fail with
+ * "Migration didn't properly handle: <table>".
  */
 object NotiFastMigrations {
 
@@ -47,54 +49,82 @@ object NotiFastMigrations {
                 "CREATE UNIQUE INDEX IF NOT EXISTS `index_subjects_userId_name` ON `subjects` (`userId`, `name`)"
             )
 
-            // --- notes ---
-            db.execSQL("ALTER TABLE `notes` ADD COLUMN `subjectId` TEXT NOT NULL DEFAULT ''")
+            // --- notes: rebuild so only expected indices remain ---
             db.execSQL(
                 """
-                UPDATE `notes` SET `subjectId` = (
-                    SELECT s.`id` FROM `subjects` s
-                    WHERE s.`userId` = `notes`.`userId`
-                      AND s.`name` = `notes`.`subject` COLLATE NOCASE
-                    LIMIT 1
+                CREATE TABLE IF NOT EXISTS `notes_new` (
+                    `id` TEXT NOT NULL,
+                    `userId` TEXT NOT NULL,
+                    `subjectId` TEXT NOT NULL,
+                    `subject` TEXT NOT NULL,
+                    `title` TEXT NOT NULL,
+                    `content` TEXT NOT NULL,
+                    `imageUrl` TEXT,
+                    `tags` TEXT NOT NULL,
+                    `timestamp` INTEGER,
+                    `updatedAt` INTEGER,
+                    PRIMARY KEY(`id`)
                 )
                 """.trimIndent()
             )
             db.execSQL(
-                "CREATE INDEX IF NOT EXISTS `index_notes_subjectId` ON `notes` (`subjectId`)"
+                """
+                INSERT INTO `notes_new` (`id`, `userId`, `subjectId`, `subject`, `title`, `content`, `imageUrl`, `tags`, `timestamp`, `updatedAt`)
+                SELECT n.`id`,
+                       n.`userId`,
+                       COALESCE((
+                           SELECT s.`id` FROM `subjects` s
+                           WHERE s.`userId` = n.`userId`
+                             AND s.`name` = n.`subject` COLLATE NOCASE
+                           LIMIT 1
+                       ), ''),
+                       n.`subject`,
+                       n.`title`,
+                       n.`content`,
+                       n.`imageUrl`,
+                       n.`tags`,
+                       n.`timestamp`,
+                       n.`updatedAt`
+                FROM `notes` n
+                """.trimIndent()
             )
+            db.execSQL("DROP TABLE `notes`")
+            db.execSQL("ALTER TABLE `notes_new` RENAME TO `notes`")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_notes_userId` ON `notes` (`userId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_notes_subjectId` ON `notes` (`subjectId`)")
 
-            // --- evaluations ---
+            // --- evaluations: add columns, keep only expected indices ---
             db.execSQL("ALTER TABLE `evaluations` ADD COLUMN `subjectId` TEXT NOT NULL DEFAULT ''")
             db.execSQL("ALTER TABLE `evaluations` ADD COLUMN `gradeScaleId` TEXT NOT NULL DEFAULT '0-10'")
             db.execSQL(
                 """
-                UPDATE `evaluations` SET `subjectId` = (
+                UPDATE `evaluations` SET `subjectId` = COALESCE((
                     SELECT s.`id` FROM `subjects` s
                     WHERE s.`userId` = `evaluations`.`userId`
                       AND s.`name` = `evaluations`.`subjectName` COLLATE NOCASE
                     LIMIT 1
-                )
+                ), '')
                 """.trimIndent()
             )
-            db.execSQL(
-                "CREATE INDEX IF NOT EXISTS `index_evaluations_subjectId` ON `evaluations` (`subjectId`)"
-            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_evaluations_userId` ON `evaluations` (`userId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_evaluations_subjectId` ON `evaluations` (`subjectId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_evaluations_subjectName` ON `evaluations` (`subjectName`)")
 
             // --- schedules ---
             db.execSQL("ALTER TABLE `schedules` ADD COLUMN `subjectId` TEXT NOT NULL DEFAULT ''")
             db.execSQL(
                 """
-                UPDATE `schedules` SET `subjectId` = (
+                UPDATE `schedules` SET `subjectId` = COALESCE((
                     SELECT s.`id` FROM `subjects` s
                     WHERE s.`userId` = `schedules`.`userId`
                       AND s.`name` = `schedules`.`subjectName` COLLATE NOCASE
                     LIMIT 1
-                )
+                ), '')
                 """.trimIndent()
             )
-            db.execSQL(
-                "CREATE INDEX IF NOT EXISTS `index_schedules_subjectId` ON `schedules` (`subjectId`)"
-            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_schedules_userId` ON `schedules` (`userId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_schedules_subjectId` ON `schedules` (`subjectId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_schedules_dayOfWeek` ON `schedules` (`dayOfWeek`)")
         }
     }
 }
