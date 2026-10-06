@@ -70,8 +70,9 @@ fun EditEvaluationScreen(
     }
 
     val evaluationType = EvaluationType.fromName(uiState.type)
+    val gradeScale = com.notifast.app.domain.model.GradeScale.fromId(uiState.gradeScaleId)
     val isGradeInvalid = uiState.grade.isNotBlank() && (uiState.grade.toDoubleOrNull()?.let {
-        it < GradeConstants.MIN_GRADE || it > GradeConstants.MAX_GRADE
+        !com.notifast.app.domain.model.GradePolicy.validateGrade(it, gradeScale)
     } ?: true)
 
     val hasUnsavedChanges = uiState.title.isNotBlank() || selectedImageUri != null

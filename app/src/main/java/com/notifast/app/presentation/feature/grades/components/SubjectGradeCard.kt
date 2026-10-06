@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.data.model.Evaluation
-import com.notifast.app.domain.util.GradeConstants
 import com.notifast.app.presentation.feature.grades.SubjectGradeInfo
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
 import java.util.Locale
@@ -53,7 +52,8 @@ import java.util.Locale
 @Composable
 fun SubjectGradeCard(
     subjectGrade: SubjectGradeInfo,
-    onUpdateGrade: (String, Double?, Boolean) -> Unit
+    onUpdateGrade: (String, Double?, Boolean) -> Unit,
+    minPassingGrade: Double = 6.0
 ) {
     var expanded by remember { mutableStateOf(false) }
     val subject = subjectGrade.subject
@@ -106,8 +106,7 @@ fun SubjectGradeCard(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    val threshold = GradeConstants.PASSING_THRESHOLD
-                    val isPassing = subjectAverage >= threshold
+                    val isPassing = subjectAverage >= minPassingGrade
                     Text(
                         text = String.format(Locale.getDefault(), "%.1f", subjectAverage),
                         fontWeight = FontWeight.Bold,

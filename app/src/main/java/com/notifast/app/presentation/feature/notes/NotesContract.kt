@@ -4,8 +4,6 @@ import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
 
-enum class NoteFilter { RECIENTES, ANTIGUAS, POR_MATERIA }
-
 sealed interface NextActivity {
     data class ClassActivity(
         val schedule: Schedule,
@@ -44,12 +42,9 @@ data class NotesUiState(
     val globalAverage: Double? = null,
     val totalNotesCount: Int = 0,
     val totalSubjectsCount: Int = 0,
-    val expandedSubject: String? = null,
-    val currentFilter: NoteFilter = NoteFilter.RECIENTES,
     val searchQuery: String = "",
     val availableTags: List<String> = emptyList(),
     val selectedTag: String? = null,
-    val syncMessage: String? = null,
     val userFirstName: String = "",
     val userLastName: String = "",
     val userEmail: String = "",
@@ -58,11 +53,8 @@ data class NotesUiState(
 
 sealed interface NotesEvent {
     data object LoadNotes : NotesEvent
-    data class SetFilter(val filter: NoteFilter) : NotesEvent
     data class Search(val query: String) : NotesEvent
     data class SelectTag(val tag: String?) : NotesEvent
     data class DeleteNote(val note: Note) : NotesEvent
-    data object ClearSyncMessage : NotesEvent
-    data class ToggleSubject(val subjectName: String) : NotesEvent
     data class DeleteSubject(val subjectName: String) : NotesEvent
 }

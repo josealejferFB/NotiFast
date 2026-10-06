@@ -39,7 +39,6 @@ class NotesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NotesUiState())
     val uiState: StateFlow<NotesUiState> = _uiState.asStateFlow()
 
-    private val _currentFilter = MutableStateFlow(NoteFilter.RECIENTES)
     private val _searchQuery = MutableStateFlow("")
     private val _selectedTag = MutableStateFlow<String?>(null)
 
@@ -75,8 +74,8 @@ class NotesViewModel @Inject constructor(
             }
             _uiState.update { it.copy(userId = userId, isLoading = true, error = null) }
 
-            val filterParamsFlow = combine(_currentFilter, _searchQuery, _selectedTag) { filter, query, tag ->
-                Triple(filter, query, tag)
+            val filterParamsFlow = combine(_searchQuery, _selectedTag) { query, tag ->
+                query to tag
             }
 
             combine(
@@ -85,10 +84,10 @@ class NotesViewModel @Inject constructor(
                 evaluationRepository.getEvaluations(userId),
                 scheduleRepository.getSchedules(userId),
                 filterParamsFlow
-            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, schedules: List<Schedule>, params: Triple<NoteFilter, String, String?> ->
-                val (filter, query, tag) = params
+            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, schedules: List<Schedule>, params: Pair<String, String?> ->
+                val (query, tag) = params
                 val availableTags = notes.flatMap { it.tags }.distinct().sorted()
-                val filtered = filterNotes(notes, filter, query, tag)
+                val filtered = filterNotes(notes, query, tag)
                 val subjectInfos = computeSubjectInfos(notes, subjects, evaluations)
                 val subjectNames = subjects.map { it.name }
                 val nextActivity = computeNextActivity(schedules, evaluations, subjects)
@@ -106,7 +105,6 @@ class NotesViewModel @Inject constructor(
                         globalAverage = globalAverage,
                         totalNotesCount = notes.size,
                         totalSubjectsCount = subjects.size,
-                        currentFilter = filter,
                         searchQuery = query,
                         availableTags = availableTags,
                         selectedTag = tag,
@@ -205,7 +203,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun filterNotes(notes: List<Note>, filter: NoteFilter, query: String, selectedTag: String?): Map<String, List<Note>> {
+    private fun filterNotes(notes: List<Note>, query: String, selectedTag: String?): Map<String, List<Note>> {
         var filtered = notes
         if (!selectedTag.isNullOrBlank()) {
             filtered = filtered.filter { it.tags.any { tag -> tag.equals(selectedTag, ignoreCase = true) } }
@@ -219,25 +217,16 @@ class NotesViewModel @Inject constructor(
                 it.tags.any { tag -> tag.contains(cleanQuery, ignoreCase = true) }
             }
         }
-        return when (filter) {
-            NoteFilter.RECIENTES -> filtered.sortedByDescending { it.timestamp?.time ?: 0L }.groupBy { it.subject }
-            NoteFilter.ANTIGUAS -> filtered.sortedBy { it.timestamp?.time ?: Long.MAX_VALUE }.groupBy { it.subject }
-            NoteFilter.POR_MATERIA -> filtered.groupBy { it.subject }
-        }
+        // Fixed order: most recent first; notes without timestamp last
+        return filtered.sortedByDescending { it.timestamp?.time ?: 0L }.groupBy { it.subject }
     }
 
     fun onEvent(event: NotesEvent) {
         when (event) {
             is NotesEvent.LoadNotes -> loadNotes()
-            is NotesEvent.SetFilter -> _currentFilter.value = event.filter
             is NotesEvent.Search -> _searchQuery.value = event.query
             is NotesEvent.SelectTag -> _selectedTag.value = event.tag
-            is NotesEvent.ClearSyncMessage -> _uiState.update { it.copy(syncMessage = null) }
             is NotesEvent.DeleteNote -> deleteNote(event.note)
-            is NotesEvent.ToggleSubject -> {
-                val current = _uiState.value.expandedSubject
-                _uiState.update { it.copy(expandedSubject = if (current == event.subjectName) null else event.subjectName) }
-            }
             is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
         }
     }
@@ -245,10 +234,9 @@ class NotesViewModel @Inject constructor(
     private fun deleteNote(note: Note) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(syncMessage = "Eliminando...") }
             noteRepository.deleteNote(userId, note).fold(
-                onSuccess = { _uiState.update { it.copy(syncMessage = null) } },
-                onFailure = { _uiState.update { it.copy(syncMessage = "Error al eliminar") } }
+                onSuccess = { _uiState.update { it.copy(error = null) } },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar") } }
             )
         }
     }
@@ -256,10 +244,9 @@ class NotesViewModel @Inject constructor(
     private fun deleteSubject(subjectName: String) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(syncMessage = "Eliminando materia...") }
             noteRepository.deleteSubject(userId, subjectName).fold(
-                onSuccess = { _uiState.update { it.copy(syncMessage = null) } },
-                onFailure = { _uiState.update { it.copy(syncMessage = "Error al eliminar materia") } }
+                onSuccess = { _uiState.update { it.copy(error = null) } },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar materia") } }
             )
         }
     }
