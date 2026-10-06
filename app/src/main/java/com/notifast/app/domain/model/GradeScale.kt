@@ -27,6 +27,11 @@ enum class GradeScale(
         }
     }
 
+    fun roundGrade(grade: Double): Double = when (this) {
+        SCALE_0_100 -> kotlin.math.round(grade)
+        else -> kotlin.math.round(grade * 10.0) / 10.0
+    }
+
     companion object {
         fun fromId(id: String?): GradeScale {
             return entries.find { it.id.equals(id, ignoreCase = true) } ?: SCALE_0_10
