@@ -26,6 +26,7 @@ class SchedulesViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val evaluationRepository: EvaluationRepository,
     private val authRepository: AuthRepository,
+    private val userPrefsRepository: com.notifast.app.domain.repository.UserPrefsRepository? = null,
     private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase? = null
 ) : ViewModel() {
 
@@ -47,7 +48,7 @@ class SchedulesViewModel @Inject constructor(
         evaluationRepository: EvaluationRepository,
         authRepository: AuthRepository,
         timeProvider: () -> Pair<Int, String>
-    ) : this(scheduleRepository, evaluationRepository, authRepository, null) {
+    ) : this(scheduleRepository, evaluationRepository, authRepository, null, null) {
         this.currentTimeProvider = timeProvider
         if (_uiState.value.schedules.isNotEmpty() || _uiState.value.evaluations.isNotEmpty()) {
             updateState(
@@ -86,6 +87,11 @@ class SchedulesViewModel @Inject constructor(
                 schedules to evaluations
             }.collect { (schedules, evaluations) ->
                 updateState(schedules = schedules, evaluations = evaluations)
+            }
+        }
+        viewModelScope.launch {
+            userPrefsRepository?.firstDayOfWeekFlow?.collect { day ->
+                _uiState.update { it.copy(firstDayOfWeek = day) }
             }
         }
     }

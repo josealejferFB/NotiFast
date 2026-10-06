@@ -60,7 +60,8 @@ fun AgendaMonthCalendarView(
     onChangeMonth: (Int) -> Unit,
     onGoToToday: () -> Unit,
     onEvaluationClick: (Evaluation) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    firstDayOfWeek: String = "SUNDAY"
 ) {
     val monthTitle = remember(currentMonth) {
         SimpleDateFormat("MMMM yyyy", Locale.getDefault())
@@ -105,7 +106,8 @@ fun AgendaMonthCalendarView(
             currentMonth = currentMonth,
             selectedDate = selectedDate,
             evaluationsByDate = evaluationsByDate,
-            onDateSelected = onDateSelected
+            onDateSelected = onDateSelected,
+            firstDayOfWeek = firstDayOfWeek
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -157,19 +159,30 @@ private fun CalendarMatrix(
     currentMonth: Calendar,
     selectedDate: Calendar,
     evaluationsByDate: Map<String, List<Evaluation>>,
-    onDateSelected: (Calendar) -> Unit
+    onDateSelected: (Calendar) -> Unit,
+    firstDayOfWeek: String = "SUNDAY"
 ) {
     val daysInMonth = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
-    val firstDayOfWeek = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK) - 1
+    // 0 = Sunday … 6 = Saturday (matches Schedule.DAY_NAMES)
+    val monthStartsOn = (currentMonth.clone() as Calendar).apply { set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK) - 1
+    val startOffset = if (firstDayOfWeek.equals("MONDAY", ignoreCase = true)) 1 else 0
+    // Padding so the first day of the month lands under the correct column
+    val paddingCount = (monthStartsOn - startOffset + 7) % 7
     val days = (1..daysInMonth).toList()
-    val paddingDays = (0 until firstDayOfWeek).map { "" }
+    val paddingDays = (0 until paddingCount).map { "" }
     val format = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val selectedDateStr = format.format(selectedDate.time)
     val todayStr = format.format(Date())
 
+    val dayLabels = if (startOffset == 1) {
+        listOf("L", "M", "X", "J", "V", "S", "D")
+    } else {
+        listOf("D", "L", "M", "X", "J", "V", "S")
+    }
+
     Column {
         Row(Modifier.fillMaxWidth()) {
-            listOf("D", "L", "M", "X", "J", "V", "S").forEach { day ->
+            dayLabels.forEach { day ->
                 Text(
                     text = day,
                     modifier = Modifier.weight(1f),

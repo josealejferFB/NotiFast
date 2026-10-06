@@ -81,6 +81,7 @@ data class SchedulesUiState(
     val timelineItems: List<ScheduleTimelineItem> = emptyList(),
     val conflicts: List<Schedule> = emptyList(),
     val weeklySummary: WeeklyScheduleSummary = WeeklyScheduleSummary(),
+    val firstDayOfWeek: String = "SUNDAY",
     val error: String? = null,
     val userFirstName: String = "",
     val userEmail: String = "",

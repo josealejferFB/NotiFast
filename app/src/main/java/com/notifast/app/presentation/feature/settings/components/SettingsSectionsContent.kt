@@ -180,12 +180,6 @@ fun SettingsSectionsContent(
                 onClick = { onEvent(SettingsEvent.ClearCache) }
             )
             SettingsRowItem(
-                title = stringResource(R.string.settings_storage_export_title),
-                subtitle = stringResource(R.string.settings_storage_export_subtitle),
-                icon = Icons.Default.Download,
-                onClick = { onEvent(SettingsEvent.ExportData) }
-            )
-            SettingsRowItem(
                 title = stringResource(R.string.settings_storage_privacy_title),
                 subtitle = stringResource(R.string.settings_storage_privacy_subtitle),
                 icon = Icons.Default.Shield,

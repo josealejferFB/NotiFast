@@ -197,7 +197,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.SetActiveAcademicCycle -> viewModelScope.launch { userPrefsRepository.setActiveAcademicCycle(event.cycle) }
             is SettingsEvent.SetFirstDayOfWeek -> viewModelScope.launch { userPrefsRepository.setFirstDayOfWeek(event.day) }
             is SettingsEvent.ClearCache -> clearCache()
-            is SettingsEvent.ExportData -> _uiState.update { it.copy(snackbarMessage = "¡Cuaderno preparado para exportar!") }
+            is SettingsEvent.ClearCache -> clearCache()
             is SettingsEvent.OpenDialog -> _uiState.update { it.copy(activeDialog = event.dialog) }
             is SettingsEvent.DismissDialog -> _uiState.update { it.copy(activeDialog = null) }
             is SettingsEvent.ClearSnackbar -> _uiState.update { it.copy(snackbarMessage = null) }

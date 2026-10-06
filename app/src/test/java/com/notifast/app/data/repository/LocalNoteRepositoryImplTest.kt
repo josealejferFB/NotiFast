@@ -218,4 +218,53 @@ class LocalNoteRepositoryImplTest {
         assertEquals(1, notes.size)
         assertEquals("T1", notes[0].title)
     }
+
+    @Test
+    fun `addNote returns generated id`() = runTest {
+        coEvery { subjectDao.getSubjectByName("u1", "Física") } returns
+            SubjectEntity(userId = "u1", id = "s1", name = "Física")
+        coEvery { noteDao.insertNote(any()) } returns 1L
+
+        val result = repository.addNote("u1", "Física", "Título", "Contenido", null, emptyList())
+        assertTrue(result.isSuccess)
+        assertTrue(result.getOrNull().orEmpty().isNotBlank())
+    }
+
+    @Test
+    fun `addNote fails cleanly when image upload fails`() = runTest {
+        coEvery { subjectDao.getSubjectByName("u1", "Física") } returns
+            SubjectEntity(userId = "u1", id = "s1", name = "Física")
+        val mockUri = mockk<Uri>()
+        coEvery { imageRepository.uploadNoteImage("u1", mockUri) } returns Result.failure(Exception("upload fail"))
+
+        val result = repository.addNote("u1", "Física", "T", "C", mockUri, emptyList())
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { noteDao.insertNote(any()) }
+    }
+
+    @Test
+    fun `addNote fails when subject does not exist`() = runTest {
+        coEvery { subjectDao.getSubjectByName("u1", "Inexistente") } returns null
+        val result = repository.addNote("u1", "Inexistente", "T", "C", null, emptyList())
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun `deleteSubject cascades by subjectId`() = runTest {
+        val subject = SubjectEntity(userId = "u1", id = "s1", name = "Física")
+        coEvery { subjectDao.getSubjectByName("u1", "Física") } returns subject
+        coEvery { noteDao.getNotesBySubjectId("u1", "s1") } returns flowOf(emptyList())
+        coEvery { evaluationDao.getEvaluationsBySubjectId("u1", "s1") } returns flowOf(emptyList())
+        coEvery { noteDao.deleteNotesBySubjectId("u1", "s1") } returns 0
+        coEvery { evaluationDao.deleteEvaluationsBySubjectId("u1", "s1") } returns 0
+        coEvery { scheduleDao.deleteSchedulesBySubjectId("u1", "s1") } returns 0
+        coEvery { subjectDao.deleteSubjectById("u1", "s1") } returns 1
+
+        val result = repository.deleteSubject("u1", "Física")
+        assertTrue(result.isSuccess)
+        coVerify { noteDao.deleteNotesBySubjectId("u1", "s1") }
+        coVerify { evaluationDao.deleteEvaluationsBySubjectId("u1", "s1") }
+        coVerify { scheduleDao.deleteSchedulesBySubjectId("u1", "s1") }
+        coVerify { subjectDao.deleteSubjectById("u1", "s1") }
+    }
 }

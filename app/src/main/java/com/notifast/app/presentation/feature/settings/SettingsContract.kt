@@ -54,7 +54,6 @@ sealed interface SettingsEvent {
     data class SetActiveAcademicCycle(val cycle: String) : SettingsEvent
     data class SetFirstDayOfWeek(val day: String) : SettingsEvent
     data object ClearCache : SettingsEvent
-    data object ExportData : SettingsEvent
     data class OpenDialog(val dialog: SettingsDialogType) : SettingsEvent
     data object DismissDialog : SettingsEvent
     data object ClearSnackbar : SettingsEvent

@@ -187,7 +187,8 @@ fun SchedulesScreen(
                                 onDateSelected = { viewModel.onEvent(SchedulesEvent.SelectDate(it)) },
                                 onChangeMonth = { viewModel.onEvent(SchedulesEvent.ChangeMonth(it)) },
                                 onGoToToday = { viewModel.onEvent(SchedulesEvent.GoToToday) },
-                                onEvaluationClick = { selectedEvaluation = it }
+                                onEvaluationClick = { selectedEvaluation = it },
+                                firstDayOfWeek = uiState.firstDayOfWeek
                             )
                         }
                         ScheduleViewMode.WEEKLY_BENTO -> {
