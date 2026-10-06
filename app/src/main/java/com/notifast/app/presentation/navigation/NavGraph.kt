@@ -89,6 +89,7 @@ fun MainContent() {
     }
 
     Scaffold(
+        containerColor = androidx.compose.ui.graphics.Color.Transparent,
         bottomBar = {
             if (showBottomBar) {
                 NotiFastBottomNav(
@@ -104,11 +105,12 @@ fun MainContent() {
                 )
             }
         }
-    ) { innerPadding ->
+    ) { _ ->
+        // Floating bottom bar draws over the study background — do not inset
+        // content away from the bottom or a solid gap appears behind the capsule.
         NavHost(
             navController = navController,
-            startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = startDestination
         ) {
             composable(Screen.Onboarding.route) {
                 OnboardingScreen(
