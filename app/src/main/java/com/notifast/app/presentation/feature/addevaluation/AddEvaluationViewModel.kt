@@ -7,6 +7,7 @@ import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,7 @@ class AddEvaluationViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
     private val authRepository: AuthRepository,
+    private val userPrefsRepository: UserPrefsRepository,
     private val scheduleEvaluationAlertUseCase: com.notifast.app.domain.usecase.ScheduleEvaluationAlertUseCase
 ) : ViewModel() {
 
@@ -77,6 +79,7 @@ class AddEvaluationViewModel @Inject constructor(
                 return@launch
             }
             val evalId = java.util.UUID.randomUUID().toString()
+            val scaleId = userPrefsRepository.defaultGradeScaleFlow.first()
             val evaluation = Evaluation(
                 id = evalId,
                 userId = userId,
@@ -86,7 +89,8 @@ class AddEvaluationViewModel @Inject constructor(
                 date = date,
                 quickTips = state.quickTips.trim(),
                 type = state.selectedType.name,
-                weight = if (state.selectedType.showWeight) state.weight.toDoubleOrNull()?.coerceIn(0.0, 100.0) else null
+                weight = if (state.selectedType.showWeight) state.weight.toDoubleOrNull()?.coerceIn(0.0, 100.0) else null,
+                gradeScaleId = scaleId
             )
             evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess { savedId ->
                 scheduleEvaluationAlertUseCase(evaluation.copy(id = savedId))

@@ -168,7 +168,13 @@ class SubjectDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val eval = _uiState.value.evaluations.find { it.id == evalId } ?: return@launch
-            evaluationRepository.updateEvaluation(userId, eval.copy(grade = grade, isPresented = isPresented), null)
+            val activeScale = _uiState.value.gradeScale
+            val updated = eval.copy(
+                grade = grade?.let { activeScale.roundGrade(it) },
+                isPresented = isPresented,
+                gradeScaleId = activeScale.id
+            )
+            evaluationRepository.updateEvaluation(userId, updated, null)
                 .onSuccess {
                     if (grade != null || isPresented) {
                         cancelAlertUseCase?.cancelEvaluationAlert(evalId)

@@ -131,8 +131,14 @@ class GradesViewModel @Inject constructor(
     private fun updateGrade(evaluationId: String, grade: Double?, isPresented: Boolean) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            val current = _uiState.value.evaluationsBySubject.values.flatten().find { it.id == evaluationId } ?: return@launch
-            val updated = current.copy(grade = grade, isPresented = isPresented)
+            val current = _uiState.value.evaluationsBySubject.values.flatten()
+                .find { it.id == evaluationId } ?: return@launch
+            val activeScale = _uiState.value.gradeScale
+            val updated = current.copy(
+                grade = grade?.let { activeScale.roundGrade(it) },
+                isPresented = isPresented,
+                gradeScaleId = activeScale.id
+            )
             evaluationRepository.updateEvaluation(userId, updated, null).onFailure { e ->
                 _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") }
             }

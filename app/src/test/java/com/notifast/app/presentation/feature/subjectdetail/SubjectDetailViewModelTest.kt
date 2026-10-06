@@ -185,6 +185,25 @@ class SubjectDetailViewModelTest {
     }
 
     @Test
+    fun `SaveGrade stamps active grade scale id`() = runTest {
+        coEvery { evaluationRepository.updateEvaluation(any(), any(), any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SubjectDetailEvent.SaveGrade("2", 9.0, true))
+        advanceUntilIdle()
+
+        coVerify {
+            evaluationRepository.updateEvaluation(
+                "user_123",
+                match { it.id == "2" && it.grade == 9.0 && it.gradeScaleId == "0-20" },
+                null
+            )
+        }
+    }
+
+    @Test
     fun `when delete schedule event, calls repository delete`() = runTest {
         coEvery { scheduleRepository.deleteSchedule(any(), any()) } returns Result.success(Unit)
         val viewModel = createViewModel()

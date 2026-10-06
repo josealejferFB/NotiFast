@@ -1,0 +1,78 @@
+package com.notifast.app.presentation.feature.addevaluation
+
+import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.ScheduleEvaluationAlertUseCase
+import com.notifast.app.util.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import java.util.Date
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class AddEvaluationViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val noteRepository: NoteRepository = mockk(relaxed = true)
+    private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
+    private val authRepository: AuthRepository = mockk(relaxed = true)
+    private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
+    private val scheduleEvaluationAlertUseCase: ScheduleEvaluationAlertUseCase = mockk(relaxed = true)
+
+    private val sampleSubjects = listOf(
+        SubjectData(name = "Matemáticas", colorHex = "#3B9797")
+    )
+
+    @Before
+    fun setUp() {
+        coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { noteRepository.getSubjects("user_123") } returns flowOf(sampleSubjects)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")
+        coEvery { evaluationRepository.addEvaluation(any(), any(), any()) } returns Result.success("eval-1")
+    }
+
+    private fun createViewModel(): AddEvaluationViewModel {
+        return AddEvaluationViewModel(
+            noteRepository,
+            evaluationRepository,
+            authRepository,
+            userPrefsRepository,
+            scheduleEvaluationAlertUseCase
+        )
+    }
+
+    @Test
+    fun `Save stamps active grade scale id`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddEvaluationEvent.SelectSubject("Matemáticas"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateTitle("Parcial 2"))
+        viewModel.onEvent(AddEvaluationEvent.Save(Date(), null))
+        advanceUntilIdle()
+
+        coVerify {
+            evaluationRepository.addEvaluation(
+                "user_123",
+                match {
+                    it.subjectName == "Matemáticas" &&
+                        it.title == "Parcial 2" &&
+                        it.gradeScaleId == "0-20"
+                },
+                null
+            )
+        }
+    }
+}

@@ -14,6 +14,7 @@ import com.notifast.app.domain.usecase.CalculateAcademicStatsUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import com.notifast.app.util.MainDispatcherRule
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -98,5 +99,29 @@ class GradesViewModelTest {
 
         viewModel.onEvent(GradesEvent.SelectTab(GradesTab.ANALYTICS))
         assertEquals(GradesTab.ANALYTICS, viewModel.uiState.value.selectedTab)
+    }
+
+    @Test
+    fun `UpdateGrade stamps active grade scale id`() = runTest {
+        coEvery { evaluationRepository.updateEvaluation(any(), any(), any()) } returns Result.success(Unit)
+        // Active scale differs from stored gradeScaleId ("0-20") so stamping is observable.
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+        val viewModel = GradesViewModel(
+            evaluationRepository, noteRepository, scheduleRepository,
+            authRepository, userPrefsRepository,
+            calculateWeightedAverageUseCase, calculateAcademicStatsUseCase
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(GradesEvent.UpdateGrade("1", 15.0, true))
+        advanceUntilIdle()
+
+        coVerify {
+            evaluationRepository.updateEvaluation(
+                "user_123",
+                match { it.grade == 15.0 && it.gradeScaleId == "0-10" },
+                null
+            )
+        }
     }
 }
