@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.notifast.app.domain.util.GradeConstants
 
 import com.notifast.app.domain.repository.NoteRepository
 
