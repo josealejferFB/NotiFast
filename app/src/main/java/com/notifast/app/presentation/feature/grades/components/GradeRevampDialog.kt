@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
-import com.notifast.app.domain.util.GradeConstants
+import com.notifast.app.domain.model.GradePolicy
+import com.notifast.app.domain.model.GradeScale
 
 /**
  * Dialog to record or edit an evaluation grade in NotiFast 3.0.
@@ -43,6 +44,7 @@ fun GradeRevampDialog(
     onDismiss: () -> Unit,
     onSave: (String, Double?, Boolean) -> Unit
 ) {
+    val scale = GradeScale.fromId(evaluation.gradeScaleId)
     var grade by remember {
         mutableStateOf(evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "")
     }
@@ -74,11 +76,11 @@ fun GradeRevampDialog(
                         grade = it
                         error = null
                         val parsed = it.toDoubleOrNull()
-                        if (it.isNotEmpty() && parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE) {
+                        if (it.isNotEmpty() && parsed != null && GradePolicy.validateGrade(parsed, scale)) {
                             isPresented = true
                         }
                     },
-                    label = { Text("Nota (${GradeConstants.MIN_GRADE} - ${GradeConstants.MAX_GRADE})") },
+                    label = { Text("Nota (${scale.minGrade} - ${scale.maxGrade})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = error != null,
                     supportingText = error?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
@@ -116,8 +118,8 @@ fun GradeRevampDialog(
                         val g = grade.toDoubleOrNull()
                         when {
                             g == null -> error = "Nota inválida"
-                            g < GradeConstants.MIN_GRADE || g > GradeConstants.MAX_GRADE ->
-                                error = "La nota debe estar entre ${GradeConstants.MIN_GRADE} y ${GradeConstants.MAX_GRADE}"
+                            !GradePolicy.validateGrade(g, scale) ->
+                                error = "La nota debe estar entre ${scale.minGrade} y ${scale.maxGrade}"
                             else -> {
                                 onSave(evaluation.id, g, isPresented)
                                 onDismiss()

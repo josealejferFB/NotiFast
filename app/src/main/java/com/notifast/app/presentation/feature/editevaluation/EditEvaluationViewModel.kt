@@ -39,7 +39,11 @@ class EditEvaluationViewModel @Inject constructor(
     private fun loadSubjects() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingSubjects = true) }
-            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isLoadingSubjects = false) }
+                return@launch
+            }
             val subjects = noteRepository.getSubjects(userId).first()
             _uiState.update { it.copy(subjects = subjects, isLoadingSubjects = false) }
         }
@@ -48,8 +52,16 @@ class EditEvaluationViewModel @Inject constructor(
     private fun loadEvaluation() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            val eval = evaluationRepository.getEvaluation(userId, evalId).first() ?: return@launch
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }
+                return@launch
+            }
+            val eval = evaluationRepository.getEvaluation(userId, evalId).first()
+            if (eval == null) {
+                _uiState.update { it.copy(isLoading = false, error = "Evaluación no encontrada") }
+                return@launch
+            }
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -62,6 +74,7 @@ class EditEvaluationViewModel @Inject constructor(
                     grade = eval.grade?.toString() ?: "",
                     weight = eval.weight?.toString() ?: "",
                     isPresented = eval.isPresented,
+                    gradeScaleId = eval.gradeScaleId,
                     existingImageUrl = eval.imageUrl,
                     date = eval.date
                 )
@@ -78,8 +91,9 @@ class EditEvaluationViewModel @Inject constructor(
             is EditEvaluationEvent.UpdateQuickTips -> _uiState.update { it.copy(quickTips = event.value) }
             is EditEvaluationEvent.UpdateGrade -> {
                 val v = event.value
+                val scale = com.notifast.app.domain.model.GradeScale.fromId(_uiState.value.gradeScaleId)
                 val parsed = v.toDoubleOrNull()
-                if (v.isEmpty() || (parsed != null && parsed in GradeConstants.MIN_GRADE..GradeConstants.MAX_GRADE) || v.matches(Regex("^[0-9]{1,2}\\.$"))) {
+                if (v.isEmpty() || (parsed != null && com.notifast.app.domain.model.GradePolicy.validateGrade(parsed, scale)) || v.matches(Regex("^[0-9]{1,3}\\.$"))) {
                     _uiState.update { it.copy(grade = v) }
                 }
             }
@@ -92,6 +106,7 @@ class EditEvaluationViewModel @Inject constructor(
             }
             is EditEvaluationEvent.TogglePresented -> _uiState.update { it.copy(isPresented = !it.isPresented) }
             is EditEvaluationEvent.Save -> save(event.date, event.imageUri)
+            is EditEvaluationEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
@@ -105,6 +120,7 @@ class EditEvaluationViewModel @Inject constructor(
                 _uiState.update { it.copy(isSaving = false) }
                 return@launch
             }
+            val scale = com.notifast.app.domain.model.GradeScale.fromId(state.gradeScaleId)
             val updatedEval = com.notifast.app.data.model.Evaluation(
                 id = state.evalId,
                 userId = userId,
@@ -115,9 +131,10 @@ class EditEvaluationViewModel @Inject constructor(
                 imageUrl = if (imageUri != null) null else state.existingImageUrl,
                 type = state.type,
                 quickTips = state.quickTips.trim(),
-                grade = state.grade.toDoubleOrNull()?.coerceIn(GradeConstants.MIN_GRADE, GradeConstants.MAX_GRADE),
+                grade = state.grade.toDoubleOrNull()?.let { com.notifast.app.domain.model.GradePolicy.clampGrade(it, scale) },
                 weight = state.weight.toDoubleOrNull()?.coerceIn(0.0, 100.0),
-                isPresented = state.isPresented
+                isPresented = state.isPresented,
+                gradeScaleId = state.gradeScaleId
             )
             evaluationRepository.updateEvaluation(userId, updatedEval, imageUri).onSuccess {
                 if (updatedEval.grade != null || updatedEval.isPresented) {
@@ -126,8 +143,8 @@ class EditEvaluationViewModel @Inject constructor(
                     scheduleEvaluationAlertUseCase(updatedEval)
                 }
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
-            }.onFailure {
-                _uiState.update { it.copy(isSaving = false) }
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSaving = false, error = e.message ?: "Error al guardar") }
             }
         }
     }

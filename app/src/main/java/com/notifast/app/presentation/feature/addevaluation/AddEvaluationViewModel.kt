@@ -36,7 +36,11 @@ class AddEvaluationViewModel @Inject constructor(
     private fun loadSubjects() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
             val subjects = noteRepository.getSubjects(userId).first()
             _uiState.update { it.copy(subjects = subjects, isLoading = false) }
         }
@@ -72,7 +76,9 @@ class AddEvaluationViewModel @Inject constructor(
                 _uiState.update { it.copy(isSaving = false, error = "Materia y título son requeridos") }
                 return@launch
             }
+            val evalId = java.util.UUID.randomUUID().toString()
             val evaluation = Evaluation(
+                id = evalId,
                 userId = userId,
                 subjectName = state.selectedSubject.trim(),
                 title = cleanTitle,
@@ -82,8 +88,8 @@ class AddEvaluationViewModel @Inject constructor(
                 type = state.selectedType.name,
                 weight = if (state.selectedType.showWeight) state.weight.toDoubleOrNull()?.coerceIn(0.0, 100.0) else null
             )
-            evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess {
-                scheduleEvaluationAlertUseCase(evaluation)
+            evaluationRepository.addEvaluation(userId, evaluation, imageUri).onSuccess { savedId ->
+                scheduleEvaluationAlertUseCase(evaluation.copy(id = savedId))
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure { e ->
                 _uiState.update { it.copy(isSaving = false, error = e.message ?: "Error al guardar la evaluación") }

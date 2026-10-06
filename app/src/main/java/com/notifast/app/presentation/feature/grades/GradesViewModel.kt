@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +35,8 @@ class GradesViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(GradesUiState())
     val uiState: StateFlow<GradesUiState> = _uiState.asStateFlow()
+
+    private var loadJob: kotlinx.coroutines.Job? = null
 
     init {
         loadData()
@@ -54,18 +57,25 @@ class GradesViewModel @Inject constructor(
     }
 
     private fun loadData() {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
             _uiState.update { it.copy(isLoading = true) }
             combine(
                 evaluationRepository.getEvaluations(userId),
                 noteRepository.getSubjects(userId),
                 scheduleRepository.getSchedules(userId),
-                userPrefsRepository.defaultGradeScaleFlow
-            ) { evaluations, subjects, schedules, scaleId ->
+                userPrefsRepository.defaultGradeScaleFlow,
+                userPrefsRepository.minPassingGradeFlow
+            ) { evaluations, subjects, schedules, scaleId, minPassing ->
                 val evalsBySubject = evaluations.groupBy { it.subjectName }
-                val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
                 val scale = GradeScale.fromId(scaleId)
+                val customMin = if (minPassing > 0f) minPassing.toDouble() else null
+                val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
                 val subjectGrades = evalsBySubject.map { (subject, evals) ->
                     SubjectGradeInfo(
                         subject = subject,
@@ -78,19 +88,25 @@ class GradesViewModel @Inject constructor(
                     evaluations = evaluations,
                     subjects = subjects,
                     schedules = schedules,
-                    gradeScale = scale
+                    gradeScale = scale,
+                    customMinPassingGrade = customMin
                 )
 
-                _uiState.value.copy(
-                    evaluationsBySubject = evalsBySubject,
-                    subjects = subjects,
-                    globalAverage = globalAverage,
-                    gradeScale = scale,
-                    subjectGrades = subjectGrades,
-                    academicStats = academicStats,
-                    isLoading = false
-                )
-            }.collect { state -> _uiState.value = state }
+                _uiState.update { prev ->
+                    prev.copy(
+                        evaluationsBySubject = evalsBySubject,
+                        subjects = subjects,
+                        globalAverage = globalAverage,
+                        gradeScale = scale,
+                        minPassingGrade = customMin ?: scale.minPassingGrade,
+                        subjectGrades = subjectGrades,
+                        academicStats = academicStats,
+                        isLoading = false
+                    )
+                }
+            }.catch { e ->
+                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al cargar datos") }
+            }.collect { }
         }
     }
 

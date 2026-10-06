@@ -23,6 +23,7 @@ data class GradesUiState(
     val subjects: List<SubjectData> = emptyList(),
     val globalAverage: Double = 0.0,
     val gradeScale: GradeScale = GradeScale.SCALE_0_10,
+    val minPassingGrade: Double = 6.0,
     val subjectGrades: List<SubjectGradeInfo> = emptyList(),
     val academicStats: AcademicStats = AcademicStats(),
     val error: String? = null,

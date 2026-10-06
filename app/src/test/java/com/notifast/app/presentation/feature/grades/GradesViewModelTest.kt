@@ -56,6 +56,7 @@ class GradesViewModelTest {
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(sampleEvaluations)
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(sampleSchedules)
         coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
     }
 
     @Test
