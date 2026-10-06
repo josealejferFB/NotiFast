@@ -58,6 +58,7 @@ fun SubjectDetailScreen(
                     subjectIcon = uiState.subjectIcon,
                     subjectColorHex = uiState.subjectColorHex,
                     averageGrade = uiState.averageGrade,
+                    displayScale = uiState.gradeScale,
                     evaluatedPercent = uiState.progressPercent,
                     onBackClick = onBackClick,
                     onAddNoteClick = { onAddNoteClick(uiState.subjectName) },
@@ -99,6 +100,7 @@ fun SubjectDetailScreen(
                                     assignedWeight = uiState.totalAssignedWeight,
                                     gradedWeight = uiState.evaluatedWeight,
                                     availableWeight = uiState.availableWeight,
+                                    displayScale = uiState.gradeScale,
                                     onAddEvaluationClick = { onAddEvaluationClick(uiState.subjectName) },
                                     onEditGradeClick = { gradeDialogEval = it },
                                     onDeleteEvaluationClick = { deleteEval = it }

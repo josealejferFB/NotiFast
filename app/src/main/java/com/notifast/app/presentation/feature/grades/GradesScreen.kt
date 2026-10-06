@@ -113,6 +113,7 @@ fun GradesScreen(
                                         onUpdateGrade = { id, g, p ->
                                             viewModel.onEvent(GradesEvent.UpdateGrade(id, g, p))
                                         },
+                                        displayScale = uiState.gradeScale,
                                         minPassingGrade = uiState.minPassingGrade
                                     )
                                 }

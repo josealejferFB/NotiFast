@@ -450,6 +450,7 @@
     <string name="analytics_workload_title">Correlación de Carga Horaria</string>
     <string name="analytics_workload_subtitle">Horas semanales de clase vs promedio obtenido</string>
     <string name="analytics_workload_total_hours">%1$.1f hrs/sem</string>
+    <string name="analytics_workload_prom_avg">Prom: %1$s</string>
     <string name="analytics_best_subject_label">Mayor Rendimiento</string>
     <string name="analytics_lowest_subject_label">Mayor Esfuerzo Requerido</string>
     <string name="analytics_recommendations_title">Recomendaciones Tácticas</string>

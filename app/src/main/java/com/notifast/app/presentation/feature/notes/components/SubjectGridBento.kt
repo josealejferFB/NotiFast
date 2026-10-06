@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastEmptyState
 import com.notifast.app.presentation.feature.notes.SubjectInfo
 import com.notifast.app.presentation.theme.ThemeUtils
@@ -57,7 +58,7 @@ import com.notifast.app.presentation.theme.color.MutedCrimson
 import com.notifast.app.presentation.theme.color.AquaGreen
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import com.notifast.app.presentation.theme.type.monoAcademic
-import java.util.Locale
+import com.notifast.app.presentation.util.GradeFormatters
 
 @Composable
 fun SubjectGridBento(
@@ -67,6 +68,8 @@ fun SubjectGridBento(
     onAddEvaluationClick: (String) -> Unit,
     onDeleteSubject: (String) -> Unit,
     onAddSubjectClick: () -> Unit,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
+    minPassingGrade: Double = displayScale.minPassingGrade,
     modifier: Modifier = Modifier
 ) {
     if (subjectInfos.isEmpty()) {
@@ -92,7 +95,9 @@ fun SubjectGridBento(
                     onClick = { onSubjectClick(subjectInfo.name) },
                     onAddNote = { onAddNoteClick(subjectInfo.name) },
                     onAddEval = { onAddEvaluationClick(subjectInfo.name) },
-                    onDelete = { onDeleteSubject(subjectInfo.name) }
+                    onDelete = { onDeleteSubject(subjectInfo.name) },
+                    displayScale = displayScale,
+                    minPassingGrade = minPassingGrade
                 )
             }
         }
@@ -105,7 +110,9 @@ private fun SubjectBentoCard(
     onClick: () -> Unit,
     onAddNote: () -> Unit,
     onAddEval: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    displayScale: GradeScale,
+    minPassingGrade: Double
 ) {
     val isDark = isSystemInDarkTheme()
     val interactionSource = remember { MutableInteractionSource() }
@@ -133,7 +140,12 @@ private fun SubjectBentoCard(
                     }
                 }
                 subjectInfo.averageGrade?.let { avg ->
-                    Text(String.format(Locale.getDefault(), "%.1f", avg), style = MaterialTheme.typography.monoAcademic, fontWeight = FontWeight.Bold, color = if (avg >= 3.0) ForestSage else AquaGreen)
+                    Text(
+                        GradeFormatters.average(avg, displayScale),
+                        style = MaterialTheme.typography.monoAcademic,
+                        fontWeight = FontWeight.Bold,
+                        color = if (avg >= minPassingGrade) ForestSage else AquaGreen
+                    )
                 }
             }
             Spacer(Modifier.height(8.dp))

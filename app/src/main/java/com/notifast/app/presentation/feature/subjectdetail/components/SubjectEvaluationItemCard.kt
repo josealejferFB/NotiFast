@@ -28,14 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.theme.type.monoAcademicBold
+import com.notifast.app.presentation.util.GradeFormatters
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun SubjectEvaluationItemCard(
     evaluation: Evaluation,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     onEditGradeClick: (Evaluation) -> Unit,
     onDeleteClick: (Evaluation) -> Unit,
     modifier: Modifier = Modifier
@@ -101,7 +104,11 @@ fun SubjectEvaluationItemCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (isGraded) String.format(Locale.US, "%.1f", evaluation.grade) else stringResource(R.string.subject_detail_edit_grade_btn),
+                        text = if (isGraded) {
+                            GradeFormatters.grade(evaluation.grade, evaluation.gradeScaleId, displayScale)
+                        } else {
+                            stringResource(R.string.subject_detail_edit_grade_btn)
+                        },
                         style = MaterialTheme.typography.monoAcademicBold,
                         color = if (isGraded) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
                         fontSize = if (isGraded) 16.sp else 13.sp

@@ -41,9 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.feature.grades.SubjectGradeInfo
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
-import java.util.Locale
+import com.notifast.app.presentation.util.GradeFormatters
 
 /**
  * NotiFast 3.0 Subject Grade Card.
@@ -53,7 +54,8 @@ import java.util.Locale
 fun SubjectGradeCard(
     subjectGrade: SubjectGradeInfo,
     onUpdateGrade: (String, Double?, Boolean) -> Unit,
-    minPassingGrade: Double = 6.0
+    displayScale: GradeScale,
+    minPassingGrade: Double
 ) {
     var expanded by remember { mutableStateOf(false) }
     val subject = subjectGrade.subject
@@ -108,7 +110,7 @@ fun SubjectGradeCard(
                 Column(horizontalAlignment = Alignment.End) {
                     val isPassing = subjectAverage >= minPassingGrade
                     Text(
-                        text = String.format(Locale.getDefault(), "%.1f", subjectAverage),
+                        text = GradeFormatters.average(subjectAverage, displayScale),
                         fontWeight = FontWeight.Bold,
                         fontFamily = JetBrainsMonoFamily,
                         fontSize = 20.sp,
@@ -126,7 +128,11 @@ fun SubjectGradeCard(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(modifier = Modifier.height(8.dp))
                     evaluations.forEach { eval ->
-                        EvaluationDetailRow(evaluation = eval, onUpdateGrade = onUpdateGrade)
+                        EvaluationDetailRow(
+                            evaluation = eval,
+                            displayScale = displayScale,
+                            onUpdateGrade = onUpdateGrade
+                        )
                     }
                 }
             }
@@ -137,6 +143,7 @@ fun SubjectGradeCard(
 @Composable
 fun EvaluationDetailRow(
     evaluation: Evaluation,
+    displayScale: GradeScale,
     onUpdateGrade: (String, Double?, Boolean) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -178,7 +185,9 @@ fun EvaluationDetailRow(
             shape = RoundedCornerShape(10.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
-            val gradeStr = evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "—"
+            val gradeStr = evaluation.grade?.let {
+                GradeFormatters.grade(it, evaluation.gradeScaleId, displayScale)
+            } ?: "—"
             Text(
                 text = gradeStr,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),

@@ -35,9 +35,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.EvaluationType
+import com.notifast.app.domain.model.GradeScale
+import com.notifast.app.presentation.util.GradeFormatters
 
 /**
  * NotiFast 3.0 Tactile Agenda Evaluation Card.
@@ -46,6 +50,7 @@ import com.notifast.app.data.model.EvaluationType
 @Composable
 fun AgendaEvaluationCard(
     evaluation: Evaluation,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -165,7 +170,9 @@ fun AgendaEvaluationCard(
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
-                                text = evaluation.grade?.let { String.format("%.1f", it) } ?: "Entregada",
+                                text = evaluation.grade?.let {
+                                    GradeFormatters.grade(it, evaluation.gradeScaleId, displayScale)
+                                } ?: stringResource(R.string.grades_status_pending),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.secondary

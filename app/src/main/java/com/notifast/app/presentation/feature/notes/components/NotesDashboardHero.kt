@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.feature.notes.NextActivity
 import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.color.ForestSage
@@ -53,6 +54,7 @@ import com.notifast.app.presentation.theme.color.MutedCrimson
 import com.notifast.app.presentation.theme.color.AquaGreen
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import com.notifast.app.presentation.theme.type.monoAcademic
+import com.notifast.app.presentation.util.GradeFormatters
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -63,6 +65,8 @@ fun NotesDashboardHero(
     totalSubjects: Int,
     globalAverage: Double?,
     onAddNoteClick: (String?) -> Unit,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
+    minPassingGrade: Double = displayScale.minPassingGrade,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -76,9 +80,9 @@ fun NotesDashboardHero(
             MetricStatCard(
                 Modifier.weight(1f),
                 stringResource(R.string.notes_hub_stat_average_label),
-                globalAverage?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: stringResource(R.string.notes_hub_stat_average_na),
+                globalAverage?.let { GradeFormatters.average(it, displayScale) } ?: stringResource(R.string.notes_hub_stat_average_na),
                 Icons.AutoMirrored.Filled.Assignment,
-                if ((globalAverage ?: 0.0) >= 3.0) ForestSage else AquaGreen
+                if ((globalAverage ?: 0.0) >= minPassingGrade) ForestSage else AquaGreen
             )
         }
     }

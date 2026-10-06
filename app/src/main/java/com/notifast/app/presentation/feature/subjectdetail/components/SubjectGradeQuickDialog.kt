@@ -107,6 +107,14 @@ fun SubjectGradeQuickDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                Spacer(Modifier.height(6.dp))
+
+                Text(
+                    text = stringResource(R.string.eval_grade_scale_hint, scale.label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
                 Spacer(Modifier.height(12.dp))
 
                 Row(

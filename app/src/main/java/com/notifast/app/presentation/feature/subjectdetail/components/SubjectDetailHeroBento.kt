@@ -21,9 +21,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.type.monoAcademicLarge
+import com.notifast.app.presentation.util.GradeFormatters
 
 import androidx.compose.material.icons.filled.Share
 
@@ -33,6 +35,7 @@ fun SubjectDetailHeroBento(
     subjectIcon: String,
     subjectColorHex: String,
     averageGrade: Double?,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     evaluatedPercent: Float,
     onBackClick: () -> Unit,
     onAddNoteClick: () -> Unit,
@@ -83,7 +86,7 @@ fun SubjectDetailHeroBento(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 HeroMetricPill(
                     label = stringResource(R.string.subject_detail_stat_gpa),
-                    value = averageGrade?.let { String.format(java.util.Locale.US, "%.1f", it) } ?: "--",
+                    value = averageGrade?.let { GradeFormatters.average(it, displayScale) } ?: "--",
                     modifier = Modifier.weight(1f)
                 )
                 HeroMetricPill(

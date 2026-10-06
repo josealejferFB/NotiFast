@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
-import java.util.Locale
+import com.notifast.app.presentation.util.GradeFormatters
 
 /**
  * NotiFast 3.0 Studio Notebook Global Average Hero Block.
@@ -62,7 +62,7 @@ fun MainAverageDashboard(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = String.format(Locale.getDefault(), "%.2f", generalAverage),
+                text = GradeFormatters.average(generalAverage, gradeScale),
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 54.sp,
                 fontWeight = FontWeight.Bold,

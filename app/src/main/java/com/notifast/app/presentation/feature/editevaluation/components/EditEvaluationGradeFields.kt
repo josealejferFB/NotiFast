@@ -83,6 +83,11 @@ fun EditEvaluationGradeFields(
                 } else null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
+            Text(
+                text = stringResource(R.string.eval_grade_scale_hint, gradeScale.label),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         NotiFastFormField(

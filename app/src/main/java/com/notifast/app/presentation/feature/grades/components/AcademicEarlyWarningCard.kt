@@ -18,17 +18,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.domain.model.SubjectHealthStatus
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.theme.color.AquaGreen
 import com.notifast.app.presentation.theme.color.Ruby
 import com.notifast.app.presentation.theme.color.TerracottaWarm
+import com.notifast.app.presentation.util.GradeFormatters
 import java.util.Locale
 
 @Composable
 fun AcademicEarlyWarningCard(
     atRiskSubjects: List<SubjectAcademicHealth>,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     modifier: Modifier = Modifier
 ) {
     NotiFastCard(
@@ -78,7 +81,10 @@ fun AcademicEarlyWarningCard(
                 )
             } else {
                 atRiskSubjects.forEach { subject ->
-                    EarlyWarningSubjectRow(subject = subject)
+                    EarlyWarningSubjectRow(
+                        subject = subject,
+                        displayScale = displayScale
+                    )
                 }
             }
         }
@@ -86,7 +92,10 @@ fun AcademicEarlyWarningCard(
 }
 
 @Composable
-private fun EarlyWarningSubjectRow(subject: SubjectAcademicHealth) {
+private fun EarlyWarningSubjectRow(
+    subject: SubjectAcademicHealth,
+    displayScale: GradeScale
+) {
     val isCritical = subject.status == SubjectHealthStatus.CRITICAL_FAIL
     val tagBg = if (isCritical) Ruby.copy(alpha = 0.12f) else TerracottaWarm.copy(alpha = 0.12f)
     val tagColor = if (isCritical) Ruby else TerracottaWarm
@@ -112,7 +121,7 @@ private fun EarlyWarningSubjectRow(subject: SubjectAcademicHealth) {
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            val neededStr = String.format(Locale.US, "%.1f", subject.minGradeNeededToPass)
+            val neededStr = GradeFormatters.average(subject.minGradeNeededToPass, displayScale)
             val remStr = String.format(Locale.US, "%.0f", subject.remainingWeight)
             Text(
                 text = stringResource(R.string.analytics_early_warning_pts_needed, neededStr, remStr),

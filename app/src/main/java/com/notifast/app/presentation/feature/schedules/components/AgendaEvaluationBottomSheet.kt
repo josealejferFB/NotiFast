@@ -41,7 +41,9 @@ import coil.compose.AsyncImage
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.EvaluationType
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
+import com.notifast.app.presentation.util.GradeFormatters
 
 /**
  * NotiFast 3.0 Tactical Agenda Evaluation Detail BottomSheet.
@@ -49,6 +51,7 @@ import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
 @Composable
 fun AgendaEvaluationBottomSheet(
     eval: Evaluation,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -127,7 +130,7 @@ fun AgendaEvaluationBottomSheet(
             DetailRow(
                 icon = Icons.Default.Event,
                 label = stringResource(R.string.eval_grade_obtained_label),
-                content = "${eval.grade}/20",
+                content = GradeFormatters.gradeWithScale(eval.grade, eval.gradeScaleId, displayScale),
                 color = MaterialTheme.colorScheme.primary,
                 isMono = true
             )

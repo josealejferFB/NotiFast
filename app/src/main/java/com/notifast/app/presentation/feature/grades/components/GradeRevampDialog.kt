@@ -102,6 +102,12 @@ fun GradeRevampDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                Text(
+                    text = stringResource(R.string.eval_grade_scale_hint, scale.label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier

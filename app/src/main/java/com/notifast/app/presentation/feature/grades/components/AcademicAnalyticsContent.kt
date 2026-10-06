@@ -54,14 +54,16 @@ fun AcademicAnalyticsContent(
 
         // Early Warning Alerts Card
         AcademicEarlyWarningCard(
-            atRiskSubjects = stats.atRiskSubjects
+            atRiskSubjects = stats.atRiskSubjects,
+            displayScale = gradeScale
         )
 
         // Workload Correlation Card
         AcademicWorkloadCard(
             totalWeeklyHours = stats.totalWeeklyClassHours,
             bestSubject = stats.bestSubject,
-            lowestSubject = stats.lowestSubject
+            lowestSubject = stats.lowestSubject,
+            displayScale = gradeScale
         )
 
         // Recommendations

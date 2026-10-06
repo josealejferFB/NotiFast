@@ -18,17 +18,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.theme.color.AquaGreen
 import com.notifast.app.presentation.theme.color.Ruby
-import java.util.Locale
+import com.notifast.app.presentation.util.GradeFormatters
 
 @Composable
 fun AcademicWorkloadCard(
     totalWeeklyHours: Double,
     bestSubject: SubjectAcademicHealth?,
     lowestSubject: SubjectAcademicHealth?,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     modifier: Modifier = Modifier
 ) {
     NotiFastCard(
@@ -85,6 +87,7 @@ fun AcademicWorkloadCard(
                             label = stringResource(R.string.analytics_best_subject_label),
                             subjectName = best.subjectName,
                             average = best.currentAverage,
+                            displayScale = displayScale,
                             color = AquaGreen,
                             modifier = Modifier.weight(1f)
                         )
@@ -94,6 +97,7 @@ fun AcademicWorkloadCard(
                             label = stringResource(R.string.analytics_lowest_subject_label),
                             subjectName = lowest.subjectName,
                             average = lowest.currentAverage,
+                            displayScale = displayScale,
                             color = Ruby,
                             modifier = Modifier.weight(1f)
                         )
@@ -109,6 +113,7 @@ private fun WorkloadPill(
     label: String,
     subjectName: String,
     average: Double,
+    displayScale: GradeScale,
     color: androidx.compose.ui.graphics.Color,
     modifier: Modifier = Modifier
 ) {
@@ -131,7 +136,10 @@ private fun WorkloadPill(
             maxLines = 1
         )
         Text(
-            text = String.format(Locale.US, "Prom: %.1f", average),
+            text = stringResource(
+                R.string.analytics_workload_prom_avg,
+                GradeFormatters.average(average, displayScale)
+            ),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = color

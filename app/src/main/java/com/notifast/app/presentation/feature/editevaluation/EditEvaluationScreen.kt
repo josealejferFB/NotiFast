@@ -153,7 +153,8 @@ fun EditEvaluationScreen(
                             weight = uiState.weight,
                             onWeightChange = { viewModel.onEvent(EditEvaluationEvent.UpdateWeight(it)) },
                             existingImageUrl = uiState.existingImageUrl,
-                            onImageSelected = { selectedImageUri = it }
+                            onImageSelected = { selectedImageUri = it },
+                            gradeScale = gradeScale
                         )
 
                         // 6. Optional Description

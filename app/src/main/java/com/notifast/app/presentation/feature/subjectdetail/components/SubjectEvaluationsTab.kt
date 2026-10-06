@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastEmptyState
@@ -31,6 +32,7 @@ fun SubjectEvaluationsTab(
     assignedWeight: Double,
     gradedWeight: Double,
     availableWeight: Double,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     onAddEvaluationClick: () -> Unit,
     onEditGradeClick: (Evaluation) -> Unit,
     onDeleteEvaluationClick: (Evaluation) -> Unit,
@@ -60,6 +62,7 @@ fun SubjectEvaluationsTab(
             evaluations.forEach { evaluation ->
                 SubjectEvaluationItemCard(
                     evaluation = evaluation,
+                    displayScale = displayScale,
                     onEditGradeClick = onEditGradeClick,
                     onDeleteClick = onDeleteEvaluationClick
                 )
