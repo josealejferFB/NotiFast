@@ -223,7 +223,8 @@ class UserPrefsRepositoryImpl @Inject constructor(
 
     override val minPassingGradeFlow: Flow<Float>
         get() = safeDataFlow { preferences ->
-            preferences[PreferencesKeys.MIN_PASSING_GRADE] ?: 11.0f
+            // 0f = "use GradeScale default". A non-zero value is a user override.
+            preferences[PreferencesKeys.MIN_PASSING_GRADE] ?: 0f
         }
 
     override suspend fun setMinPassingGrade(grade: Float): Result<Unit> {

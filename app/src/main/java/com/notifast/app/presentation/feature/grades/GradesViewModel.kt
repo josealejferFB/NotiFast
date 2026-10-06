@@ -74,7 +74,11 @@ class GradesViewModel @Inject constructor(
             ) { evaluations, subjects, schedules, scaleId, minPassing ->
                 val evalsBySubject = evaluations.groupBy { it.subjectName }
                 val scale = GradeScale.fromId(scaleId)
-                val customMin = if (minPassing > 0f) minPassing.toDouble() else null
+                // Only honor a custom passing grade if it is valid for the active scale;
+                // the DataStore default (11.0) is a 0-20 threshold and must not apply to 0-10.
+                val customMin = minPassing.toDouble().takeIf {
+                    it > scale.minGrade && it <= scale.maxGrade
+                }
                 val globalAverage = calculateWeightedAverageUseCase(evaluations) ?: 0.0
                 val subjectGrades = evalsBySubject.map { (subject, evals) ->
                     SubjectGradeInfo(
