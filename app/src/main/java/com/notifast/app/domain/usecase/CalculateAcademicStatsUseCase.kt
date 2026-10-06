@@ -5,12 +5,17 @@ import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.model.AcademicStats
 import com.notifast.app.domain.model.GradeBandDistribution
+import com.notifast.app.domain.model.GradePolicy
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.domain.model.SubjectHealthStatus
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * Academic health/stats per subject. All grade math delegates to [GradePolicy]
+ * so this stays consistent with the dashboard average and the simulator (D1-D6).
+ */
 class CalculateAcademicStatsUseCase @Inject constructor() {
 
     operator fun invoke(
@@ -24,7 +29,7 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
             return AcademicStats()
         }
 
-        val minPassingGrade = customMinPassingGrade ?: gradeScale.minPassingGrade
+        val minPassingGrade = GradePolicy.resolveMinPassing(gradeScale, customMinPassingGrade)
         val maxGrade = gradeScale.maxGrade
         val minGrade = gradeScale.minGrade
 
@@ -40,11 +45,11 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
 
         val totalWeeklyHours = subjectHealthList.sumOf { it.weeklyHours }
         val approvedSubjects = subjectHealthList.filter { it.status == SubjectHealthStatus.APPROVED }
-        val atRiskSubjects = subjectHealthList.filter { 
-            it.status == SubjectHealthStatus.AT_RISK || it.status == SubjectHealthStatus.CRITICAL_FAIL 
+        val atRiskSubjects = subjectHealthList.filter {
+            it.status == SubjectHealthStatus.AT_RISK || it.status == SubjectHealthStatus.CRITICAL_FAIL
         }
-        val onTrackOrApproved = subjectHealthList.filter { 
-            it.status == SubjectHealthStatus.ON_TRACK || it.status == SubjectHealthStatus.APPROVED 
+        val onTrackOrApproved = subjectHealthList.filter {
+            it.status == SubjectHealthStatus.ON_TRACK || it.status == SubjectHealthStatus.APPROVED
         }
 
         val projectedPassingRate = if (subjectHealthList.isNotEmpty()) {
@@ -91,36 +96,10 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
             calculateHours(schedule.startTime, schedule.endTime)
         }
 
-        val hasExplicitWeights = subjectEvals.any { (it.weight ?: 0.0) > 0.0 }
-        val totalExplicitWeight = subjectEvals.mapNotNull { it.weight }.sum()
-
-        var evaluatedWeight = 0.0
-        var accumulatedPoints = 0.0
-
-        if (subjectEvals.isNotEmpty()) {
-            subjectEvals.forEach { eval ->
-                val weight = if (hasExplicitWeights) {
-                    if (totalExplicitWeight > 100.0) {
-                        ((eval.weight ?: 0.0) / totalExplicitWeight) * 100.0
-                    } else {
-                        eval.weight ?: 0.0
-                    }
-                } else {
-                    100.0 / subjectEvals.size.toDouble()
-                }
-
-                if (eval.grade != null || eval.isPresented) {
-                    val gradeVal = eval.grade ?: 0.0
-                    evaluatedWeight += weight
-                    accumulatedPoints += gradeVal * (weight / 100.0)
-                }
-            }
-        }
-
-        val remainingWeight = (100.0 - evaluatedWeight).coerceAtLeast(0.0)
-        val currentAverage = if (evaluatedWeight > 0.0) {
-            accumulatedPoints / (evaluatedWeight / 100.0)
-        } else 0.0
+        val evaluatedWeight = GradePolicy.evaluatedWeight(subjectEvals)
+        val remainingWeight = GradePolicy.remainingWeight(subjectEvals)
+        val accumulatedPoints = GradePolicy.accumulatedPoints(subjectEvals)
+        val currentAverage = GradePolicy.weightedAverage(subjectEvals) ?: 0.0
 
         val pointsNeeded = (minPassingGrade - accumulatedPoints).coerceAtLeast(0.0)
         val minGradeNeeded = if (accumulatedPoints >= minPassingGrade) {
@@ -132,18 +111,10 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         }
 
         val status = when {
-            accumulatedPoints >= minPassingGrade || (remainingWeight <= 0.001 && currentAverage >= minPassingGrade) -> {
-                SubjectHealthStatus.APPROVED
-            }
-            minGradeNeeded > maxGrade -> {
-                SubjectHealthStatus.CRITICAL_FAIL
-            }
-            evaluatedWeight > 0.0 && currentAverage < minPassingGrade -> {
-                SubjectHealthStatus.AT_RISK
-            }
-            else -> {
-                SubjectHealthStatus.ON_TRACK
-            }
+            accumulatedPoints >= minPassingGrade -> SubjectHealthStatus.APPROVED
+            minGradeNeeded > maxGrade -> SubjectHealthStatus.CRITICAL_FAIL
+            evaluatedWeight > 0.0 && currentAverage < minPassingGrade -> SubjectHealthStatus.AT_RISK
+            else -> SubjectHealthStatus.ON_TRACK
         }
 
         return SubjectAcademicHealth(
@@ -170,6 +141,7 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         if (parts.size != 2) return null
         val h = parts[0].toIntOrNull() ?: return null
         val m = parts[1].toIntOrNull() ?: return null
+        if (h !in 0..23 || m !in 0..59) return null
         return h * 60 + m
     }
 
@@ -179,7 +151,7 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         maxGrade: Double,
         minGrade: Double
     ): GradeBandDistribution {
-        val graded = evaluations.mapNotNull { it.grade }
+        val graded = evaluations.filter { GradePolicy.countsForAverage(it) }.mapNotNull { it.grade }
         if (graded.isEmpty()) return GradeBandDistribution()
 
         var excellent = 0

@@ -1,7 +1,9 @@
 package com.notifast.app.domain.usecase
 
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Schedule
 import com.notifast.app.domain.model.GradeScale
+import com.notifast.app.domain.model.GradePolicy
 import javax.inject.Inject
 
 enum class SimulatorStatus {
@@ -20,6 +22,10 @@ data class RequiredGradeResult(
     val status: SimulatorStatus
 )
 
+/**
+ * Required-grade simulator. Accumulated points and remaining weight come from
+ * [GradePolicy] (D1/D2/D6): remaining is the real pending weight, not 100-evaluated.
+ */
 class CalculateRequiredGradeUseCase @Inject constructor() {
 
     operator fun invoke(
@@ -27,11 +33,8 @@ class CalculateRequiredGradeUseCase @Inject constructor() {
         targetGrade: Double,
         scale: GradeScale = GradeScale.SCALE_0_10
     ): RequiredGradeResult {
-        val presentedEvals = evaluations.filter { it.isPresented && it.grade != null }
-        val pendingEvals = evaluations.filter { !it.isPresented }
-
-        val currentAccumulated = presentedEvals.sumOf { (it.grade ?: 0.0) * ((it.weight ?: 0.0) / 100.0) }
-        val remainingWeight = pendingEvals.sumOf { it.weight ?: 0.0 }
+        val currentAccumulated = GradePolicy.accumulatedPoints(evaluations)
+        val remainingWeight = GradePolicy.remainingWeight(evaluations)
 
         if (currentAccumulated >= targetGrade) {
             return RequiredGradeResult(
