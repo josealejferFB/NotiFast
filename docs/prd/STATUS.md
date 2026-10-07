@@ -18,11 +18,48 @@ Sprint Design 3.0: Tactile Studio [███████████████
 Fase 3: Features Avanzadas        [████████████████] 100% (18/18 tareas) ✅
 Fase 3.5: Offline-First Local     [████████████████] 100% (9/9 tareas) ✅
 Fase 3.6: Sanitización Lógica     [████████████████] 100% (10/10 tareas) ✅
+Editor Premium (OneNote-like)     [████████████░░░░]  75% (9/12 tareas) 🔄
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  79.5% (94/107 tareas)
+PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  82% (103/119 tareas)
 ```
+
+---
+
+## 📝 Editor Premium de Apuntes (OneNote-like) — En Progreso
+
+**Objetivo:** Transformar el editor de markdown tipo IDE a una experiencia de cuaderno premium: bloques reordenable, texto rico sin sintaxis visible, multi-foto inline, anotación/dibujo sobre fotos, checklists y fórmulas.
+
+### Fase 1: Motor de bloques + editor rico (100% ✅)
+- `NoteBlock` sealed class (Heading, Paragraph, BulletList, Checklist, Quote, Image, MathBlock, Divider) + `NoteBlockCodec` JSON.
+- `MarkdownToBlocksParser` para migración de contenido legacy.
+- Room migration 2→3 (`blocksJson`, `schemaVersion`).
+- `NoteEditorViewModel` unificado con operaciones de bloques, auto-save, checklist toggles.
+- UI: `NoteEditorScreen` + `BlockListEditor` + `BlockRenderers` + `BlockInsertMenu`.
+- Navegación unificada (`note_editor`), `SubjectDetail.onNoteClick` cableado.
+- Visor `NoteDetailExpandable` renderiza bloques con fallback markdown.
+
+### Fase 2: Multi-foto + cámara (100% ✅)
+- `ImageBlockPickerSheet` con galería (`GetContent`) + cámara (`TakePicture` + FileProvider).
+- Bloques Image inline en el flujo del documento.
+
+### Fase 3: Anotación/dibujo sobre fotos (75% 🔄)
+- `PhotoAnnotation` (Stroke, AnnotationText, Arrow) + `PhotoAnnotationCodec`.
+- `DrawingCanvasState` (undo/redo/eraser) + `DrawingCanvas` (pointerInput + Path).
+- `PhotoAnnotatorScreen` con toolbar flotante (lápiz, resaltador, colores, grosores).
+- Pendiente: flatten de anotación + persistencia en bloque Image.
+
+### Fase 4: Checklists + fórmulas + export PDF (0%)
+- Checklists interactivos (VM ya soporta, falta pulir UI).
+- MathRenderer nativo + SymbolKeyboard.
+- Export PDF.
+- Búsqueda global indexa bloques.
+
+### Tests añadidos
+- `NoteBlockCodecTest` (12), `MarkdownToBlocksParserTest` (16), `NoteBlocksRepositoryTest` (4),
+  `NoteEditorViewModelTest` (13), `NoteEditorImageTest` (3), `PhotoAnnotationCodecTest` (8),
+  `DrawingCanvasStateTest` (10). Suite completa: 260+ tests en verde.
 
 ---
 

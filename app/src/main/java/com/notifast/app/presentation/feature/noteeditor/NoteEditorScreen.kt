@@ -178,7 +178,11 @@ fun NoteEditorScreen(
         com.notifast.app.presentation.feature.noteeditor.annotator.PhotoAnnotatorScreen(
             imagePath = annotatingImagePath!!,
             onSave = { annotation ->
-                // Fase 3.4: persist annotation into block
+                val blockId = annotatingImageId
+                if (blockId != null) {
+                    val json = com.notifast.app.domain.util.PhotoAnnotationCodec.toJson(annotation)
+                    viewModel.onEvent(NoteEditorEvent.ImageAnnotationSaved(blockId, json))
+                }
                 annotatingImageId = null
                 annotatingImagePath = null
             },

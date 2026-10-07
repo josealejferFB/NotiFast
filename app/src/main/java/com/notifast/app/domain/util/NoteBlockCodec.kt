@@ -107,6 +107,7 @@ object NoteBlockCodec {
                     obj.addProperty("path", src.path)
                     obj.addProperty("caption", src.caption)
                     obj.addProperty("widthRatio", src.widthRatio)
+                    src.annotationJson?.let { obj.addProperty("annotationJson", it) }
                 }
                 is NoteBlock.MathBlock -> {
                     obj.addProperty("type", TYPE_MATH)
@@ -156,7 +157,8 @@ object NoteBlockCodec {
                     id = id,
                     path = obj.get("path")?.asString ?: "",
                     caption = obj.get("caption")?.asString ?: "",
-                    widthRatio = obj.get("widthRatio")?.asFloat ?: 1f
+                    widthRatio = obj.get("widthRatio")?.asFloat ?: 1f,
+                    annotationJson = obj.get("annotationJson")?.asString
                 )
                 TYPE_MATH -> NoteBlock.MathBlock(
                     id = id,

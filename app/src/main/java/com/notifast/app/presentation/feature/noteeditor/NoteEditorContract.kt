@@ -40,6 +40,7 @@ sealed interface NoteEditorEvent {
 
     data class ImageBlockAdded(val afterBlockId: String?, val path: String) : NoteEditorEvent
     data class ImageBlockRemoved(val blockId: String) : NoteEditorEvent
+    data class ImageAnnotationSaved(val blockId: String, val annotationJson: String) : NoteEditorEvent
 
     data class MathSourceChanged(val blockId: String, val source: String) : NoteEditorEvent
 

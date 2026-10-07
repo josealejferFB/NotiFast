@@ -130,6 +130,9 @@ class NoteEditorViewModel @Inject constructor(
 
             is NoteEditorEvent.ImageBlockAdded -> insertImageBlock(event.afterBlockId, event.path)
             is NoteEditorEvent.ImageBlockRemoved -> deleteBlock(event.blockId)
+            is NoteEditorEvent.ImageAnnotationSaved -> updateBlock(event.blockId) { block ->
+                if (block is NoteBlock.Image) block.copy(annotationJson = event.annotationJson) else block
+            }
 
             is NoteEditorEvent.MathSourceChanged -> updateBlock(event.blockId) { block ->
                 if (block is NoteBlock.MathBlock) block.copy(source = event.source) else block

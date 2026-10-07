@@ -36,7 +36,8 @@ sealed class NoteBlock {
         override val id: String,
         val path: String,
         val caption: String = "",
-        val widthRatio: Float = 1f
+        val widthRatio: Float = 1f,
+        val annotationJson: String? = null
     ) : NoteBlock()
 
     data class MathBlock(
