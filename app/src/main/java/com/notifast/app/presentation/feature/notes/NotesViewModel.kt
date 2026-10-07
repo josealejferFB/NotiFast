@@ -6,10 +6,13 @@ import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.domain.model.GradePolicy
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +35,7 @@ class NotesViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val evaluationRepository: EvaluationRepository,
     private val scheduleRepository: ScheduleRepository,
+    private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
     val importSubjectPackageUseCase: ImportSubjectPackageUseCase
 ) : ViewModel() {
@@ -74,28 +78,41 @@ class NotesViewModel @Inject constructor(
             }
             _uiState.update { it.copy(userId = userId, isLoading = true, error = null) }
 
-            val filterParamsFlow = combine(_searchQuery, _selectedTag) { query, tag ->
-                query to tag
-            }
+            val gradePrefs = combine(
+                userPrefsRepository.defaultGradeScaleFlow,
+                userPrefsRepository.minPassingGradeFlow
+            ) { scaleId, minPassing -> ScalePrefs(scaleId, minPassing) }
 
-            combine(
+            val dataFlow = combine(
                 noteRepository.getNotes(userId),
                 noteRepository.getSubjects(userId),
                 evaluationRepository.getEvaluations(userId),
                 scheduleRepository.getSchedules(userId),
-                filterParamsFlow
-            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, schedules: List<Schedule>, params: Pair<String, String?> ->
+                gradePrefs
+            ) { notes: List<Note>, subjects: List<SubjectData>, evaluations: List<Evaluation>, schedules: List<Schedule>, prefs: ScalePrefs ->
+                DomainData(notes, subjects, evaluations, schedules, prefs.scaleId, prefs.minPassing)
+            }
+
+            combine(
+                dataFlow,
+                combine(_searchQuery, _selectedTag) { query, tag -> query to tag }
+            ) { domain, params ->
                 val (query, tag) = params
+                val scale = GradeScale.fromId(domain.scaleId)
+                val customMinPassing = domain.minPassing.toDouble().takeIf {
+                    it > scale.minGrade && it <= scale.maxGrade
+                }
+                val minPassingGrade = GradePolicy.resolveMinPassing(scale, customMinPassing)
+                val notes = domain.notes
+                val subjects = domain.subjects
+                val evaluations = domain.evaluations
                 val availableTags = notes.flatMap { it.tags }.distinct().sorted()
                 val filtered = filterNotes(notes, query, tag)
-                val subjectInfos = computeSubjectInfos(notes, subjects, evaluations)
+                val subjectInfos = computeSubjectInfos(notes, subjects, evaluations, scale)
                 val subjectNames = subjects.map { it.name }
-                val nextActivity = computeNextActivity(schedules, evaluations, subjects)
-                val globalAverage = calculateWeightedAverageUseCase(
-                    evaluations,
-                    com.notifast.app.domain.model.GradeScale.SCALE_0_10
-                )?.let {
-                    kotlin.math.round(it * 10) / 10.0
+                val nextActivity = computeNextActivity(domain.schedules, evaluations, subjects)
+                val globalAverage = calculateWeightedAverageUseCase(evaluations, scale)?.let {
+                    scale.roundGrade(it)
                 }
 
                 _uiState.update { prev ->
@@ -106,6 +123,8 @@ class NotesViewModel @Inject constructor(
                         subjectInfos = subjectInfos,
                         nextActivity = nextActivity,
                         globalAverage = globalAverage,
+                        gradeScale = scale,
+                        minPassingGrade = minPassingGrade,
                         totalNotesCount = notes.size,
                         totalSubjectsCount = subjects.size,
                         searchQuery = query,
@@ -181,15 +200,13 @@ class NotesViewModel @Inject constructor(
     private fun computeSubjectInfos(
         notes: List<Note>,
         subjects: List<SubjectData>,
-        evaluations: List<Evaluation>
+        evaluations: List<Evaluation>,
+        scale: GradeScale
     ): List<SubjectInfo> {
         return subjects.map { subject ->
             val subjectNotes = notes.filter { it.subject == subject.name }
             val subjectEvals = evaluations.filter { it.subjectName == subject.name }
-            val avg = calculateWeightedAverageUseCase(
-                subjectEvals,
-                com.notifast.app.domain.model.GradeScale.SCALE_0_10
-            )
+            val avg = calculateWeightedAverageUseCase(subjectEvals, scale)
             val upcoming = subjectEvals
                 .filter { !it.isPresented && it.date != null }
                 .sortedBy { it.date }
@@ -201,7 +218,7 @@ class NotesViewModel @Inject constructor(
                 colorHex = subject.colorHex,
                 notes = subjectNotes,
                 evaluations = subjectEvals,
-                averageGrade = avg?.let { kotlin.math.round(it * 10) / 10.0 },
+                averageGrade = avg?.let { scale.roundGrade(it) },
                 completedEvalCount = subjectEvals.count { it.isPresented },
                 pendingEvalCount = subjectEvals.count { !it.isPresented },
                 upcomingEvaluations = upcoming
@@ -256,4 +273,15 @@ class NotesViewModel @Inject constructor(
             )
         }
     }
+
+    private data class DomainData(
+        val notes: List<Note>,
+        val subjects: List<SubjectData>,
+        val evaluations: List<Evaluation>,
+        val schedules: List<Schedule>,
+        val scaleId: String,
+        val minPassing: Float
+    )
+
+    private data class ScalePrefs(val scaleId: String, val minPassing: Float)
 }

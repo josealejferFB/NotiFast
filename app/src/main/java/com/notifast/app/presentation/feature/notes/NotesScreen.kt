@@ -141,7 +141,9 @@ fun NotesScreen(
                             onAddNoteClick = handleOpenAddNote,
                             onAddEvaluationClick = onAddEvaluationClick,
                             onDeleteSubject = { subjectToDelete = it },
-                            onAddSubjectClick = { showAddSubjectSheet = true }
+                            onAddSubjectClick = { showAddSubjectSheet = true },
+                            displayScale = uiState.gradeScale,
+                            minPassingGrade = uiState.minPassingGrade
                         )
                     }
                 }

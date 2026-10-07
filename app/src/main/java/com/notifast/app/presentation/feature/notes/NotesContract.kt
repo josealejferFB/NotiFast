@@ -3,6 +3,7 @@ package com.notifast.app.presentation.feature.notes
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.domain.model.GradeScale
 
 sealed interface NextActivity {
     data class ClassActivity(
@@ -40,6 +41,8 @@ data class NotesUiState(
     val subjectInfos: List<SubjectInfo> = emptyList(),
     val nextActivity: NextActivity = NextActivity.FreeDay,
     val globalAverage: Double? = null,
+    val gradeScale: GradeScale = GradeScale.SCALE_0_10,
+    val minPassingGrade: Double = GradeScale.SCALE_0_10.minPassingGrade,
     val totalNotesCount: Int = 0,
     val totalSubjectsCount: Int = 0,
     val searchQuery: String = "",

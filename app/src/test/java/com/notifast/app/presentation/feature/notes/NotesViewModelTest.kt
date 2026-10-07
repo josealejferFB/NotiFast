@@ -5,10 +5,12 @@ import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.data.model.User
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import com.notifast.app.util.MainDispatcherRule
 import io.mockk.coEvery
@@ -35,6 +37,7 @@ class NotesViewModelTest {
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
     private val scheduleRepository: ScheduleRepository = mockk(relaxed = true)
+    private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
     private val importSubjectPackageUseCase: com.notifast.app.domain.usecase.ImportSubjectPackageUseCase = mockk(relaxed = true)
 
@@ -52,6 +55,7 @@ class NotesViewModelTest {
         authRepository,
         evaluationRepository,
         scheduleRepository,
+        userPrefsRepository,
         calculateWeightedAverageUseCase,
         importSubjectPackageUseCase
     )
@@ -64,6 +68,9 @@ class NotesViewModelTest {
         coEvery { noteRepository.getNotes("user_123") } returns flowOf(sampleNotes)
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(emptyList())
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(emptyList())
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+        // 0.0 is invalid for any active scale → falls back to scale.minPassingGrade
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
     }
 
     @Test
@@ -143,7 +150,32 @@ class NotesViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertEquals(4.5, state.globalAverage)
+        assertEquals(4.5, state.globalAverage!!, 0.001)
+        assertEquals(GradeScale.SCALE_0_10, state.gradeScale)
+        assertEquals(6.0, state.minPassingGrade, 0.001)
+    }
+
+    @Test
+    fun `globalAverage uses user grade scale 0-20`() = runTest {
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-20")
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
+        val eval = Evaluation(
+            id = "e1",
+            subjectName = "Matemáticas",
+            grade = 14.0,
+            weight = 100.0,
+            isPresented = true,
+            gradeScaleId = "0-20"
+        )
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(listOf(eval))
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(14.0, state.globalAverage!!, 0.001)
+        assertEquals(GradeScale.SCALE_0_20, state.gradeScale)
+        assertEquals(11.0, state.minPassingGrade, 0.001)
     }
 
     @Test

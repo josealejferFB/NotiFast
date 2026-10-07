@@ -48,7 +48,9 @@ fun NotesTabContent(
                 totalNotes = uiState.totalNotesCount,
                 totalSubjects = uiState.totalSubjectsCount,
                 globalAverage = uiState.globalAverage,
-                onAddNoteClick = onAddNoteClick
+                onAddNoteClick = onAddNoteClick,
+                displayScale = uiState.gradeScale,
+                minPassingGrade = uiState.minPassingGrade
             )
         }
 
