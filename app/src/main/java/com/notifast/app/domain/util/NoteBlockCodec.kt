@@ -1,0 +1,189 @@
+package com.notifast.app.domain.util
+
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
+import com.google.gson.reflect.TypeToken
+import com.notifast.app.data.model.CheckItem
+import com.notifast.app.data.model.ListItem
+import com.notifast.app.data.model.NoteBlock
+import com.notifast.app.data.model.TextSpan
+import com.notifast.app.data.model.TextStyle
+import java.lang.reflect.Type
+
+object NoteBlockCodec {
+
+    private const val TYPE_HEADING = "heading"
+    private const val TYPE_PARAGRAPH = "paragraph"
+    private const val TYPE_BULLET_LIST = "bullet_list"
+    private const val TYPE_CHECKLIST = "checklist"
+    private const val TYPE_QUOTE = "quote"
+    private const val TYPE_IMAGE = "image"
+    private const val TYPE_MATH = "math"
+    private const val TYPE_DIVIDER = "divider"
+
+    private val gson: Gson = GsonBuilder()
+        .registerTypeAdapter(NoteBlock::class.java, NoteBlockAdapter())
+        .registerTypeAdapter(TextStyle::class.java, TextStyleAdapter())
+        .create()
+
+    private val listType = object : TypeToken<List<NoteBlock>>() {}.type
+
+    fun toJson(blocks: List<NoteBlock>): String = gson.toJson(blocks, listType)
+
+    fun fromJson(json: String): List<NoteBlock> {
+        if (json.isBlank()) return emptyList()
+        return gson.fromJson(json, listType) ?: emptyList()
+    }
+
+    fun extractPlainText(blocks: List<NoteBlock>): String {
+        return blocks.joinToString(separator = "\n") { block ->
+            when (block) {
+                is NoteBlock.Heading -> block.text
+                is NoteBlock.Paragraph -> block.text
+                is NoteBlock.Quote -> block.text
+                is NoteBlock.BulletList -> block.items.joinToString("\n") { it.text }
+                is NoteBlock.Checklist -> block.items.joinToString("\n") { it.text }
+                is NoteBlock.Image -> block.caption
+                is NoteBlock.MathBlock -> block.source
+                is NoteBlock.Divider -> ""
+            }
+        }.trim()
+    }
+
+    private class TextStyleAdapter : JsonSerializer<TextStyle>, JsonDeserializer<TextStyle> {
+        override fun serialize(src: TextStyle?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+            return JsonPrimitive(src?.name ?: "")
+        }
+
+        override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): TextStyle {
+            val name = json?.asString ?: return TextStyle.BOLD
+            return TextStyle.entries.firstOrNull { it.name == name } ?: TextStyle.BOLD
+        }
+    }
+
+    private class NoteBlockAdapter : JsonSerializer<NoteBlock>, JsonDeserializer<NoteBlock> {
+        override fun serialize(src: NoteBlock?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+            val obj = JsonObject()
+            when (src) {
+                is NoteBlock.Heading -> {
+                    obj.addProperty("type", TYPE_HEADING)
+                    obj.addProperty("id", src.id)
+                    obj.addProperty("text", src.text)
+                    obj.addProperty("level", src.level)
+                    obj.add("spans", context!!.serialize(src.spans))
+                }
+                is NoteBlock.Paragraph -> {
+                    obj.addProperty("type", TYPE_PARAGRAPH)
+                    obj.addProperty("id", src.id)
+                    obj.addProperty("text", src.text)
+                    obj.add("spans", context!!.serialize(src.spans))
+                }
+                is NoteBlock.BulletList -> {
+                    obj.addProperty("type", TYPE_BULLET_LIST)
+                    obj.addProperty("id", src.id)
+                    obj.add("items", context!!.serialize(src.items))
+                }
+                is NoteBlock.Checklist -> {
+                    obj.addProperty("type", TYPE_CHECKLIST)
+                    obj.addProperty("id", src.id)
+                    obj.add("items", context!!.serialize(src.items))
+                }
+                is NoteBlock.Quote -> {
+                    obj.addProperty("type", TYPE_QUOTE)
+                    obj.addProperty("id", src.id)
+                    obj.addProperty("text", src.text)
+                    obj.add("spans", context!!.serialize(src.spans))
+                }
+                is NoteBlock.Image -> {
+                    obj.addProperty("type", TYPE_IMAGE)
+                    obj.addProperty("id", src.id)
+                    obj.addProperty("path", src.path)
+                    obj.addProperty("caption", src.caption)
+                    obj.addProperty("widthRatio", src.widthRatio)
+                }
+                is NoteBlock.MathBlock -> {
+                    obj.addProperty("type", TYPE_MATH)
+                    obj.addProperty("id", src.id)
+                    obj.addProperty("source", src.source)
+                    obj.addProperty("display", src.display)
+                }
+                is NoteBlock.Divider -> {
+                    obj.addProperty("type", TYPE_DIVIDER)
+                    obj.addProperty("id", src.id)
+                }
+                null -> {}
+            }
+            return obj
+        }
+
+        override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): NoteBlock {
+            val obj = json?.asJsonObject ?: throw IllegalArgumentException("Bloque nulo")
+            val type = obj.get("type")?.asString ?: TYPE_PARAGRAPH
+            val id = obj.get("id")?.asString ?: ""
+            return when (type) {
+                TYPE_HEADING -> NoteBlock.Heading(
+                    id = id,
+                    text = obj.get("text")?.asString ?: "",
+                    level = obj.get("level")?.asInt ?: 1,
+                    spans = parseSpans(obj, context)
+                )
+                TYPE_PARAGRAPH -> NoteBlock.Paragraph(
+                    id = id,
+                    text = obj.get("text")?.asString ?: "",
+                    spans = parseSpans(obj, context)
+                )
+                TYPE_BULLET_LIST -> NoteBlock.BulletList(
+                    id = id,
+                    items = parseListItems(obj, context)
+                )
+                TYPE_CHECKLIST -> NoteBlock.Checklist(
+                    id = id,
+                    items = parseCheckItems(obj, context)
+                )
+                TYPE_QUOTE -> NoteBlock.Quote(
+                    id = id,
+                    text = obj.get("text")?.asString ?: "",
+                    spans = parseSpans(obj, context)
+                )
+                TYPE_IMAGE -> NoteBlock.Image(
+                    id = id,
+                    path = obj.get("path")?.asString ?: "",
+                    caption = obj.get("caption")?.asString ?: "",
+                    widthRatio = obj.get("widthRatio")?.asFloat ?: 1f
+                )
+                TYPE_MATH -> NoteBlock.MathBlock(
+                    id = id,
+                    source = obj.get("source")?.asString ?: "",
+                    display = obj.get("display")?.asBoolean ?: true
+                )
+                TYPE_DIVIDER -> NoteBlock.Divider(id = id)
+                else -> NoteBlock.Paragraph(id = id, text = obj.get("text")?.asString ?: "")
+            }
+        }
+
+        private fun parseSpans(obj: JsonObject, context: JsonDeserializationContext?): List<TextSpan> {
+            val spansElem = obj.get("spans") ?: return emptyList()
+            val spanListType = object : TypeToken<List<TextSpan>>() {}.type
+            return context!!.deserialize(spansElem, spanListType)
+        }
+
+        private fun parseListItems(obj: JsonObject, context: JsonDeserializationContext?): List<ListItem> {
+            val itemsElem = obj.get("items") ?: return emptyList()
+            val itemListType = object : TypeToken<List<ListItem>>() {}.type
+            return context!!.deserialize(itemsElem, itemListType)
+        }
+
+        private fun parseCheckItems(obj: JsonObject, context: JsonDeserializationContext?): List<CheckItem> {
+            val itemsElem = obj.get("items") ?: return emptyList()
+            val checkListType = object : TypeToken<List<CheckItem>>() {}.type
+            return context!!.deserialize(itemsElem, checkListType)
+        }
+    }
+}
