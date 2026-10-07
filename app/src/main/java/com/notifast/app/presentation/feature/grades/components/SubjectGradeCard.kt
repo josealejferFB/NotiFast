@@ -202,6 +202,7 @@ fun EvaluationDetailRow(
     if (showDialog) {
         GradeRevampDialog(
             evaluation = evaluation,
+            displayScale = displayScale,
             onDismiss = { showDialog = false },
             onSave = onUpdateGrade
         )

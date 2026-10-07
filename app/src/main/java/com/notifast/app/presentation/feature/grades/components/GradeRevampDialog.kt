@@ -37,14 +37,16 @@ import com.notifast.app.domain.model.GradeScale
 
 /**
  * Dialog to record or edit an evaluation grade in NotiFast 3.0.
+ * Validates against the parent's active [displayScale], not the evaluation's stored scale.
  */
 @Composable
 fun GradeRevampDialog(
     evaluation: Evaluation,
+    displayScale: GradeScale = GradeScale.fromId(evaluation.gradeScaleId),
     onDismiss: () -> Unit,
     onSave: (String, Double?, Boolean) -> Unit
 ) {
-    val scale = GradeScale.fromId(evaluation.gradeScaleId)
+    val scale = displayScale
     val invalidGradeMsg = stringResource(R.string.grades_dialog_grade_invalid)
     val gradeRangeMsg = stringResource(
         R.string.grades_dialog_grade_range,

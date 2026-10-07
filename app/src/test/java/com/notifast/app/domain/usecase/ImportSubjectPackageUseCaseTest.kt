@@ -84,4 +84,34 @@ class ImportSubjectPackageUseCaseTest {
         val result = importSubjectPackageUseCase("u1", "INVALID_DATA")
         assertTrue(result.isFailure)
     }
+
+    @Test
+    fun `rejects grade outside its own scale`() = runTest {
+        every { noteRepository.getSubjects("u1") } returns flowOf(emptyList())
+        val invalidPkg = samplePkg.copy(
+            evaluations = listOf(
+                Evaluation(
+                    id = "e1",
+                    subjectName = "Química Orgánica",
+                    title = "Lab 1",
+                    type = EvaluationType.PROJECT.name,
+                    weight = 20.0,
+                    grade = 50.0,
+                    gradeScaleId = "0-10"
+                )
+            )
+        )
+        val payload = SubjectPackageCodec.encodeToCompressedString(invalidPkg)
+
+        val result = importSubjectPackageUseCase("u1", payload, ConflictStrategy.RENAME)
+
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        assertTrue(
+            result.exceptionOrNull()?.message.orEmpty()
+                .contains("Nota inválida en evaluación 'Lab 1'")
+        )
+        coVerify(exactly = 0) { evaluationRepository.addEvaluation(any(), any(), any()) }
+        coVerify(exactly = 0) { noteRepository.addSubject(any(), any(), any(), any()) }
+    }
 }

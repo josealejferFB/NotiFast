@@ -31,8 +31,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.model.GradePolicy
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastButton
+
+private data class GradePreset(val label: String, val value: Double)
 
 @Composable
 fun SubjectGradeQuickDialog(
@@ -43,12 +46,27 @@ fun SubjectGradeQuickDialog(
 ) {
     var gradeText by remember { mutableStateOf(evaluation.grade?.toString() ?: "") }
     var isPresented by remember { mutableStateOf(evaluation.isPresented || evaluation.grade != null) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val invalidGradeMsg = stringResource(R.string.grades_dialog_grade_invalid)
+    val gradeRangeMsg = stringResource(
+        R.string.grades_dialog_grade_range,
+        scale.minGrade.toString(),
+        scale.maxGrade.toString()
+    )
 
     val presetChips = remember(scale) {
         when (scale) {
-            GradeScale.SCALE_0_20 -> listOf(20.0, 18.0, 16.0, 14.0, 11.0, 8.0)
-            GradeScale.SCALE_0_100 -> listOf(100.0, 90.0, 80.0, 70.0, 60.0, 50.0)
-            else -> listOf(10.0, 9.0, 8.0, 7.0, 6.0, 5.0)
+            GradeScale.SCALE_0_20 -> listOf(20.0, 18.0, 16.0, 14.0, 11.0, 8.0).map { it.toPreset() }
+            GradeScale.SCALE_0_100 -> listOf(100.0, 90.0, 80.0, 70.0, 60.0, 50.0).map { it.toPreset() }
+            GradeScale.SCALE_LETTER -> listOf(
+                GradePreset("A", 4.0),
+                GradePreset("B", 3.0),
+                GradePreset("C", 2.0),
+                GradePreset("D", 1.0),
+                GradePreset("F", 0.0)
+            )
+            else -> listOf(10.0, 9.0, 8.0, 7.0, 6.0, 5.0).map { it.toPreset() }
         }
     }
 
@@ -77,12 +95,18 @@ fun SubjectGradeQuickDialog(
                 ) {
                     presetChips.forEach { preset ->
                         FilterChip(
-                            selected = gradeText == preset.toString() || (preset % 1.0 == 0.0 && gradeText == preset.toInt().toString()),
+                            selected = gradeText == preset.value.toString() ||
+                                (preset.value % 1.0 == 0.0 && gradeText == preset.value.toInt().toString()),
                             onClick = {
-                                gradeText = if (preset % 1.0 == 0.0) preset.toInt().toString() else preset.toString()
+                                gradeText = if (preset.value % 1.0 == 0.0) {
+                                    preset.value.toInt().toString()
+                                } else {
+                                    preset.value.toString()
+                                }
                                 isPresented = true
+                                error = null
                             },
-                            label = { Text(if (preset % 1.0 == 0.0) preset.toInt().toString() else preset.toString()) },
+                            label = { Text(preset.label) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                                 selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -98,9 +122,12 @@ fun SubjectGradeQuickDialog(
                     value = gradeText,
                     onValueChange = {
                         gradeText = it
+                        error = null
                         if (it.isNotBlank()) isPresented = true
                     },
                     label = { Text(stringResource(R.string.subject_detail_quick_grade_score_label)) },
+                    isError = error != null,
+                    supportingText = error?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     shape = RoundedCornerShape(12.dp),
@@ -137,8 +164,16 @@ fun SubjectGradeQuickDialog(
             NotiFastButton(
                 text = stringResource(R.string.btn_save),
                 onClick = {
-                    val parsed = gradeText.toDoubleOrNull()
-                    onSave(parsed, isPresented)
+                    if (gradeText.isBlank()) {
+                        onSave(null, isPresented)
+                    } else {
+                        val parsed = gradeText.toDoubleOrNull()
+                        when {
+                            parsed == null -> error = invalidGradeMsg
+                            !GradePolicy.validateGrade(parsed, scale) -> error = gradeRangeMsg
+                            else -> onSave(parsed, isPresented)
+                        }
+                    }
                 }
             )
         },
@@ -149,3 +184,9 @@ fun SubjectGradeQuickDialog(
         }
     )
 }
+
+private fun Double.toPreset(): GradePreset =
+    GradePreset(
+        label = if (this % 1.0 == 0.0) toInt().toString() else toString(),
+        value = this
+    )

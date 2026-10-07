@@ -3,6 +3,8 @@ package com.notifast.app.domain.usecase
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.package_data.SubjectPackageCodec
+import com.notifast.app.domain.model.GradePolicy
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.package_data.ConflictStrategy
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
@@ -34,8 +36,11 @@ class ImportSubjectPackageUseCase @Inject constructor(
                 if (e.weight != null && (e.weight < 0.0 || e.weight > 100.0)) {
                     return Result.failure(IllegalArgumentException("Peso inválido en evaluación '${e.title}': ${e.weight}"))
                 }
-                if (e.grade != null && e.grade < 0.0) {
-                    return Result.failure(IllegalArgumentException("Nota inválida en evaluación '${e.title}'"))
+                if (e.grade != null) {
+                    val src = GradeScale.fromId(e.gradeScaleId)
+                    if (!GradePolicy.validateGrade(e.grade, src)) {
+                        return Result.failure(IllegalArgumentException("Nota inválida en evaluación '${e.title}'"))
+                    }
                 }
             }
             pkg.schedules.forEach { s ->

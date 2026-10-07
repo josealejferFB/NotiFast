@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.UserPrefsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ class EditEvaluationViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
     private val authRepository: AuthRepository,
+    private val userPrefsRepository: UserPrefsRepository,
     private val scheduleEvaluationAlertUseCase: com.notifast.app.domain.usecase.ScheduleEvaluationAlertUseCase,
     private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase
 ) : ViewModel() {
@@ -61,6 +63,10 @@ class EditEvaluationViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = "Evaluación no encontrada") }
                 return@launch
             }
+            val activeScaleId = userPrefsRepository.defaultGradeScaleFlow.first()
+            val activeScale = com.notifast.app.domain.model.GradeScale.fromId(activeScaleId)
+            val srcScale = com.notifast.app.domain.model.GradeScale.fromId(eval.gradeScaleId)
+            val displayGrade = eval.grade?.let { com.notifast.app.domain.model.GradePolicy.convertGrade(it, srcScale, activeScale) }
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -70,10 +76,10 @@ class EditEvaluationViewModel @Inject constructor(
                     title = eval.title,
                     description = eval.description,
                     quickTips = eval.quickTips,
-                    grade = eval.grade?.toString() ?: "",
+                    grade = displayGrade?.toString() ?: "",
                     weight = eval.weight?.toString() ?: "",
                     isPresented = eval.isPresented,
-                    gradeScaleId = eval.gradeScaleId,
+                    gradeScaleId = activeScaleId,
                     existingImageUrl = eval.imageUrl,
                     date = eval.date
                 )
