@@ -48,7 +48,13 @@ fun BlockRenderer(
         is NoteBlock.BulletList -> BulletListBlock(block, modifier)
         is NoteBlock.Checklist -> ChecklistBlock(block, onCheckToggle, onCheckTextChange, modifier)
         is NoteBlock.Image -> ImageBlock(block, onImageClick, modifier)
-        is NoteBlock.MathBlock -> MathBlockView(block, modifier)
+        is NoteBlock.MathBlock -> MathBlockView(
+            block = block,
+            isFocused = isFocused,
+            onSourceChange = onTextChange,
+            onFocus = onFocus,
+            modifier = modifier
+        )
         is NoteBlock.Divider -> DividerBlock(modifier)
     }
 }
@@ -175,18 +181,42 @@ private fun ImageBlock(block: NoteBlock.Image, onImageClick: () -> Unit, modifie
 }
 
 @Composable
-private fun MathBlockView(block: NoteBlock.MathBlock, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(Icons.Default.Functions, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        com.notifast.app.presentation.feature.noteeditor.math.MathRenderer(source = block.source)
+private fun MathBlockView(
+    block: NoteBlock.MathBlock,
+    isFocused: Boolean,
+    onSourceChange: (String) -> Unit,
+    onFocus: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(Icons.Default.Functions, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            if (isFocused) {
+                BlockTextField(
+                    value = block.source,
+                    onValueChange = onSourceChange,
+                    onFocus = onFocus,
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    isFocused = true,
+                    placeholder = "frac{a}{b}"
+                )
+            } else {
+                com.notifast.app.presentation.feature.noteeditor.math.MathRenderer(source = block.source)
+            }
+        }
+        if (isFocused) {
+            com.notifast.app.presentation.feature.noteeditor.math.SymbolKeyboard(
+                onInsert = { insert -> onSourceChange(block.source + insert) }
+            )
+        }
     }
 }
 

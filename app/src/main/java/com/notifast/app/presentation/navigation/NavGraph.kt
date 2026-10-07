@@ -32,11 +32,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import com.notifast.app.presentation.feature.addnote.AddNoteScreen
 import com.notifast.app.presentation.feature.addsubject.AddSubjectScreen
 import com.notifast.app.presentation.feature.noteeditor.NoteEditorScreen
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
-import com.notifast.app.presentation.feature.editnote.EditNoteScreen
 import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
 import com.notifast.app.presentation.feature.editprofile.EditProfileScreen
 import com.notifast.app.presentation.feature.grades.GradesScreen
@@ -147,28 +145,6 @@ fun MainContent() {
                     onBackClick = { navController.popBackStack() },
                     onNoteSaved = { navController.popBackStack() },
                     onNavigateToAddSubject = { navController.navigate(Screen.AddSubject.route) }
-                )
-            }
-            composable(
-                route = Screen.AddNote.route,
-                arguments = listOf(navArgument("subject") { type = NavType.StringType; defaultValue = "" })
-            ) { backStackEntry ->
-                val subject = Uri.decode(backStackEntry.arguments?.getString("subject") ?: "")
-                AddNoteScreen(
-                    subject = subject,
-                    onBackClick = { navController.popBackStack() },
-                    onNoteAdded = { navController.popBackStack() }
-                )
-            }
-            composable(
-                route = Screen.EditNote.route,
-                arguments = listOf(navArgument("noteId") { type = NavType.StringType }),
-                enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeIn() },
-                exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeOut() }
-            ) {
-                EditNoteScreen(
-                    onBackClick = { navController.popBackStack() },
-                    onNoteSaved = { navController.popBackStack() }
                 )
             }
             composable(Screen.AddSubject.route) {

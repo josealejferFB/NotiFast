@@ -151,18 +151,8 @@ fun NotesScreen(
         }
 
         if (showAddNoteSheet) {
-            com.notifast.app.presentation.feature.addnote.AddNoteBottomSheet(
-                onDismissRequest = { showAddNoteSheet = false },
-                onNoteAdded = {
-                    showAddNoteSheet = false
-                    viewModel.onEvent(NotesEvent.LoadNotes)
-                },
-                initialSubject = addNoteSubject ?: "",
-                onNavigateToAddSubject = {
-                    showAddNoteSheet = false
-                    showAddSubjectSheet = true
-                }
-            )
+            showAddNoteSheet = false
+            onAddNoteClick(addNoteSubject ?: "")
         }
 
         if (showAddSubjectSheet) {

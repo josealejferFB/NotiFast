@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
@@ -51,12 +52,12 @@ fun AnnotatorToolbar(
     modifier: Modifier = Modifier
 ) {
     val colors = listOf(
-        -0x1000000, // black
-        -0x10000,   // red
-        -0xff0001,  // blue
-        -0xff0100,  // green
-        -0x100,     // yellow
-        -0xffff01   // magenta
+        MaterialTheme.colorScheme.onSurface.toArgb(),
+        MaterialTheme.colorScheme.error.toArgb(),
+        MaterialTheme.colorScheme.primary.toArgb(),
+        MaterialTheme.colorScheme.tertiary.toArgb(),
+        MaterialTheme.colorScheme.secondary.toArgb(),
+        MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
     )
 
     Surface(

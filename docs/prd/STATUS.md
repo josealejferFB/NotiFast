@@ -61,6 +61,31 @@ PROGRESO TOTAL ESTIMADO:          [█████████████░░
   `NoteEditorViewModelTest` (13), `NoteEditorImageTest` (3), `PhotoAnnotationCodecTest` (8),
   `DrawingCanvasStateTest` (10). Suite completa: 260+ tests en verde.
 
+### Auditoría sistemática (Systematic Debugging) — 2026-10-06
+**7 CRITICAL + 9 HIGH + 8 MEDIUM + 4 LOW encontrados y parchados:**
+
+**CRITICAL (pérdida datos / crash) — TODOS parchados:**
+1. Cancel≡Save en PhotoAnnotator → estado `isCancelled` separado
+2. VM del anotador compartido sin reset → `init()` resetea estado
+3. Navegación durante composición → `LaunchedEffect`
+4. Race auto-save vs SaveClicked (bug #9 reintroducido) → `persistJob` compartido
+5. `NoteBlockCodec.fromJson` crash con JSON corrupto → `try/catch` + fallback
+6. Editar nota legacy borraba `imageUrl` del disco → preservar campos existentes
+7. URIs `content://` de galería no persistidas → `ImageRepository.uploadNoteImage`
+
+**HIGH (feature rota / UX) — TODOS parchados:**
+8. ImageBlock no clicable → flujo de anotación inalcanzable → `Modifier.clickable`
+9. Sin UI para borrar bloques → botón Close por bloque
+10. Checklist items no editables → `BlockTextField` + placeholder
+11. Fórmulas no se renderizaban en editor → `MathRenderer` integrado
+12. Anotaciones nunca se pintaban → `AnnotatedImage` con overlay de strokes
+13. Preselección de materia rota → `savedStateHandle["subject"]`
+14. `hasUnsavedChanges` ignoraba fotos/fórmulas → include Image/MathBlock
+15. `changeBlockType` destruía items → joinToString
+16. Trazos de 1 punto invisibles → filtro `size >= 2`
+
+**Higiene:** strings a `strings.xml`, highlighter alpha fix, log en codec, UUID para bloques sin id, `clear()` limpia undo stack.
+
 ---
 
 ## 🧼 Fase 3.6: Sanitización de Lógica de Negocio (100% — Oct 2026)

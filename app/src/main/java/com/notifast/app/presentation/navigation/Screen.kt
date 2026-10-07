@@ -25,13 +25,6 @@ sealed class Screen(
             return if (params.isEmpty()) "note_editor" else "note_editor?${params.joinToString("&")}"
         }
     }
-    data object AddNote : Screen("add_note?subject={subject}") {
-        fun createRoute(subject: String? = null) =
-            if (subject != null) "add_note?subject=${Uri.encode(subject)}" else "add_note"
-    }
-    data object EditNote : Screen("edit_note/{noteId}") {
-        fun createRoute(noteId: String) = "edit_note/${Uri.encode(noteId)}"
-    }
     data object AddSubject : Screen("add_subject")
 
     data object Schedules : Screen("agenda", "Agenda", Icons.Default.Schedule)

@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -53,17 +54,25 @@ fun NoteDetailExpandable(
 ) {
     val context = LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
-    val exportChooserTitle = stringResource(R.string.notes_export_markdown)
     val exportLabel = stringResource(R.string.notes_export_markdown)
 
-    val exportMarkdown = {
-        val fullText = ExportNoteMarkdownUseCase()(note)
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, note.title)
-            putExtra(Intent.EXTRA_TEXT, fullText)
+    val exportPdf = {
+        scope.launch {
+            val useCase = com.notifast.app.domain.usecase.ExportNotePdfUseCase(context)
+            useCase(note).onSuccess { file ->
+                val uri = androidx.core.content.FileProvider.getUriForFile(
+                    context, "${context.packageName}.fileprovider", file
+                )
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "application/pdf"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_SUBJECT, note.title)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(Intent.createChooser(shareIntent, exportLabel))
+            }
         }
-        context.startActivity(Intent.createChooser(shareIntent, exportChooserTitle))
+        Unit
     }
 
     Card(
@@ -104,7 +113,7 @@ fun NoteDetailExpandable(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.surfaceContainer,
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        onClick = exportMarkdown
+                        onClick = exportPdf
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

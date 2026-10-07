@@ -8,7 +8,7 @@ data class PhotoAnnotatorUiState(
     val imagePath: String = "",
     val canvasState: DrawingCanvasState = DrawingCanvasState(),
     val currentTool: DrawTool = DrawTool.PEN,
-    val currentColor: Int = -0x1000000,
+    val currentColor: Int = android.graphics.Color.BLACK,
     val currentWidth: Float = 5f,
     val isSaved: Boolean = false,
     val isCancelled: Boolean = false,
