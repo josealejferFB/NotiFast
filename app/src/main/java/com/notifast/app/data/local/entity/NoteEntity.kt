@@ -23,7 +23,9 @@ data class NoteEntity(
     val imageUrl: String? = null,
     val tags: List<String> = emptyList(),
     val timestamp: Date? = null,
-    val updatedAt: Date? = null
+    val updatedAt: Date? = null,
+    val blocksJson: String = "[]",
+    val schemaVersion: Int = 1
 ) {
     constructor(
         id: String,

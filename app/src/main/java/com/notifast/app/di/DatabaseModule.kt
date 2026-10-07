@@ -27,7 +27,7 @@ object DatabaseModule {
             context,
             NotiFastDatabase::class.java,
             "notifast.db"
-        ).addMigrations(NotiFastMigrations.MIGRATION_1_2).build()
+        ).addMigrations(NotiFastMigrations.MIGRATION_1_2, NotiFastMigrations.MIGRATION_2_3).build()
     }
 
     @Provides

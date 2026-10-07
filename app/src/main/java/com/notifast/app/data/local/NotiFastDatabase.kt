@@ -23,7 +23,7 @@ import com.notifast.app.data.local.entity.UserEntity
         EvaluationEntity::class,
         ScheduleEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(RoomConverters::class)

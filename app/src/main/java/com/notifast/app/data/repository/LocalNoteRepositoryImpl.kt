@@ -11,9 +11,12 @@ import com.notifast.app.data.local.dao.SubjectDao
 import com.notifast.app.data.local.entity.NoteEntity
 import com.notifast.app.data.local.entity.SubjectEntity
 import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.util.MarkdownToBlocksParser
+import com.notifast.app.domain.util.NoteBlockCodec
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -90,6 +93,41 @@ class LocalNoteRepositoryImpl @Inject constructor(
             Result.success(noteId)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add note '$title' for user $userId", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun addNoteWithBlocks(
+        userId: String,
+        subject: String,
+        title: String,
+        blocks: List<NoteBlock>,
+        tags: List<String>
+    ): Result<String> {
+        return try {
+            val subjectEntity = subjectDao.getSubjectByName(userId, subject)
+                ?: return Result.failure(Exception("La materia no existe"))
+            val noteId = UUID.randomUUID().toString()
+            val now = Date()
+            noteDao.insertNote(
+                NoteEntity(
+                    id = noteId,
+                    userId = userId,
+                    subjectId = subjectEntity.id,
+                    subject = subject,
+                    title = title,
+                    content = NoteBlockCodec.extractPlainText(blocks),
+                    imageUrl = null,
+                    tags = tags,
+                    timestamp = now,
+                    updatedAt = now,
+                    blocksJson = NoteBlockCodec.toJson(blocks),
+                    schemaVersion = 2
+                )
+            )
+            Result.success(noteId)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to add note with blocks '$title' for user $userId", e)
             Result.failure(e)
         }
     }
@@ -197,6 +235,7 @@ class LocalNoteRepositoryImpl @Inject constructor(
                 subjectDao.getSubjectByName(userId, note.subject)?.id ?: ""
             }
 
+            val hasBlocks = note.blocks.isNotEmpty()
             noteDao.updateNote(
                 NoteEntity(
                     id = note.id,
@@ -204,11 +243,13 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     subjectId = subjectId,
                     subject = note.subject,
                     title = note.title,
-                    content = note.content,
+                    content = if (hasBlocks) NoteBlockCodec.extractPlainText(note.blocks) else note.content,
                     imageUrl = imageUrl,
                     tags = note.tags,
                     timestamp = note.timestamp ?: existing?.timestamp ?: Date(),
-                    updatedAt = Date()
+                    updatedAt = Date(),
+                    blocksJson = if (hasBlocks) NoteBlockCodec.toJson(note.blocks) else (existing?.blocksJson ?: "[]"),
+                    schemaVersion = if (hasBlocks) 2 else (existing?.schemaVersion ?: 1)
                 )
             )
             Result.success(Unit)
@@ -286,16 +327,24 @@ class LocalNoteRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun NoteEntity.toDomain(): Note = Note(
-        id = id,
-        userId = userId,
-        subjectId = subjectId,
-        subject = subject,
-        title = title,
-        content = content,
-        imageUrl = imageUrl,
-        tags = tags,
-        timestamp = timestamp,
-        updatedAt = updatedAt
-    )
+    private fun NoteEntity.toDomain(): Note {
+        val blocks = if (schemaVersion >= 2) {
+            NoteBlockCodec.fromJson(blocksJson)
+        } else {
+            MarkdownToBlocksParser.parse(content, imageUrl)
+        }
+        return Note(
+            id = id,
+            userId = userId,
+            subjectId = subjectId,
+            subject = subject,
+            title = title,
+            content = content,
+            imageUrl = imageUrl,
+            tags = tags,
+            timestamp = timestamp,
+            updatedAt = updatedAt,
+            blocks = blocks
+        )
+    }
 }

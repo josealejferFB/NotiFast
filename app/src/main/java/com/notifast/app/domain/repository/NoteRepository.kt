@@ -2,6 +2,7 @@ package com.notifast.app.domain.repository
 
 import android.net.Uri
 import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.SubjectData
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +15,13 @@ interface NoteRepository {
         title: String,
         content: String,
         imageUri: Uri?,
+        tags: List<String> = emptyList()
+    ): Result<String>
+    suspend fun addNoteWithBlocks(
+        userId: String,
+        subject: String,
+        title: String,
+        blocks: List<NoteBlock>,
         tags: List<String> = emptyList()
     ): Result<String>
     suspend fun addSubject(

@@ -127,4 +127,17 @@ object NotiFastMigrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_schedules_dayOfWeek` ON `schedules` (`dayOfWeek`)")
         }
     }
+
+    /**
+     * v2 → v3: block-based note content (blocksJson + schemaVersion).
+     *
+     * Legacy rows keep schemaVersion=1 so reads convert markdown on the fly.
+     * New writes store schemaVersion=2 with serialized NoteBlock JSON.
+     */
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `notes` ADD COLUMN `blocksJson` TEXT NOT NULL DEFAULT '[]'")
+            db.execSQL("ALTER TABLE `notes` ADD COLUMN `schemaVersion` INTEGER NOT NULL DEFAULT 1")
+        }
+    }
 }

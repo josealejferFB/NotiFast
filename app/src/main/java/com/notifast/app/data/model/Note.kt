@@ -12,5 +12,6 @@ data class Note(
     val imageUrl: String? = null,
     val tags: List<String> = emptyList(),
     val timestamp: Date? = null,
-    val updatedAt: Date? = null
+    val updatedAt: Date? = null,
+    val blocks: List<NoteBlock> = emptyList()
 )
