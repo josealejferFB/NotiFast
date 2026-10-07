@@ -155,6 +155,7 @@
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_delete">Eliminar</string>
     <string name="btn_close">Cerrar</string>
+    <string name="btn_back">Atrás</string>
     <string name="btn_edit">Editar</string>
 
     <!-- Phase 2.1: Subjects, Schedules, Notes & Evaluations Ergonomics -->
