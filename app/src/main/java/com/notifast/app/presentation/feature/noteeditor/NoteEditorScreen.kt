@@ -63,6 +63,8 @@ fun NoteEditorScreen(
 
     var showDiscardDialog by remember { mutableStateOf(false) }
     var showImagePicker by remember { mutableStateOf(false) }
+    var annotatingImageId by remember { mutableStateOf<String?>(null) }
+    var annotatingImagePath by remember { mutableStateOf<String?>(null) }
     val handleBack = { if (hasUnsavedChanges) showDiscardDialog = true else onBackClick() }
     BackHandler(enabled = hasUnsavedChanges) { showDiscardDialog = true }
 
@@ -135,7 +137,13 @@ fun NoteEditorScreen(
                     onCheckTextChange = { id, index, text ->
                         viewModel.onEvent(NoteEditorEvent.CheckItemTextChanged(id, index, text))
                     },
-                    onImageClick = { /* Fase 3: anotación */ },
+                    onImageClick = { blockId ->
+                        val block = uiState.blocks.find { it.id == blockId }
+                        if (block is com.notifast.app.data.model.NoteBlock.Image) {
+                            annotatingImageId = blockId
+                            annotatingImagePath = block.path
+                        }
+                    },
                     onBlockDeleted = { viewModel.onEvent(NoteEditorEvent.BlockDeleted(it)) }
                 )
 
@@ -163,6 +171,21 @@ fun NoteEditorScreen(
                 )
             },
             onDismiss = { showImagePicker = false }
+        )
+    }
+
+    if (annotatingImagePath != null) {
+        com.notifast.app.presentation.feature.noteeditor.annotator.PhotoAnnotatorScreen(
+            imagePath = annotatingImagePath!!,
+            onSave = { annotation ->
+                // Fase 3.4: persist annotation into block
+                annotatingImageId = null
+                annotatingImagePath = null
+            },
+            onCancel = {
+                annotatingImageId = null
+                annotatingImagePath = null
+            }
         )
     }
 }

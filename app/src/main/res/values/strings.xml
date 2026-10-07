@@ -158,6 +158,12 @@
     <string name="btn_back">Atrás</string>
     <string name="note_camera_capture">Tomar foto</string>
     <string name="note_gallery_pick">Elegir de galería</string>
+    <string name="note_annotate_title">Anotar foto</string>
+    <string name="note_annotate_pen">Lápiz</string>
+    <string name="note_annotate_highlighter">Resaltador</string>
+    <string name="note_annotate_undo">Deshacer</string>
+    <string name="note_annotate_redo">Rehacer</string>
+    <string name="note_annotate_clear">Limpiar</string>
     <string name="btn_edit">Editar</string>
 
     <!-- Phase 2.1: Subjects, Schedules, Notes & Evaluations Ergonomics -->
