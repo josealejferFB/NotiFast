@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.0
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.0**  
-> **Última actualización:** 5 de Octubre, 2026  
+> **Última actualización:** 6 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/NotiFast/PRODUCT.md)
 
 ---
@@ -74,9 +74,30 @@ Los promedios pueden **cambiar de valor** respecto a versiones anteriores: antes
 - T9: `ExportNoteMarkdownUseCase`, strings de grade dialog / search / eval fields localizados.
 
 ### Pendiente conocido (no bloqueante)
-- El promedio global de Grades mezcla escalas (una nota 15/20 con notas /10). Unificar exige normalizar a escala o promediar solo por materia.
 - Strings de fallback en ViewModels (solo visibles si `e.message` viene nulo desde repo).
 - Smoke de import P2P / logout→continuar no automatizado.
+
+---
+
+## Sistema de Calificaciones Multi-escala (100% — Oct 2026)
+
+### Decisiones nuevas
+- **D5 (rev):** Cambiar la escala en Ajustes **reescribe** notas (`grade`, `gradeScaleId`) y nota mínima custom vía `ConvertGradeScaleUseCase` + batch Room `@Transaction`, previa confirmación.
+- **D11/D11b:** Captura siempre en escala activa (stamp `gradeScaleId`); sin selector de escala en evaluaciones; hint «Puedes cambiarla en Ajustes».
+- **D12:** Escalas 0-10, 0-20, 0-100, A-F.
+- **D13:** Redondeo destino (0-100 entero, resto 1 decimal; A-F GPA 1 decimal).
+- **D14:** Display unificado en `GradeFormatters`.
+- **D15:** Conversión por-evaluación desde su propio `gradeScaleId` (notas mixtas).
+- **D16:** `minPassingGrade == 0f` = default de la escala.
+- **D17:** Cambio de escala atómico (`ChangeGradeScale`); Settings es el único entry point.
+
+### Bugs cerrados (B1–B18)
+Integridad gradeScaleId (entity/ctor/stamp), formatos hardcodeados (/20, %.1f, >=3.0), NotesViewModel escala fija, minPassing custom no propagado, globalAverage = promedio de promedios, import P2P sin validar rango, A-F incompleto, dialog 0f, etc.
+
+### Verificación
+- Suite unitaria verde + `assembleDebug` OK.
+- Spec: `docs/superpowers/specs/2026-10-06-grade-scale-multi-base-design.md`
+- Plan: `docs/superpowers/plans/2026-10-06-grade-scale-multi-base.md`
 
 ---
 
