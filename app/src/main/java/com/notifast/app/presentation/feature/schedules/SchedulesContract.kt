@@ -2,6 +2,7 @@ package com.notifast.app.presentation.feature.schedules
 
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.domain.model.GradeScale
 import java.util.Calendar
 
 enum class ScheduleViewMode {
@@ -82,6 +83,7 @@ data class SchedulesUiState(
     val conflicts: List<Schedule> = emptyList(),
     val weeklySummary: WeeklyScheduleSummary = WeeklyScheduleSummary(),
     val firstDayOfWeek: String = "SUNDAY",
+    val gradeScale: GradeScale = GradeScale.SCALE_0_10,
     val error: String? = null,
     val userFirstName: String = "",
     val userEmail: String = "",

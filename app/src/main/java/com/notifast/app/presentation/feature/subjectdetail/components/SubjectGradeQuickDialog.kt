@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -34,8 +30,8 @@ import com.notifast.app.data.model.Evaluation
 import com.notifast.app.domain.model.GradePolicy
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastButton
-
-private data class GradePreset(val label: String, val value: Double)
+import com.notifast.app.presentation.atoms.NotiFastGradePresetChips
+import com.notifast.app.presentation.atoms.presetText
 
 @Composable
 fun SubjectGradeQuickDialog(
@@ -44,7 +40,18 @@ fun SubjectGradeQuickDialog(
     onSave: (grade: Double?, isPresented: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var gradeText by remember { mutableStateOf(evaluation.grade?.toString() ?: "") }
+    var gradeText by remember {
+        mutableStateOf(
+            evaluation.grade?.let { raw ->
+                val converted = GradePolicy.convertGrade(
+                    raw,
+                    GradeScale.fromId(evaluation.gradeScaleId),
+                    scale
+                )
+                presetText(scale.roundGrade(converted))
+            } ?: ""
+        )
+    }
     var isPresented by remember { mutableStateOf(evaluation.isPresented || evaluation.grade != null) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -54,21 +61,6 @@ fun SubjectGradeQuickDialog(
         scale.minGrade.toString(),
         scale.maxGrade.toString()
     )
-
-    val presetChips = remember(scale) {
-        when (scale) {
-            GradeScale.SCALE_0_20 -> listOf(20.0, 18.0, 16.0, 14.0, 11.0, 8.0).map { it.toPreset() }
-            GradeScale.SCALE_0_100 -> listOf(100.0, 90.0, 80.0, 70.0, 60.0, 50.0).map { it.toPreset() }
-            GradeScale.SCALE_LETTER -> listOf(
-                GradePreset("A", 4.0),
-                GradePreset("B", 3.0),
-                GradePreset("C", 2.0),
-                GradePreset("D", 1.0),
-                GradePreset("F", 0.0)
-            )
-            else -> listOf(10.0, 9.0, 8.0, 7.0, 6.0, 5.0).map { it.toPreset() }
-        }
-    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -88,33 +80,15 @@ fun SubjectGradeQuickDialog(
                 )
                 Spacer(Modifier.height(14.dp))
 
-                // Preset grade chips
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    presetChips.forEach { preset ->
-                        FilterChip(
-                            selected = gradeText == preset.value.toString() ||
-                                (preset.value % 1.0 == 0.0 && gradeText == preset.value.toInt().toString()),
-                            onClick = {
-                                gradeText = if (preset.value % 1.0 == 0.0) {
-                                    preset.value.toInt().toString()
-                                } else {
-                                    preset.value.toString()
-                                }
-                                isPresented = true
-                                error = null
-                            },
-                            label = { Text(preset.label) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            ),
-                            modifier = Modifier.weight(1f)
-                        )
+                NotiFastGradePresetChips(
+                    scale = scale,
+                    selectedText = gradeText,
+                    onPresetClick = { value ->
+                        gradeText = presetText(value)
+                        isPresented = true
+                        error = null
                     }
-                }
+                )
 
                 Spacer(Modifier.height(12.dp))
 
@@ -184,9 +158,3 @@ fun SubjectGradeQuickDialog(
         }
     )
 }
-
-private fun Double.toPreset(): GradePreset =
-    GradePreset(
-        label = if (this % 1.0 == 0.0) toInt().toString() else toString(),
-        value = this
-    )

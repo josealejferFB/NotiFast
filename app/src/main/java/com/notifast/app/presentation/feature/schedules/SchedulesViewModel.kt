@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.ScheduleRepository
@@ -92,6 +93,11 @@ class SchedulesViewModel @Inject constructor(
         viewModelScope.launch {
             userPrefsRepository?.firstDayOfWeekFlow?.collect { day ->
                 _uiState.update { it.copy(firstDayOfWeek = day) }
+            }
+        }
+        viewModelScope.launch {
+            userPrefsRepository?.defaultGradeScaleFlow?.collect { scaleId ->
+                _uiState.update { it.copy(gradeScale = GradeScale.fromId(scaleId)) }
             }
         }
     }

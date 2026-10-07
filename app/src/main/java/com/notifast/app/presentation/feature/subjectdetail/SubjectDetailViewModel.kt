@@ -136,7 +136,7 @@ class SubjectDetailViewModel @Inject constructor(
                         availableTags = allTags,
                         evaluations = subjectEvals,
                         schedules = subjectSchedules,
-                        averageGrade = avg?.let { kotlin.math.round(it * 10) / 10.0 },
+                        averageGrade = avg?.let { scale.roundGrade(it) },
                         completedEvalCount = completed,
                         pendingEvalCount = total - completed,
                         upcomingEvaluations = upcoming,

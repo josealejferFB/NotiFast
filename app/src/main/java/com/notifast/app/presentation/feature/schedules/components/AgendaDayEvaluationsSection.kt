@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.model.GradeScale
 
 /**
  * NotiFast 3.0 Daily Evaluations Banner Section for Timeline.
@@ -32,7 +33,8 @@ import com.notifast.app.data.model.Evaluation
 fun AgendaDayEvaluationsSection(
     evaluations: List<Evaluation>,
     onEvaluationClick: (Evaluation) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    displayScale: GradeScale = GradeScale.SCALE_0_10
 ) {
     if (evaluations.isEmpty()) return
 
@@ -75,6 +77,7 @@ fun AgendaDayEvaluationsSection(
             evaluations.forEach { eval ->
                 AgendaEvaluationCard(
                     evaluation = eval,
+                    displayScale = displayScale,
                     onClick = { onEvaluationClick(eval) }
                 )
             }

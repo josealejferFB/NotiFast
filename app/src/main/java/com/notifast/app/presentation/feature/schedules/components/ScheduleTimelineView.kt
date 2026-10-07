@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastEmptyState
 import com.notifast.app.presentation.feature.schedules.ScheduleTimelineItem
 
@@ -34,6 +35,7 @@ fun ScheduleTimelineView(
     onDeleteSchedule: (Schedule) -> Unit = {},
     onJoinMeeting: (String) -> Unit = {},
     modifier: Modifier = Modifier,
+    displayScale: GradeScale = GradeScale.SCALE_0_10,
     contentPadding: PaddingValues = PaddingValues(bottom = 120.dp, top = 4.dp)
 ) {
     if (items.isEmpty() && dailyEvaluations.isEmpty()) {
@@ -60,7 +62,8 @@ fun ScheduleTimelineView(
             item(key = "daily_evaluations_header") {
                 AgendaDayEvaluationsSection(
                     evaluations = dailyEvaluations,
-                    onEvaluationClick = onEvaluationClick
+                    onEvaluationClick = onEvaluationClick,
+                    displayScale = displayScale
                 )
             }
         }

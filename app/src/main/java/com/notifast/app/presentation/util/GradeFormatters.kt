@@ -30,4 +30,15 @@ object GradeFormatters {
 
     fun passing(value: Double, displayScale: GradeScale): String =
         displayScale.formatGrade(value)
+
+    /**
+     * Seed text for grade inputs: converts the stored grade from its own scale to
+     * [displayScale] (rounded) so the field matches what validation expects.
+     */
+    fun seed(grade: Double?, sourceScaleId: String, displayScale: GradeScale): String {
+        if (grade == null) return ""
+        val converted = GradePolicy.convertGrade(grade, GradeScale.fromId(sourceScaleId), displayScale)
+        val rounded = displayScale.roundGrade(converted)
+        return if (rounded % 1.0 == 0.0) rounded.toInt().toString() else rounded.toString()
+    }
 }

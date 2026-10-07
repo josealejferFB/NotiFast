@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastEmptyState
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
 import java.text.SimpleDateFormat
@@ -61,7 +62,8 @@ fun AgendaMonthCalendarView(
     onGoToToday: () -> Unit,
     onEvaluationClick: (Evaluation) -> Unit,
     modifier: Modifier = Modifier,
-    firstDayOfWeek: String = "SUNDAY"
+    firstDayOfWeek: String = "SUNDAY",
+    displayScale: GradeScale = GradeScale.SCALE_0_10
 ) {
     val monthTitle = remember(currentMonth) {
         SimpleDateFormat("MMMM yyyy", Locale.getDefault())
@@ -146,6 +148,7 @@ fun AgendaMonthCalendarView(
                 items(dailyEvaluations, key = { it.id }) { eval ->
                     AgendaEvaluationCard(
                         evaluation = eval,
+                        displayScale = displayScale,
                         onClick = { onEvaluationClick(eval) }
                     )
                 }

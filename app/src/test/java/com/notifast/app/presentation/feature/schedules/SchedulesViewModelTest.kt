@@ -283,4 +283,21 @@ class SchedulesViewModelTest {
         viewModel.onEvent(SchedulesEvent.ClearError)
         assertNull(viewModel.uiState.value.error)
     }
+
+    @Test
+    fun `when defaultGradeScaleFlow emits, exposes gradeScale on uiState`() = runTest {
+        val userPrefsRepository: com.notifast.app.domain.repository.UserPrefsRepository = mockk(relaxed = true)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-100")
+        coEvery { userPrefsRepository.firstDayOfWeekFlow } returns flowOf("MONDAY")
+
+        val viewModel = SchedulesViewModel(
+            scheduleRepository = scheduleRepository,
+            evaluationRepository = evaluationRepository,
+            authRepository = authRepository,
+            userPrefsRepository = userPrefsRepository
+        )
+        advanceUntilIdle()
+
+        assertEquals(com.notifast.app.domain.model.GradeScale.SCALE_0_100, viewModel.uiState.value.gradeScale)
+    }
 }

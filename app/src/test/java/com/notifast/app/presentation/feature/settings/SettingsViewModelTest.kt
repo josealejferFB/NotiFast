@@ -120,7 +120,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `ChangeGradeScale converts evaluations and prefs atomically`() = runTest {
+    fun `ChangeGradeScale converts evaluations and persists converted custom min passing`() = runTest {
         val evals = listOf(
             Evaluation(id = "1", grade = 15.0, isPresented = true, weight = 100.0, gradeScaleId = "0-20")
         )
@@ -140,7 +140,72 @@ class SettingsViewModelTest {
 
         coVerify { evaluationRepository.updateEvaluations("user_123", match { it.single().grade == 75.0 }) }
         coVerify { userPrefsRepository.setDefaultGradeScale("0-100") }
-        coVerify { userPrefsRepository.setMinPassingGrade(60f) }
+        // D16: custom 6.0 (0-20) converts to 30.0 (0-100) — dialog value is not written raw
+        coVerify { userPrefsRepository.setMinPassingGrade(30f) }
+        assertEquals(30f, viewModel.uiState.value.minPassingGrade, 0.01f)
+    }
+
+    @Test
+    fun `ChangeGradeScale without custom min passing persists 0f sentinel`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(emptyList())
+        coEvery { evaluationRepository.updateEvaluations(any(), any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setDefaultGradeScale(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setMinPassingGrade(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.ChangeGradeScale("0-20", 11f))
+        advanceUntilIdle()
+
+        coVerify { userPrefsRepository.setDefaultGradeScale("0-20") }
+        coVerify { userPrefsRepository.setMinPassingGrade(0f) }
+        coVerify(exactly = 0) { userPrefsRepository.setMinPassingGrade(11f) }
+        assertEquals(0f, viewModel.uiState.value.minPassingGrade, 0.01f)
+    }
+
+    @Test
+    fun `when setDefaultGradeScale fails, sets error and does not show success state`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(emptyList())
+        coEvery { evaluationRepository.updateEvaluations(any(), any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setDefaultGradeScale(any()) } returns Result.failure(RuntimeException("prefs down"))
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.ChangeGradeScale("0-20", 11f))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("prefs down", state.error)
+        assertNull(state.lastScaleLabel)
+    }
+
+    @Test
+    fun `when setMinPassingGrade fails, sets error and does not show success state`() = runTest {
+        coEvery { authRepository.getCurrentUserId() } returns "user_123"
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(emptyList())
+        coEvery { evaluationRepository.updateEvaluations(any(), any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setDefaultGradeScale(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setMinPassingGrade(any()) } returns Result.failure(RuntimeException("min pass write failed"))
+        coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.ChangeGradeScale("0-20", 11f))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("min pass write failed", state.error)
+        assertNull(state.lastScaleLabel)
     }
 
     @Test

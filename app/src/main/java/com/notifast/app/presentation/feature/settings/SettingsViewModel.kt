@@ -180,16 +180,24 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
                 return@launch
             }
+            // D16: 0f sentinel means "use scale default"; only persist a concrete
+            // value when the user actually had a custom min passing (converted).
+            val persistedMinPassing =
+                if (result.hasCustomMinPassing) result.minPassingGrade.toFloat() else 0f
             userPrefsRepository.setDefaultGradeScale(target.id).onFailure { e ->
                 Log.e(TAG, "Failed to persist default grade scale", e)
+                _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
+                return@launch
             }
-            userPrefsRepository.setMinPassingGrade(newPassing).onFailure { e ->
+            userPrefsRepository.setMinPassingGrade(persistedMinPassing).onFailure { e ->
                 Log.e(TAG, "Failed to persist min passing grade", e)
+                _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
+                return@launch
             }
             _uiState.update {
                 it.copy(
                     defaultGradeScale = target.id,
-                    minPassingGrade = newPassing,
+                    minPassingGrade = persistedMinPassing,
                     lastConvertedCount = result.convertedCount,
                     lastScaleLabel = target.label,
                     error = null

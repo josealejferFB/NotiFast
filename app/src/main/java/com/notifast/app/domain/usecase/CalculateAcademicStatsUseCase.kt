@@ -190,7 +190,7 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
                 "En ${subject.subjectName} la meta mínima ya no es alcanzable. Consulta opciones de recuperación académica."
             } else {
                 val neededStr = gradeScale.formatGrade(subject.minGradeNeededToPass)
-                val remStr = gradeScale.formatGrade(subject.remainingWeight)
+                val remStr = kotlin.math.round(subject.remainingWeight).toInt().toString()
                 "En ${subject.subjectName} necesitas promediar $neededStr en el $remStr% restante para aprobar."
             }
         }

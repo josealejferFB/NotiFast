@@ -175,7 +175,8 @@ fun SchedulesScreen(
                                 onTakeNote = onTakeNoteClick,
                                 onEditSchedule = onEditScheduleClick,
                                 onDeleteSchedule = { scheduleToDelete = it },
-                                onJoinMeeting = openMeeting
+                                onJoinMeeting = openMeeting,
+                                displayScale = uiState.gradeScale
                             )
                         }
                         ScheduleViewMode.MONTHLY_CALENDAR -> {
@@ -188,7 +189,8 @@ fun SchedulesScreen(
                                 onChangeMonth = { viewModel.onEvent(SchedulesEvent.ChangeMonth(it)) },
                                 onGoToToday = { viewModel.onEvent(SchedulesEvent.GoToToday) },
                                 onEvaluationClick = { selectedEvaluation = it },
-                                firstDayOfWeek = uiState.firstDayOfWeek
+                                firstDayOfWeek = uiState.firstDayOfWeek,
+                                displayScale = uiState.gradeScale
                             )
                         }
                         ScheduleViewMode.WEEKLY_BENTO -> {
@@ -221,6 +223,7 @@ fun SchedulesScreen(
                 selectedEvaluation?.let { eval ->
                     AgendaEvaluationBottomSheet(
                         eval = eval,
+                        displayScale = uiState.gradeScale,
                         onEdit = { scope.launch { evalSheetState.hide() }.invokeOnCompletion { selectedEvaluation = null; onEditEvaluationClick(eval) } },
                         onDelete = { evalToDelete = eval; selectedEvaluation = null }
                     )

@@ -22,7 +22,9 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastFormField
+import com.notifast.app.presentation.atoms.NotiFastGradePresetChips
 import com.notifast.app.presentation.atoms.NotiFastImagePickerField
+import com.notifast.app.presentation.atoms.presetText
 
 @Composable
 fun EditEvaluationGradeFields(
@@ -72,6 +74,11 @@ fun EditEvaluationGradeFields(
         }
 
         if (isPresented) {
+            NotiFastGradePresetChips(
+                scale = gradeScale,
+                selectedText = grade,
+                onPresetClick = { value -> onGradeChange(presetText(value)) }
+            )
             NotiFastFormField(
                 value = grade,
                 onValueChange = onGradeChange,

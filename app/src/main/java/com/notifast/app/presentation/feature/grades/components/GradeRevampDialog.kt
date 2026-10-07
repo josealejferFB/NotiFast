@@ -34,6 +34,8 @@ import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.domain.model.GradePolicy
 import com.notifast.app.domain.model.GradeScale
+import com.notifast.app.presentation.atoms.NotiFastGradePresetChips
+import com.notifast.app.presentation.atoms.presetText
 
 /**
  * Dialog to record or edit an evaluation grade in NotiFast 3.0.
@@ -54,7 +56,16 @@ fun GradeRevampDialog(
         scale.maxGrade.toString()
     )
     var grade by remember {
-        mutableStateOf(evaluation.grade?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: "")
+        mutableStateOf(
+            evaluation.grade?.let { raw ->
+                val converted = GradePolicy.convertGrade(
+                    raw,
+                    GradeScale.fromId(evaluation.gradeScaleId),
+                    scale
+                )
+                presetText(scale.roundGrade(converted))
+            } ?: ""
+        )
     }
     var isPresented by remember { mutableStateOf(evaluation.isPresented) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -76,6 +87,16 @@ fun GradeRevampDialog(
                     evaluation.title,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                NotiFastGradePresetChips(
+                    scale = scale,
+                    selectedText = grade,
+                    onPresetClick = { value ->
+                        grade = presetText(value)
+                        isPresented = true
+                        error = null
+                    }
                 )
 
                 OutlinedTextField(
