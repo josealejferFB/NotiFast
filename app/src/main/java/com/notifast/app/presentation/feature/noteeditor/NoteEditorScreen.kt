@@ -31,6 +31,7 @@ import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.feature.noteeditor.components.BlockInsertMenu
 import com.notifast.app.presentation.feature.noteeditor.components.BlockListEditor
 import com.notifast.app.presentation.feature.noteeditor.components.EditorTopBar
+import com.notifast.app.presentation.feature.noteeditor.components.ImageBlockPickerSheet
 import com.notifast.app.presentation.feature.noteeditor.components.NoteSubjectSelectorChip
 
 @Composable
@@ -61,6 +62,7 @@ fun NoteEditorScreen(
             }
 
     var showDiscardDialog by remember { mutableStateOf(false) }
+    var showImagePicker by remember { mutableStateOf(false) }
     val handleBack = { if (hasUnsavedChanges) showDiscardDialog = true else onBackClick() }
     BackHandler(enabled = hasUnsavedChanges) { showDiscardDialog = true }
 
@@ -145,12 +147,24 @@ fun NoteEditorScreen(
                             NoteEditorEvent.BlockInserted(uiState.focusedBlockId, type)
                         )
                     },
-                    onAddImage = { /* Fase 2: picker */ }
+                    onAddImage = { showImagePicker = true }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
+
+    if (showImagePicker) {
+        ImageBlockPickerSheet(
+            onImageSelected = { uri ->
+                viewModel.onEvent(
+                    NoteEditorEvent.ImageBlockAdded(uiState.focusedBlockId, uri.toString())
+                )
+            },
+            onCameraSelected = { /* Fase 2.2: cámara */ },
+            onDismiss = { showImagePicker = false }
+        )
     }
 }
 
