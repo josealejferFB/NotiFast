@@ -110,8 +110,9 @@ fun BlockReadOnlyRenderer(block: NoteBlock, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(Icons.Default.Functions, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            Text(block.source, style = MaterialTheme.typography.bodyMedium)
+            com.notifast.app.presentation.feature.noteeditor.math.MathRenderer(
+                source = block.source
+            )
         }
         is NoteBlock.Divider -> HorizontalDivider(
             modifier = modifier.fillMaxWidth(),
