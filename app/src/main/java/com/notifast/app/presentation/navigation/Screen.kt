@@ -17,6 +17,14 @@ sealed class Screen(
     data object Login : Screen("login")
 
     data object Notes : Screen("notes", "Apuntes", Icons.AutoMirrored.Filled.MenuBook)
+    data object NoteEditor : Screen("note_editor?subject={subject}&noteId={noteId}") {
+        fun createRoute(subject: String? = null, noteId: String? = null): String {
+            val params = mutableListOf<String>()
+            subject?.let { params.add("subject=${Uri.encode(it)}") }
+            noteId?.let { params.add("noteId=${Uri.encode(it)}") }
+            return if (params.isEmpty()) "note_editor" else "note_editor?${params.joinToString("&")}"
+        }
+    }
     data object AddNote : Screen("add_note?subject={subject}") {
         fun createRoute(subject: String? = null) =
             if (subject != null) "add_note?subject=${Uri.encode(subject)}" else "add_note"

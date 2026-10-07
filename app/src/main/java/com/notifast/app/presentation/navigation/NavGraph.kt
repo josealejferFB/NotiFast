@@ -34,6 +34,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import com.notifast.app.presentation.feature.addnote.AddNoteScreen
 import com.notifast.app.presentation.feature.addsubject.AddSubjectScreen
+import com.notifast.app.presentation.feature.noteeditor.NoteEditorScreen
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
 import com.notifast.app.presentation.feature.editnote.EditNoteScreen
 import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
@@ -121,14 +122,31 @@ fun MainContent() {
             }
             composable(Screen.Notes.route) {
                 NotesScreen(
-                    onAddNoteClick = { subject -> navController.navigate(Screen.AddNote.createRoute(subject)) },
+                    onAddNoteClick = { subject -> navController.navigate(Screen.NoteEditor.createRoute(subject = subject)) },
                     onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
                     onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
-                    onNoteClick = { noteId -> navController.navigate(Screen.EditNote.createRoute(noteId)) },
+                    onNoteClick = { noteId -> navController.navigate(Screen.NoteEditor.createRoute(noteId = noteId)) },
                     onAddEvaluationClick = { subject -> navController.navigate(Screen.AddEvaluation.createRoute(subject)) },
                     onSubjectDetailClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                     onSearchClick = { showGlobalSearchSheet = true }
+                )
+            }
+            composable(
+                route = Screen.NoteEditor.route,
+                arguments = listOf(
+                    navArgument("subject") { type = NavType.StringType; defaultValue = "" },
+                    navArgument("noteId") { type = NavType.StringType; defaultValue = "" }
+                ),
+                enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeIn() },
+                exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeOut() }
+            ) { backStackEntry ->
+                val subject = Uri.decode(backStackEntry.arguments?.getString("subject") ?: "")
+                val noteId = backStackEntry.arguments?.getString("noteId")?.takeIf { it.isNotBlank() }
+                NoteEditorScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onNoteSaved = { navController.popBackStack() },
+                    onNavigateToAddSubject = { navController.navigate(Screen.AddSubject.route) }
                 )
             }
             composable(
@@ -167,16 +185,17 @@ fun MainContent() {
             ) { backStackEntry ->
                 val subjectName = Uri.decode(backStackEntry.arguments?.getString("subjectName") ?: "")
                 SubjectDetailScreen(
-                    onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute(subjectName)) },
+                    onAddNoteClick = { navController.navigate(Screen.NoteEditor.createRoute(subject = subjectName)) },
                     onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute(subjectName)) },
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    onNoteClick = { note -> navController.navigate(Screen.NoteEditor.createRoute(noteId = note.id)) }
                 )
             }
             composable(Screen.Schedules.route) {
                 SchedulesScreen(
                     onAddScheduleClick = { navController.navigate(Screen.AddSchedule.route) },
                     onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute()) },
-                    onTakeNoteClick = { subject -> navController.navigate(Screen.AddNote.createRoute(subject)) },
+                    onTakeNoteClick = { subject -> navController.navigate(Screen.NoteEditor.createRoute(subject = subject)) },
                     onEditScheduleClick = { scheduleId -> navController.navigate(Screen.EditSchedule.createRoute(scheduleId)) },
                     onEditEvaluationClick = { eval -> navController.navigate(Screen.EditEvaluation.createRoute(eval.id)) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
