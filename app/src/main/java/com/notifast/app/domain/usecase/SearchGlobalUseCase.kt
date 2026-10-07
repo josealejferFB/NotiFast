@@ -65,11 +65,17 @@ class SearchGlobalUseCase @Inject constructor(
             // 2. Apuntes
             if (filter == SearchFilter.ALL || filter == SearchFilter.NOTES) {
                 notes.filter { note ->
-                    val combinedText = "${note.title} ${note.content} ${note.subject} ${note.tags.joinToString(" ")}".normalize()
+                    val blockText = if (note.blocks.isNotEmpty()) {
+                        com.notifast.app.domain.util.NoteBlockCodec.extractPlainText(note.blocks)
+                    } else note.content
+                    val combinedText = "${note.title} $blockText ${note.subject} ${note.tags.joinToString(" ")}".normalize()
                     tokens.all { token -> combinedText.contains(token) }
                 }.forEach { note ->
-                    val snippetText = if (note.content.isNotBlank()) {
-                        if (note.content.length > 80) note.content.take(80) + "..." else note.content
+                    val bodyText = if (note.blocks.isNotEmpty()) {
+                        com.notifast.app.domain.util.NoteBlockCodec.extractPlainText(note.blocks)
+                    } else note.content
+                    val snippetText = if (bodyText.isNotBlank()) {
+                        if (bodyText.length > 80) bodyText.take(80) + "..." else bodyText
                     } else null
 
                     results.add(
