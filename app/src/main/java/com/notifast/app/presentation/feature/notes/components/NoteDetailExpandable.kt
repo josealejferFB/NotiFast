@@ -165,7 +165,14 @@ fun NoteDetailExpandable(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                NotiFastMarkdown(content = note.content)
+                if (note.blocks.isNotEmpty()) {
+                    note.blocks.forEach { block ->
+                        BlockReadOnlyRenderer(block = block)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                } else {
+                    NotiFastMarkdown(content = note.content)
+                }
 
                 Spacer(modifier = Modifier.height(28.dp))
 
