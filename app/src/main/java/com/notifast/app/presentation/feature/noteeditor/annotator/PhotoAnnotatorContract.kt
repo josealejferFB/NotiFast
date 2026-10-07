@@ -11,6 +11,7 @@ data class PhotoAnnotatorUiState(
     val currentColor: Int = -0x1000000,
     val currentWidth: Float = 5f,
     val isSaved: Boolean = false,
+    val isCancelled: Boolean = false,
     val error: String? = null
 )
 

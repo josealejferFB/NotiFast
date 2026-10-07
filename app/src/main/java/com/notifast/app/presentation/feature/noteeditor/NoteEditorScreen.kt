@@ -44,9 +44,8 @@ fun NoteEditorScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    if (uiState.isSaved) {
-        onNoteSaved()
-        return
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onNoteSaved()
     }
 
     val hasUnsavedChanges = uiState.title.isNotBlank() ||
@@ -57,6 +56,8 @@ fun NoteEditorScreen(
                     is com.notifast.app.data.model.NoteBlock.Quote -> block.text.isNotBlank()
                     is com.notifast.app.data.model.NoteBlock.BulletList -> block.items.isNotEmpty()
                     is com.notifast.app.data.model.NoteBlock.Checklist -> block.items.isNotEmpty()
+                    is com.notifast.app.data.model.NoteBlock.Image -> true
+                    is com.notifast.app.data.model.NoteBlock.MathBlock -> block.source.isNotBlank()
                     else -> false
                 }
             }
@@ -167,7 +168,7 @@ fun NoteEditorScreen(
         ImageBlockPickerSheet(
             onImageSelected = { uri ->
                 viewModel.onEvent(
-                    NoteEditorEvent.ImageBlockAdded(uiState.focusedBlockId, uri.toString())
+                    NoteEditorEvent.ImageSelectedForBlock(uiState.focusedBlockId, uri)
                 )
             },
             onDismiss = { showImagePicker = false }

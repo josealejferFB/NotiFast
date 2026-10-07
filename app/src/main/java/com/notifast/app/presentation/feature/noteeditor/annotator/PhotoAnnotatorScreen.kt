@@ -27,12 +27,17 @@ fun PhotoAnnotatorScreen(
 
     LaunchedEffect(imagePath) { viewModel.init(imagePath) }
 
-    if (uiState.isSaved) {
-        val annotation = com.notifast.app.data.model.PhotoAnnotation(
-            strokes = uiState.canvasState.strokes
-        )
-        onSave(annotation)
-        return
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) {
+            val annotation = com.notifast.app.data.model.PhotoAnnotation(
+                strokes = uiState.canvasState.strokes
+            )
+            onSave(annotation)
+        }
+    }
+
+    LaunchedEffect(uiState.isCancelled) {
+        if (uiState.isCancelled) onCancel()
     }
 
     Scaffold(

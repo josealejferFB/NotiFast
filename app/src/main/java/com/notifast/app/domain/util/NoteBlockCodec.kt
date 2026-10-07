@@ -39,7 +39,11 @@ object NoteBlockCodec {
 
     fun fromJson(json: String): List<NoteBlock> {
         if (json.isBlank()) return emptyList()
-        return gson.fromJson(json, listType) ?: emptyList()
+        return try {
+            gson.fromJson(json, listType) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     fun extractPlainText(blocks: List<NoteBlock>): String {
@@ -127,7 +131,8 @@ object NoteBlockCodec {
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): NoteBlock {
             val obj = json?.asJsonObject ?: throw IllegalArgumentException("Bloque nulo")
             val type = obj.get("type")?.asString ?: TYPE_PARAGRAPH
-            val id = obj.get("id")?.asString ?: ""
+            val id = obj.get("id")?.takeIf { it.asString.isNotBlank() }?.asString
+                ?: java.util.UUID.randomUUID().toString()
             return when (type) {
                 TYPE_HEADING -> NoteBlock.Heading(
                     id = id,

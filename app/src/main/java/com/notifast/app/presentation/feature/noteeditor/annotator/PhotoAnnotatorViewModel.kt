@@ -19,7 +19,7 @@ class PhotoAnnotatorViewModel @Inject constructor() : ViewModel() {
     val uiState: StateFlow<PhotoAnnotatorUiState> = _uiState.asStateFlow()
 
     fun init(imagePath: String) {
-        _uiState.update { it.copy(imagePath = imagePath) }
+        _uiState.value = PhotoAnnotatorUiState(imagePath = imagePath)
     }
 
     fun onEvent(event: PhotoAnnotatorEvent) {
@@ -38,11 +38,7 @@ class PhotoAnnotatorViewModel @Inject constructor() : ViewModel() {
                 if (event.points.isEmpty()) return
                 val stroke = Stroke(
                     points = event.points,
-                    color = if (state.currentTool == DrawTool.HIGHLIGHTER) {
-                        state.currentColor or (0x66 shl 24)
-                    } else {
-                        state.currentColor
-                    },
+                    color = state.currentColor,
                     width = state.currentWidth,
                     tool = state.currentTool,
                     alpha = if (state.currentTool == DrawTool.HIGHLIGHTER) 0.4f else 1f
@@ -59,7 +55,7 @@ class PhotoAnnotatorViewModel @Inject constructor() : ViewModel() {
                 it.copy(canvasState = it.canvasState.clear())
             }
             is PhotoAnnotatorEvent.Save -> _uiState.update { it.copy(isSaved = true) }
-            is PhotoAnnotatorEvent.Cancel -> _uiState.update { it.copy(isSaved = true) }
+            is PhotoAnnotatorEvent.Cancel -> _uiState.update { it.copy(isCancelled = true) }
         }
     }
 }

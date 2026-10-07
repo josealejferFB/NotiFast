@@ -7,7 +7,9 @@ import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
+import android.content.Context
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -33,6 +35,8 @@ class NoteEditorViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val noteRepository: NoteRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
+    private val imageRepository: ImageRepository = mockk(relaxed = true)
+    private val context: Context = mockk(relaxed = true)
 
     @Before
     fun setUp() {
@@ -52,7 +56,7 @@ class NoteEditorViewModelTest {
         val handle = SavedStateHandle().apply {
             noteId?.let { set("noteId", it) }
         }
-        return NoteEditorViewModel(handle, noteRepository, authRepository)
+        return NoteEditorViewModel(handle, noteRepository, authRepository, imageRepository, context)
     }
 
     @Test

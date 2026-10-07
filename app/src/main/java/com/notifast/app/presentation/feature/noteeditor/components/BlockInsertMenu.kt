@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.notifast.app.R
 import com.notifast.app.presentation.feature.noteeditor.BlockType
 
 @Composable
@@ -37,13 +39,13 @@ fun BlockInsertMenu(
 ) {
     val haptics = LocalHapticFeedback.current
     val actions = listOf(
-        Triple(BlockType.PARAGRAPH, Icons.Default.FormatBold, "Texto"),
-        Triple(BlockType.HEADING, Icons.Default.Title, "Título"),
-        Triple(BlockType.BULLET_LIST, Icons.Default.FormatListBulleted, "Lista"),
-        Triple(BlockType.CHECKLIST, Icons.Default.CheckBox, "Check"),
-        Triple(BlockType.QUOTE, Icons.Default.FormatQuote, "Cita"),
-        Triple(BlockType.MATH, Icons.Default.Functions, "Fórmula"),
-        Triple(BlockType.DIVIDER, Icons.Default.HorizontalRule, "Línea")
+        Triple(BlockType.PARAGRAPH, Icons.Default.FormatBold, stringResource(R.string.editor_block_text)),
+        Triple(BlockType.HEADING, Icons.Default.Title, stringResource(R.string.editor_block_heading)),
+        Triple(BlockType.BULLET_LIST, Icons.Default.FormatListBulleted, stringResource(R.string.editor_block_list)),
+        Triple(BlockType.CHECKLIST, Icons.Default.CheckBox, stringResource(R.string.editor_block_checklist)),
+        Triple(BlockType.QUOTE, Icons.Default.FormatQuote, stringResource(R.string.editor_block_quote)),
+        Triple(BlockType.MATH, Icons.Default.Functions, stringResource(R.string.editor_block_math)),
+        Triple(BlockType.DIVIDER, Icons.Default.HorizontalRule, stringResource(R.string.editor_block_divider))
     )
 
     Surface(
@@ -66,7 +68,7 @@ fun BlockInsertMenu(
                     onInsert(type)
                 }
             }
-            InsertChip(icon = Icons.Default.Image, label = "Foto") {
+            InsertChip(icon = Icons.Default.Image, label = stringResource(R.string.editor_block_photo)) {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onAddImage()
             }

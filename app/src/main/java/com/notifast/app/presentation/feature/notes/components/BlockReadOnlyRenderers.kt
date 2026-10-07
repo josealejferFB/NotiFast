@@ -94,12 +94,11 @@ fun BlockReadOnlyRenderer(block: NoteBlock, modifier: Modifier = Modifier) {
                 }
             }
         }
-        is NoteBlock.Image -> AsyncImage(
-            model = block.path,
+        is NoteBlock.Image -> com.notifast.app.presentation.feature.noteeditor.components.AnnotatedImage(
+            path = block.path,
+            annotationJson = block.annotationJson,
             contentDescription = block.caption,
-            modifier = modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+            modifier = modifier.fillMaxWidth()
         )
         is NoteBlock.MathBlock -> Row(
             modifier = modifier

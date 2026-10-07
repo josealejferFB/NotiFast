@@ -31,7 +31,7 @@ data class DrawingCanvasState(
         )
     }
 
-    fun clear(): DrawingCanvasState = copy(strokes = emptyList())
+    fun clear(): DrawingCanvasState = copy(strokes = emptyList(), undoneStrokes = emptyList())
 
     fun eraseAt(point: Point, radius: Float): DrawingCanvasState {
         val remaining = strokes.filterNot { stroke ->

@@ -39,6 +39,7 @@ sealed interface NoteEditorEvent {
     data class CheckItemRemoved(val blockId: String, val itemIndex: Int) : NoteEditorEvent
 
     data class ImageBlockAdded(val afterBlockId: String?, val path: String) : NoteEditorEvent
+    data class ImageSelectedForBlock(val afterBlockId: String?, val uri: android.net.Uri) : NoteEditorEvent
     data class ImageBlockRemoved(val blockId: String) : NoteEditorEvent
     data class ImageAnnotationSaved(val blockId: String, val annotationJson: String) : NoteEditorEvent
 

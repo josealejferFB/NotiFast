@@ -1,16 +1,20 @@
 package com.notifast.app.presentation.feature.noteeditor
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notifast.app.R
 import com.notifast.app.data.model.CheckItem
 import com.notifast.app.data.model.ListItem
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.TextSpan
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,11 +30,14 @@ import javax.inject.Inject
 class NoteEditorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val imageRepository: ImageRepository,
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val noteId: String? = savedStateHandle["noteId"]
-    private val _uiState = MutableStateFlow(NoteEditorUiState(noteId = noteId))
+    private val initialSubject: String = savedStateHandle["subject"] ?: ""
+    private val _uiState = MutableStateFlow(NoteEditorUiState(noteId = noteId, subject = initialSubject))
     val uiState: StateFlow<NoteEditorUiState> = _uiState.asStateFlow()
 
     private var saveJob: Job? = null
@@ -65,6 +72,7 @@ class NoteEditorViewModel @Inject constructor(
                 it.copy(
                     isLoading = false,
                     subjects = subjects,
+                    subject = if (it.subject.isBlank()) initialSubject else it.subject,
                     blocks = defaultBlocks()
                 )
             }
@@ -129,6 +137,7 @@ class NoteEditorViewModel @Inject constructor(
             }
 
             is NoteEditorEvent.ImageBlockAdded -> insertImageBlock(event.afterBlockId, event.path)
+            is NoteEditorEvent.ImageSelectedForBlock -> persistAndInsertImage(event.afterBlockId, event.uri)
             is NoteEditorEvent.ImageBlockRemoved -> deleteBlock(event.blockId)
             is NoteEditorEvent.ImageAnnotationSaved -> updateBlock(event.blockId) { block ->
                 if (block is NoteBlock.Image) block.copy(annotationJson = event.annotationJson) else block
@@ -241,15 +250,31 @@ class NoteEditorViewModel @Inject constructor(
         scheduleAutoSave()
     }
 
+    private fun persistAndInsertImage(afterBlockId: String?, uri: android.net.Uri) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            imageRepository.uploadNoteImage(userId, uri).fold(
+                onSuccess = { persistedPath ->
+                    insertImageBlock(afterBlockId, persistedPath)
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(error = e.message ?: context.getString(R.string.note_error_save_failed)) }
+                }
+            )
+        }
+    }
+
     private fun changeBlockType(blockId: String, newType: BlockType) {
         updateBlock(blockId) { block ->
             val text = when (block) {
                 is NoteBlock.Heading -> block.text
                 is NoteBlock.Paragraph -> block.text
                 is NoteBlock.Quote -> block.text
-                is NoteBlock.BulletList -> block.items.firstOrNull()?.text ?: ""
-                is NoteBlock.Checklist -> block.items.firstOrNull()?.text ?: ""
-                else -> ""
+                is NoteBlock.BulletList -> block.items.joinToString("\n") { it.text }
+                is NoteBlock.Checklist -> block.items.joinToString("\n") { it.text }
+                is NoteBlock.MathBlock -> block.source
+                is NoteBlock.Image -> block.caption
+                is NoteBlock.Divider -> ""
             }
             createBlock(newType, id = blockId, text = text)
         }
@@ -278,26 +303,26 @@ class NoteEditorViewModel @Inject constructor(
 
     private fun saveNote() {
         saveJob?.cancel()
-        viewModelScope.launch { persistNote(exitAfter = true) }
+        saveJob = viewModelScope.launch { persistNote(exitAfter = true) }
     }
 
     private suspend fun persistNote(exitAfter: Boolean = false) {
         val state = _uiState.value
         val userId = authRepository.getCurrentUserId()
         if (userId == null) {
-            _uiState.update { it.copy(error = "Usuario no autenticado") }
+            _uiState.update { it.copy(error = context.getString(R.string.note_error_unauthenticated)) }
             return
         }
         if (state.subject.isBlank()) {
-            if (exitAfter) _uiState.update { it.copy(error = "Selecciona una materia") }
+            if (exitAfter) _uiState.update { it.copy(error = context.getString(R.string.note_error_select_subject)) }
             return
         }
         if (state.title.isBlank()) {
-            if (exitAfter) _uiState.update { it.copy(error = "El título es obligatorio") }
+            if (exitAfter) _uiState.update { it.copy(error = context.getString(R.string.note_error_title_required)) }
             return
         }
 
-        _uiState.update { it.copy(syncStatus = "Guardando...", error = null) }
+        _uiState.update { it.copy(syncStatus = context.getString(R.string.sync_saving), error = null) }
 
         if (state.noteId == null) {
             noteRepository.addNoteWithBlocks(
@@ -312,24 +337,29 @@ class NoteEditorViewModel @Inject constructor(
                         it.copy(
                             noteId = id,
                             isSaved = exitAfter,
-                            syncStatus = if (exitAfter) null else "Guardado"
+                            syncStatus = if (exitAfter) null else context.getString(R.string.sync_saved)
                         )
                     }
                 },
                 onFailure = { e ->
                     _uiState.update {
-                        it.copy(syncStatus = null, error = e.message ?: "Error al guardar")
+                        it.copy(syncStatus = null, error = e.message ?: context.getString(R.string.note_error_save_failed))
                     }
                 }
             )
         } else {
+            val existingNotes = noteRepository.getNotes(userId).first()
+            val existing = existingNotes.find { it.id == state.noteId }
             val note = Note(
                 id = state.noteId,
                 userId = userId,
+                subjectId = existing?.subjectId ?: "",
                 subject = state.subject,
                 title = state.title,
-                content = "",
+                content = existing?.content ?: "",
+                imageUrl = existing?.imageUrl,
                 tags = state.tags,
+                timestamp = existing?.timestamp,
                 blocks = state.blocks
             )
             noteRepository.updateNote(userId, note, imageUri = null).fold(
@@ -337,13 +367,13 @@ class NoteEditorViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isSaved = exitAfter,
-                            syncStatus = if (exitAfter) null else "Guardado"
+                            syncStatus = if (exitAfter) null else context.getString(R.string.sync_saved)
                         )
                     }
                 },
                 onFailure = { e ->
                     _uiState.update {
-                        it.copy(syncStatus = null, error = e.message ?: "Error al guardar")
+                        it.copy(syncStatus = null, error = e.message ?: context.getString(R.string.note_error_save_failed))
                     }
                 }
             )

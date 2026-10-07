@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.noteeditor.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -144,18 +145,17 @@ private fun ChecklistBlock(
         block.items.forEachIndexed { index, item ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = item.isChecked, onCheckedChange = { onCheckToggle(index) })
-                Text(
-                    text = item.text,
-                    style = MaterialTheme.typography.bodyLarge.copy(
+                BlockTextField(
+                    value = item.text,
+                    onValueChange = { onCheckTextChange(index, it) },
+                    onFocus = {},
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
                         textDecoration = if (item.isChecked) {
                             androidx.compose.ui.text.style.TextDecoration.LineThrough
                         } else null
                     ),
-                    color = if (item.isChecked) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    }
+                    isFocused = false,
+                    placeholder = "Tarea…"
                 )
             }
         }
@@ -164,13 +164,13 @@ private fun ChecklistBlock(
 
 @Composable
 private fun ImageBlock(block: NoteBlock.Image, onImageClick: () -> Unit, modifier: Modifier = Modifier) {
-    AsyncImage(
-        model = block.path,
+    AnnotatedImage(
+        path = block.path,
+        annotationJson = block.annotationJson,
         contentDescription = block.caption,
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .then(Modifier)
+            .clickable(onClick = onImageClick)
     )
 }
 
@@ -186,7 +186,7 @@ private fun MathBlockView(block: NoteBlock.MathBlock, modifier: Modifier = Modif
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Icon(Icons.Default.Functions, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Text(block.source, style = MaterialTheme.typography.bodyMedium)
+        com.notifast.app.presentation.feature.noteeditor.math.MathRenderer(source = block.source)
     }
 }
 

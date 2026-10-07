@@ -42,7 +42,7 @@ fun DrawingCanvas(
                         currentPoints = currentPoints + Point(change.position.x, change.position.y)
                     },
                     onDragEnd = {
-                        if (currentPoints.isNotEmpty()) {
+                        if (currentPoints.size >= 2) {
                             onStrokeComplete(currentPoints)
                         }
                         currentPoints = emptyList()

@@ -164,6 +164,18 @@
     <string name="note_annotate_undo">Deshacer</string>
     <string name="note_annotate_redo">Rehacer</string>
     <string name="note_annotate_clear">Limpiar</string>
+    <string name="note_error_unauthenticated">Usuario no autenticado</string>
+    <string name="note_error_select_subject">Selecciona una materia</string>
+    <string name="note_error_title_required">El título es obligatorio</string>
+    <string name="note_error_save_failed">Error al guardar</string>
+    <string name="editor_block_text">Texto</string>
+    <string name="editor_block_heading">Título</string>
+    <string name="editor_block_list">Lista</string>
+    <string name="editor_block_checklist">Check</string>
+    <string name="editor_block_quote">Cita</string>
+    <string name="editor_block_math">Fórmula</string>
+    <string name="editor_block_divider">Línea</string>
+    <string name="editor_block_photo">Foto</string>
     <string name="btn_edit">Editar</string>
 
     <!-- Phase 2.1: Subjects, Schedules, Notes & Evaluations Ergonomics -->

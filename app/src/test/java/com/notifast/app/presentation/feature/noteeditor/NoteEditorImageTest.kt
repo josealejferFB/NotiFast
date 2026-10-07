@@ -4,7 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
+import android.content.Context
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,8 @@ class NoteEditorImageTest {
     private val testDispatcher = StandardTestDispatcher()
     private val noteRepository: NoteRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
+    private val imageRepository: ImageRepository = mockk(relaxed = true)
+    private val context: Context = mockk(relaxed = true)
 
     @Before
     fun setUp() {
@@ -42,7 +46,7 @@ class NoteEditorImageTest {
     }
 
     private fun createViewModel(): NoteEditorViewModel {
-        return NoteEditorViewModel(SavedStateHandle(), noteRepository, authRepository)
+        return NoteEditorViewModel(SavedStateHandle(), noteRepository, authRepository, imageRepository, context)
     }
 
     @Test

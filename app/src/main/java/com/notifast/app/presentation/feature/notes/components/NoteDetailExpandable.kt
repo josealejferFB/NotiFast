@@ -52,6 +52,7 @@ fun NoteDetailExpandable(
     onEdit: () -> Unit
 ) {
     val context = LocalContext.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val exportChooserTitle = stringResource(R.string.notes_export_markdown)
     val exportLabel = stringResource(R.string.notes_export_markdown)
 
