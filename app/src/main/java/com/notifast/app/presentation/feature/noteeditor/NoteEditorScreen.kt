@@ -162,7 +162,6 @@ fun NoteEditorScreen(
                     NoteEditorEvent.ImageBlockAdded(uiState.focusedBlockId, uri.toString())
                 )
             },
-            onCameraSelected = { /* Fase 2.2: cámara */ },
             onDismiss = { showImagePicker = false }
         )
     }
