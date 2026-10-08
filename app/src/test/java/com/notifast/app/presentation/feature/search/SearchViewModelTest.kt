@@ -46,7 +46,7 @@ class SearchViewModelTest {
             title = "Derivadas",
             subtitle = "Cálculo I",
             subjectName = "Cálculo I",
-            targetRoute = "edit_note/n1"
+            targetRoute = "note_editor?noteId=n1"
         )
     )
 

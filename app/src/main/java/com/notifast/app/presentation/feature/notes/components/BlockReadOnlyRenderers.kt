@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.notifast.app.data.model.NoteBlock
+import com.notifast.app.presentation.feature.noteeditor.components.applyNoteSpans
 
 @Composable
 fun BlockReadOnlyRenderer(block: NoteBlock, modifier: Modifier = Modifier) {
@@ -37,13 +38,13 @@ fun BlockReadOnlyRenderer(block: NoteBlock, modifier: Modifier = Modifier) {
                 else -> MaterialTheme.typography.titleMedium
             }
             Text(
-                text = block.text,
+                text = applyNoteSpans(block.text, block.spans),
                 style = style.copy(fontWeight = FontWeight.Bold),
                 modifier = modifier.fillMaxWidth()
             )
         }
         is NoteBlock.Paragraph -> Text(
-            text = block.text,
+            text = applyNoteSpans(block.text, block.spans),
             style = MaterialTheme.typography.bodyLarge,
             modifier = modifier.fillMaxWidth()
         )
@@ -55,7 +56,7 @@ fun BlockReadOnlyRenderer(block: NoteBlock, modifier: Modifier = Modifier) {
                     .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
             )
             Text(
-                text = block.text,
+                text = applyNoteSpans(block.text, block.spans),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
@@ -66,10 +67,20 @@ fun BlockReadOnlyRenderer(block: NoteBlock, modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            block.items.forEach { item ->
+            block.items.forEachIndexed { index, item ->
                 Row(verticalAlignment = Alignment.Top) {
-                    Text("•", modifier = Modifier.padding(end = 8.dp, top = 2.dp))
-                    Text(item.text, style = MaterialTheme.typography.bodyLarge)
+                    val prefix = if (block.isOrdered) "${index + 1}." else "•"
+                    Text(
+                        text = prefix,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier
+                            .width(24.dp)
+                            .padding(top = 2.dp)
+                    )
+                    Text(
+                        text = applyNoteSpans(item.text, item.spans),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }

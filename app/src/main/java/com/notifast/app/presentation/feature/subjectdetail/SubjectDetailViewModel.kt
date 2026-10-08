@@ -113,7 +113,7 @@ class SubjectDetailViewModel @Inject constructor(
 
                 val allTags = domain.notes.flatMap { it.tags }.distinct()
                 val filteredNotes = domain.notes.filter { n ->
-                    (filter.tag == null || n.tags.contains(filter.tag)) &&
+                    (filter.tag == null || n.tags.any { it.equals(filter.tag, ignoreCase = true) }) &&
                     (filter.query.isBlank() || n.title.contains(filter.query, true) || n.content.contains(filter.query, true))
                 }
 

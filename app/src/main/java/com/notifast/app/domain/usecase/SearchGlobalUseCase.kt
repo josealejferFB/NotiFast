@@ -88,7 +88,7 @@ class SearchGlobalUseCase @Inject constructor(
                             subjectName = note.subject,
                             subjectColorHex = subjectColorMap[note.subject].orEmpty(),
                             badgeText = if (note.tags.isNotEmpty()) "#${note.tags.first()}" else "Apunte",
-                            targetRoute = "edit_note/${encode(note.id)}"
+                            targetRoute = "note_editor?noteId=${encode(note.id)}"
                         )
                     )
                 }
