@@ -201,4 +201,30 @@ class NoteEditorViewModelTest {
         vm.onEvent(NoteEditorEvent.TagToggled("examen"))
         assertFalse(vm.uiState.value.tags.contains("examen"))
     }
+
+    @Test
+    fun `CustomTagAdded trims and stores tag`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        vm.onEvent(NoteEditorEvent.CustomTagAdded("  examen  "))
+        assertTrue(vm.uiState.value.tags.contains("examen"))
+        assertFalse(vm.uiState.value.tags.contains("  examen  "))
+    }
+
+    @Test
+    fun `CustomTagAdded ignores blank tags`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        vm.onEvent(NoteEditorEvent.CustomTagAdded("   "))
+        assertTrue(vm.uiState.value.tags.isEmpty())
+    }
+
+    @Test
+    fun `CustomTagRemoved removes tag`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        vm.onEvent(NoteEditorEvent.CustomTagAdded("tarea"))
+        vm.onEvent(NoteEditorEvent.CustomTagRemoved("tarea"))
+        assertFalse(vm.uiState.value.tags.contains("tarea"))
+    }
 }

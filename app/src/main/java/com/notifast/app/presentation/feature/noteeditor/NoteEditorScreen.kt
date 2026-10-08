@@ -33,6 +33,7 @@ import com.notifast.app.presentation.feature.noteeditor.components.BlockListEdit
 import com.notifast.app.presentation.feature.noteeditor.components.EditorTopBar
 import com.notifast.app.presentation.feature.noteeditor.components.ImageBlockPickerSheet
 import com.notifast.app.presentation.feature.noteeditor.components.NoteSubjectSelectorChip
+import com.notifast.app.presentation.feature.noteeditor.components.NoteTagsEditor
 
 @Composable
 fun NoteEditorScreen(
@@ -114,6 +115,16 @@ fun NoteEditorScreen(
                     selectedSubject = uiState.subject,
                     onSubjectSelected = { viewModel.onEvent(NoteEditorEvent.SubjectChanged(it)) },
                     onCreateSubjectClick = onNavigateToAddSubject
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                NoteTagsEditor(
+                    selectedTags = uiState.tags,
+                    availableTags = emptyList(),
+                    onTagToggled = { viewModel.onEvent(NoteEditorEvent.TagToggled(it)) },
+                    onCustomTagAdded = { viewModel.onEvent(NoteEditorEvent.CustomTagAdded(it)) },
+                    onCustomTagRemoved = { viewModel.onEvent(NoteEditorEvent.CustomTagRemoved(it)) }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
