@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -34,7 +35,8 @@ fun NotiFastFormField(
     height: Dp? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
-    supportingText: @Composable (() -> Unit)? = null
+    supportingText: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
         value = value,
@@ -50,6 +52,7 @@ fun NotiFastFormField(
         singleLine = singleLine,
         minLines = minLines,
         maxLines = maxLines,
+        visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         isError = isError,
         supportingText = supportingText,
