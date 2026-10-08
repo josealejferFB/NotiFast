@@ -204,4 +204,43 @@ class SmartMarkdownFormatterTest {
         assertEquals("- Item 1\n", result.text)
         assertEquals(TextRange(9), result.selection)
     }
+
+    @Test
+    fun `toggleFormat with cursor at 0 on text starting with newline does not throw exception`() {
+        val initial = TextFieldValue("\nhello", selection = TextRange(0))
+        val styles = listOf(
+            FormatStyle.H1,
+            FormatStyle.H2,
+            FormatStyle.CHECKBOX,
+            FormatStyle.BULLET,
+            FormatStyle.QUOTE,
+            FormatStyle.DIVIDER
+        )
+        for (style in styles) {
+            val result = SmartMarkdownFormatter.toggleFormat(initial, style)
+            assertTrue("Text should not be empty after toggling $style", result.text.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun `toggleFormat switching from checkbox to bullet yields bullet list item without corrupting line`() {
+        val checkboxValue = TextFieldValue("- [ ] Item", selection = TextRange(10))
+        val result = SmartMarkdownFormatter.toggleFormat(checkboxValue, FormatStyle.BULLET)
+
+        assertEquals("- Item", result.text)
+    }
+
+    @Test
+    fun `toggleFormat with divider inserts horizontal rule and toggles off`() {
+        val empty = TextFieldValue("", selection = TextRange(0))
+        val withDivider = SmartMarkdownFormatter.toggleFormat(empty, FormatStyle.DIVIDER)
+        assertEquals("---\n", withDivider.text)
+
+        val toggledOff = SmartMarkdownFormatter.toggleFormat(withDivider, FormatStyle.DIVIDER)
+        assertEquals("", toggledOff.text)
+
+        val textValue = TextFieldValue("hello", selection = TextRange(5))
+        val withDividerAfterText = SmartMarkdownFormatter.toggleFormat(textValue, FormatStyle.DIVIDER)
+        assertEquals("hello\n---\n", withDividerAfterText.text)
+    }
 }

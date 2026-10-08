@@ -32,7 +32,6 @@ object SmartMarkdownFormatter {
     )
 
     fun toggleFormat(value: TextFieldValue, style: FormatStyle): TextFieldValue {
-        val text = value.text
         val selStart = value.selection.min
         val selEnd = value.selection.max
 
@@ -54,9 +53,8 @@ object SmartMarkdownFormatter {
         val cursor = value.selection.start
         val active = mutableSetOf<FormatStyle>()
 
-        val lineStart = text.lastIndexOf('\n', (cursor - 1).coerceAtLeast(0)).let { if (it == -1) 0 else it + 1 }
-        val lineEnd = text.indexOf('\n', cursor).let { if (it == -1) text.length else it }
-        val line = if (lineStart <= lineEnd && lineEnd <= text.length) text.substring(lineStart, lineEnd) else ""
+        val (lineStart, lineEnd) = getLineBounds(text, cursor)
+        val line = text.substring(lineStart, lineEnd)
         val trimmed = line.trimStart()
 
         when {
@@ -132,7 +130,7 @@ object SmartMarkdownFormatter {
         val newlinePos = cursor - 1
         if (newValue.text[newlinePos] != '\n') return newValue
 
-        val lineStart = newValue.text.lastIndexOf('\n', newlinePos - 1).let { if (it == -1) 0 else it + 1 }
+        val lineStart = if (newlinePos == 0) 0 else newValue.text.lastIndexOf('\n', newlinePos - 1).let { if (it == -1) 0 else it + 1 }
         val prevLine = newValue.text.substring(lineStart, newlinePos)
         val indent = prevLine.takeWhile { it == ' ' || it == '\t' }
         val trimmed = prevLine.trim()
@@ -272,14 +270,14 @@ object SmartMarkdownFormatter {
     private fun toggleLinePrefix(value: TextFieldValue, targetPrefix: String): TextFieldValue {
         val text = value.text
         val cursor = value.selection.start
-        val lineStart = text.lastIndexOf('\n', (cursor - 1).coerceAtLeast(0)).let { if (it == -1) 0 else it + 1 }
-        val lineEnd = text.indexOf('\n', cursor).let { if (it == -1) text.length else it }
+        val (lineStart, lineEnd) = getLineBounds(text, cursor)
         val line = text.substring(lineStart, lineEnd)
 
         // Check if line already has targetPrefix
         val matchesTarget = when (targetPrefix) {
             "- [ ] " -> line.startsWith("- [ ] ") || line.startsWith("- [x] ", ignoreCase = true)
             "# " -> line.startsWith("# ") && !line.startsWith("## ")
+            "- " -> line.startsWith("- ") && !line.startsWith("- [ ] ") && !line.startsWith("- [x] ", ignoreCase = true)
             else -> line.startsWith(targetPrefix)
         }
 
@@ -311,8 +309,7 @@ object SmartMarkdownFormatter {
     private fun toggleDivider(value: TextFieldValue): TextFieldValue {
         val text = value.text
         val cursor = value.selection.start
-        val lineStart = text.lastIndexOf('\n', (cursor - 1).coerceAtLeast(0)).let { if (it == -1) 0 else it + 1 }
-        val lineEnd = text.indexOf('\n', cursor).let { if (it == -1) text.length else it }
+        val (lineStart, lineEnd) = getLineBounds(text, cursor)
         val line = text.substring(lineStart, lineEnd)
 
         if (line.trim() == "---") {
@@ -324,11 +321,26 @@ object SmartMarkdownFormatter {
 
         return if (line.isEmpty()) {
             val newText = text.substring(0, lineStart) + "---\n" + text.substring(lineStart)
-            TextFieldValue(newText, selection = TextRange(lineStart + 4))
+            TextFieldValue(newText, selection = TextRange(lineStart + 3))
         } else {
             val newText = text.substring(0, cursor) + "\n---\n" + text.substring(cursor)
-            TextFieldValue(newText, selection = TextRange(cursor + 5))
+            TextFieldValue(newText, selection = TextRange(cursor + 4))
         }
+    }
+
+    private fun getLineBounds(text: String, cursor: Int): Pair<Int, Int> {
+        val safeCursor = cursor.coerceIn(0, text.length)
+        val lineStart = if (safeCursor == 0) {
+            0
+        } else {
+            val prevNewline = text.lastIndexOf('\n', safeCursor - 1)
+            if (prevNewline == -1) 0 else prevNewline + 1
+        }
+        val nextNewline = text.indexOf('\n', safeCursor)
+        val lineEnd = if (nextNewline == -1) text.length else nextNewline
+        val clampedStart = lineStart.coerceIn(0, text.length)
+        val clampedEnd = lineEnd.coerceIn(clampedStart, text.length)
+        return Pair(clampedStart, clampedEnd)
     }
 
     private fun findSingleAsterisk(text: String, fromIndex: Int): Int {
