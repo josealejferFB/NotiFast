@@ -11,6 +11,9 @@ data class NoteEditorUiState(
     val blocks: List<NoteBlock> = emptyList(),
     val tags: List<String> = emptyList(),
     val focusedBlockId: String? = null,
+    val selectionBlockId: String? = null,
+    val selectionStart: Int = 0,
+    val selectionEnd: Int = 0,
     val isEditMode: Boolean = true,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
@@ -28,6 +31,8 @@ sealed interface NoteEditorEvent {
     data class BlockTextChanged(val blockId: String, val text: String) : NoteEditorEvent
     data class BlockSpansChanged(val blockId: String, val spans: List<com.notifast.app.data.model.TextSpan>) : NoteEditorEvent
     data class BlockFocused(val blockId: String?) : NoteEditorEvent
+    data class SelectionChanged(val blockId: String?, val start: Int, val end: Int) : NoteEditorEvent
+    data class ToggleSpanStyle(val blockId: String, val start: Int, val end: Int, val style: com.notifast.app.data.model.TextStyle) : NoteEditorEvent
     data class BlockMoved(val fromIndex: Int, val toIndex: Int) : NoteEditorEvent
     data class BlockDeleted(val blockId: String) : NoteEditorEvent
     data class BlockInserted(val afterBlockId: String?, val type: BlockType) : NoteEditorEvent

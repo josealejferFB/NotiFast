@@ -34,6 +34,7 @@ import com.notifast.app.presentation.feature.noteeditor.components.EditorTopBar
 import com.notifast.app.presentation.feature.noteeditor.components.ImageBlockPickerSheet
 import com.notifast.app.presentation.feature.noteeditor.components.NoteSubjectSelectorChip
 import com.notifast.app.presentation.feature.noteeditor.components.NoteTagsEditor
+import com.notifast.app.presentation.feature.noteeditor.components.TextFormatToolbar
 
 @Composable
 fun NoteEditorScreen(
@@ -136,6 +137,35 @@ fun NoteEditorScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                val hasSelection = uiState.selectionBlockId != null && uiState.selectionEnd > uiState.selectionStart
+                val activeStyles = if (hasSelection && uiState.selectionBlockId != null) {
+                    val selBlock = uiState.blocks.find { it.id == uiState.selectionBlockId }
+                    val selSpans = when (selBlock) {
+                        is com.notifast.app.data.model.NoteBlock.Heading -> selBlock.spans
+                        is com.notifast.app.data.model.NoteBlock.Paragraph -> selBlock.spans
+                        is com.notifast.app.data.model.NoteBlock.Quote -> selBlock.spans
+                        else -> emptyList()
+                    }
+                    com.notifast.app.domain.util.TextSpanOps.stylesAt(
+                        selSpans, uiState.selectionStart, uiState.selectionEnd
+                    )
+                } else emptySet()
+
+                TextFormatToolbar(
+                    visible = hasSelection,
+                    activeStyles = activeStyles,
+                    onToggleStyle = { style ->
+                        val blockId = uiState.selectionBlockId
+                        if (blockId != null) {
+                            viewModel.onEvent(
+                                NoteEditorEvent.ToggleSpanStyle(
+                                    blockId, uiState.selectionStart, uiState.selectionEnd, style
+                                )
+                            )
+                        }
+                    }
+                )
+
                 BlockListEditor(
                     blocks = uiState.blocks,
                     focusedBlockId = uiState.focusedBlockId,
@@ -157,6 +187,12 @@ fun NoteEditorScreen(
                         }
                     },
                     onBlockDeleted = { viewModel.onEvent(NoteEditorEvent.BlockDeleted(it)) },
+                    onBlockSpansChanged = { id, spans ->
+                        viewModel.onEvent(NoteEditorEvent.BlockSpansChanged(id, spans))
+                    },
+                    onBlockSelectionChanged = { id, s, e ->
+                        viewModel.onEvent(NoteEditorEvent.SelectionChanged(id, s, e))
+                    },
                     onListItemTextChange = { id, index, text ->
                         viewModel.onEvent(NoteEditorEvent.ListItemTextChanged(id, index, text))
                     },

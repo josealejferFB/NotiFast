@@ -13,6 +13,7 @@ import com.notifast.app.data.model.TextSpan
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.util.TextSpanOps
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -114,6 +115,24 @@ class NoteEditorViewModel @Inject constructor(
                 }
             }
             is NoteEditorEvent.BlockFocused -> _uiState.update { it.copy(focusedBlockId = event.blockId) }
+            is NoteEditorEvent.SelectionChanged -> _uiState.update {
+                it.copy(selectionBlockId = event.blockId, selectionStart = event.start, selectionEnd = event.end)
+            }
+            is NoteEditorEvent.ToggleSpanStyle -> updateBlock(event.blockId) { block ->
+                val currentSpans = when (block) {
+                    is NoteBlock.Heading -> block.spans
+                    is NoteBlock.Paragraph -> block.spans
+                    is NoteBlock.Quote -> block.spans
+                    else -> emptyList()
+                }
+                val newSpans = TextSpanOps.toggleStyle(currentSpans, event.start, event.end, event.style)
+                when (block) {
+                    is NoteBlock.Heading -> block.copy(spans = newSpans)
+                    is NoteBlock.Paragraph -> block.copy(spans = newSpans)
+                    is NoteBlock.Quote -> block.copy(spans = newSpans)
+                    else -> block
+                }
+            }
             is NoteEditorEvent.BlockMoved -> moveBlock(event.fromIndex, event.toIndex)
             is NoteEditorEvent.BlockDeleted -> deleteBlock(event.blockId)
             is NoteEditorEvent.BlockInserted -> insertBlock(event.afterBlockId, event.type)

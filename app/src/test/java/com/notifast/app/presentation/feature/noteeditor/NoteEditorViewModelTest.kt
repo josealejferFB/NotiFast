@@ -6,6 +6,8 @@ import com.notifast.app.data.model.ListItem
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.TextSpan
+import com.notifast.app.data.model.TextStyle
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
@@ -293,5 +295,39 @@ class NoteEditorViewModelTest {
         vm.onEvent(NoteEditorEvent.BlockInserted(null, BlockType.ORDERED_LIST))
         val last = vm.uiState.value.blocks.last() as NoteBlock.BulletList
         assertTrue(last.isOrdered)
+    }
+
+    @Test
+    fun `ToggleSpanStyle applies bold over selection`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTextChanged(blockId, "hola mundo"))
+        vm.onEvent(NoteEditorEvent.ToggleSpanStyle(blockId, 0, 4, TextStyle.BOLD))
+        val block = vm.uiState.value.blocks[0] as NoteBlock.Paragraph
+        assertEquals(listOf(TextSpan(0, 4, setOf(TextStyle.BOLD))), block.spans)
+    }
+
+    @Test
+    fun `ToggleSpanStyle twice removes style`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTextChanged(blockId, "hola mundo"))
+        vm.onEvent(NoteEditorEvent.ToggleSpanStyle(blockId, 0, 4, TextStyle.BOLD))
+        vm.onEvent(NoteEditorEvent.ToggleSpanStyle(blockId, 0, 4, TextStyle.BOLD))
+        val block = vm.uiState.value.blocks[0] as NoteBlock.Paragraph
+        assertTrue(block.spans.isEmpty())
+    }
+
+    @Test
+    fun `SelectionChanged stores selection in state`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.SelectionChanged(blockId, 2, 7))
+        assertEquals(blockId, vm.uiState.value.selectionBlockId)
+        assertEquals(2, vm.uiState.value.selectionStart)
+        assertEquals(7, vm.uiState.value.selectionEnd)
     }
 }
