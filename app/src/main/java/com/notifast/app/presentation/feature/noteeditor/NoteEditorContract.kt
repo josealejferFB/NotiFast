@@ -38,6 +38,11 @@ sealed interface NoteEditorEvent {
     data class CheckItemAdded(val blockId: String) : NoteEditorEvent
     data class CheckItemRemoved(val blockId: String, val itemIndex: Int) : NoteEditorEvent
 
+    data class ListItemTextChanged(val blockId: String, val itemIndex: Int, val text: String) : NoteEditorEvent
+    data class ListItemAdded(val blockId: String) : NoteEditorEvent
+    data class ListItemRemoved(val blockId: String, val itemIndex: Int) : NoteEditorEvent
+    data class ListItemOrderedChanged(val blockId: String, val isOrdered: Boolean) : NoteEditorEvent
+
     data class ImageBlockAdded(val afterBlockId: String?, val path: String) : NoteEditorEvent
     data class ImageSelectedForBlock(val afterBlockId: String?, val uri: android.net.Uri) : NoteEditorEvent
     data class ImageBlockRemoved(val blockId: String) : NoteEditorEvent
@@ -51,5 +56,5 @@ sealed interface NoteEditorEvent {
 }
 
 enum class BlockType {
-    HEADING, PARAGRAPH, BULLET_LIST, CHECKLIST, QUOTE, IMAGE, MATH, DIVIDER
+    HEADING, PARAGRAPH, BULLET_LIST, ORDERED_LIST, CHECKLIST, QUOTE, IMAGE, MATH, DIVIDER
 }

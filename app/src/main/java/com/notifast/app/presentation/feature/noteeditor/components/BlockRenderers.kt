@@ -13,21 +13,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Functions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.notifast.app.R
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.TextSpan
 
@@ -42,14 +48,33 @@ fun BlockRenderer(
     onImageClick: () -> Unit,
     onSpansChanged: (List<TextSpan>) -> Unit = {},
     onSelectionChange: (Int, Int) -> Unit = { _, _ -> },
+    onListItemTextChange: (Int, String) -> Unit = { _, _ -> },
+    onListItemAdded: () -> Unit = {},
+    onListItemRemoved: (Int) -> Unit = {},
+    onCheckItemAdded: () -> Unit = {},
+    onCheckItemRemoved: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     when (block) {
         is NoteBlock.Heading -> HeadingBlock(block, isFocused, onTextChange, onFocus, onSpansChanged, onSelectionChange, modifier)
         is NoteBlock.Paragraph -> ParagraphBlock(block, isFocused, onTextChange, onFocus, onSpansChanged, onSelectionChange, modifier)
         is NoteBlock.Quote -> QuoteBlock(block, isFocused, onTextChange, onFocus, onSpansChanged, onSelectionChange, modifier)
-        is NoteBlock.BulletList -> BulletListBlock(block, modifier)
-        is NoteBlock.Checklist -> ChecklistBlock(block, onCheckToggle, onCheckTextChange, modifier)
+        is NoteBlock.BulletList -> EditableListBlock(
+            block = block,
+            onItemTextChange = onListItemTextChange,
+            onItemAdded = onListItemAdded,
+            onItemRemoved = onListItemRemoved,
+            onFocus = onFocus,
+            modifier = modifier
+        )
+        is NoteBlock.Checklist -> ChecklistBlock(
+            block = block,
+            onCheckToggle = onCheckToggle,
+            onCheckTextChange = onCheckTextChange,
+            onItemAdded = onCheckItemAdded,
+            onItemRemoved = onCheckItemRemoved,
+            modifier = modifier
+        )
         is NoteBlock.Image -> ImageBlock(block, onImageClick, modifier)
         is NoteBlock.MathBlock -> MathBlockView(
             block = block,
@@ -147,22 +172,12 @@ private fun QuoteBlock(
 }
 
 @Composable
-private fun BulletListBlock(block: NoteBlock.BulletList, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.items.forEach { item ->
-            Row(verticalAlignment = Alignment.Top) {
-                Text("•", modifier = Modifier.padding(end = 8.dp, top = 2.dp))
-                Text(item.text, style = MaterialTheme.typography.bodyLarge)
-            }
-        }
-    }
-}
-
-@Composable
 private fun ChecklistBlock(
     block: NoteBlock.Checklist,
     onCheckToggle: (Int) -> Unit,
     onCheckTextChange: (Int, String) -> Unit,
+    onItemAdded: () -> Unit,
+    onItemRemoved: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -179,9 +194,30 @@ private fun ChecklistBlock(
                         } else null
                     ),
                     isFocused = false,
-                    placeholder = "Tarea…"
+                    placeholder = stringResource(R.string.editor_checklist_item_placeholder),
+                    modifier = Modifier.weight(1f)
                 )
+                if (block.items.size > 1) {
+                    IconButton(
+                        onClick = { onItemRemoved(index) },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.editor_task_remove_cd),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
+        }
+        TextButton(onClick = onItemAdded) {
+            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+            Text(
+                text = stringResource(R.string.editor_add_task),
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }

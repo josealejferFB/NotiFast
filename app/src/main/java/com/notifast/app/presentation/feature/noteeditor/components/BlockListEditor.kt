@@ -29,6 +29,11 @@ fun BlockListEditor(
     onBlockDeleted: (String) -> Unit,
     onBlockSpansChanged: (String, List<TextSpan>) -> Unit = { _, _ -> },
     onBlockSelectionChanged: (String, Int, Int) -> Unit = { _, _, _ -> },
+    onListItemTextChange: (String, Int, String) -> Unit = { _, _, _ -> },
+    onListItemAdded: (String) -> Unit = {},
+    onListItemRemoved: (String, Int) -> Unit = { _, _ -> },
+    onCheckItemAdded: (String) -> Unit = {},
+    onCheckItemRemoved: (String, Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -50,6 +55,11 @@ fun BlockListEditor(
                     onImageClick = { onImageClick(block.id) },
                     onSpansChanged = { spans -> onBlockSpansChanged(block.id, spans) },
                     onSelectionChange = { s, e -> onBlockSelectionChanged(block.id, s, e) },
+                    onListItemTextChange = { index, text -> onListItemTextChange(block.id, index, text) },
+                    onListItemAdded = { onListItemAdded(block.id) },
+                    onListItemRemoved = { index -> onListItemRemoved(block.id, index) },
+                    onCheckItemAdded = { onCheckItemAdded(block.id) },
+                    onCheckItemRemoved = { index -> onCheckItemRemoved(block.id, index) },
                     modifier = Modifier
                         .weight(1f)
                         .padding(vertical = 2.dp)

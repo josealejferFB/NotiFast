@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Functions
 import androidx.compose.material.icons.filled.HorizontalRule
@@ -42,6 +43,7 @@ fun BlockInsertMenu(
         Triple(BlockType.PARAGRAPH, Icons.Default.FormatBold, stringResource(R.string.editor_block_text)),
         Triple(BlockType.HEADING, Icons.Default.Title, stringResource(R.string.editor_block_heading)),
         Triple(BlockType.BULLET_LIST, Icons.Default.FormatListBulleted, stringResource(R.string.editor_block_list)),
+        Triple(BlockType.ORDERED_LIST, Icons.Default.FormatListNumbered, stringResource(R.string.editor_block_ordered_list)),
         Triple(BlockType.CHECKLIST, Icons.Default.CheckBox, stringResource(R.string.editor_block_checklist)),
         Triple(BlockType.QUOTE, Icons.Default.FormatQuote, stringResource(R.string.editor_block_quote)),
         Triple(BlockType.MATH, Icons.Default.Functions, stringResource(R.string.editor_block_math)),

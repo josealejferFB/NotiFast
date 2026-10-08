@@ -156,7 +156,18 @@ fun NoteEditorScreen(
                             annotatingImagePath = block.path
                         }
                     },
-                    onBlockDeleted = { viewModel.onEvent(NoteEditorEvent.BlockDeleted(it)) }
+                    onBlockDeleted = { viewModel.onEvent(NoteEditorEvent.BlockDeleted(it)) },
+                    onListItemTextChange = { id, index, text ->
+                        viewModel.onEvent(NoteEditorEvent.ListItemTextChanged(id, index, text))
+                    },
+                    onListItemAdded = { viewModel.onEvent(NoteEditorEvent.ListItemAdded(it)) },
+                    onListItemRemoved = { id, index ->
+                        viewModel.onEvent(NoteEditorEvent.ListItemRemoved(id, index))
+                    },
+                    onCheckItemAdded = { viewModel.onEvent(NoteEditorEvent.CheckItemAdded(it)) },
+                    onCheckItemRemoved = { id, index ->
+                        viewModel.onEvent(NoteEditorEvent.CheckItemRemoved(id, index))
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

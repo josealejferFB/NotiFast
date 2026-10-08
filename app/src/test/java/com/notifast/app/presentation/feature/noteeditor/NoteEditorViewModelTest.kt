@@ -227,4 +227,71 @@ class NoteEditorViewModelTest {
         vm.onEvent(NoteEditorEvent.CustomTagRemoved("tarea"))
         assertFalse(vm.uiState.value.tags.contains("tarea"))
     }
+
+    @Test
+    fun `ListItemTextChanged updates item text`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.BULLET_LIST))
+        vm.onEvent(NoteEditorEvent.ListItemTextChanged(blockId, 0, "comprar leche"))
+        val list = vm.uiState.value.blocks[0] as NoteBlock.BulletList
+        assertEquals("comprar leche", list.items[0].text)
+    }
+
+    @Test
+    fun `ListItemAdded appends empty item`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.BULLET_LIST))
+        vm.onEvent(NoteEditorEvent.ListItemAdded(blockId))
+        val list = vm.uiState.value.blocks[0] as NoteBlock.BulletList
+        assertEquals(2, list.items.size)
+    }
+
+    @Test
+    fun `ListItemRemoved drops item`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.BULLET_LIST))
+        vm.onEvent(NoteEditorEvent.ListItemAdded(blockId))
+        vm.onEvent(NoteEditorEvent.ListItemAdded(blockId))
+        vm.onEvent(NoteEditorEvent.ListItemRemoved(blockId, 1))
+        val list = vm.uiState.value.blocks[0] as NoteBlock.BulletList
+        assertEquals(2, list.items.size)
+    }
+
+    @Test
+    fun `CheckItemAdded appends empty check`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.CHECKLIST))
+        vm.onEvent(NoteEditorEvent.CheckItemAdded(blockId))
+        val list = vm.uiState.value.blocks[0] as NoteBlock.Checklist
+        assertEquals(2, list.items.size)
+    }
+
+    @Test
+    fun `CheckItemRemoved drops check`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        val blockId = vm.uiState.value.blocks[0].id
+        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.CHECKLIST))
+        vm.onEvent(NoteEditorEvent.CheckItemAdded(blockId))
+        vm.onEvent(NoteEditorEvent.CheckItemRemoved(blockId, 0))
+        val list = vm.uiState.value.blocks[0] as NoteBlock.Checklist
+        assertEquals(1, list.items.size)
+    }
+
+    @Test
+    fun `BlockInserted ORDERED_LIST creates ordered bullet list`() = runTest(testDispatcher) {
+        val vm = createViewModelForNew()
+        testDispatcher.scheduler.advanceUntilIdle()
+        vm.onEvent(NoteEditorEvent.BlockInserted(null, BlockType.ORDERED_LIST))
+        val last = vm.uiState.value.blocks.last() as NoteBlock.BulletList
+        assertTrue(last.isOrdered)
+    }
 }

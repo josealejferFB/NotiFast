@@ -136,6 +136,23 @@ class NoteEditorViewModel @Inject constructor(
                 } else block
             }
 
+            is NoteEditorEvent.ListItemTextChanged -> updateListItem(event.blockId, event.itemIndex) { item ->
+                item.copy(text = event.text)
+            }
+            is NoteEditorEvent.ListItemAdded -> updateBlock(event.blockId) { block ->
+                if (block is NoteBlock.BulletList) {
+                    block.copy(items = block.items + ListItem(text = ""))
+                } else block
+            }
+            is NoteEditorEvent.ListItemRemoved -> updateBlock(event.blockId) { block ->
+                if (block is NoteBlock.BulletList) {
+                    block.copy(items = block.items.filterIndexed { i, _ -> i != event.itemIndex })
+                } else block
+            }
+            is NoteEditorEvent.ListItemOrderedChanged -> updateBlock(event.blockId) { block ->
+                if (block is NoteBlock.BulletList) block.copy(isOrdered = event.isOrdered) else block
+            }
+
             is NoteEditorEvent.ImageBlockAdded -> insertImageBlock(event.afterBlockId, event.path)
             is NoteEditorEvent.ImageSelectedForBlock -> persistAndInsertImage(event.afterBlockId, event.uri)
             is NoteEditorEvent.ImageBlockRemoved -> deleteBlock(event.blockId)
@@ -192,6 +209,14 @@ class NoteEditorViewModel @Inject constructor(
     private fun updateChecklistItem(blockId: String, itemIndex: Int, transform: (CheckItem) -> CheckItem) {
         updateBlock(blockId) { block ->
             if (block is NoteBlock.Checklist) {
+                block.copy(items = block.items.mapIndexed { i, item -> if (i == itemIndex) transform(item) else item })
+            } else block
+        }
+    }
+
+    private fun updateListItem(blockId: String, itemIndex: Int, transform: (ListItem) -> ListItem) {
+        updateBlock(blockId) { block ->
+            if (block is NoteBlock.BulletList) {
                 block.copy(items = block.items.mapIndexed { i, item -> if (i == itemIndex) transform(item) else item })
             } else block
         }
@@ -284,7 +309,8 @@ class NoteEditorViewModel @Inject constructor(
         return when (type) {
             BlockType.HEADING -> NoteBlock.Heading(id = id, text = text, level = 1)
             BlockType.PARAGRAPH -> NoteBlock.Paragraph(id = id, text = text)
-            BlockType.BULLET_LIST -> NoteBlock.BulletList(id = id, items = listOf(ListItem(text = text)))
+            BlockType.BULLET_LIST -> NoteBlock.BulletList(id = id, items = listOf(ListItem(text = text)), isOrdered = false)
+            BlockType.ORDERED_LIST -> NoteBlock.BulletList(id = id, items = listOf(ListItem(text = text)), isOrdered = true)
             BlockType.CHECKLIST -> NoteBlock.Checklist(id = id, items = listOf(CheckItem(text = text)))
             BlockType.QUOTE -> NoteBlock.Quote(id = id, text = text)
             BlockType.IMAGE -> NoteBlock.Image(id = id, path = text)
