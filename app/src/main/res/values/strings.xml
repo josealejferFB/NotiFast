@@ -610,4 +610,18 @@
     <string name="settings_grade_scale_converted_snack">%1$d notas convertidas a %2$s</string>
     <string name="settings_grade_scale_changed_snack">Escala actualizada a %1$s</string>
     <string name="settings_academic_passing_default">Por defecto (%1$s)</string>
+
+    <!-- Note Editor Accessory Toolbar & Reading Mode -->
+    <string name="editor_format_bold">Negrita</string>
+    <string name="editor_format_italic">Cursiva</string>
+    <string name="editor_format_quote">Cita en bloque</string>
+    <string name="editor_format_h1">Título principal</string>
+    <string name="editor_format_h2">Subtítulo</string>
+    <string name="editor_format_checkbox">Tarea con casilla</string>
+    <string name="editor_format_bullet">Lista de viñetas</string>
+    <string name="editor_format_latex">Fórmula LaTeX</string>
+    <string name="editor_format_divider">Separador horizontal</string>
+    <string name="editor_format_photo">Adjuntar foto de pizarra</string>
+    <string name="editor_toggle_reading_mode">Modo lectura</string>
+    <string name="editor_toggle_edit_mode">Modo edición</string>
 </resources>
