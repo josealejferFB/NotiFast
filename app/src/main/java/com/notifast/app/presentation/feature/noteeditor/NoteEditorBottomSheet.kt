@@ -1,19 +1,27 @@
 package com.notifast.app.presentation.feature.noteeditor
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,7 +43,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
@@ -42,11 +53,6 @@ import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import kotlinx.coroutines.launch
 
-/**
- * Unified create/edit note editor as an expandable bottom sheet.
- * Registered as a Navigation Compose `dialog()` destination so every entry point
- * (FAB, edit card, SubjectDetail, Schedules, global search) shares one flow (R5).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEditorBottomSheet(
@@ -61,23 +67,10 @@ fun NoteEditorBottomSheet(
     val scope = rememberCoroutineScope()
 
     var showDiscardDialog by remember { mutableStateOf(false) }
-    var showImagePicker by remember { mutableStateOf(false) }
-    var annotatingImageId by remember { mutableStateOf<String?>(null) }
-    var annotatingImagePath by remember { mutableStateOf<String?>(null) }
 
     val hasUnsavedChanges = uiState.title.isNotBlank() ||
-            uiState.blocks.any { block ->
-                when (block) {
-                    is com.notifast.app.data.model.NoteBlock.Paragraph -> block.text.isNotBlank()
-                    is com.notifast.app.data.model.NoteBlock.Heading -> block.text.isNotBlank()
-                    is com.notifast.app.data.model.NoteBlock.Quote -> block.text.isNotBlank()
-                    is com.notifast.app.data.model.NoteBlock.BulletList -> block.items.isNotEmpty()
-                    is com.notifast.app.data.model.NoteBlock.Checklist -> block.items.isNotEmpty()
-                    is com.notifast.app.data.model.NoteBlock.Image -> true
-                    is com.notifast.app.data.model.NoteBlock.MathBlock -> block.source.isNotBlank()
-                    else -> false
-                }
-            }
+            uiState.content.isNotBlank() ||
+            uiState.imageUri != null
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
@@ -120,105 +113,129 @@ fun NoteEditorBottomSheet(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 8.dp)
         ) {
-            SheetHeader(
-                isEdit = noteId != null,
-                title = uiState.title,
-                onClose = {
-                    if (hasUnsavedChanges) showDiscardDialog = true else closeSheet { onDismiss() }
-                },
-                onSave = { viewModel.onEvent(NoteEditorEvent.SaveClicked) }
-            )
+            val canSave = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    modifier = Modifier.size(38.dp)
+                ) {
+                    IconButton(
+                        onClick = {
+                            if (hasUnsavedChanges) showDiscardDialog = true else closeSheet { onDismiss() }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.notes_discard_title),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+
+                Text(
+                    text = if (noteId != null) stringResource(R.string.edit_note_title)
+                    else stringResource(R.string.fab_add_note),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 19.sp),
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 12.dp),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+
+                IconButton(
+                    onClick = { viewModel.onEvent(NoteEditorEvent.TogglePreview(!uiState.isPreviewMode)) }
+                ) {
+                    Icon(
+                        imageVector = if (uiState.isPreviewMode) Icons.Default.Edit else Icons.Default.Visibility,
+                        contentDescription = stringResource(
+                            if (uiState.isPreviewMode) R.string.editor_toggle_edit_mode
+                            else R.string.editor_toggle_reading_mode
+                        ),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = if (canSave) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, if (canSave) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant),
+                    modifier = Modifier
+                        .height(38.dp)
+                        .clickable(enabled = canSave) { viewModel.onEvent(NoteEditorEvent.SaveClicked) }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (uiState.isLoading) {
+                            androidx.compose.material3.CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = if (canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.btn_save),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             NoteEditorContent(
                 uiState = uiState,
-                viewModel = viewModel,
-                onNavigateToAddSubject = {},
-                showImagePicker = showImagePicker,
-                onShowImagePicker = { showImagePicker = true },
-                onDismissImagePicker = { showImagePicker = false },
-                onAnnotateImage = { blockId, path ->
-                    annotatingImageId = blockId
-                    annotatingImagePath = path
-                }
+                onTitleChanged = { viewModel.onEvent(NoteEditorEvent.TitleChanged(it)) },
+                onContentChanged = { viewModel.onEvent(NoteEditorEvent.ContentChanged(it)) },
+                onSubjectSelected = { viewModel.onEvent(NoteEditorEvent.SubjectChanged(it)) },
+                onTagToggled = { viewModel.onEvent(NoteEditorEvent.TagToggled(it)) },
+                onCustomTagAdded = { viewModel.onEvent(NoteEditorEvent.CustomTagAdded(it)) },
+                onCustomTagRemoved = { viewModel.onEvent(NoteEditorEvent.CustomTagRemoved(it)) },
+                onInsertFormatting = { p, s -> viewModel.onEvent(NoteEditorEvent.InsertFormatting(p, s)) },
+                onTogglePreview = { viewModel.onEvent(NoteEditorEvent.TogglePreview(it)) },
+                onTaskCheckToggled = { index, checked -> viewModel.onEvent(NoteEditorEvent.TaskCheckToggled(index, checked)) },
+                onImageSelected = { viewModel.onEvent(NoteEditorEvent.ImageSelected(it)) },
+                onCreateSubjectClick = {}
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-    }
+            Spacer(modifier = Modifier.height(16.dp))
 
-    // R6: nested sheet — dismiss picker before dispatching insert
-    if (showImagePicker) {
-        com.notifast.app.presentation.feature.noteeditor.components.ImageBlockPickerSheet(
-            onImageSelected = { uri ->
-                showImagePicker = false
-                viewModel.onEvent(
-                    NoteEditorEvent.ImageSelectedForBlock(uiState.focusedBlockId, uri)
-                )
-            },
-            onDismiss = { showImagePicker = false }
-        )
-    }
-
-    if (annotatingImagePath != null) {
-        com.notifast.app.presentation.feature.noteeditor.annotator.PhotoAnnotatorScreen(
-            imagePath = annotatingImagePath!!,
-            onSave = { annotation ->
-                val blockId = annotatingImageId
-                if (blockId != null) {
-                    val json = com.notifast.app.domain.util.PhotoAnnotationCodec.toJson(annotation)
-                    viewModel.onEvent(NoteEditorEvent.ImageAnnotationSaved(blockId, json))
-                }
-                annotatingImageId = null
-                annotatingImagePath = null
-            },
-            onCancel = {
-                annotatingImageId = null
-                annotatingImagePath = null
-            }
-        )
-    }
-}
-
-@Composable
-private fun SheetHeader(
-    isEdit: Boolean,
-    title: String,
-    onClose: () -> Unit,
-    onSave: () -> Unit
-) {
-    androidx.compose.foundation.layout.Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onClose, modifier = Modifier.size(48.dp)) {
-            Icon(
-                Icons.Default.Close,
-                contentDescription = stringResource(R.string.notes_discard_title),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            NotiFastButton(
+                text = stringResource(R.string.add_note_btn_save_note),
+                onClick = { viewModel.onEvent(NoteEditorEvent.SaveClicked) },
+                isLoading = uiState.isLoading,
+                enabled = canSave,
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(28.dp))
         }
-        Text(
-            text = if (isEdit) stringResource(R.string.edit_note_title)
-            else stringResource(R.string.fab_add_note),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-        NotiFastButton(
-            text = stringResource(R.string.add_note_btn_save_note),
-            onClick = onSave,
-            modifier = Modifier.height(40.dp)
-        )
-    }
-    if (title.isNotBlank()) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

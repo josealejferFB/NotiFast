@@ -21,20 +21,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
+import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
-import com.notifast.app.presentation.feature.noteeditor.components.BlockInsertMenu
-import com.notifast.app.presentation.feature.noteeditor.components.BlockListEditor
 import com.notifast.app.presentation.feature.noteeditor.components.EditorTopBar
-import com.notifast.app.presentation.feature.noteeditor.components.ImageBlockPickerSheet
-import com.notifast.app.presentation.feature.noteeditor.components.NoteSubjectSelectorChip
-import com.notifast.app.presentation.feature.noteeditor.components.NoteTagsEditor
-import com.notifast.app.presentation.feature.noteeditor.components.TextFormatToolbar
 
 @Composable
 fun NoteEditorScreen(
@@ -51,23 +47,10 @@ fun NoteEditorScreen(
     }
 
     val hasUnsavedChanges = uiState.title.isNotBlank() ||
-            uiState.blocks.any { block ->
-                when (block) {
-                    is com.notifast.app.data.model.NoteBlock.Paragraph -> block.text.isNotBlank()
-                    is com.notifast.app.data.model.NoteBlock.Heading -> block.text.isNotBlank()
-                    is com.notifast.app.data.model.NoteBlock.Quote -> block.text.isNotBlank()
-                    is com.notifast.app.data.model.NoteBlock.BulletList -> block.items.isNotEmpty()
-                    is com.notifast.app.data.model.NoteBlock.Checklist -> block.items.isNotEmpty()
-                    is com.notifast.app.data.model.NoteBlock.Image -> true
-                    is com.notifast.app.data.model.NoteBlock.MathBlock -> block.source.isNotBlank()
-                    else -> false
-                }
-            }
+            uiState.content.isNotBlank() ||
+            uiState.imageUri != null
 
     var showDiscardDialog by remember { mutableStateOf(false) }
-    var showImagePicker by remember { mutableStateOf(false) }
-    var annotatingImageId by remember { mutableStateOf<String?>(null) }
-    var annotatingImagePath by remember { mutableStateOf<String?>(null) }
     val handleBack = { if (hasUnsavedChanges) showDiscardDialog = true else onBackClick() }
     BackHandler(enabled = hasUnsavedChanges) { showDiscardDialog = true }
 
@@ -93,13 +76,16 @@ fun NoteEditorScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
         Scaffold(
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+            containerColor = Color.Transparent,
             topBar = {
                 EditorTopBar(
-                    title = uiState.title.ifBlank { stringResource(R.string.fab_add_note) },
+                    title = if (uiState.noteId != null) stringResource(R.string.edit_note_title)
+                    else stringResource(R.string.fab_add_note),
                     syncStatus = uiState.syncStatus,
                     onBackClick = handleBack,
-                    onSaveClick = { viewModel.onEvent(NoteEditorEvent.SaveClicked) }
+                    onSaveClick = { viewModel.onEvent(NoteEditorEvent.SaveClicked) },
+                    isPreviewMode = uiState.isPreviewMode,
+                    onTogglePreview = { viewModel.onEvent(NoteEditorEvent.TogglePreview(!uiState.isPreviewMode)) }
                 )
             },
             snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -109,160 +95,33 @@ fun NoteEditorScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
-                NoteSubjectSelectorChip(
-                    subjects = uiState.subjects,
-                    selectedSubject = uiState.subject,
+                NoteEditorContent(
+                    uiState = uiState,
+                    onTitleChanged = { viewModel.onEvent(NoteEditorEvent.TitleChanged(it)) },
+                    onContentChanged = { viewModel.onEvent(NoteEditorEvent.ContentChanged(it)) },
                     onSubjectSelected = { viewModel.onEvent(NoteEditorEvent.SubjectChanged(it)) },
+                    onTagToggled = { viewModel.onEvent(NoteEditorEvent.TagToggled(it)) },
+                    onCustomTagAdded = { viewModel.onEvent(NoteEditorEvent.CustomTagAdded(it)) },
+                    onCustomTagRemoved = { viewModel.onEvent(NoteEditorEvent.CustomTagRemoved(it)) },
+                    onInsertFormatting = { p, s -> viewModel.onEvent(NoteEditorEvent.InsertFormatting(p, s)) },
+                    onTogglePreview = { viewModel.onEvent(NoteEditorEvent.TogglePreview(it)) },
+                    onTaskCheckToggled = { index, checked -> viewModel.onEvent(NoteEditorEvent.TaskCheckToggled(index, checked)) },
+                    onImageSelected = { viewModel.onEvent(NoteEditorEvent.ImageSelected(it)) },
                     onCreateSubjectClick = onNavigateToAddSubject
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                NoteTagsEditor(
-                    selectedTags = uiState.tags,
-                    availableTags = emptyList(),
-                    onTagToggled = { viewModel.onEvent(NoteEditorEvent.TagToggled(it)) },
-                    onCustomTagAdded = { viewModel.onEvent(NoteEditorEvent.CustomTagAdded(it)) },
-                    onCustomTagRemoved = { viewModel.onEvent(NoteEditorEvent.CustomTagRemoved(it)) }
+                NotiFastButton(
+                    text = stringResource(R.string.add_note_btn_save_note),
+                    onClick = { viewModel.onEvent(NoteEditorEvent.SaveClicked) },
+                    isLoading = uiState.isLoading,
+                    enabled = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                TitleField(
-                    title = uiState.title,
-                    onTitleChange = { viewModel.onEvent(NoteEditorEvent.TitleChanged(it)) }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                val hasSelection = uiState.selectionBlockId != null && uiState.selectionEnd > uiState.selectionStart
-                val activeStyles = if (hasSelection && uiState.selectionBlockId != null) {
-                    val selBlock = uiState.blocks.find { it.id == uiState.selectionBlockId }
-                    val selSpans = when (selBlock) {
-                        is com.notifast.app.data.model.NoteBlock.Heading -> selBlock.spans
-                        is com.notifast.app.data.model.NoteBlock.Paragraph -> selBlock.spans
-                        is com.notifast.app.data.model.NoteBlock.Quote -> selBlock.spans
-                        else -> emptyList()
-                    }
-                    com.notifast.app.domain.util.TextSpanOps.stylesAt(
-                        selSpans, uiState.selectionStart, uiState.selectionEnd
-                    )
-                } else emptySet()
-
-                TextFormatToolbar(
-                    visible = hasSelection,
-                    activeStyles = activeStyles,
-                    onToggleStyle = { style ->
-                        val blockId = uiState.selectionBlockId
-                        if (blockId != null) {
-                            viewModel.onEvent(
-                                NoteEditorEvent.ToggleSpanStyle(
-                                    blockId, uiState.selectionStart, uiState.selectionEnd, style
-                                )
-                            )
-                        }
-                    }
-                )
-
-                BlockListEditor(
-                    blocks = uiState.blocks,
-                    focusedBlockId = uiState.focusedBlockId,
-                    onBlockTextChanged = { id, text ->
-                        viewModel.onEvent(NoteEditorEvent.BlockTextChanged(id, text))
-                    },
-                    onBlockFocused = { viewModel.onEvent(NoteEditorEvent.BlockFocused(it)) },
-                    onCheckToggle = { id, index ->
-                        viewModel.onEvent(NoteEditorEvent.CheckItemToggled(id, index))
-                    },
-                    onCheckTextChange = { id, index, text ->
-                        viewModel.onEvent(NoteEditorEvent.CheckItemTextChanged(id, index, text))
-                    },
-                    onImageClick = { blockId ->
-                        val block = uiState.blocks.find { it.id == blockId }
-                        if (block is com.notifast.app.data.model.NoteBlock.Image) {
-                            annotatingImageId = blockId
-                            annotatingImagePath = block.path
-                        }
-                    },
-                    onBlockDeleted = { viewModel.onEvent(NoteEditorEvent.BlockDeleted(it)) },
-                    onBlockSpansChanged = { id, spans ->
-                        viewModel.onEvent(NoteEditorEvent.BlockSpansChanged(id, spans))
-                    },
-                    onBlockSelectionChanged = { id, s, e ->
-                        viewModel.onEvent(NoteEditorEvent.SelectionChanged(id, s, e))
-                    },
-                    onListItemTextChange = { id, index, text ->
-                        viewModel.onEvent(NoteEditorEvent.ListItemTextChanged(id, index, text))
-                    },
-                    onListItemAdded = { viewModel.onEvent(NoteEditorEvent.ListItemAdded(it)) },
-                    onListItemRemoved = { id, index ->
-                        viewModel.onEvent(NoteEditorEvent.ListItemRemoved(id, index))
-                    },
-                    onCheckItemAdded = { viewModel.onEvent(NoteEditorEvent.CheckItemAdded(it)) },
-                    onCheckItemRemoved = { id, index ->
-                        viewModel.onEvent(NoteEditorEvent.CheckItemRemoved(id, index))
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                BlockInsertMenu(
-                    onInsert = { type ->
-                        viewModel.onEvent(
-                            NoteEditorEvent.BlockInserted(uiState.focusedBlockId, type)
-                        )
-                    },
-                    onAddImage = { showImagePicker = true }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
-
-    if (showImagePicker) {
-        ImageBlockPickerSheet(
-            onImageSelected = { uri ->
-                viewModel.onEvent(
-                    NoteEditorEvent.ImageSelectedForBlock(uiState.focusedBlockId, uri)
-                )
-            },
-            onDismiss = { showImagePicker = false }
-        )
-    }
-
-    if (annotatingImagePath != null) {
-        com.notifast.app.presentation.feature.noteeditor.annotator.PhotoAnnotatorScreen(
-            imagePath = annotatingImagePath!!,
-            onSave = { annotation ->
-                val blockId = annotatingImageId
-                if (blockId != null) {
-                    val json = com.notifast.app.domain.util.PhotoAnnotationCodec.toJson(annotation)
-                    viewModel.onEvent(NoteEditorEvent.ImageAnnotationSaved(blockId, json))
-                }
-                annotatingImageId = null
-                annotatingImagePath = null
-            },
-            onCancel = {
-                annotatingImageId = null
-                annotatingImagePath = null
-            }
-        )
-    }
-}
-
-@Composable
-private fun TitleField(title: String, onTitleChange: (String) -> Unit) {
-    com.notifast.app.presentation.feature.noteeditor.components.BlockTextField(
-        value = title,
-        onValueChange = onTitleChange,
-        onFocus = {},
-        textStyle = MaterialTheme.typography.headlineSmall.copy(
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-        ),
-        isFocused = false,
-        placeholder = stringResource(R.string.add_note_title_placeholder)
-    )
 }
