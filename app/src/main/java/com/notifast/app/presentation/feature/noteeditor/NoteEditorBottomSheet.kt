@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,7 +48,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -57,9 +61,10 @@ import com.notifast.app.R
 import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.feature.noteeditor.components.DockedAccessoryToolbar
+import com.notifast.app.presentation.feature.noteeditor.util.SmartMarkdownFormatter
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NoteEditorBottomSheet(
     noteId: String?,
@@ -71,12 +76,26 @@ fun NoteEditorBottomSheet(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val scope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         viewModel.onEvent(NoteEditorEvent.ImageSelected(uri))
     }
 
-    var showDiscardDialog by remember { mutableStateOf(false) }
+    var contentFieldValue by remember {
+        mutableStateOf(TextFieldValue(uiState.content, TextRange(uiState.content.length)))
+    }
 
+    LaunchedEffect(uiState.content) {
+        if (uiState.content != contentFieldValue.text) {
+            contentFieldValue = TextFieldValue(uiState.content, TextRange(uiState.content.length))
+        }
+    }
+
+    val activeStyles = remember(contentFieldValue) {
+        SmartMarkdownFormatter.detectActiveStyles(contentFieldValue)
+    }
+
+    var showDiscardDialog by remember { mutableStateOf(false) }
     val hasUnsavedChanges = uiState.title.isNotBlank() || uiState.content.isNotBlank() || uiState.imageUri != null
 
     LaunchedEffect(uiState.isSaved) {
@@ -101,26 +120,18 @@ fun NoteEditorBottomSheet(
     }
 
     ModalBottomSheet(
-        onDismissRequest = {
-            if (hasUnsavedChanges) showDiscardDialog = true else closeSheet { onDismiss() }
-        },
+        onDismissRequest = { if (hasUnsavedChanges) showDiscardDialog = true else closeSheet { onDismiss() } },
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         modifier = Modifier.imePadding()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-        ) {
+        Column(modifier = Modifier.fillMaxWidth().navigationBarsPadding()) {
             val canSave = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 4.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -129,16 +140,8 @@ fun NoteEditorBottomSheet(
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     modifier = Modifier.size(38.dp)
                 ) {
-                    IconButton(
-                        onClick = { if (hasUnsavedChanges) showDiscardDialog = true else closeSheet { onDismiss() } },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = stringResource(R.string.notes_discard_title),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(20.dp)
-                        )
+                    IconButton(onClick = { if (hasUnsavedChanges) showDiscardDialog = true else closeSheet { onDismiss() } }, modifier = Modifier.fillMaxSize()) {
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.notes_discard_title), tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
                     }
                 }
 
@@ -153,14 +156,10 @@ fun NoteEditorBottomSheet(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                IconButton(
-                    onClick = { viewModel.onEvent(NoteEditorEvent.TogglePreview(!uiState.isPreviewMode)) }
-                ) {
+                IconButton(onClick = { viewModel.onEvent(NoteEditorEvent.TogglePreview(!uiState.isPreviewMode)) }) {
                     Icon(
                         imageVector = if (uiState.isPreviewMode) Icons.Default.Edit else Icons.Default.Visibility,
-                        contentDescription = stringResource(
-                            if (uiState.isPreviewMode) R.string.editor_toggle_edit_mode else R.string.editor_toggle_reading_mode
-                        ),
+                        contentDescription = stringResource(if (uiState.isPreviewMode) R.string.editor_toggle_edit_mode else R.string.editor_toggle_reading_mode),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -173,21 +172,13 @@ fun NoteEditorBottomSheet(
                     border = BorderStroke(1.dp, if (canSave) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant),
                     modifier = Modifier.height(38.dp).clickable(enabled = canSave) { viewModel.onEvent(NoteEditorEvent.SaveClicked) }
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(modifier = Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
                         } else {
                             Icon(Icons.Default.Check, null, modifier = Modifier.size(16.dp), tint = if (canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                             Spacer(Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(R.string.btn_save),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = if (canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
+                            Text(text = stringResource(R.string.btn_save), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = if (canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                         }
                     }
                 }
@@ -196,23 +187,25 @@ fun NoteEditorBottomSheet(
             Spacer(modifier = Modifier.height(6.dp))
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = false)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp)
             ) {
                 NoteEditorContent(
                     uiState = uiState,
+                    contentFieldValue = contentFieldValue,
                     onTitleChanged = { viewModel.onEvent(NoteEditorEvent.TitleChanged(it)) },
-                    onContentChanged = { viewModel.onEvent(NoteEditorEvent.ContentChanged(it)) },
+                    onContentFieldValueChange = { new ->
+                        val handled = SmartMarkdownFormatter.handleSmartEnter(contentFieldValue, new)
+                        contentFieldValue = handled
+                        viewModel.onEvent(NoteEditorEvent.ContentChanged(handled.text))
+                    },
                     onSubjectSelected = { viewModel.onEvent(NoteEditorEvent.SubjectChanged(it)) },
                     onTagToggled = { viewModel.onEvent(NoteEditorEvent.TagToggled(it)) },
                     onCustomTagAdded = { viewModel.onEvent(NoteEditorEvent.CustomTagAdded(it)) },
                     onCustomTagRemoved = { viewModel.onEvent(NoteEditorEvent.CustomTagRemoved(it)) },
-                    onTaskCheckToggled = { index, checked -> viewModel.onEvent(NoteEditorEvent.TaskCheckToggled(index, checked)) },
+                    onTaskCheckToggled = { i, c -> viewModel.onEvent(NoteEditorEvent.TaskCheckToggled(i, c)) },
                     onImageSelected = { viewModel.onEvent(NoteEditorEvent.ImageSelected(it)) },
-                    onCreateSubjectClick = {}
+                    onCreateSubjectClick = {},
+                    bringIntoViewRequester = bringIntoViewRequester
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -230,6 +223,13 @@ fun NoteEditorBottomSheet(
 
             if (!uiState.isPreviewMode) {
                 DockedAccessoryToolbar(
+                    activeStyles = activeStyles,
+                    onToggleFormat = { style ->
+                        val updated = SmartMarkdownFormatter.toggleFormat(contentFieldValue, style)
+                        contentFieldValue = updated
+                        viewModel.onEvent(NoteEditorEvent.ContentChanged(updated.text))
+                        scope.launch { bringIntoViewRequester.bringIntoView() }
+                    },
                     onInsertFormatting = { p, s -> viewModel.onEvent(NoteEditorEvent.InsertFormatting(p, s)) },
                     onAttachPhotoClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth()

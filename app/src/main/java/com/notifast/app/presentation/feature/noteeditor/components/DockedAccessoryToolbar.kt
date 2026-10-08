@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.noteeditor.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -39,17 +40,38 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import com.notifast.app.presentation.feature.noteeditor.util.FormatStyle
+
+data class MarkdownToolbarItem(
+    val style: FormatStyle? = null,
+    val icon: ImageVector? = null,
+    val textBadge: String? = null,
+    val contentDescriptionRes: Int,
+    val prefix: String = "",
+    val suffix: String = "",
+    val customAction: (() -> Unit)? = null
+)
 
 @Composable
 fun DockedAccessoryToolbar(
     onInsertFormatting: (prefix: String, suffix: String) -> Unit,
     onAttachPhotoClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    activeStyles: Set<FormatStyle> = emptySet(),
+    onToggleFormat: ((FormatStyle) -> Unit)? = null
 ) {
+    @Composable
+    fun ItemBtn(item: MarkdownToolbarItem) {
+        ToolbarItemButton(
+            item = item,
+            activeStyles = activeStyles,
+            onToggleFormat = onToggleFormat,
+            onInsertFormatting = onInsertFormatting
+        )
+    }
+
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(52.dp),
+        modifier = modifier.fillMaxWidth().height(52.dp),
         color = MaterialTheme.colorScheme.surfaceContainer,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
@@ -61,69 +83,25 @@ fun DockedAccessoryToolbar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Categoría: Texto
-            ToolbarItemButton(
-                icon = Icons.Default.FormatBold,
-                contentDescription = stringResource(R.string.editor_format_bold),
-                onClick = { onInsertFormatting("**", "**") }
-            )
-            ToolbarItemButton(
-                icon = Icons.Default.FormatItalic,
-                contentDescription = stringResource(R.string.editor_format_italic),
-                onClick = { onInsertFormatting("*", "*") }
-            )
-            ToolbarItemButton(
-                icon = Icons.Default.FormatQuote,
-                contentDescription = stringResource(R.string.editor_format_quote),
-                onClick = { onInsertFormatting("> ", "") }
-            )
+            ItemBtn(MarkdownToolbarItem(FormatStyle.BOLD, Icons.Default.FormatBold, null, R.string.editor_format_bold, "**", "**"))
+            ItemBtn(MarkdownToolbarItem(FormatStyle.ITALIC, Icons.Default.FormatItalic, null, R.string.editor_format_italic, "*", "*"))
+            ItemBtn(MarkdownToolbarItem(FormatStyle.QUOTE, Icons.Default.FormatQuote, null, R.string.editor_format_quote, "> "))
 
             ToolbarMicroDivider()
 
-            // Categoría: Estructura
-            ToolbarItemButton(
-                textBadge = "H1",
-                contentDescription = stringResource(R.string.editor_format_h1),
-                onClick = { onInsertFormatting("# ", "") }
-            )
-            ToolbarItemButton(
-                textBadge = "H2",
-                contentDescription = stringResource(R.string.editor_format_h2),
-                onClick = { onInsertFormatting("## ", "") }
-            )
+            ItemBtn(MarkdownToolbarItem(FormatStyle.H1, null, "H1", R.string.editor_format_h1, "# "))
+            ItemBtn(MarkdownToolbarItem(FormatStyle.H2, null, "H2", R.string.editor_format_h2, "## "))
 
             ToolbarMicroDivider()
 
-            // Categoría: Listas
-            ToolbarItemButton(
-                icon = Icons.Default.CheckBox,
-                contentDescription = stringResource(R.string.editor_format_checkbox),
-                onClick = { onInsertFormatting("- [ ] ", "") }
-            )
-            ToolbarItemButton(
-                icon = Icons.AutoMirrored.Filled.FormatListBulleted,
-                contentDescription = stringResource(R.string.editor_format_bullet),
-                onClick = { onInsertFormatting("- ", "") }
-            )
+            ItemBtn(MarkdownToolbarItem(FormatStyle.CHECKBOX, Icons.Default.CheckBox, null, R.string.editor_format_checkbox, "- [ ] "))
+            ItemBtn(MarkdownToolbarItem(FormatStyle.BULLET, Icons.AutoMirrored.Filled.FormatListBulleted, null, R.string.editor_format_bullet, "- "))
 
             ToolbarMicroDivider()
 
-            // Categoría: Insertar
-            ToolbarItemButton(
-                icon = Icons.Default.Functions,
-                contentDescription = stringResource(R.string.editor_format_latex),
-                onClick = { onInsertFormatting("$$ ", " $$") }
-            )
-            ToolbarItemButton(
-                icon = Icons.Default.HorizontalRule,
-                contentDescription = stringResource(R.string.editor_format_divider),
-                onClick = { onInsertFormatting("\n---\n", "") }
-            )
-            ToolbarItemButton(
-                icon = Icons.Default.CameraAlt,
-                contentDescription = stringResource(R.string.editor_format_photo),
-                onClick = onAttachPhotoClick
-            )
+            ItemBtn(MarkdownToolbarItem(FormatStyle.LATEX, Icons.Default.Functions, null, R.string.editor_format_latex, "$$ ", " $$"))
+            ItemBtn(MarkdownToolbarItem(FormatStyle.DIVIDER, Icons.Default.HorizontalRule, null, R.string.editor_format_divider, "\n---\n"))
+            ItemBtn(MarkdownToolbarItem(null, Icons.Default.CameraAlt, null, R.string.editor_format_photo, customAction = onAttachPhotoClick))
         }
     }
 }
@@ -131,9 +109,7 @@ fun DockedAccessoryToolbar(
 @Composable
 private fun ToolbarMicroDivider(modifier: Modifier = Modifier) {
     VerticalDivider(
-        modifier = modifier
-            .height(20.dp)
-            .padding(horizontal = 2.dp),
+        modifier = modifier.height(20.dp).padding(horizontal = 2.dp),
         thickness = 1.dp,
         color = MaterialTheme.colorScheme.outlineVariant
     )
@@ -141,40 +117,58 @@ private fun ToolbarMicroDivider(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ToolbarItemButton(
-    onClick: () -> Unit,
-    contentDescription: String,
-    modifier: Modifier = Modifier,
-    icon: ImageVector? = null,
-    textBadge: String? = null
+    item: MarkdownToolbarItem,
+    activeStyles: Set<FormatStyle>,
+    onToggleFormat: ((FormatStyle) -> Unit)?,
+    onInsertFormatting: (prefix: String, suffix: String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
+    val isActive = item.style != null && item.style in activeStyles
+    val containerColor = if (isActive) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.5f)
+    }
+    val contentColor = if (isActive) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Box(
         modifier = modifier
             .size(42.dp)
             .clip(RoundedCornerShape(10.dp))
+            .background(containerColor)
             .clickable(
-                onClickLabel = contentDescription,
+                onClickLabel = stringResource(item.contentDescriptionRes),
                 role = Role.Button
             ) {
                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onClick()
+                if (item.customAction != null) {
+                    item.customAction.invoke()
+                } else if (onToggleFormat != null && item.style != null) {
+                    onToggleFormat(item.style)
+                } else {
+                    onInsertFormatting(item.prefix, item.suffix)
+                }
             },
         contentAlignment = Alignment.Center
     ) {
-        if (icon != null) {
+        if (item.icon != null) {
             Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                imageVector = item.icon,
+                contentDescription = stringResource(item.contentDescriptionRes),
+                tint = contentColor,
                 modifier = Modifier.size(20.dp)
             )
-        } else if (textBadge != null) {
+        } else if (item.textBadge != null) {
             Text(
-                text = textBadge,
+                text = item.textBadge,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = contentColor
             )
         }
     }
