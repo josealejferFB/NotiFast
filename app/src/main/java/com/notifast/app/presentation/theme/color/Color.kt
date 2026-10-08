@@ -13,6 +13,7 @@ val AquaGreen = Color(0xFF2A7B7B)         // Studio Aqua Green / Deep Mint (Ligh
 val StudioAqua = Color(0xFF2A7B7B)
 val ForestSage = Color(0xFF15803D)        // Forest Sage / Success
 val CoralFlame = Color(0xFFB91C1C)        // Urgent / Critical Error
+val HighlightWash = Color(0xFFFFF59D)     // Rich-text highlight background wash
 
 // Legacy brand aliases for backward compatibility
 val Ruby = MutedCrimson

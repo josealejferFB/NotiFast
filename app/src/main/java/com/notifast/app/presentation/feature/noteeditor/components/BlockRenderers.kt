@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.notifast.app.data.model.NoteBlock
+import com.notifast.app.data.model.TextSpan
 
 @Composable
 fun BlockRenderer(
@@ -39,12 +40,14 @@ fun BlockRenderer(
     onCheckToggle: (Int) -> Unit,
     onCheckTextChange: (Int, String) -> Unit,
     onImageClick: () -> Unit,
+    onSpansChanged: (List<TextSpan>) -> Unit = {},
+    onSelectionChange: (Int, Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     when (block) {
-        is NoteBlock.Heading -> HeadingBlock(block, isFocused, onTextChange, onFocus, modifier)
-        is NoteBlock.Paragraph -> ParagraphBlock(block, isFocused, onTextChange, onFocus, modifier)
-        is NoteBlock.Quote -> QuoteBlock(block, isFocused, onTextChange, onFocus, modifier)
+        is NoteBlock.Heading -> HeadingBlock(block, isFocused, onTextChange, onFocus, onSpansChanged, onSelectionChange, modifier)
+        is NoteBlock.Paragraph -> ParagraphBlock(block, isFocused, onTextChange, onFocus, onSpansChanged, onSelectionChange, modifier)
+        is NoteBlock.Quote -> QuoteBlock(block, isFocused, onTextChange, onFocus, onSpansChanged, onSelectionChange, modifier)
         is NoteBlock.BulletList -> BulletListBlock(block, modifier)
         is NoteBlock.Checklist -> ChecklistBlock(block, onCheckToggle, onCheckTextChange, modifier)
         is NoteBlock.Image -> ImageBlock(block, onImageClick, modifier)
@@ -65,6 +68,8 @@ private fun HeadingBlock(
     isFocused: Boolean,
     onTextChange: (String) -> Unit,
     onFocus: () -> Unit,
+    onSpansChanged: (List<TextSpan>) -> Unit,
+    onSelectionChange: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val style = when (block.level) {
@@ -72,10 +77,13 @@ private fun HeadingBlock(
         2 -> MaterialTheme.typography.titleLarge
         else -> MaterialTheme.typography.titleMedium
     }
-    BlockTextField(
+    RichBlockTextField(
         value = block.text,
+        spans = block.spans,
         onValueChange = onTextChange,
+        onSpansChange = onSpansChanged,
         onFocus = onFocus,
+        onSelectionChange = onSelectionChange,
         textStyle = style.copy(fontWeight = FontWeight.Bold),
         isFocused = isFocused,
         modifier = modifier
@@ -88,12 +96,17 @@ private fun ParagraphBlock(
     isFocused: Boolean,
     onTextChange: (String) -> Unit,
     onFocus: () -> Unit,
+    onSpansChanged: (List<TextSpan>) -> Unit,
+    onSelectionChange: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    BlockTextField(
+    RichBlockTextField(
         value = block.text,
+        spans = block.spans,
         onValueChange = onTextChange,
+        onSpansChange = onSpansChanged,
         onFocus = onFocus,
+        onSelectionChange = onSelectionChange,
         textStyle = MaterialTheme.typography.bodyLarge,
         isFocused = isFocused,
         modifier = modifier
@@ -106,6 +119,8 @@ private fun QuoteBlock(
     isFocused: Boolean,
     onTextChange: (String) -> Unit,
     onFocus: () -> Unit,
+    onSpansChanged: (List<TextSpan>) -> Unit,
+    onSelectionChange: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier.fillMaxWidth()) {
@@ -115,10 +130,13 @@ private fun QuoteBlock(
                 .height(24.dp)
                 .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
         )
-        BlockTextField(
+        RichBlockTextField(
             value = block.text,
+            spans = block.spans,
             onValueChange = onTextChange,
+            onSpansChange = onSpansChanged,
             onFocus = onFocus,
+            onSelectionChange = onSelectionChange,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             ),

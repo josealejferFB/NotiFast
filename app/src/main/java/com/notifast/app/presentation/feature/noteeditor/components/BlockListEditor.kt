@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.notifast.app.data.model.NoteBlock
+import com.notifast.app.data.model.TextSpan
 
 @Composable
 fun BlockListEditor(
@@ -26,6 +27,8 @@ fun BlockListEditor(
     onCheckTextChange: (String, Int, String) -> Unit,
     onImageClick: (String) -> Unit,
     onBlockDeleted: (String) -> Unit,
+    onBlockSpansChanged: (String, List<TextSpan>) -> Unit = { _, _ -> },
+    onBlockSelectionChanged: (String, Int, Int) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -45,6 +48,8 @@ fun BlockListEditor(
                     onCheckToggle = { index -> onCheckToggle(block.id, index) },
                     onCheckTextChange = { index, text -> onCheckTextChange(block.id, index, text) },
                     onImageClick = { onImageClick(block.id) },
+                    onSpansChanged = { spans -> onBlockSpansChanged(block.id, spans) },
+                    onSelectionChange = { s, e -> onBlockSelectionChanged(block.id, s, e) },
                     modifier = Modifier
                         .weight(1f)
                         .padding(vertical = 2.dp)
