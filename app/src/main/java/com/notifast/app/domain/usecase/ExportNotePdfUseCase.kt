@@ -88,9 +88,10 @@ class ExportNotePdfUseCase @Inject constructor(
                         y += LINE_HEIGHT
                     }
                     is NoteBlock.BulletList -> {
-                        block.items.forEach { item ->
+                        block.items.forEachIndexed { index, item ->
                             newPageIfNeeded(LINE_HEIGHT)
-                            canvas.drawText("  • ${item.text}", MARGIN, y, bodyPaint)
+                            val prefix = if (block.isOrdered) "${index + 1}." else "•"
+                            canvas.drawText("  $prefix ${item.text}", MARGIN, y, bodyPaint)
                             y += LINE_HEIGHT
                         }
                     }
