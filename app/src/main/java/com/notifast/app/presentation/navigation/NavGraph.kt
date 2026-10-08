@@ -19,6 +19,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +34,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import com.notifast.app.presentation.feature.addsubject.AddSubjectScreen
-import com.notifast.app.presentation.feature.noteeditor.NoteEditorScreen
+import com.notifast.app.presentation.feature.noteeditor.NoteEditorBottomSheet
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
 import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
 import com.notifast.app.presentation.feature.editprofile.EditProfileScreen
@@ -130,21 +131,20 @@ fun MainContent() {
                     onSearchClick = { showGlobalSearchSheet = true }
                 )
             }
-            composable(
+            dialog(
                 route = Screen.NoteEditor.route,
                 arguments = listOf(
                     navArgument("subject") { type = NavType.StringType; defaultValue = "" },
                     navArgument("noteId") { type = NavType.StringType; defaultValue = "" }
-                ),
-                enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeIn() },
-                exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = spring(0.8f, 400f)) + fadeOut() }
+                )
             ) { backStackEntry ->
                 val subject = Uri.decode(backStackEntry.arguments?.getString("subject") ?: "")
                 val noteId = backStackEntry.arguments?.getString("noteId")?.takeIf { it.isNotBlank() }
-                NoteEditorScreen(
-                    onBackClick = { navController.popBackStack() },
-                    onNoteSaved = { navController.popBackStack() },
-                    onNavigateToAddSubject = { navController.navigate(Screen.AddSubject.route) }
+                NoteEditorBottomSheet(
+                    noteId = noteId,
+                    subject = subject,
+                    onDismiss = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() }
                 )
             }
             composable(Screen.AddSubject.route) {
