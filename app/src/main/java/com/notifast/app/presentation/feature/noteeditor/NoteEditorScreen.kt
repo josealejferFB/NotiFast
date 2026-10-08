@@ -1,12 +1,15 @@
 package com.notifast.app.presentation.feature.noteeditor
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +33,7 @@ import com.notifast.app.R
 import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.feature.noteeditor.components.DockedAccessoryToolbar
 import com.notifast.app.presentation.feature.noteeditor.components.EditorTopBar
 
 @Composable
@@ -41,6 +45,9 @@ fun NoteEditorScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.onEvent(NoteEditorEvent.ImageSelected(uri))
+    }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onNoteSaved()
@@ -87,6 +94,17 @@ fun NoteEditorScreen(
                     isPreviewMode = uiState.isPreviewMode,
                     onTogglePreview = { viewModel.onEvent(NoteEditorEvent.TogglePreview(!uiState.isPreviewMode)) }
                 )
+            },
+            bottomBar = {
+                if (!uiState.isPreviewMode) {
+                    DockedAccessoryToolbar(
+                        onInsertFormatting = { p, s -> viewModel.onEvent(NoteEditorEvent.InsertFormatting(p, s)) },
+                        onAttachPhotoClick = { imagePickerLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .imePadding()
+                    )
+                }
             },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { padding ->
