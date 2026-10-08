@@ -6,6 +6,7 @@ import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.TextSpan
 import com.notifast.app.data.model.TextStyle
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -160,5 +161,30 @@ class NoteBlockCodecTest {
     @Test
     fun `fromJson on empty string returns empty list`() {
         assertEquals(emptyList<NoteBlock>(), NoteBlockCodec.fromJson(""))
+    }
+
+    @Test
+    fun `bullet list with isOrdered true round-trips`() {
+        val blocks = listOf(
+            NoteBlock.BulletList(
+                id = "b1",
+                items = listOf(ListItem(text = "primero"), ListItem(text = "segundo")),
+                isOrdered = true
+            )
+        )
+        val json = NoteBlockCodec.toJson(blocks)
+        val parsed = NoteBlockCodec.fromJson(json)
+        assertEquals(1, parsed.size)
+        val list = parsed[0] as NoteBlock.BulletList
+        assertTrue(list.isOrdered)
+        assertEquals(2, list.items.size)
+    }
+
+    @Test
+    fun `bullet list without isOrdered defaults to false`() {
+        val json = """[{"type":"bullet_list","id":"b1","items":[{"text":"a"}]}]"""
+        val parsed = NoteBlockCodec.fromJson(json)
+        val list = parsed[0] as NoteBlock.BulletList
+        assertFalse(list.isOrdered)
     }
 }

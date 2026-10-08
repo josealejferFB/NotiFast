@@ -92,6 +92,7 @@ object NoteBlockCodec {
                 is NoteBlock.BulletList -> {
                     obj.addProperty("type", TYPE_BULLET_LIST)
                     obj.addProperty("id", src.id)
+                    obj.addProperty("isOrdered", src.isOrdered)
                     obj.add("items", context!!.serialize(src.items))
                 }
                 is NoteBlock.Checklist -> {
@@ -147,7 +148,8 @@ object NoteBlockCodec {
                 )
                 TYPE_BULLET_LIST -> NoteBlock.BulletList(
                     id = id,
-                    items = parseListItems(obj, context)
+                    items = parseListItems(obj, context),
+                    isOrdered = obj.get("isOrdered")?.asBoolean ?: false
                 )
                 TYPE_CHECKLIST -> NoteBlock.Checklist(
                     id = id,

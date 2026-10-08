@@ -18,7 +18,8 @@ sealed class NoteBlock {
 
     data class BulletList(
         override val id: String,
-        val items: List<ListItem> = emptyList()
+        val items: List<ListItem> = emptyList(),
+        val isOrdered: Boolean = false
     ) : NoteBlock()
 
     data class Checklist(
