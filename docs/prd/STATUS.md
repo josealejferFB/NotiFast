@@ -18,16 +18,16 @@ Sprint Design 3.0: Tactile Studio [███████████████
 Fase 3: Features Avanzadas        [████████████████] 100% (18/18 tareas) ✅
 Fase 3.5: Offline-First Local     [████████████████] 100% (9/9 tareas) ✅
 Fase 3.6: Sanitización Lógica     [████████████████] 100% (10/10 tareas) ✅
-Editor Premium (OneNote-like)     [████████████░░░░]  75% (9/12 tareas) 🔄
+Editor Premium (OneNote-like)     [████████████████] 100% (12/12 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  82% (103/119 tareas)
+PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  85% (106/119 tareas)
 ```
 
 ---
 
-## 📝 Editor Premium de Apuntes (OneNote-like) — En Progreso
+## 📝 Editor Premium de Apuntes (OneNote-like) — 100% Completado
 
 **Objetivo:** Transformar el editor de markdown tipo IDE a una experiencia de cuaderno premium: bloques reordenable, texto rico sin sintaxis visible, multi-foto inline, anotación/dibujo sobre fotos, checklists y fórmulas.
 
@@ -44,22 +44,34 @@ PROGRESO TOTAL ESTIMADO:          [█████████████░░
 - `ImageBlockPickerSheet` con galería (`GetContent`) + cámara (`TakePicture` + FileProvider).
 - Bloques Image inline en el flujo del documento.
 
-### Fase 3: Anotación/dibujo sobre fotos (75% 🔄)
+### Fase 3: Anotación/dibujo sobre fotos (100% ✅)
 - `PhotoAnnotation` (Stroke, AnnotationText, Arrow) + `PhotoAnnotationCodec`.
 - `DrawingCanvasState` (undo/redo/eraser) + `DrawingCanvas` (pointerInput + Path).
 - `PhotoAnnotatorScreen` con toolbar flotante (lápiz, resaltador, colores, grosores).
-- Pendiente: flatten de anotación + persistencia en bloque Image.
+- Flatten de anotación + persistencia en bloque Image (`annotationJson`).
 
-### Fase 4: Checklists + fórmulas + export PDF (0%)
-- Checklists interactivos (VM ya soporta, falta pulir UI).
+### Fase 4: Checklists + fórmulas + export PDF (100% ✅)
+- Checklists interactivos (toggle, editar, añadir/quitar items).
 - MathRenderer nativo + SymbolKeyboard.
-- Export PDF.
+- Export PDF con listas ordenadas/numeradas.
 - Búsqueda global indexa bloques.
 
+### Fase 5: Bottom Sheet Unificado + Rich Text + Tags (100% ✅ — Oct 2026)
+- **`NoteEditorBottomSheet`** como destino `dialog()` de Navigation Compose — crear y editar llaman al mismo flujo modal expandible (70% ↔ full screen).
+- **`RichBlockTextField`** + `applyNoteSpans` — formato de texto (negrita, cursiva, subrayado, tachado, resaltado) con `TextSpan` sobre selección.
+- **`TextSpanOps`** — álgebra pura de spans (toggle/merge/split/adjustForEdit/stylesAt) con tests.
+- **`TextFormatToolbar`** contextual sobre selección de texto.
+- **`NoteTagsEditor`** — chips de etiquetas temáticas sugeridas + input custom + remove (FlowRow wrap).
+- **`EditableListBlock`** — listas ordenadas (`isOrdered`) y desordenadas editables con add/remove.
+- **Checklists** con añadir/quitar tareas.
+- **Fix bugs:** ruta de búsqueda global (`note_editor?noteId=`), match de tags case-insensitive, export markdown con bloques+spans, `NoteWithSubject` dead code eliminado.
+- **Riesgos mitigados:** R1 span index shifting (`adjustForEdit`), R2 cursor reset (`TextFieldValue` un-keyed), R3 codec manual `isOrdered`, R4 shadowing `applyNoteSpans`, R5 sin refactor VM (SavedStateHandle en dialog dest).
+
 ### Tests añadidos
-- `NoteBlockCodecTest` (12), `MarkdownToBlocksParserTest` (16), `NoteBlocksRepositoryTest` (4),
-  `NoteEditorViewModelTest` (13), `NoteEditorImageTest` (3), `PhotoAnnotationCodecTest` (8),
-  `DrawingCanvasStateTest` (10). Suite completa: 260+ tests en verde.
+- `NoteBlockCodecTest` (14), `MarkdownToBlocksParserTest` (16), `NoteBlocksRepositoryTest` (4),
+  `NoteEditorViewModelTest` (22), `NoteEditorImageTest` (3), `PhotoAnnotationCodecTest` (8),
+  `DrawingCanvasStateTest` (10), `TextSpanOpsTest` (11), `RichTextSpanTest` (6),
+  `ExportNoteMarkdownUseCaseTest` (4). Suite completa: 402 tests en verde.
 
 ### Auditoría sistemática (Systematic Debugging) — 2026-10-06
 **7 CRITICAL + 9 HIGH + 8 MEDIUM + 4 LOW encontrados y parchados:**
