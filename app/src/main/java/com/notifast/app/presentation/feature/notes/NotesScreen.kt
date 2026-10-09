@@ -38,7 +38,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
+import com.notifast.app.domain.util.MarkdownToBlocksParser
 import com.notifast.app.presentation.atoms.FabAction
+import com.notifast.app.presentation.atoms.MarkdownParser
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastExpandableFab
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
@@ -47,6 +49,7 @@ import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.feature.notes.components.NoteDetailExpandable
 import com.notifast.app.presentation.feature.notes.components.NotesTabContent
 import com.notifast.app.presentation.feature.notes.components.SubjectGridBento
+import java.util.Date
 
 @Composable
 fun NotesScreen(
@@ -66,15 +69,8 @@ fun NotesScreen(
     var expandedNote by remember { mutableStateOf<Note?>(null) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    var showAddNoteSheet by remember { mutableStateOf(false) }
-    var addNoteSubject by remember { mutableStateOf<String?>(null) }
     var showAddSubjectSheet by remember { mutableStateOf(false) }
     var showImportSubjectSheet by remember { mutableStateOf(false) }
-
-    val handleOpenAddNote: (String?) -> Unit = { subj ->
-        addNoteSubject = subj
-        showAddNoteSheet = true
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
@@ -96,7 +92,7 @@ fun NotesScreen(
                     actions = listOf(
                         FabAction(stringResource(R.string.fab_add_subject), Icons.Default.CreateNewFolder, { showAddSubjectSheet = true }, stringResource(R.string.fab_add_subject), MaterialTheme.colorScheme.secondary),
                         FabAction(stringResource(R.string.import_subject_title), androidx.compose.material.icons.Icons.Default.QrCode2, { showImportSubjectSheet = true }, stringResource(R.string.import_subject_title), MaterialTheme.colorScheme.tertiary),
-                        FabAction(stringResource(R.string.fab_add_note), Icons.AutoMirrored.Filled.NoteAdd, { handleOpenAddNote(null) }, stringResource(R.string.fab_add_note), MaterialTheme.colorScheme.primary)
+                        FabAction(stringResource(R.string.fab_add_note), Icons.AutoMirrored.Filled.NoteAdd, { onAddNoteClick(null) }, stringResource(R.string.fab_add_note), MaterialTheme.colorScheme.primary)
                     ),
                     modifier = Modifier.padding(bottom = 72.dp)
                 )
@@ -128,7 +124,7 @@ fun NotesScreen(
                         NotesTabContent(
                             uiState = uiState,
                             viewModel = viewModel,
-                            onAddNoteClick = handleOpenAddNote,
+                            onAddNoteClick = onAddNoteClick,
                             onNoteClick = onNoteClick,
                             onExpandNote = { expandedNote = it },
                             onDeleteNote = { noteToDelete = it },
@@ -138,7 +134,7 @@ fun NotesScreen(
                         SubjectGridBento(
                             subjectInfos = uiState.subjectInfos,
                             onSubjectClick = onSubjectClick,
-                            onAddNoteClick = handleOpenAddNote,
+                            onAddNoteClick = { onAddNoteClick(it) },
                             onAddEvaluationClick = onAddEvaluationClick,
                             onDeleteSubject = { subjectToDelete = it },
                             onAddSubjectClick = { showAddSubjectSheet = true },
@@ -148,11 +144,6 @@ fun NotesScreen(
                     }
                 }
             }
-        }
-
-        if (showAddNoteSheet) {
-            showAddNoteSheet = false
-            onAddNoteClick(addNoteSubject ?: "")
         }
 
         if (showAddSubjectSheet) {
@@ -199,7 +190,24 @@ fun NotesScreen(
         ) {
             Box(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 40.dp), contentAlignment = Alignment.Center) {
                 expandedNote?.let { note ->
-                    NoteDetailExpandable(note = note, onClose = { expandedNote = null }, onEdit = { onNoteClick(note.id); expandedNote = null })
+                    NoteDetailExpandable(
+                        note = note,
+                        onClose = { expandedNote = null },
+                        onEdit = {
+                            onNoteClick(note.id)
+                            expandedNote = null
+                        },
+                        onTaskCheckedChange = { taskIndex, isChecked ->
+                            val updatedContent = MarkdownParser.toggleTaskCheckbox(note.content, taskIndex, isChecked)
+                            val updatedNote = note.copy(
+                                content = updatedContent,
+                                updatedAt = Date(),
+                                blocks = MarkdownToBlocksParser.parse(updatedContent, note.imageUrl)
+                            )
+                            expandedNote = updatedNote
+                            viewModel.onEvent(NotesEvent.ToggleTaskCheck(note, taskIndex, isChecked))
+                        }
+                    )
                 }
             }
         }

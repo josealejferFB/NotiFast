@@ -9,6 +9,8 @@ import java.util.UUID
 
 object MarkdownToBlocksParser {
 
+    private val TASK_REGEX = Regex("""^[-*]\s*\[([ xX]?)]\s*(.*)$""")
+
     fun parse(markdown: String, imageUrl: String? = null): List<NoteBlock> {
         val blocks = mutableListOf<NoteBlock>()
         val lines = markdown.lines()
@@ -60,6 +62,7 @@ object MarkdownToBlocksParser {
                 continue
             }
 
+            val taskMatch = TASK_REGEX.matchEntire(trimmed)
             when {
                 trimmed.startsWith("### ") -> {
                     flushBullets()
@@ -82,17 +85,12 @@ object MarkdownToBlocksParser {
                     val (text, spans) = parseInline(raw)
                     blocks.add(NoteBlock.Heading(id = newId(), text = text, level = 1, spans = spans))
                 }
-                trimmed.startsWith("- [ ] ") -> {
+                taskMatch != null -> {
                     flushBullets()
-                    val raw = trimmed.removePrefix("- [ ] ").trim()
+                    val isChecked = taskMatch.groupValues[1].equals("x", ignoreCase = true)
+                    val raw = taskMatch.groupValues[2].trim()
                     val (text, spans) = parseInline(raw)
-                    checklistBuffer.add(CheckItem(text = text, isChecked = false, spans = spans))
-                }
-                trimmed.startsWith("- [x] ", ignoreCase = true) -> {
-                    flushBullets()
-                    val raw = trimmed.substring(6).trim()
-                    val (text, spans) = parseInline(raw)
-                    checklistBuffer.add(CheckItem(text = text, isChecked = true, spans = spans))
+                    checklistBuffer.add(CheckItem(text = text, isChecked = isChecked, spans = spans))
                 }
                 trimmed.startsWith("* ") || trimmed.startsWith("- ") -> {
                     flushChecklist()

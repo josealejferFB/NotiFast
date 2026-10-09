@@ -67,6 +67,15 @@ PROGRESO TOTAL ESTIMADO:          [█████████████░░
 - **Fix bugs:** ruta de búsqueda global (`note_editor?noteId=`), match de tags case-insensitive, export markdown con bloques+spans, `NoteWithSubject` dead code eliminado.
 - **Riesgos mitigados:** R1 span index shifting (`adjustForEdit`), R2 cursor reset (`TextFieldValue` un-keyed), R3 codec manual `isOrdered`, R4 shadowing `applyNoteSpans`, R5 sin refactor VM (SavedStateHandle en dialog dest).
 
+### Fase 6: Simplificación Nativa AAA & Acoplamiento Teclado-Toolbar (100% ✅ — 9 Oct 2026)
+- **Eliminación Total de Código Huérfano/Full-Screen:** Se removieron limpiamente 10 archivos legados de pantalla completa y editores de bloques pesados (`NoteEditorScreen`, `EditorTopBar`, `BlockTextField`, `BlockListEditor`, etc.), recuperando la simplicidad nativa y reduciendo la complejidad ciclomática.
+- **Bottom Sheet Nativo Material 3:** `NoteEditorBottomSheet` ahora utiliza `rememberModalBottomSheetState(skipPartiallyExpanded = true)`, garantizando que el editor abra siempre de forma expandida y sin pasos intermedios incómodos.
+- **Resolución Definitiva de Conflicto IME / Toolbar:** Se agregó `android:windowSoftInputMode="adjustResize"` en `AndroidManifest.xml` y se configuró `contentWindowInsets = { WindowInsets.statusBars }` en `ModalBottomSheet`. La barra de herramientas `DockedAccessoryToolbar` utiliza `Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))` y el área de contenido utiliza `weight(1f)`, asegurando que al enfocar el campo Markdown, la barra flote **directamente encima del teclado**, sin quedar oculta ni detrás del mismo.
+- **Ergonomía de Entrada & Cierre Táctil de Foco:** Se implementó `onTapOutside` en el scope del `ModalBottomSheet`, permitiendo que al tocar cualquier área exterior a los campos de texto activos (cabecera, espaciado, fondo, etiquetas), se remueva el foco (`clearFocus(force = true)`) y se minimice/cierre el teclado virtual de manera nativa y fluida.
+- **Interoperabilidad de Casillas en Vista Previa:** Integración de `onTaskCheckedChange` en `NoteDetailExpandable` y `NotesViewModel.ToggleTaskCheck`, permitiendo alternar casillas de tareas (`- [ ]` / `- [x]`) interactivamente desde el modal de vista previa del dashboard con persistencia inmediata y actualización optimista.
+- **Ergonomía de Creación de Materia y Etiquetas:** Botón de "Crear materia" cierra fluidamente el bottom sheet para abrir el creador de materias; creador de etiquetas enriquecido con cápsula de input animada (`TagInputCapsule`).
+- **Verificación en Hardware Real:** Instalado y probado con captura de pantalla y validación de toques en dispositivo Samsung (`SM-A065M`). Suite de pruebas unitarias 100% en verde.
+
 ### Tests añadidos
 - `NoteBlockCodecTest` (14), `MarkdownToBlocksParserTest` (16), `NoteBlocksRepositoryTest` (4),
   `NoteEditorViewModelTest` (22), `NoteEditorImageTest` (3), `PhotoAnnotationCodecTest` (8),

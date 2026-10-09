@@ -50,7 +50,8 @@ import com.notifast.app.presentation.atoms.NotiFastMarkdown
 fun NoteDetailExpandable(
     note: Note,
     onClose: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onTaskCheckedChange: ((taskIndex: Int, isChecked: Boolean) -> Unit)? = null
 ) {
     val context = LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
@@ -175,13 +176,15 @@ fun NoteDetailExpandable(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (note.blocks.isNotEmpty()) {
+                if (note.content.isNotBlank()) {
+                    NotiFastMarkdown(content = note.content, onTaskCheckedChange = onTaskCheckedChange)
+                } else if (note.blocks.isNotEmpty()) {
                     note.blocks.forEach { block ->
                         BlockReadOnlyRenderer(block = block)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 } else {
-                    NotiFastMarkdown(content = note.content)
+                    NotiFastMarkdown(content = "_Sin contenido escrito aún..._")
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))

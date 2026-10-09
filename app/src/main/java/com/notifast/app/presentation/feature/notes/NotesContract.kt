@@ -60,4 +60,5 @@ sealed interface NotesEvent {
     data class SelectTag(val tag: String?) : NotesEvent
     data class DeleteNote(val note: Note) : NotesEvent
     data class DeleteSubject(val subjectName: String) : NotesEvent
+    data class ToggleTaskCheck(val note: Note, val taskIndex: Int, val isChecked: Boolean) : NotesEvent
 }

@@ -6,6 +6,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -57,9 +58,8 @@ fun NoteEditorContent(
     onImageSelected: (Uri?) -> Unit,
     onCreateSubjectClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onInsertFormatting: (prefix: String, suffix: String) -> Unit = { _, _ -> },
-    onTogglePreview: (Boolean) -> Unit = {},
-    bringIntoViewRequester: BringIntoViewRequester = remember { BringIntoViewRequester() }
+    bringIntoViewRequester: BringIntoViewRequester = remember { BringIntoViewRequester() },
+    onTapOutside: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
     val colorScheme = MaterialTheme.colorScheme
@@ -83,17 +83,30 @@ fun NoteEditorContent(
             )
         } else {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onTapOutside() },
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                // 1. Title
+                // 1. Selector de Materias (Subject selector)
+                NoteSubjectSelectorChip(
+                    subjects = uiState.subjects,
+                    selectedSubject = uiState.subject,
+                    onSubjectSelected = onSubjectSelected,
+                    onCreateSubjectClick = onCreateSubjectClick
+                )
+
+                // 2. Título (Title)
                 NotiFastFormField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
                     label = stringResource(R.string.add_note_title_label)
                 )
 
-                // 2. Content
+                // 3. Contenido Markdown (Content)
                 NotiFastFormField(
                     value = contentFieldValue,
                     onValueChange = {
@@ -104,31 +117,17 @@ fun NoteEditorContent(
                     singleLine = false,
                     minLines = 8,
                     visualTransformation = markdownTransformation,
-                    modifier = Modifier
-                        .bringIntoViewRequester(bringIntoViewRequester)
-                        .onFocusEvent { focusState ->
-                            if (focusState.isFocused) {
-                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
-                            }
-                        }
+                    modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)
                 )
 
-                // 3. Photo preview
+                // 4. Foto de Pizarra / Adjuntos (Attachment preview)
                 NoteAttachmentPreview(
                     existingImageUrl = uiState.imageUrl,
                     imageUri = uiState.imageUri,
                     onImageSelected = onImageSelected
                 )
 
-                // 4. Subject selector
-                NoteSubjectSelectorChip(
-                    subjects = uiState.subjects,
-                    selectedSubject = uiState.subject,
-                    onSubjectSelected = onSubjectSelected,
-                    onCreateSubjectClick = onCreateSubjectClick
-                )
-
-                // 5. Tags editor
+                // 5. Etiquetas temáticas (Tags editor)
                 NoteTagsEditor(
                     selectedTags = uiState.tags,
                     availableTags = uiState.availableTags,
@@ -137,7 +136,7 @@ fun NoteEditorContent(
                     onCustomTagRemoved = onCustomTagRemoved
                 )
 
-                // 6. Stats badge (words, reading time)
+                // 6. Estadísticas de lectura (Stats badge)
                 if (uiState.wordCount > 0) {
                     Surface(
                         shape = RoundedCornerShape(10.dp),

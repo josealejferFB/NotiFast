@@ -28,6 +28,15 @@ class SmartMarkdownFormatterTest {
     }
 
     @Test
+    fun `toggleFormat unwraps bold when cursor is inside bold text without selection`() {
+        val initial = TextFieldValue("Hola **mundo** cruel", selection = TextRange(8))
+        val result = SmartMarkdownFormatter.toggleFormat(initial, FormatStyle.BOLD)
+
+        assertEquals("Hola mundo cruel", result.text)
+        assertEquals(TextRange(6), result.selection)
+    }
+
+    @Test
     fun `toggleFormat wraps selected text with bold`() {
         val initial = TextFieldValue("selected", selection = TextRange(0, 8))
         val result = SmartMarkdownFormatter.toggleFormat(initial, FormatStyle.BOLD)
@@ -62,6 +71,10 @@ class SmartMarkdownFormatterTest {
         assertEquals("", toggledOff.text)
         assertEquals(TextRange(0), toggledOff.selection)
 
+        val insideItalic = TextFieldValue("Hola *mundo* fin", selection = TextRange(8))
+        val unwrappedInside = SmartMarkdownFormatter.toggleFormat(insideItalic, FormatStyle.ITALIC)
+        assertEquals("Hola mundo fin", unwrappedInside.text)
+
         val selected = TextFieldValue("hello", selection = TextRange(0, 5))
         val wrapped = SmartMarkdownFormatter.toggleFormat(selected, FormatStyle.ITALIC)
         assertEquals("*hello*", wrapped.text)
@@ -71,7 +84,7 @@ class SmartMarkdownFormatterTest {
     }
 
     @Test
-    fun `toggleFormat with latex centers cursor and toggles off`() {
+    fun `toggleFormat with latex centers cursor and unwraps`() {
         val empty = TextFieldValue("", selection = TextRange(0))
         val formatted = SmartMarkdownFormatter.toggleFormat(empty, FormatStyle.LATEX)
         assertEquals("$$$$", formatted.text)
@@ -80,6 +93,10 @@ class SmartMarkdownFormatterTest {
         val toggledOff = SmartMarkdownFormatter.toggleFormat(formatted, FormatStyle.LATEX)
         assertEquals("", toggledOff.text)
         assertEquals(TextRange(0), toggledOff.selection)
+
+        val insideMath = TextFieldValue("E = \$\$mc^2\$\$ formula", selection = TextRange(8))
+        val unwrappedMath = SmartMarkdownFormatter.toggleFormat(insideMath, FormatStyle.LATEX)
+        assertEquals("E = mc^2 formula", unwrappedMath.text)
     }
 
     @Test
@@ -110,16 +127,29 @@ class SmartMarkdownFormatterTest {
     }
 
     @Test
-    fun `toggleFormat with checkbox and bullet replaces and toggles`() {
+    fun `toggleFormat with checkbox cycles unchecked, checked, and removed`() {
         val initial = TextFieldValue("Item", selection = TextRange(4))
-        val bullet = SmartMarkdownFormatter.toggleFormat(initial, FormatStyle.BULLET)
-        assertEquals("- Item", bullet.text)
+        val unchecked = SmartMarkdownFormatter.toggleFormat(initial, FormatStyle.CHECKBOX)
+        assertEquals("- [ ] Item", unchecked.text)
 
-        val checkbox = SmartMarkdownFormatter.toggleFormat(bullet, FormatStyle.CHECKBOX)
-        assertEquals("- [ ] Item", checkbox.text)
+        val checked = SmartMarkdownFormatter.toggleFormat(unchecked, FormatStyle.CHECKBOX)
+        assertEquals("- [x] Item", checked.text)
 
-        val toggledOff = SmartMarkdownFormatter.toggleFormat(checkbox, FormatStyle.CHECKBOX)
-        assertEquals("Item", toggledOff.text)
+        val removed = SmartMarkdownFormatter.toggleFormat(checked, FormatStyle.CHECKBOX)
+        assertEquals("Item", removed.text)
+    }
+
+    @Test
+    fun `toggleFormat with indented checkbox preserves indent through cycle`() {
+        val initial = TextFieldValue("  Item", selection = TextRange(6))
+        val unchecked = SmartMarkdownFormatter.toggleFormat(initial, FormatStyle.CHECKBOX)
+        assertEquals("  - [ ] Item", unchecked.text)
+
+        val checked = SmartMarkdownFormatter.toggleFormat(unchecked, FormatStyle.CHECKBOX)
+        assertEquals("  - [x] Item", checked.text)
+
+        val removed = SmartMarkdownFormatter.toggleFormat(checked, FormatStyle.CHECKBOX)
+        assertEquals("  Item", removed.text)
     }
 
     @Test
@@ -243,4 +273,39 @@ class SmartMarkdownFormatterTest {
         val withDividerAfterText = SmartMarkdownFormatter.toggleFormat(textValue, FormatStyle.DIVIDER)
         assertEquals("hello\n---\n", withDividerAfterText.text)
     }
+
+    @Test
+    fun `toggleFormat with compact no-space checkbox cycles unchecked to checked and removed`() {
+        val initial = TextFieldValue("-[ ] Item", selection = TextRange(8))
+        val checked = SmartMarkdownFormatter.toggleFormat(initial, FormatStyle.CHECKBOX)
+        assertEquals("- [x] Item", checked.text)
+
+        val removed = SmartMarkdownFormatter.toggleFormat(checked, FormatStyle.CHECKBOX)
+        assertEquals("Item", removed.text)
+    }
+
+    @Test
+    fun `detectActiveStyles detects checkbox with compact no-space syntax`() {
+        val compactUnchecked = TextFieldValue("-[ ] Tarea", selection = TextRange(6))
+        assertTrue(SmartMarkdownFormatter.detectActiveStyles(compactUnchecked).contains(FormatStyle.CHECKBOX))
+
+        val compactChecked = TextFieldValue("-[x] Tarea", selection = TextRange(6))
+        assertTrue(SmartMarkdownFormatter.detectActiveStyles(compactChecked).contains(FormatStyle.CHECKBOX))
+    }
+
+    @Test
+    fun `handleSmartEnter with compact no-space checkbox continues list and clears empty`() {
+        // Non-empty compact checkbox: continues list
+        val oldNonEmpty = TextFieldValue("-[ ] Tarea", selection = TextRange(10))
+        val newNonEmpty = TextFieldValue("-[ ] Tarea\n", selection = TextRange(11))
+        val continued = SmartMarkdownFormatter.handleSmartEnter(oldNonEmpty, newNonEmpty)
+        assertEquals("-[ ] Tarea\n- [ ] ", continued.text)
+
+        // Empty compact checkbox: clears checkbox
+        val oldEmpty = TextFieldValue("-[ ] ", selection = TextRange(5))
+        val newEmpty = TextFieldValue("-[ ] \n", selection = TextRange(6))
+        val cleared = SmartMarkdownFormatter.handleSmartEnter(oldEmpty, newEmpty)
+        assertEquals("", cleared.text)
+    }
 }
+

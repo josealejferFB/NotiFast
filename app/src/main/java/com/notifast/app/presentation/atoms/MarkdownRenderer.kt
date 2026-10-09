@@ -43,9 +43,12 @@ sealed interface MarkdownBlock {
     data class TaskItem(val isChecked: Boolean, val text: String, val index: Int) : MarkdownBlock
     data class Quote(val text: String) : MarkdownBlock
     data class CodeBlock(val code: String, val language: String = "") : MarkdownBlock
+    data class MathBlock(val formula: String) : MarkdownBlock
 }
 
 object MarkdownParser {
+
+    private val TASK_REGEX = Regex("""^[-*]\s*\[([ xX]?)]\s*(.*)$""")
 
     fun parse(rawText: String): List<MarkdownBlock> {
         if (rawText.isBlank()) return emptyList()
@@ -82,6 +85,7 @@ object MarkdownParser {
                 continue
             }
 
+            val taskMatch = TASK_REGEX.matchEntire(trimmed)
             when {
                 trimmed.startsWith("### ") -> {
                     blocks.add(MarkdownBlock.Header(level = 3, text = trimmed.removePrefix("### ").trim()))
@@ -92,15 +96,22 @@ object MarkdownParser {
                 trimmed.startsWith("# ") -> {
                     blocks.add(MarkdownBlock.Header(level = 1, text = trimmed.removePrefix("# ").trim()))
                 }
-                trimmed.startsWith("- [ ] ") -> {
-                    blocks.add(MarkdownBlock.TaskItem(isChecked = false, text = trimmed.removePrefix("- [ ] ").trim(), index = taskIndex++))
-                }
-                trimmed.startsWith("- [x] ", ignoreCase = true) -> {
-                    blocks.add(MarkdownBlock.TaskItem(isChecked = true, text = trimmed.substring(6).trim(), index = taskIndex++))
+                taskMatch != null -> {
+                    val isChecked = taskMatch.groupValues[1].equals("x", ignoreCase = true)
+                    val taskText = taskMatch.groupValues[2].trim()
+                    blocks.add(MarkdownBlock.TaskItem(isChecked = isChecked, text = taskText, index = taskIndex++))
                 }
                 trimmed.startsWith("* ") || trimmed.startsWith("- ") -> {
                     val content = if (trimmed.startsWith("* ")) trimmed.removePrefix("* ") else trimmed.removePrefix("- ")
                     blocks.add(MarkdownBlock.BulletItem(text = content.trim()))
+                }
+                trimmed.startsWith("$$") -> {
+                    val formula = if (trimmed.endsWith("$$") && trimmed.length > 4) {
+                        trimmed.removePrefix("$$").removeSuffix("$$").trim()
+                    } else {
+                        trimmed.removePrefix("$$").trim()
+                    }
+                    blocks.add(MarkdownBlock.MathBlock(formula))
                 }
                 trimmed.startsWith("> ") -> {
                     blocks.add(MarkdownBlock.Quote(text = trimmed.removePrefix("> ").trim()))
@@ -116,6 +127,30 @@ object MarkdownParser {
         }
 
         return blocks
+    }
+
+    fun toggleTaskCheckbox(rawText: String, targetIndex: Int, isChecked: Boolean): String {
+        val lines = rawText.lines()
+        var currentIndex = 0
+        val newLines = lines.map { line ->
+            val trimmed = line.trimStart()
+            val match = TASK_REGEX.matchEntire(trimmed)
+            if (match != null) {
+                if (currentIndex == targetIndex) {
+                    currentIndex++
+                    val indent = line.substring(0, line.length - trimmed.length)
+                    val rest = match.groupValues[2].trim()
+                    val check = if (isChecked) "x" else " "
+                    "$indent- [$check] $rest"
+                } else {
+                    currentIndex++
+                    line
+                }
+            } else {
+                line
+            }
+        }
+        return newLines.joinToString("\n")
     }
 
     fun parseInlineFormatting(text: String): AnnotatedString {
@@ -283,6 +318,31 @@ fun NotiFastMarkdown(
                             text = block.code,
                             fontFamily = com.notifast.app.presentation.theme.type.JetBrainsMonoFamily,
                             fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+                is MarkdownBlock.MathBlock -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "∑",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 10.dp)
+                        )
+                        Text(
+                            text = block.formula,
+                            fontFamily = FontFamily.Monospace,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }

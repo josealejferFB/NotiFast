@@ -83,4 +83,92 @@ class MarkdownParserTest {
         assertTrue(blocks[0] is MarkdownBlock.Paragraph)
         assertEquals("Este es un párrafo de texto normal para estudiar.", (blocks[0] as MarkdownBlock.Paragraph).text)
     }
+
+    @Test
+    fun `parse math block formula correctly`() {
+        val markdown = "$$ E = mc^2 $$"
+        val blocks = MarkdownParser.parse(markdown)
+
+        assertEquals(1, blocks.size)
+        assertTrue(blocks[0] is MarkdownBlock.MathBlock)
+        assertEquals("E = mc^2", (blocks[0] as MarkdownBlock.MathBlock).formula)
+    }
+
+    @Test
+    fun `toggleTaskCheckbox flips unchecked to checked and vice versa`() {
+        val markdown = """
+            # Tareas
+            - [ ] Primera tarea
+            - [x] Segunda tarea
+        """.trimIndent()
+
+        val toggled1 = MarkdownParser.toggleTaskCheckbox(markdown, targetIndex = 0, isChecked = true)
+        assertTrue(toggled1.contains("- [x] Primera tarea"))
+        assertTrue(toggled1.contains("- [x] Segunda tarea"))
+
+        val toggled2 = MarkdownParser.toggleTaskCheckbox(toggled1, targetIndex = 1, isChecked = false)
+        assertTrue(toggled2.contains("- [x] Primera tarea"))
+        assertTrue(toggled2.contains("- [ ] Segunda tarea"))
+    }
+
+    @Test
+    fun `parse task items with compact no-space format and edge cases`() {
+        val markdown = """
+            -[ ] Tarea sin espacio
+            -[x] Completada sin espacio
+            -[ ]
+            - [ ]
+            * [ ] Viñeta asterisco
+            * [x] Viñeta completada
+        """.trimIndent()
+
+        val blocks = MarkdownParser.parse(markdown)
+
+        assertEquals(6, blocks.size)
+
+        assertTrue(blocks[0] is MarkdownBlock.TaskItem)
+        val task0 = blocks[0] as MarkdownBlock.TaskItem
+        assertFalse(task0.isChecked)
+        assertEquals("Tarea sin espacio", task0.text)
+
+        assertTrue(blocks[1] is MarkdownBlock.TaskItem)
+        val task1 = blocks[1] as MarkdownBlock.TaskItem
+        assertTrue(task1.isChecked)
+        assertEquals("Completada sin espacio", task1.text)
+
+        assertTrue(blocks[2] is MarkdownBlock.TaskItem)
+        val task2 = blocks[2] as MarkdownBlock.TaskItem
+        assertFalse(task2.isChecked)
+        assertEquals("", task2.text)
+
+        assertTrue(blocks[3] is MarkdownBlock.TaskItem)
+        val task3 = blocks[3] as MarkdownBlock.TaskItem
+        assertFalse(task3.isChecked)
+        assertEquals("", task3.text)
+
+        assertTrue(blocks[4] is MarkdownBlock.TaskItem)
+        val task4 = blocks[4] as MarkdownBlock.TaskItem
+        assertFalse(task4.isChecked)
+        assertEquals("Viñeta asterisco", task4.text)
+
+        assertTrue(blocks[5] is MarkdownBlock.TaskItem)
+        val task5 = blocks[5] as MarkdownBlock.TaskItem
+        assertTrue(task5.isChecked)
+        assertEquals("Viñeta completada", task5.text)
+    }
+
+    @Test
+    fun `toggleTaskCheckbox handles compact no-space task items cleanly`() {
+        val markdown = """
+            -[ ] Tarea compacta
+            -[x] Tarea hecha
+        """.trimIndent()
+
+        val toggled = MarkdownParser.toggleTaskCheckbox(markdown, targetIndex = 0, isChecked = true)
+        assertTrue(toggled.contains("- [x] Tarea compacta"))
+
+        val toggledBack = MarkdownParser.toggleTaskCheckbox(toggled, targetIndex = 1, isChecked = false)
+        assertTrue(toggledBack.contains("- [ ] Tarea hecha"))
+    }
 }
+

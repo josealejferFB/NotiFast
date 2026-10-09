@@ -203,4 +203,29 @@ class NotesViewModelTest {
         assertEquals(1, filteredNotes.size)
         assertEquals("Cinemática", filteredNotes.first().title)
     }
+
+    @Test
+    fun `when ToggleTaskCheck event dispatched, updates note via repository`() = runTest {
+        val note = Note(
+            id = "1",
+            subject = "Matemáticas",
+            title = "Tareas",
+            content = "- [ ] Tarea 1\n- [ ] Tarea 2"
+        )
+        coEvery { noteRepository.updateNote(any(), any(), any()) } returns Result.success(Unit)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.ToggleTaskCheck(note, taskIndex = 0, isChecked = true))
+        advanceUntilIdle()
+
+        io.mockk.coVerify {
+            noteRepository.updateNote(
+                "user_123",
+                match { it.content.contains("- [x] Tarea 1") },
+                null
+            )
+        }
+    }
 }

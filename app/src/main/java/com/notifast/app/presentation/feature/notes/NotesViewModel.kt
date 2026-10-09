@@ -28,6 +28,8 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import com.notifast.app.domain.usecase.ImportSubjectPackageUseCase
+import com.notifast.app.domain.util.MarkdownToBlocksParser
+import com.notifast.app.presentation.atoms.MarkdownParser
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -251,6 +253,23 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.SelectTag -> _selectedTag.value = event.tag
             is NotesEvent.DeleteNote -> deleteNote(event.note)
             is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
+            is NotesEvent.ToggleTaskCheck -> toggleTaskCheck(event.note, event.taskIndex, event.isChecked)
+        }
+    }
+
+    private fun toggleTaskCheck(note: Note, taskIndex: Int, isChecked: Boolean) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val updatedContent = MarkdownParser.toggleTaskCheckbox(note.content, taskIndex, isChecked)
+            val updatedNote = note.copy(
+                content = updatedContent,
+                updatedAt = Date(),
+                blocks = MarkdownToBlocksParser.parse(updatedContent, note.imageUrl)
+            )
+            noteRepository.updateNote(userId, updatedNote, null).fold(
+                onSuccess = { _uiState.update { it.copy(error = null) } },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") } }
+            )
         }
     }
 

@@ -122,6 +122,7 @@
     <string name="notes_tab_preview">Vista Previa</string>
     <string name="notes_tags_label">Etiquetas temáticas</string>
     <string name="notes_add_tag_placeholder">Nueva etiqueta…</string>
+    <string name="notes_btn_new_tag">Nueva etiqueta</string>
     <string name="notes_tag_suggestion_exam">Examen</string>
     <string name="notes_tag_suggestion_homework">Tarea</string>
     <string name="notes_tag_suggestion_formula">Fórmula</string>

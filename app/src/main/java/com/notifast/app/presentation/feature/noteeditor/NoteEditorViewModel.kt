@@ -1,30 +1,27 @@
 package com.notifast.app.presentation.feature.noteeditor
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.R
-import com.notifast.app.data.model.CheckItem
-import com.notifast.app.data.model.ListItem
 import com.notifast.app.data.model.Note
-import com.notifast.app.data.model.NoteBlock
-import com.notifast.app.data.model.TextSpan
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
-import com.notifast.app.domain.util.TextSpanOps
+import com.notifast.app.domain.usecase.ExportNoteMarkdownUseCase
+import com.notifast.app.domain.util.MarkdownToBlocksParser
+import com.notifast.app.presentation.atoms.MarkdownParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,395 +30,306 @@ class NoteEditorViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val authRepository: AuthRepository,
     private val imageRepository: ImageRepository,
+    private val exportNoteMarkdownUseCase: ExportNoteMarkdownUseCase = ExportNoteMarkdownUseCase(),
     @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val noteId: String? = savedStateHandle["noteId"]
-    private val initialSubject: String = savedStateHandle["subject"] ?: ""
-    private val _uiState = MutableStateFlow(NoteEditorUiState(noteId = noteId, subject = initialSubject))
+    private val noteId: String? = savedStateHandle.get<String>("noteId")?.let { if (it.isBlank()) null else it }
+    private val initialSubject: String = savedStateHandle.get<String>("subject") ?: ""
+
+    private val _uiState = MutableStateFlow(
+        NoteEditorUiState(
+            noteId = noteId,
+            subject = initialSubject
+        )
+    )
     val uiState: StateFlow<NoteEditorUiState> = _uiState.asStateFlow()
 
-    private var saveJob: Job? = null
-
     init {
-        loadInitial()
+        loadInitial(noteId, initialSubject)
     }
 
-    private fun loadInitial() {
+    private fun loadInitial(targetNoteId: String? = noteId, targetSubject: String = initialSubject) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    isSaved = false,
+                    error = null,
+                    syncStatus = null,
+                    noteId = targetNoteId,
+                    subject = targetSubject
+                )
+            }
             val userId = authRepository.getCurrentUserId()
             val subjects = if (userId != null) noteRepository.getSubjects(userId).first() else emptyList()
-            if (noteId != null && userId != null) {
+
+            if (targetNoteId != null && userId != null) {
                 val notes = noteRepository.getNotes(userId).first()
-                val note = notes.find { it.id == noteId }
-                if (note != null) {
+                val existing = notes.find { it.id == targetNoteId }
+                if (existing != null) {
+                    val content = when {
+                        existing.content.isNotBlank() -> existing.content
+                        existing.blocks.isNotEmpty() -> {
+                            val fullExport = exportNoteMarkdownUseCase(existing)
+                            fullExport.substringAfter("\n\n", existing.content).trim()
+                        }
+                        else -> ""
+                    }
+                    val words = calculateWordCount(content)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            subject = note.subject,
+                            noteId = existing.id,
+                            subject = existing.subject,
                             subjects = subjects,
-                            title = note.title,
-                            blocks = note.blocks.ifEmpty { defaultBlocks() },
-                            tags = note.tags
+                            title = existing.title,
+                            content = content,
+                            tags = existing.tags,
+                            imageUrl = existing.imageUrl,
+                            imageUri = null,
+                            isPreviewMode = false,
+                            wordCount = words,
+                            readingTimeMinutes = calculateReadingTime(words),
+                            isSaved = false,
+                            error = null
                         )
                     }
                     return@launch
                 }
             }
+
             _uiState.update {
                 it.copy(
                     isLoading = false,
+                    noteId = null,
                     subjects = subjects,
-                    subject = if (it.subject.isBlank()) initialSubject else it.subject,
-                    blocks = defaultBlocks()
+                    subject = if (it.subject.isBlank()) targetSubject else it.subject,
+                    title = "",
+                    content = "",
+                    tags = emptyList(),
+                    imageUrl = null,
+                    imageUri = null,
+                    isPreviewMode = false,
+                    wordCount = 0,
+                    readingTimeMinutes = 0,
+                    isSaved = false,
+                    error = null
                 )
             }
         }
     }
 
-    private fun defaultBlocks(): List<NoteBlock> = listOf(
-        NoteBlock.Paragraph(id = UUID.randomUUID().toString(), text = "")
-    )
-
     fun onEvent(event: NoteEditorEvent) {
         when (event) {
+            is NoteEditorEvent.Init -> {
+                loadInitial(event.noteId, event.subject ?: "")
+            }
             is NoteEditorEvent.TitleChanged -> {
                 _uiState.update { it.copy(title = event.title) }
-                scheduleAutoSave()
+            }
+            is NoteEditorEvent.ContentChanged -> {
+                val words = calculateWordCount(event.content)
+                _uiState.update {
+                    it.copy(
+                        content = event.content,
+                        wordCount = words,
+                        readingTimeMinutes = calculateReadingTime(words)
+                    )
+                }
             }
             is NoteEditorEvent.SubjectChanged -> {
                 _uiState.update { it.copy(subject = event.subject) }
-                scheduleAutoSave()
             }
             is NoteEditorEvent.TagToggled -> toggleTag(event.tag)
             is NoteEditorEvent.CustomTagAdded -> addTag(event.tag)
             is NoteEditorEvent.CustomTagRemoved -> removeTag(event.tag)
-
-            is NoteEditorEvent.BlockTextChanged -> updateBlock(event.blockId) { block ->
-                when (block) {
-                    is NoteBlock.Heading -> block.copy(text = event.text)
-                    is NoteBlock.Paragraph -> block.copy(text = event.text)
-                    is NoteBlock.Quote -> block.copy(text = event.text)
-                    else -> block
+            is NoteEditorEvent.ImageSelected -> {
+                _uiState.update { it.copy(imageUri = event.uri) }
+            }
+            is NoteEditorEvent.InsertFormatting -> insertFormatting(event.prefix, event.suffix)
+            is NoteEditorEvent.TogglePreview -> {
+                _uiState.update { it.copy(isPreviewMode = event.isPreview) }
+            }
+            is NoteEditorEvent.TaskCheckToggled -> {
+                val updatedContent = MarkdownParser.toggleTaskCheckbox(
+                    rawText = _uiState.value.content,
+                    targetIndex = event.taskIndex,
+                    isChecked = event.isChecked
+                )
+                val words = calculateWordCount(updatedContent)
+                _uiState.update {
+                    it.copy(
+                        content = updatedContent,
+                        wordCount = words,
+                        readingTimeMinutes = calculateReadingTime(words)
+                    )
                 }
             }
-            is NoteEditorEvent.BlockSpansChanged -> updateBlock(event.blockId) { block ->
-                when (block) {
-                    is NoteBlock.Heading -> block.copy(spans = event.spans)
-                    is NoteBlock.Paragraph -> block.copy(spans = event.spans)
-                    is NoteBlock.Quote -> block.copy(spans = event.spans)
-                    else -> block
-                }
-            }
-            is NoteEditorEvent.BlockFocused -> _uiState.update { it.copy(focusedBlockId = event.blockId) }
-            is NoteEditorEvent.SelectionChanged -> _uiState.update {
-                it.copy(selectionBlockId = event.blockId, selectionStart = event.start, selectionEnd = event.end)
-            }
-            is NoteEditorEvent.ToggleSpanStyle -> updateBlock(event.blockId) { block ->
-                val currentSpans = when (block) {
-                    is NoteBlock.Heading -> block.spans
-                    is NoteBlock.Paragraph -> block.spans
-                    is NoteBlock.Quote -> block.spans
-                    else -> emptyList()
-                }
-                val newSpans = TextSpanOps.toggleStyle(currentSpans, event.start, event.end, event.style)
-                when (block) {
-                    is NoteBlock.Heading -> block.copy(spans = newSpans)
-                    is NoteBlock.Paragraph -> block.copy(spans = newSpans)
-                    is NoteBlock.Quote -> block.copy(spans = newSpans)
-                    else -> block
-                }
-            }
-            is NoteEditorEvent.BlockMoved -> moveBlock(event.fromIndex, event.toIndex)
-            is NoteEditorEvent.BlockDeleted -> deleteBlock(event.blockId)
-            is NoteEditorEvent.BlockInserted -> insertBlock(event.afterBlockId, event.type)
-            is NoteEditorEvent.BlockTypeChanged -> changeBlockType(event.blockId, event.newType)
-
-            is NoteEditorEvent.CheckItemToggled -> updateChecklistItem(event.blockId, event.itemIndex) { item ->
-                item.copy(isChecked = !item.isChecked)
-            }
-            is NoteEditorEvent.CheckItemTextChanged -> updateChecklistItem(event.blockId, event.itemIndex) { item ->
-                item.copy(text = event.text)
-            }
-            is NoteEditorEvent.CheckItemAdded -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.Checklist) {
-                    block.copy(items = block.items + CheckItem(text = ""))
-                } else block
-            }
-            is NoteEditorEvent.CheckItemRemoved -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.Checklist) {
-                    block.copy(items = block.items.filterIndexed { i, _ -> i != event.itemIndex })
-                } else block
-            }
-
-            is NoteEditorEvent.ListItemTextChanged -> updateListItem(event.blockId, event.itemIndex) { item ->
-                item.copy(text = event.text)
-            }
-            is NoteEditorEvent.ListItemAdded -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.BulletList) {
-                    block.copy(items = block.items + ListItem(text = ""))
-                } else block
-            }
-            is NoteEditorEvent.ListItemRemoved -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.BulletList) {
-                    block.copy(items = block.items.filterIndexed { i, _ -> i != event.itemIndex })
-                } else block
-            }
-            is NoteEditorEvent.ListItemOrderedChanged -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.BulletList) block.copy(isOrdered = event.isOrdered) else block
-            }
-
-            is NoteEditorEvent.ImageBlockAdded -> insertImageBlock(event.afterBlockId, event.path)
-            is NoteEditorEvent.ImageSelectedForBlock -> persistAndInsertImage(event.afterBlockId, event.uri)
-            is NoteEditorEvent.ImageBlockRemoved -> deleteBlock(event.blockId)
-            is NoteEditorEvent.ImageAnnotationSaved -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.Image) block.copy(annotationJson = event.annotationJson) else block
-            }
-
-            is NoteEditorEvent.MathSourceChanged -> updateBlock(event.blockId) { block ->
-                if (block is NoteBlock.MathBlock) block.copy(source = event.source) else block
-            }
-
             is NoteEditorEvent.SaveClicked -> saveNote()
-            is NoteEditorEvent.ClearError -> _uiState.update { it.copy(error = null) }
-            is NoteEditorEvent.ResetState -> _uiState.update { NoteEditorUiState(noteId = noteId) }
+            is NoteEditorEvent.ClearError -> {
+                _uiState.update { it.copy(error = null) }
+            }
+            is NoteEditorEvent.ResetState -> {
+                _uiState.update { NoteEditorUiState() }
+            }
+        }
+    }
+
+    private fun insertFormatting(prefix: String, suffix: String) {
+        _uiState.update { state ->
+            val current = state.content
+            val newContent = if (suffix.isEmpty()) {
+                if (current.isEmpty() || current.endsWith("\n")) {
+                    current + prefix
+                } else {
+                    current + "\n" + prefix
+                }
+            } else {
+                current + prefix + suffix
+            }
+            val words = calculateWordCount(newContent)
+            state.copy(
+                content = newContent,
+                wordCount = words,
+                readingTimeMinutes = calculateReadingTime(words)
+            )
         }
     }
 
     private fun toggleTag(tag: String) {
-        val clean = tag.trim()
+        val clean = tag.removePrefix("#").trim()
         if (clean.isBlank()) return
         _uiState.update { state ->
-            val newTags = if (state.tags.contains(clean)) {
-                state.tags.filterNot { it == clean }
+            val exists = state.tags.any { it.equals(clean, ignoreCase = true) }
+            val updated = if (exists) {
+                state.tags.filterNot { it.equals(clean, ignoreCase = true) }
             } else {
                 state.tags + clean
             }
-            state.copy(tags = newTags)
+            state.copy(tags = updated)
         }
-        scheduleAutoSave()
     }
 
     private fun addTag(tag: String) {
-        val clean = tag.trim()
+        val clean = tag.removePrefix("#").trim()
         if (clean.isBlank()) return
         _uiState.update { state ->
-            if (state.tags.contains(clean)) state
-            else state.copy(tags = state.tags + clean)
+            if (state.tags.none { it.equals(clean, ignoreCase = true) }) {
+                state.copy(tags = state.tags + clean)
+            } else state
         }
-        scheduleAutoSave()
     }
 
     private fun removeTag(tag: String) {
-        _uiState.update { it.copy(tags = it.tags.filterNot { t -> t == tag }) }
-        scheduleAutoSave()
-    }
-
-    private fun updateBlock(blockId: String, transform: (NoteBlock) -> NoteBlock) {
+        val clean = tag.removePrefix("#").trim()
         _uiState.update { state ->
-            state.copy(blocks = state.blocks.map { if (it.id == blockId) transform(it) else it })
-        }
-        scheduleAutoSave()
-    }
-
-    private fun updateChecklistItem(blockId: String, itemIndex: Int, transform: (CheckItem) -> CheckItem) {
-        updateBlock(blockId) { block ->
-            if (block is NoteBlock.Checklist) {
-                block.copy(items = block.items.mapIndexed { i, item -> if (i == itemIndex) transform(item) else item })
-            } else block
-        }
-    }
-
-    private fun updateListItem(blockId: String, itemIndex: Int, transform: (ListItem) -> ListItem) {
-        updateBlock(blockId) { block ->
-            if (block is NoteBlock.BulletList) {
-                block.copy(items = block.items.mapIndexed { i, item -> if (i == itemIndex) transform(item) else item })
-            } else block
-        }
-    }
-
-    private fun moveBlock(fromIndex: Int, toIndex: Int) {
-        _uiState.update { state ->
-            val mutable = state.blocks.toMutableList()
-            if (fromIndex in mutable.indices && toIndex in mutable.indices) {
-                val item = mutable.removeAt(fromIndex)
-                mutable.add(toIndex, item)
-            }
-            state.copy(blocks = mutable)
-        }
-        scheduleAutoSave()
-    }
-
-    private fun deleteBlock(blockId: String) {
-        _uiState.update { state ->
-            val remaining = state.blocks.filterNot { it.id == blockId }
-            state.copy(
-                blocks = remaining.ifEmpty { defaultBlocks() },
-                focusedBlockId = if (state.focusedBlockId == blockId) null else state.focusedBlockId
-            )
-        }
-        scheduleAutoSave()
-    }
-
-    private fun insertBlock(afterBlockId: String?, type: BlockType) {
-        val newBlock = createBlock(type)
-        _uiState.update { state ->
-            val mutable = state.blocks.toMutableList()
-            val index = if (afterBlockId == null) {
-                mutable.size
-            } else {
-                mutable.indexOfFirst { it.id == afterBlockId }.let { if (it == -1) mutable.size else it + 1 }
-            }
-            mutable.add(index, newBlock)
-            state.copy(blocks = mutable, focusedBlockId = newBlock.id)
-        }
-        scheduleAutoSave()
-    }
-
-    private fun insertImageBlock(afterBlockId: String?, path: String) {
-        val newBlock = NoteBlock.Image(id = UUID.randomUUID().toString(), path = path)
-        _uiState.update { state ->
-            val mutable = state.blocks.toMutableList()
-            val index = if (afterBlockId == null) {
-                mutable.size
-            } else {
-                mutable.indexOfFirst { it.id == afterBlockId }.let { if (it == -1) mutable.size else it + 1 }
-            }
-            mutable.add(index, newBlock)
-            state.copy(blocks = mutable)
-        }
-        scheduleAutoSave()
-    }
-
-    private fun persistAndInsertImage(afterBlockId: String?, uri: android.net.Uri) {
-        viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            imageRepository.uploadNoteImage(userId, uri).fold(
-                onSuccess = { persistedPath ->
-                    insertImageBlock(afterBlockId, persistedPath)
-                },
-                onFailure = { e ->
-                    _uiState.update { it.copy(error = e.message ?: context.getString(R.string.note_error_save_failed)) }
-                }
-            )
-        }
-    }
-
-    private fun changeBlockType(blockId: String, newType: BlockType) {
-        updateBlock(blockId) { block ->
-            val text = when (block) {
-                is NoteBlock.Heading -> block.text
-                is NoteBlock.Paragraph -> block.text
-                is NoteBlock.Quote -> block.text
-                is NoteBlock.BulletList -> block.items.joinToString("\n") { it.text }
-                is NoteBlock.Checklist -> block.items.joinToString("\n") { it.text }
-                is NoteBlock.MathBlock -> block.source
-                is NoteBlock.Image -> block.caption
-                is NoteBlock.Divider -> ""
-            }
-            createBlock(newType, id = blockId, text = text)
-        }
-    }
-
-    private fun createBlock(type: BlockType, id: String = UUID.randomUUID().toString(), text: String = ""): NoteBlock {
-        return when (type) {
-            BlockType.HEADING -> NoteBlock.Heading(id = id, text = text, level = 1)
-            BlockType.PARAGRAPH -> NoteBlock.Paragraph(id = id, text = text)
-            BlockType.BULLET_LIST -> NoteBlock.BulletList(id = id, items = listOf(ListItem(text = text)), isOrdered = false)
-            BlockType.ORDERED_LIST -> NoteBlock.BulletList(id = id, items = listOf(ListItem(text = text)), isOrdered = true)
-            BlockType.CHECKLIST -> NoteBlock.Checklist(id = id, items = listOf(CheckItem(text = text)))
-            BlockType.QUOTE -> NoteBlock.Quote(id = id, text = text)
-            BlockType.IMAGE -> NoteBlock.Image(id = id, path = text)
-            BlockType.MATH -> NoteBlock.MathBlock(id = id, source = text)
-            BlockType.DIVIDER -> NoteBlock.Divider(id = id)
-        }
-    }
-
-    private fun scheduleAutoSave() {
-        saveJob?.cancel()
-        saveJob = viewModelScope.launch {
-            delay(1000)
-            persistNote()
+            state.copy(tags = state.tags.filterNot { it.equals(clean, ignoreCase = true) })
         }
     }
 
     private fun saveNote() {
-        saveJob?.cancel()
-        saveJob = viewModelScope.launch { persistNote(exitAfter = true) }
-    }
-
-    private suspend fun persistNote(exitAfter: Boolean = false) {
         val state = _uiState.value
-        val userId = authRepository.getCurrentUserId()
-        if (userId == null) {
-            _uiState.update { it.copy(error = context.getString(R.string.note_error_unauthenticated)) }
-            return
-        }
         if (state.subject.isBlank()) {
-            if (exitAfter) _uiState.update { it.copy(error = context.getString(R.string.note_error_select_subject)) }
+            _uiState.update { it.copy(error = context.getString(R.string.note_error_select_subject)) }
             return
         }
         if (state.title.isBlank()) {
-            if (exitAfter) _uiState.update { it.copy(error = context.getString(R.string.note_error_title_required)) }
+            _uiState.update { it.copy(error = context.getString(R.string.note_error_title_required)) }
             return
         }
 
-        _uiState.update { it.copy(syncStatus = context.getString(R.string.sync_saving), error = null) }
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(error = context.getString(R.string.note_error_unauthenticated)) }
+                return@launch
+            }
+            _uiState.update { it.copy(isLoading = true, syncStatus = context.getString(R.string.sync_saving), error = null) }
 
-        if (state.noteId == null) {
-            noteRepository.addNoteWithBlocks(
-                userId = userId,
-                subject = state.subject,
-                title = state.title,
-                blocks = state.blocks,
-                tags = state.tags
-            ).fold(
-                onSuccess = { id ->
-                    _uiState.update {
-                        it.copy(
-                            noteId = id,
-                            isSaved = exitAfter,
-                            syncStatus = if (exitAfter) null else context.getString(R.string.sync_saved)
-                        )
+            if (state.noteId == null) {
+                val result = noteRepository.addNote(
+                    userId = userId,
+                    subject = state.subject,
+                    title = state.title,
+                    content = state.content,
+                    imageUri = state.imageUri,
+                    tags = state.tags
+                )
+                result.fold(
+                    onSuccess = { id ->
+                        _uiState.update {
+                            it.copy(
+                                noteId = id,
+                                isLoading = false,
+                                isSaved = true,
+                                syncStatus = context.getString(R.string.sync_saved)
+                            )
+                        }
+                    },
+                    onFailure = { e ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                syncStatus = null,
+                                error = e.message ?: context.getString(R.string.note_error_save_failed)
+                            )
+                        }
                     }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(syncStatus = null, error = e.message ?: context.getString(R.string.note_error_save_failed))
+                )
+            } else {
+                val existingNotes = noteRepository.getNotes(userId).first()
+                val existing = existingNotes.find { it.id == state.noteId }
+                val updatedNote = Note(
+                    id = state.noteId,
+                    userId = userId,
+                    subjectId = existing?.subjectId ?: "",
+                    subject = state.subject,
+                    title = state.title,
+                    content = state.content,
+                    imageUrl = existing?.imageUrl,
+                    tags = state.tags,
+                    timestamp = existing?.timestamp ?: Date(),
+                    updatedAt = Date(),
+                    blocks = MarkdownToBlocksParser.parse(state.content, existing?.imageUrl)
+                )
+
+                val result = noteRepository.updateNote(
+                    userId = userId,
+                    note = updatedNote,
+                    imageUri = state.imageUri
+                )
+                result.fold(
+                    onSuccess = {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isSaved = true,
+                                syncStatus = context.getString(R.string.sync_saved)
+                            )
+                        }
+                    },
+                    onFailure = { e ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                syncStatus = null,
+                                error = e.message ?: context.getString(R.string.note_error_save_failed)
+                            )
+                        }
                     }
-                }
-            )
-        } else {
-            val existingNotes = noteRepository.getNotes(userId).first()
-            val existing = existingNotes.find { it.id == state.noteId }
-            val note = Note(
-                id = state.noteId,
-                userId = userId,
-                subjectId = existing?.subjectId ?: "",
-                subject = state.subject,
-                title = state.title,
-                content = existing?.content ?: "",
-                imageUrl = existing?.imageUrl,
-                tags = state.tags,
-                timestamp = existing?.timestamp,
-                blocks = state.blocks
-            )
-            noteRepository.updateNote(userId, note, imageUri = null).fold(
-                onSuccess = {
-                    _uiState.update {
-                        it.copy(
-                            isSaved = exitAfter,
-                            syncStatus = if (exitAfter) null else context.getString(R.string.sync_saved)
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(syncStatus = null, error = e.message ?: context.getString(R.string.note_error_save_failed))
-                    }
-                }
-            )
+                )
+            }
         }
+    }
+
+    private fun calculateWordCount(text: String): Int {
+        if (text.isBlank()) return 0
+        return text.trim().split(Regex("\\s+")).filter { it.isNotBlank() }.size
+    }
+
+    private fun calculateReadingTime(wordCount: Int): Int {
+        if (wordCount <= 0) return 0
+        return maxOf(1, (wordCount / 200))
     }
 }

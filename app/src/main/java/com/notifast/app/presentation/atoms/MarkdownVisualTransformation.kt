@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
@@ -32,10 +33,12 @@ class MarkdownVisualTransformation(
             // Line-based formatting (H1, H2, H3, quotes, lists)
             var lineStart = 0
             val lines = raw.split("\n")
+            val taskRegex = Regex("""^([*-]\s*\[[ xX]?]\s*)(.*)$""")
             for (line in lines) {
                 val lineEnd = lineStart + line.length
                 val trimmed = line.trimStart()
                 val indent = line.length - trimmed.length
+                val taskMatch = taskRegex.matchEntire(trimmed)
 
                 when {
                     trimmed.startsWith("### ") -> {
@@ -70,8 +73,24 @@ class MarkdownVisualTransformation(
                             lineEnd
                         )
                     }
-                    trimmed.startsWith("- [ ] ") || trimmed.startsWith("- [x] ", ignoreCase = true) -> {
-                        addStyle(SpanStyle(color = colorScheme.primary, fontWeight = FontWeight.Bold), lineStart + indent, lineStart + indent + 6)
+                    taskMatch != null -> {
+                        val token = taskMatch.groupValues[1]
+                        val tokenLen = token.length
+                        val isChecked = token.contains("x", ignoreCase = true)
+                        val tokenEnd = (lineStart + indent + tokenLen).coerceAtMost(lineEnd)
+                        if (isChecked) {
+                            addStyle(SpanStyle(color = colorScheme.primary.copy(alpha = 0.7f), fontWeight = FontWeight.Bold), lineStart + indent, tokenEnd)
+                            addStyle(
+                                SpanStyle(
+                                    textDecoration = TextDecoration.LineThrough,
+                                    color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                ),
+                                tokenEnd,
+                                lineEnd
+                            )
+                        } else {
+                            addStyle(SpanStyle(color = colorScheme.primary, fontWeight = FontWeight.Bold), lineStart + indent, tokenEnd)
+                        }
                     }
                     trimmed.startsWith("- ") -> {
                         addStyle(SpanStyle(color = colorScheme.primary, fontWeight = FontWeight.Bold), lineStart + indent, lineStart + indent + 2)

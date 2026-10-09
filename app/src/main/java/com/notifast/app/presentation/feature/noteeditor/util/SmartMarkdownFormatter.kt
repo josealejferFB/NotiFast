@@ -21,10 +21,23 @@ enum class FormatStyle {
  */
 object SmartMarkdownFormatter {
 
+    private val TASK_ITEM_REGEX = Regex("""^[-*]\s*\[([ xX]?)]\s*(.*)$""")
+    private val EMPTY_TASK_REGEX = Regex("""^[-*]\s*\[[ xX]?]\s*$""")
+    private val TASK_PREFIX_REGEX = Regex("""^[-*]\s*\[[ xX]?]\s*""")
+
     private val KNOWN_LINE_PREFIXES = listOf(
         "- [ ] ",
         "- [x] ",
         "- [X] ",
+        "-[ ] ",
+        "-[x] ",
+        "-[X] ",
+        "-[ ]",
+        "-[x]",
+        "-[X]",
+        "- [ ]",
+        "- [x]",
+        "- [X]",
         "## ",
         "# ",
         "> ",
@@ -32,9 +45,6 @@ object SmartMarkdownFormatter {
     )
 
     fun toggleFormat(value: TextFieldValue, style: FormatStyle): TextFieldValue {
-        val selStart = value.selection.min
-        val selEnd = value.selection.max
-
         return when (style) {
             FormatStyle.BOLD -> toggleInline(value, "**", "**")
             FormatStyle.ITALIC -> toggleItalic(value)
@@ -65,7 +75,7 @@ object SmartMarkdownFormatter {
         if (trimmed.startsWith("> ")) active.add(FormatStyle.QUOTE)
 
         when {
-            trimmed.startsWith("- [ ] ") || trimmed.startsWith("- [x] ", ignoreCase = true) -> active.add(FormatStyle.CHECKBOX)
+            TASK_ITEM_REGEX.matches(trimmed) -> active.add(FormatStyle.CHECKBOX)
             trimmed.startsWith("- ") -> active.add(FormatStyle.BULLET)
         }
 
@@ -136,7 +146,7 @@ object SmartMarkdownFormatter {
         val trimmed = prevLine.trim()
 
         // Empty task item
-        if (trimmed.equals("- [ ]", ignoreCase = true) || trimmed.equals("- [x]", ignoreCase = true)) {
+        if (EMPTY_TASK_REGEX.matches(trimmed)) {
             val before = newValue.text.substring(0, lineStart)
             val after = newValue.text.substring(newlinePos + 1)
             val newText = before + after
@@ -154,7 +164,7 @@ object SmartMarkdownFormatter {
         }
 
         // Non-empty task item
-        val isTaskItem = trimmed.startsWith("- [ ] ") || trimmed.startsWith("- [x] ", ignoreCase = true)
+        val isTaskItem = TASK_ITEM_REGEX.matches(trimmed) && !EMPTY_TASK_REGEX.matches(trimmed)
         if (isTaskItem) {
             val nextPrefix = "$indent- [ ] "
             val before = newValue.text.substring(0, newlinePos + 1)
@@ -218,6 +228,21 @@ object SmartMarkdownFormatter {
                 return TextFieldValue(newText, selection = TextRange(cursor - prefix.length))
             }
 
+            // Toggle off inside enclosing span
+            val (lineStart, lineEnd) = getLineBounds(text, cursor)
+            val line = text.substring(lineStart, lineEnd)
+            val relCursor = cursor - lineStart
+            val span = findEnclosingSpan(line, relCursor, prefix, suffix)
+            if (span != null) {
+                val (sStart, sEnd) = span
+                val absStart = lineStart + sStart
+                val absEnd = lineStart + sEnd
+                val inner = text.substring(absStart + prefix.length, absEnd - suffix.length)
+                val newText = text.substring(0, absStart) + inner + text.substring(absEnd)
+                val newCursor = (cursor - prefix.length).coerceIn(absStart, absStart + inner.length)
+                return TextFieldValue(newText, selection = TextRange(newCursor))
+            }
+
             // Insert empty tokens and place cursor in middle
             val newText = text.substring(0, cursor) + prefix + suffix + text.substring(cursor)
             return TextFieldValue(newText, selection = TextRange(cursor + prefix.length))
@@ -262,6 +287,21 @@ object SmartMarkdownFormatter {
                 return TextFieldValue(newText, selection = TextRange(cursor - 1))
             }
 
+            // Toggle off inside enclosing italic span
+            val (lineStart, lineEnd) = getLineBounds(text, cursor)
+            val line = text.substring(lineStart, lineEnd)
+            val relCursor = cursor - lineStart
+            val span = findEnclosingItalicSpan(line, relCursor)
+            if (span != null) {
+                val (sStart, sEnd) = span
+                val absStart = lineStart + sStart
+                val absEnd = lineStart + sEnd
+                val inner = text.substring(absStart + 1, absEnd - 1)
+                val newText = text.substring(0, absStart) + inner + text.substring(absEnd)
+                val newCursor = (cursor - 1).coerceIn(absStart, absStart + inner.length)
+                return TextFieldValue(newText, selection = TextRange(newCursor))
+            }
+
             val newText = text.substring(0, cursor) + "**" + text.substring(cursor)
             return TextFieldValue(newText, selection = TextRange(cursor + 1))
         }
@@ -272,37 +312,61 @@ object SmartMarkdownFormatter {
         val cursor = value.selection.start
         val (lineStart, lineEnd) = getLineBounds(text, cursor)
         val line = text.substring(lineStart, lineEnd)
+        val indent = line.takeWhile { it == ' ' || it == '\t' }
+        val contentStart = lineStart + indent.length
+        val contentLine = line.substring(indent.length)
 
-        // Check if line already has targetPrefix
+        // Special handling for checkbox: unchecked -> checked -> removed
+        if (targetPrefix == "- [ ] ") {
+            val taskPrefixMatch = TASK_PREFIX_REGEX.find(contentLine)
+            if (taskPrefixMatch != null && taskPrefixMatch.range.first == 0) {
+                val matchedPrefix = taskPrefixMatch.value
+                val isChecked = matchedPrefix.contains("x", ignoreCase = true)
+                val rest = contentLine.substring(matchedPrefix.length)
+                return if (!isChecked) {
+                    val newContent = "- [x] $rest"
+                    val newText = text.substring(0, contentStart) + newContent + text.substring(lineEnd)
+                    val offsetDiff = newContent.length - contentLine.length
+                    val newCursor = (cursor + offsetDiff).coerceIn(contentStart, contentStart + newContent.length)
+                    TextFieldValue(newText, selection = TextRange(newCursor))
+                } else {
+                    val newContent = rest
+                    val newText = text.substring(0, contentStart) + newContent + text.substring(lineEnd)
+                    val newCursor = if (cursor <= contentStart + matchedPrefix.length) contentStart else cursor - matchedPrefix.length
+                    TextFieldValue(newText, selection = TextRange(newCursor.coerceIn(0, newText.length)))
+                }
+            }
+        }
+
+        // Check if contentLine already has targetPrefix
         val matchesTarget = when (targetPrefix) {
-            "- [ ] " -> line.startsWith("- [ ] ") || line.startsWith("- [x] ", ignoreCase = true)
-            "# " -> line.startsWith("# ") && !line.startsWith("## ")
-            "- " -> line.startsWith("- ") && !line.startsWith("- [ ] ") && !line.startsWith("- [x] ", ignoreCase = true)
-            else -> line.startsWith(targetPrefix)
+            "# " -> contentLine.startsWith("# ") && !contentLine.startsWith("## ")
+            "- " -> contentLine.startsWith("- ") && !TASK_ITEM_REGEX.matches(contentLine)
+            else -> contentLine.startsWith(targetPrefix)
         }
 
         if (matchesTarget) {
-            val prefixLen = if (targetPrefix == "- [ ] " && line.startsWith("- [x] ", ignoreCase = true)) 6 else targetPrefix.length
-            val newText = text.substring(0, lineStart) + text.substring(lineStart + prefixLen)
-            val newCursor = if (cursor <= lineStart + prefixLen) lineStart else cursor - prefixLen
+            val prefixLen = targetPrefix.length
+            val newText = text.substring(0, contentStart) + text.substring(contentStart + prefixLen)
+            val newCursor = if (cursor <= contentStart + prefixLen) contentStart else cursor - prefixLen
             return TextFieldValue(newText, selection = TextRange(newCursor))
         }
 
-        // Check if line starts with any other known prefix
-        val existingPrefix = KNOWN_LINE_PREFIXES.find { line.startsWith(it) }
+        // Check if contentLine starts with any other known prefix
+        val existingPrefix = KNOWN_LINE_PREFIXES.find { contentLine.startsWith(it) }
         if (existingPrefix != null) {
-            val newText = text.substring(0, lineStart) + targetPrefix + text.substring(lineStart + existingPrefix.length)
-            val newCursor = if (cursor <= lineStart + existingPrefix.length) {
-                lineStart + targetPrefix.length
+            val newText = text.substring(0, contentStart) + targetPrefix + text.substring(contentStart + existingPrefix.length)
+            val newCursor = if (cursor <= contentStart + existingPrefix.length) {
+                contentStart + targetPrefix.length
             } else {
                 cursor - existingPrefix.length + targetPrefix.length
             }
             return TextFieldValue(newText, selection = TextRange(newCursor))
         }
 
-        // Prepend target prefix
-        val newText = text.substring(0, lineStart) + targetPrefix + text.substring(lineStart)
-        val newCursor = cursor + targetPrefix.length
+        // Prepend target prefix after indent
+        val newText = text.substring(0, contentStart) + targetPrefix + text.substring(contentStart)
+        val newCursor = if (cursor < contentStart) contentStart + targetPrefix.length else cursor + targetPrefix.length
         return TextFieldValue(newText, selection = TextRange(newCursor))
     }
 
@@ -341,6 +405,41 @@ object SmartMarkdownFormatter {
         val clampedStart = lineStart.coerceIn(0, text.length)
         val clampedEnd = lineEnd.coerceIn(clampedStart, text.length)
         return Pair(clampedStart, clampedEnd)
+    }
+
+    private fun findEnclosingSpan(line: String, relCursor: Int, prefix: String, suffix: String): Pair<Int, Int>? {
+        var i = 0
+        while (i < line.length) {
+            val start = line.indexOf(prefix, i)
+            if (start == -1) break
+            val end = line.indexOf(suffix, start + prefix.length)
+            if (end == -1) break
+            val fullEnd = end + suffix.length
+            if (relCursor in start..fullEnd) {
+                return Pair(start, fullEnd)
+            }
+            i = fullEnd
+        }
+        return null
+    }
+
+    private fun findEnclosingItalicSpan(line: String, relCursor: Int): Pair<Int, Int>? {
+        var i = 0
+        while (i < line.length) {
+            if (line[i] == '*' && (i + 1 == line.length || line[i + 1] != '*') && (i == 0 || line[i - 1] != '*')) {
+                val end = findSingleAsterisk(line, i + 1)
+                if (end != -1) {
+                    val fullEnd = end + 1
+                    if (relCursor in i..fullEnd) {
+                        return Pair(i, fullEnd)
+                    }
+                    i = fullEnd
+                    continue
+                }
+            }
+            i++
+        }
+        return null
     }
 
     private fun findSingleAsterisk(text: String, fromIndex: Int): Int {

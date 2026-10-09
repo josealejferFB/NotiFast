@@ -1,20 +1,14 @@
 package com.notifast.app.presentation.feature.noteeditor
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
-import com.notifast.app.data.model.CheckItem
-import com.notifast.app.data.model.ListItem
 import com.notifast.app.data.model.Note
-import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.SubjectData
-import com.notifast.app.data.model.TextSpan
-import com.notifast.app.data.model.TextStyle
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
-import android.content.Context
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,6 +20,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -54,280 +49,212 @@ class NoteEditorViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModelForNew(noteId: String? = null): NoteEditorViewModel {
+    private fun createViewModel(noteId: String? = null, subject: String = ""): NoteEditorViewModel {
         val handle = SavedStateHandle().apply {
             noteId?.let { set("noteId", it) }
+            if (subject.isNotBlank()) set("subject", subject)
         }
-        return NoteEditorViewModel(handle, noteRepository, authRepository, imageRepository, context)
+        return NoteEditorViewModel(handle, noteRepository, authRepository, imageRepository, context = context)
     }
 
     @Test
-    fun `new note starts with one empty paragraph block`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
+    fun `new note starts with empty content and zero words`() = runTest(testDispatcher) {
+        val vm = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
         val state = vm.uiState.value
+
         assertNull(state.noteId)
-        assertEquals(1, state.blocks.size)
-        assertTrue(state.blocks[0] is NoteBlock.Paragraph)
+        assertEquals("", state.title)
+        assertEquals("", state.content)
+        assertEquals(0, state.wordCount)
+        assertEquals(0, state.readingTimeMinutes)
+        assertFalse(state.isPreviewMode)
+    }
+
+    @Test
+    fun `new note with initial subject sets subject`() = runTest(testDispatcher) {
+        val vm = createViewModel(subject = "Química")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Química", vm.uiState.value.subject)
     }
 
     @Test
     fun `title change updates state`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        vm.onEvent(NoteEditorEvent.TitleChanged("Mi título"))
-        assertEquals("Mi título", vm.uiState.value.title)
+        val vm = createViewModel()
+        vm.onEvent(NoteEditorEvent.TitleChanged("Termodinámica"))
+
+        assertEquals("Termodinámica", vm.uiState.value.title)
     }
 
     @Test
-    fun `block text change updates the correct block`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTextChanged(blockId, "hola"))
-        assertEquals("hola", (vm.uiState.value.blocks[0] as NoteBlock.Paragraph).text)
+    fun `content change updates content and calculates word count and reading time`() = runTest(testDispatcher) {
+        val vm = createViewModel()
+        val sampleText = "Primera ley de la termodinámica conservación de energía"
+        vm.onEvent(NoteEditorEvent.ContentChanged(sampleText))
+
+        assertEquals(sampleText, vm.uiState.value.content)
+        assertEquals(8, vm.uiState.value.wordCount)
+        assertEquals(1, vm.uiState.value.readingTimeMinutes)
     }
 
     @Test
-    fun `block insert after focused adds new block`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val firstId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockInserted(firstId, BlockType.HEADING))
-        assertEquals(2, vm.uiState.value.blocks.size)
-        assertTrue(vm.uiState.value.blocks[1] is NoteBlock.Heading)
+    fun `insert formatting appends markdown syntax smoothly`() = runTest(testDispatcher) {
+        val vm = createViewModel()
+        vm.onEvent(NoteEditorEvent.InsertFormatting("# "))
+
+        assertEquals("# ", vm.uiState.value.content)
+
+        vm.onEvent(NoteEditorEvent.InsertFormatting("**", "**"))
+        assertEquals("# ****", vm.uiState.value.content)
     }
 
     @Test
-    fun `block delete removes block`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.BlockInserted(null, BlockType.DIVIDER))
-        assertEquals(2, vm.uiState.value.blocks.size)
-        val secondId = vm.uiState.value.blocks[1].id
-        vm.onEvent(NoteEditorEvent.BlockDeleted(secondId))
-        assertEquals(1, vm.uiState.value.blocks.size)
+    fun `toggle preview switches mode`() = runTest(testDispatcher) {
+        val vm = createViewModel()
+        assertFalse(vm.uiState.value.isPreviewMode)
+
+        vm.onEvent(NoteEditorEvent.TogglePreview(true))
+        assertTrue(vm.uiState.value.isPreviewMode)
+
+        vm.onEvent(NoteEditorEvent.TogglePreview(false))
+        assertFalse(vm.uiState.value.isPreviewMode)
     }
 
     @Test
-    fun `block move reorders blocks`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val firstId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockInserted(firstId, BlockType.HEADING))
-        // blocks: [paragraph, heading]
-        vm.onEvent(NoteEditorEvent.BlockMoved(1, 0))
-        assertTrue(vm.uiState.value.blocks[0] is NoteBlock.Heading)
+    fun `task check toggled modifies markdown checkbox syntax reactively`() = runTest(testDispatcher) {
+        val vm = createViewModel()
+        vm.onEvent(NoteEditorEvent.ContentChanged("- [ ] Estudiar para el parcial\n- [ ] Hacer guía"))
+
+        vm.onEvent(NoteEditorEvent.TaskCheckToggled(taskIndex = 0, isChecked = true))
+
+        assertTrue(vm.uiState.value.content.contains("- [x] Estudiar para el parcial"))
+        assertTrue(vm.uiState.value.content.contains("- [ ] Hacer guía"))
     }
 
     @Test
-    fun `check item toggle persists in block`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.CHECKLIST))
-        vm.onEvent(NoteEditorEvent.CheckItemAdded(blockId))
-        vm.onEvent(NoteEditorEvent.CheckItemToggled(blockId, 0))
-        val checklist = vm.uiState.value.blocks[0] as NoteBlock.Checklist
-        assertTrue(checklist.items[0].isChecked)
+    fun `tag operations add toggle and remove tags cleanly`() = runTest(testDispatcher) {
+        val vm = createViewModel()
+
+        vm.onEvent(NoteEditorEvent.TagToggled("resumen"))
+        assertTrue(vm.uiState.value.tags.contains("resumen"))
+
+        vm.onEvent(NoteEditorEvent.CustomTagAdded("examen"))
+        assertTrue(vm.uiState.value.tags.contains("examen"))
+
+        vm.onEvent(NoteEditorEvent.CustomTagRemoved("resumen"))
+        assertFalse(vm.uiState.value.tags.contains("resumen"))
+        assertTrue(vm.uiState.value.tags.contains("examen"))
     }
 
     @Test
-    fun `save creates note with blocks via addNoteWithBlocks`() = runTest(testDispatcher) {
-        coEvery {
-            noteRepository.addNoteWithBlocks(any(), any(), any(), any(), any())
-        } returns Result.success("n1")
-        val vm = createViewModelForNew()
+    fun `save requires non-blank subject and non-blank title`() = runTest(testDispatcher) {
+        val vm = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.TitleChanged("Título"))
+
+        vm.onEvent(NoteEditorEvent.SaveClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertNotNull(vm.uiState.value.error)
+        assertFalse(vm.uiState.value.isSaved)
+
         vm.onEvent(NoteEditorEvent.SubjectChanged("Física"))
         vm.onEvent(NoteEditorEvent.SaveClicked)
         testDispatcher.scheduler.advanceUntilIdle()
+        assertNotNull(vm.uiState.value.error)
+        assertFalse(vm.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `successful save calls noteRepository addNote for new note`() = runTest(testDispatcher) {
+        coEvery {
+            noteRepository.addNote(any(), any(), any(), any(), any(), any())
+        } returns Result.success("new_note_123")
+
+        val vm = createViewModel()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        vm.onEvent(NoteEditorEvent.SubjectChanged("Física"))
+        vm.onEvent(NoteEditorEvent.TitleChanged("Leyes de Newton"))
+        vm.onEvent(NoteEditorEvent.ContentChanged("F = m * a"))
+        vm.onEvent(NoteEditorEvent.SaveClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
         assertTrue(vm.uiState.value.isSaved)
-        coVerify {
-            noteRepository.addNoteWithBlocks("u1", "Física", "Título", any(), any())
+        assertEquals("new_note_123", vm.uiState.value.noteId)
+        coVerify(exactly = 1) {
+            noteRepository.addNote("u1", "Física", "Leyes de Newton", "F = m * a", null, emptyList())
         }
     }
 
     @Test
-    fun `save with blank title sets error`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.SaveClicked)
-        assertFalse(vm.uiState.value.isSaved)
-        assertNull(vm.uiState.value.error) // no subject either - may still error
-    }
-
-    @Test
-    fun `existing note loads blocks from repository`() = runTest(testDispatcher) {
-        val blocks = listOf(NoteBlock.Paragraph(id = "p1", text = "existente"))
-        coEvery { noteRepository.getNotes("u1") } returns flowOf(
-            listOf(
-                Note(
-                    id = "n1", userId = "u1", subjectId = "s1", subject = "Física",
-                    title = "Vieja", content = "existente", tags = listOf("a"),
-                    blocks = blocks
-                )
-            )
+    fun `loading existing note populates title content and tags`() = runTest(testDispatcher) {
+        val existing = Note(
+            id = "note_99",
+            subject = "Física",
+            title = "Cinemática",
+            content = "# Movimiento Rectilíneo",
+            tags = listOf("fórmulas")
         )
-        val vm = createViewModelForNew(noteId = "n1")
+        coEvery { noteRepository.getNotes("u1") } returns flowOf(listOf(existing))
+
+        val vm = createViewModel(noteId = "note_99")
         testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals("n1", vm.uiState.value.noteId)
-        assertEquals("Vieja", vm.uiState.value.title)
-        assertEquals(blocks, vm.uiState.value.blocks)
+
+        val state = vm.uiState.value
+        assertEquals("note_99", state.noteId)
+        assertEquals("Cinemática", state.title)
+        assertEquals("Física", state.subject)
+        assertEquals("# Movimiento Rectilíneo", state.content)
+        assertEquals(listOf("fórmulas"), state.tags)
     }
 
     @Test
-    fun `check item text change updates item`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
+    fun `init event cleanses state and resets isSaved flag for new note`() = runTest(testDispatcher) {
+        val vm = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.CHECKLIST))
-        vm.onEvent(NoteEditorEvent.CheckItemAdded(blockId))
-        vm.onEvent(NoteEditorEvent.CheckItemTextChanged(blockId, 0, "comprar pan"))
-        val checklist = vm.uiState.value.blocks[0] as NoteBlock.Checklist
-        assertEquals("comprar pan", checklist.items[0].text)
-    }
 
-    @Test
-    fun `subject change updates state`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        vm.onEvent(NoteEditorEvent.SubjectChanged("Física"))
-        assertEquals("Física", vm.uiState.value.subject)
-    }
+        // Simulate dirty state with title and content
+        vm.onEvent(NoteEditorEvent.TitleChanged("Viejo"))
+        vm.onEvent(NoteEditorEvent.ContentChanged("Contenido viejo"))
+        assertEquals("Viejo", vm.uiState.value.title)
 
-    @Test
-    fun `tag toggle adds and removes`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        vm.onEvent(NoteEditorEvent.TagToggled("examen"))
-        assertTrue(vm.uiState.value.tags.contains("examen"))
-        vm.onEvent(NoteEditorEvent.TagToggled("examen"))
-        assertFalse(vm.uiState.value.tags.contains("examen"))
-    }
-
-    @Test
-    fun `CustomTagAdded trims and stores tag`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
+        // Dispatch Init for new note
+        vm.onEvent(NoteEditorEvent.Init(noteId = null, subject = "Biología"))
         testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.CustomTagAdded("  examen  "))
-        assertTrue(vm.uiState.value.tags.contains("examen"))
-        assertFalse(vm.uiState.value.tags.contains("  examen  "))
+
+        val state = vm.uiState.value
+        assertNull(state.noteId)
+        assertEquals("Biología", state.subject)
+        assertEquals("", state.title)
+        assertEquals("", state.content)
+        assertFalse(state.isSaved)
+        assertNull(state.error)
     }
 
     @Test
-    fun `CustomTagAdded ignores blank tags`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.CustomTagAdded("   "))
-        assertTrue(vm.uiState.value.tags.isEmpty())
-    }
+    fun `init event loads existing note and resets isSaved`() = runTest(testDispatcher) {
+        val existing = Note(
+            id = "note_101",
+            subject = "Historia",
+            title = "Revolución Industrial",
+            content = "Máquina de vapor",
+            tags = listOf("siglo_xix")
+        )
+        coEvery { noteRepository.getNotes("u1") } returns flowOf(listOf(existing))
 
-    @Test
-    fun `CustomTagRemoved removes tag`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
+        val vm = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.CustomTagAdded("tarea"))
-        vm.onEvent(NoteEditorEvent.CustomTagRemoved("tarea"))
-        assertFalse(vm.uiState.value.tags.contains("tarea"))
-    }
 
-    @Test
-    fun `ListItemTextChanged updates item text`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
+        vm.onEvent(NoteEditorEvent.Init(noteId = "note_101", subject = "Historia"))
         testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.BULLET_LIST))
-        vm.onEvent(NoteEditorEvent.ListItemTextChanged(blockId, 0, "comprar leche"))
-        val list = vm.uiState.value.blocks[0] as NoteBlock.BulletList
-        assertEquals("comprar leche", list.items[0].text)
-    }
 
-    @Test
-    fun `ListItemAdded appends empty item`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.BULLET_LIST))
-        vm.onEvent(NoteEditorEvent.ListItemAdded(blockId))
-        val list = vm.uiState.value.blocks[0] as NoteBlock.BulletList
-        assertEquals(2, list.items.size)
-    }
-
-    @Test
-    fun `ListItemRemoved drops item`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.BULLET_LIST))
-        vm.onEvent(NoteEditorEvent.ListItemAdded(blockId))
-        vm.onEvent(NoteEditorEvent.ListItemAdded(blockId))
-        vm.onEvent(NoteEditorEvent.ListItemRemoved(blockId, 1))
-        val list = vm.uiState.value.blocks[0] as NoteBlock.BulletList
-        assertEquals(2, list.items.size)
-    }
-
-    @Test
-    fun `CheckItemAdded appends empty check`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.CHECKLIST))
-        vm.onEvent(NoteEditorEvent.CheckItemAdded(blockId))
-        val list = vm.uiState.value.blocks[0] as NoteBlock.Checklist
-        assertEquals(2, list.items.size)
-    }
-
-    @Test
-    fun `CheckItemRemoved drops check`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTypeChanged(blockId, BlockType.CHECKLIST))
-        vm.onEvent(NoteEditorEvent.CheckItemAdded(blockId))
-        vm.onEvent(NoteEditorEvent.CheckItemRemoved(blockId, 0))
-        val list = vm.uiState.value.blocks[0] as NoteBlock.Checklist
-        assertEquals(1, list.items.size)
-    }
-
-    @Test
-    fun `BlockInserted ORDERED_LIST creates ordered bullet list`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        vm.onEvent(NoteEditorEvent.BlockInserted(null, BlockType.ORDERED_LIST))
-        val last = vm.uiState.value.blocks.last() as NoteBlock.BulletList
-        assertTrue(last.isOrdered)
-    }
-
-    @Test
-    fun `ToggleSpanStyle applies bold over selection`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTextChanged(blockId, "hola mundo"))
-        vm.onEvent(NoteEditorEvent.ToggleSpanStyle(blockId, 0, 4, TextStyle.BOLD))
-        val block = vm.uiState.value.blocks[0] as NoteBlock.Paragraph
-        assertEquals(listOf(TextSpan(0, 4, setOf(TextStyle.BOLD))), block.spans)
-    }
-
-    @Test
-    fun `ToggleSpanStyle twice removes style`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.BlockTextChanged(blockId, "hola mundo"))
-        vm.onEvent(NoteEditorEvent.ToggleSpanStyle(blockId, 0, 4, TextStyle.BOLD))
-        vm.onEvent(NoteEditorEvent.ToggleSpanStyle(blockId, 0, 4, TextStyle.BOLD))
-        val block = vm.uiState.value.blocks[0] as NoteBlock.Paragraph
-        assertTrue(block.spans.isEmpty())
-    }
-
-    @Test
-    fun `SelectionChanged stores selection in state`() = runTest(testDispatcher) {
-        val vm = createViewModelForNew()
-        testDispatcher.scheduler.advanceUntilIdle()
-        val blockId = vm.uiState.value.blocks[0].id
-        vm.onEvent(NoteEditorEvent.SelectionChanged(blockId, 2, 7))
-        assertEquals(blockId, vm.uiState.value.selectionBlockId)
-        assertEquals(2, vm.uiState.value.selectionStart)
-        assertEquals(7, vm.uiState.value.selectionEnd)
+        val state = vm.uiState.value
+        assertEquals("note_101", state.noteId)
+        assertEquals("Historia", state.subject)
+        assertEquals("Revolución Industrial", state.title)
+        assertEquals("Máquina de vapor", state.content)
+        assertEquals(listOf("siglo_xix"), state.tags)
+        assertFalse(state.isSaved)
     }
 }
+

@@ -60,7 +60,13 @@ class ExportNotePdfUseCase @Inject constructor(
             canvas.drawText("${note.subject}  ·  ${note.tags.joinToString(" #")}", MARGIN, y, mutedPaint)
             y += LINE_HEIGHT * 1.5f
 
-            note.blocks.forEach { block ->
+            val blocksToRender = if (note.blocks.isNotEmpty()) {
+                note.blocks
+            } else {
+                com.notifast.app.domain.util.MarkdownToBlocksParser.parse(note.content, note.imageUrl)
+            }
+
+            blocksToRender.forEach { block ->
                 when (block) {
                     is NoteBlock.Heading -> {
                         newPageIfNeeded(LINE_HEIGHT * 2)

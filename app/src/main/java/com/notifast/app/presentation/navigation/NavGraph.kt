@@ -67,6 +67,7 @@ fun MainContent() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     var showGlobalSearchSheet by remember { mutableStateOf(false) }
+    var activeNoteEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
 
     val startDestination = if (authState == true) Screen.Notes.route else Screen.Onboarding.route
 
@@ -121,30 +122,14 @@ fun MainContent() {
             }
             composable(Screen.Notes.route) {
                 NotesScreen(
-                    onAddNoteClick = { subject -> navController.navigate(Screen.NoteEditor.createRoute(subject = subject)) },
+                    onAddNoteClick = { subject -> activeNoteEditorArgs = Pair(null, subject) },
                     onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
                     onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
-                    onNoteClick = { noteId -> navController.navigate(Screen.NoteEditor.createRoute(noteId = noteId)) },
+                    onNoteClick = { noteId -> activeNoteEditorArgs = Pair(noteId, null) },
                     onAddEvaluationClick = { subject -> navController.navigate(Screen.AddEvaluation.createRoute(subject)) },
                     onSubjectDetailClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                     onSearchClick = { showGlobalSearchSheet = true }
-                )
-            }
-            dialog(
-                route = Screen.NoteEditor.route,
-                arguments = listOf(
-                    navArgument("subject") { type = NavType.StringType; defaultValue = "" },
-                    navArgument("noteId") { type = NavType.StringType; defaultValue = "" }
-                )
-            ) { backStackEntry ->
-                val subject = Uri.decode(backStackEntry.arguments?.getString("subject") ?: "")
-                val noteId = backStackEntry.arguments?.getString("noteId")?.takeIf { it.isNotBlank() }
-                NoteEditorBottomSheet(
-                    noteId = noteId,
-                    subject = subject,
-                    onDismiss = { navController.popBackStack() },
-                    onSaved = { navController.popBackStack() }
                 )
             }
             composable(Screen.AddSubject.route) {
@@ -161,17 +146,17 @@ fun MainContent() {
             ) { backStackEntry ->
                 val subjectName = Uri.decode(backStackEntry.arguments?.getString("subjectName") ?: "")
                 SubjectDetailScreen(
-                    onAddNoteClick = { navController.navigate(Screen.NoteEditor.createRoute(subject = subjectName)) },
+                    onAddNoteClick = { activeNoteEditorArgs = Pair(null, subjectName) },
                     onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute(subjectName)) },
                     onBackClick = { navController.popBackStack() },
-                    onNoteClick = { note -> navController.navigate(Screen.NoteEditor.createRoute(noteId = note.id)) }
+                    onNoteClick = { note -> activeNoteEditorArgs = Pair(note.id, null) }
                 )
             }
             composable(Screen.Schedules.route) {
                 SchedulesScreen(
                     onAddScheduleClick = { navController.navigate(Screen.AddSchedule.route) },
                     onAddEvaluationClick = { navController.navigate(Screen.AddEvaluation.createRoute()) },
-                    onTakeNoteClick = { subject -> navController.navigate(Screen.NoteEditor.createRoute(subject = subject)) },
+                    onTakeNoteClick = { subject -> activeNoteEditorArgs = Pair(null, subject) },
                     onEditScheduleClick = { scheduleId -> navController.navigate(Screen.EditSchedule.createRoute(scheduleId)) },
                     onEditEvaluationClick = { eval -> navController.navigate(Screen.EditEvaluation.createRoute(eval.id)) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
@@ -241,6 +226,20 @@ fun MainContent() {
                     navController.navigate(route)
                 }
             )
+        }
+        activeNoteEditorArgs?.let { (noteId, subject) ->
+            androidx.compose.runtime.key(noteId ?: "new", subject ?: "") {
+                NoteEditorBottomSheet(
+                    noteId = noteId,
+                    subject = subject,
+                    onDismiss = { activeNoteEditorArgs = null },
+                    onSaved = { activeNoteEditorArgs = null },
+                    onCreateSubject = {
+                        activeNoteEditorArgs = null
+                        navController.navigate(Screen.AddSubject.route)
+                    }
+                )
+            }
         }
     }
 }
