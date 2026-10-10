@@ -148,4 +148,30 @@ class AddScheduleViewModelTest {
         assertEquals(1, state.subjects.size)
         assertEquals(1, state.existingSchedules.size)
     }
+
+    @Test
+    fun `when RefreshSubjectsAndSelect is dispatched, reloads subjects and updates subjectName preserving other fields`() = runTest {
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateStartTime("08:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateEndTime("10:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateClassroom("Aula 202"))
+
+        val updatedSubjects = listOf(
+            SubjectData(name = "Matemáticas", colorHex = "#3B9797"),
+            SubjectData(name = "Química", colorHex = "#FF5722")
+        )
+        coEvery { noteRepository.getSubjects("user_123") } returns flowOf(updatedSubjects)
+
+        viewModel.onEvent(AddScheduleEvent.RefreshSubjectsAndSelect("Química"))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("Química", state.subjectName)
+        assertEquals(2, state.subjects.size)
+        assertEquals("08:00", state.startTime)
+        assertEquals("10:00", state.endTime)
+        assertEquals("Aula 202", state.classroom)
+    }
 }

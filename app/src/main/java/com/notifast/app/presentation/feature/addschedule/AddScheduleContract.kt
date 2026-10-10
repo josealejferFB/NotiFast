@@ -30,6 +30,7 @@ sealed interface AddScheduleEvent {
     data class UpdateClassroom(val classroom: String) : AddScheduleEvent
     data class UpdateTeacher(val teacher: String) : AddScheduleEvent
     data class UpdateMeetingUrl(val url: String) : AddScheduleEvent
+    data class RefreshSubjectsAndSelect(val subjectName: String) : AddScheduleEvent
     data object SaveSchedule : AddScheduleEvent
     data object ClearError : AddScheduleEvent
     data object ResetState : AddScheduleEvent

@@ -61,7 +61,6 @@ fun EvaluationEditorSheetLayout(
     val isImeVisible = WindowInsets.isImeVisible
 
     var showDiscardDialog by remember { mutableStateOf(false) }
-    var pendingDismissAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     fun dismissSheet(action: (() -> Unit)? = null) {
         scope.launch {
@@ -97,13 +96,10 @@ fun EvaluationEditorSheetLayout(
             confirmWeight = FontWeight.Bold,
             onConfirm = {
                 showDiscardDialog = false
-                val pending = pendingDismissAction
-                pendingDismissAction = null
-                dismissSheet(action = pending)
+                dismissSheet()
             },
             onDismiss = {
                 showDiscardDialog = false
-                pendingDismissAction = null
             }
         )
     }
@@ -111,12 +107,7 @@ fun EvaluationEditorSheetLayout(
     val handleCreateSubject = {
         keyboardController?.hide()
         focusManager.clearFocus()
-        if (hasUnsavedChanges) {
-            pendingDismissAction = onCreateSubject
-            showDiscardDialog = true
-        } else {
-            dismissSheet(action = onCreateSubject)
-        }
+        onCreateSubject()
     }
 
     ModalBottomSheet(

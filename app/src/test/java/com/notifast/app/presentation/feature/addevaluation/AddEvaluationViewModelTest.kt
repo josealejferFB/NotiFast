@@ -103,4 +103,30 @@ class AddEvaluationViewModelTest {
         assertFalse(state.isSaved)
         assertEquals(1, state.subjects.size)
     }
+
+    @Test
+    fun `RefreshSubjectsAndSelect reloads subjects and updates selectedSubject preserving other fields`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddEvaluationEvent.UpdateTitle("Parcial 1"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateDescription("Temas 1-3"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateWeight("25"))
+
+        val updatedSubjects = listOf(
+            SubjectData(name = "Matemáticas", colorHex = "#3B9797"),
+            SubjectData(name = "Química", colorHex = "#FF5722")
+        )
+        coEvery { noteRepository.getSubjects("user_123") } returns flowOf(updatedSubjects)
+
+        viewModel.onEvent(AddEvaluationEvent.RefreshSubjectsAndSelect("Química"))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("Química", state.selectedSubject)
+        assertEquals(2, state.subjects.size)
+        assertEquals("Parcial 1", state.title)
+        assertEquals("Temas 1-3", state.description)
+        assertEquals("25", state.weight)
+    }
 }

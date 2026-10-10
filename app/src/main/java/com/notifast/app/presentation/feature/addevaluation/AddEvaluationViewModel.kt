@@ -67,7 +67,21 @@ class AddEvaluationViewModel @Inject constructor(
             }
             is AddEvaluationEvent.SelectType -> _uiState.update { it.copy(selectedType = event.type) }
             is AddEvaluationEvent.Save -> save(event.date, event.imageUri)
+            is AddEvaluationEvent.RefreshSubjectsAndSelect -> refreshSubjectsAndSelect(event.subjectName)
             is AddEvaluationEvent.ClearError -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun refreshSubjectsAndSelect(subjectName: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val subjects = noteRepository.getSubjects(userId).first()
+            _uiState.update { current ->
+                current.copy(
+                    subjects = subjects,
+                    selectedSubject = if (subjectName.isNotBlank()) subjectName else current.selectedSubject
+                )
+            }
         }
     }
 

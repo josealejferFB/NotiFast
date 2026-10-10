@@ -91,7 +91,6 @@ fun NoteEditorBottomSheet(
     }
 
     var showDiscardDialog by remember { mutableStateOf(false) }
-    var pendingDismissAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val hasUnsavedChanges = uiState.title.isNotBlank() || uiState.content.isNotBlank() || uiState.imageUri != null
 
     fun dismissSheet(action: (() -> Unit)? = null) {
@@ -122,13 +121,10 @@ fun NoteEditorBottomSheet(
         NoteEditorDiscardDialog(
             onConfirm = {
                 showDiscardDialog = false
-                val pending = pendingDismissAction
-                pendingDismissAction = null
-                dismissSheet(action = pending)
+                dismissSheet()
             },
             onDismiss = {
                 showDiscardDialog = false
-                pendingDismissAction = null
             }
         )
     }
@@ -136,12 +132,7 @@ fun NoteEditorBottomSheet(
     val handleCreateSubject = {
         keyboardController?.hide()
         focusManager.clearFocus()
-        if (hasUnsavedChanges) {
-            pendingDismissAction = onCreateSubject
-            showDiscardDialog = true
-        } else {
-            dismissSheet(action = onCreateSubject)
-        }
+        onCreateSubject()
     }
 
     val canSave = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading

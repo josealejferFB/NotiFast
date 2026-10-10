@@ -27,5 +27,6 @@ sealed interface AddEvaluationEvent {
     data class UpdateWeight(val value: String) : AddEvaluationEvent
     data class SelectType(val type: EvaluationType) : AddEvaluationEvent
     data class Save(val date: java.util.Date, val imageUri: android.net.Uri?) : AddEvaluationEvent
+    data class RefreshSubjectsAndSelect(val subjectName: String) : AddEvaluationEvent
     data object ClearError : AddEvaluationEvent
 }

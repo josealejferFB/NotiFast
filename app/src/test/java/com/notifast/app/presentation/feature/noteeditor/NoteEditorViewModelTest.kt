@@ -209,7 +209,7 @@ class NoteEditorViewModelTest {
     }
 
     @Test
-    fun `init event cleanses state and resets isSaved flag for new note`() = runTest(testDispatcher) {
+    fun `init event retains draft title and content when switching subject for new note`() = runTest(testDispatcher) {
         val vm = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -218,17 +218,33 @@ class NoteEditorViewModelTest {
         vm.onEvent(NoteEditorEvent.ContentChanged("Contenido viejo"))
         assertEquals("Viejo", vm.uiState.value.title)
 
-        // Dispatch Init for new note
+        // Dispatch Init for new note with updated subject (e.g. from subject creation)
         vm.onEvent(NoteEditorEvent.Init(noteId = null, subject = "Biología"))
         testDispatcher.scheduler.advanceUntilIdle()
 
         val state = vm.uiState.value
         assertNull(state.noteId)
         assertEquals("Biología", state.subject)
-        assertEquals("", state.title)
-        assertEquals("", state.content)
+        assertEquals("Viejo", state.title)
+        assertEquals("Contenido viejo", state.content)
         assertFalse(state.isSaved)
         assertNull(state.error)
+    }
+
+    @Test
+    fun `resetState event cleanses draft state completely`() = runTest(testDispatcher) {
+        val vm = createViewModel()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        vm.onEvent(NoteEditorEvent.TitleChanged("Viejo"))
+        vm.onEvent(NoteEditorEvent.ContentChanged("Contenido viejo"))
+        vm.onEvent(NoteEditorEvent.ResetState)
+
+        val state = vm.uiState.value
+        assertNull(state.noteId)
+        assertEquals("", state.subject)
+        assertEquals("", state.title)
+        assertEquals("", state.content)
     }
 
     @Test

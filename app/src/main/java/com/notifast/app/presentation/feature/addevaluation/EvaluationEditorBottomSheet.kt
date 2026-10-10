@@ -65,6 +65,12 @@ private fun AddEvaluationEditorSheet(
         }
     }
 
+    LaunchedEffect(initialSubject) {
+        if (initialSubject.isNotBlank()) {
+            viewModel.onEvent(AddEvaluationEvent.RefreshSubjectsAndSelect(initialSubject))
+        }
+    }
+
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
             Toast.makeText(context, R.string.evaluation_saved_success, Toast.LENGTH_SHORT).show()

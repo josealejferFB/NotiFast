@@ -80,6 +80,7 @@ class AddScheduleViewModel @Inject constructor(
             is AddScheduleEvent.UpdateClassroom -> _uiState.update { it.copy(classroom = event.classroom) }
             is AddScheduleEvent.UpdateTeacher -> _uiState.update { it.copy(teacher = event.teacher) }
             is AddScheduleEvent.UpdateMeetingUrl -> _uiState.update { it.copy(meetingUrl = event.url) }
+            is AddScheduleEvent.RefreshSubjectsAndSelect -> refreshSubjectsAndSelect(event.subjectName)
             is AddScheduleEvent.ClearError -> _uiState.update { it.copy(error = null) }
             is AddScheduleEvent.SaveSchedule -> saveSchedule()
             is AddScheduleEvent.ResetState -> {
@@ -99,6 +100,19 @@ class AddScheduleViewModel @Inject constructor(
                         conflictingSchedules = emptyList()
                     )
                 }
+            }
+        }
+    }
+
+    private fun refreshSubjectsAndSelect(subjectName: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val subjects = noteRepository.getSubjects(userId).first()
+            _uiState.update { current ->
+                current.copy(
+                    subjects = subjects,
+                    subjectName = if (subjectName.isNotBlank()) subjectName else current.subjectName
+                )
             }
         }
     }

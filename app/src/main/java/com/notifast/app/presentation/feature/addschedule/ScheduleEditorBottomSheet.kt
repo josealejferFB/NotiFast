@@ -19,6 +19,7 @@ import com.notifast.app.presentation.feature.editschedule.EditScheduleViewModel
 @Composable
 fun ScheduleEditorBottomSheet(
     scheduleId: String? = null,
+    initialSubject: String = "",
     onDismiss: () -> Unit,
     onSaved: () -> Unit,
     onCreateSubject: () -> Unit = {}
@@ -32,6 +33,7 @@ fun ScheduleEditorBottomSheet(
         )
     } else {
         AddScheduleEditorSheet(
+            initialSubject = initialSubject,
             onDismiss = onDismiss,
             onSaved = onSaved,
             onCreateSubject = onCreateSubject
@@ -41,6 +43,7 @@ fun ScheduleEditorBottomSheet(
 
 @Composable
 private fun AddScheduleEditorSheet(
+    initialSubject: String = "",
     onDismiss: () -> Unit,
     onSaved: () -> Unit,
     onCreateSubject: () -> Unit,
@@ -51,6 +54,15 @@ private fun AddScheduleEditorSheet(
 
     LaunchedEffect(Unit) {
         viewModel.onEvent(AddScheduleEvent.ResetState)
+        if (initialSubject.isNotBlank()) {
+            viewModel.onEvent(AddScheduleEvent.UpdateSubjectName(initialSubject))
+        }
+    }
+
+    LaunchedEffect(initialSubject) {
+        if (initialSubject.isNotBlank()) {
+            viewModel.onEvent(AddScheduleEvent.RefreshSubjectsAndSelect(initialSubject))
+        }
     }
 
     LaunchedEffect(uiState.isSaved) {

@@ -66,7 +66,7 @@ fun MainContent() {
     val currentDestination = navBackStackEntry?.destination
     var showGlobalSearchSheet by remember { mutableStateOf(false) }
     var activeNoteEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
-    var activeScheduleEditorId by remember { mutableStateOf<String?>(null) }
+    var activeScheduleEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
     var activeEvaluationEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
     var showAddSubjectSheetFromEditor by remember { mutableStateOf(false) }
 
@@ -142,17 +142,17 @@ fun MainContent() {
                 SubjectDetailScreen(
                     onAddNoteClick = { activeNoteEditorArgs = Pair(null, subjectName) },
                     onAddEvaluationClick = { activeEvaluationEditorArgs = Pair(null, subjectName) },
-                    onAddScheduleClick = { activeScheduleEditorId = "NEW" },
+                    onAddScheduleClick = { activeScheduleEditorArgs = Pair(null, subjectName) },
                     onBackClick = { navController.popBackStack() },
                     onNoteClick = { note -> activeNoteEditorArgs = Pair(note.id, null) }
                 )
             }
             composable(Screen.Schedules.route) {
                 SchedulesScreen(
-                    onAddScheduleClick = { activeScheduleEditorId = "NEW" },
+                    onAddScheduleClick = { activeScheduleEditorArgs = Pair(null, null) },
                     onAddEvaluationClick = { activeEvaluationEditorArgs = Pair(null, null) },
                     onTakeNoteClick = { subject -> activeNoteEditorArgs = Pair(null, subject) },
-                    onEditScheduleClick = { scheduleId -> activeScheduleEditorId = scheduleId },
+                    onEditScheduleClick = { scheduleId -> activeScheduleEditorArgs = Pair(scheduleId, null) },
                     onEditEvaluationClick = { eval -> activeEvaluationEditorArgs = Pair(eval.id, null) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
                     onSearchClick = { showGlobalSearchSheet = true }
@@ -207,13 +207,13 @@ fun MainContent() {
                 )
             }
         }
-        activeScheduleEditorId?.let { scheduleIdArg ->
-            val targetId = if (scheduleIdArg == "NEW") null else scheduleIdArg
-            key(scheduleIdArg) {
+        activeScheduleEditorArgs?.let { (scheduleId, subject) ->
+            key(scheduleId ?: "new") {
                 ScheduleEditorBottomSheet(
-                    scheduleId = targetId,
-                    onDismiss = { activeScheduleEditorId = null },
-                    onSaved = { activeScheduleEditorId = null },
+                    scheduleId = scheduleId,
+                    initialSubject = subject ?: "",
+                    onDismiss = { activeScheduleEditorArgs = null },
+                    onSaved = { activeScheduleEditorArgs = null },
                     onCreateSubject = { showAddSubjectSheetFromEditor = true }
                 )
             }
@@ -234,12 +234,9 @@ fun MainContent() {
                 onDismissRequest = { showAddSubjectSheetFromEditor = false },
                 onSubjectCreated = { createdSubject ->
                     showAddSubjectSheetFromEditor = false
-                    if (activeEvaluationEditorArgs != null && activeEvaluationEditorArgs?.first == null) {
-                        activeEvaluationEditorArgs = Pair(null, createdSubject)
-                    }
-                    if (activeNoteEditorArgs != null && activeNoteEditorArgs?.first == null) {
-                        activeNoteEditorArgs = Pair(null, createdSubject)
-                    }
+                    activeScheduleEditorArgs?.let { if (it.first == null) activeScheduleEditorArgs = Pair(null, createdSubject) }
+                    activeEvaluationEditorArgs?.let { if (it.first == null) activeEvaluationEditorArgs = Pair(null, createdSubject) }
+                    activeNoteEditorArgs?.let { if (it.first == null) activeNoteEditorArgs = Pair(null, createdSubject) }
                 }
             )
         }

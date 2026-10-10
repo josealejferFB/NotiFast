@@ -58,7 +58,7 @@ class NoteEditorViewModel @Inject constructor(
                     error = null,
                     syncStatus = null,
                     noteId = targetNoteId,
-                    subject = targetSubject
+                    subject = if (targetSubject.isNotBlank()) targetSubject else it.subject
                 )
             }
             val userId = authRepository.getCurrentUserId()
@@ -99,20 +99,24 @@ class NoteEditorViewModel @Inject constructor(
                 }
             }
 
-            _uiState.update {
-                it.copy(
+            _uiState.update { current ->
+                val currentTitle = current.title
+                val currentContent = current.content
+                val hasDraft = currentTitle.isNotBlank() || currentContent.isNotBlank()
+                val words = if (hasDraft) calculateWordCount(currentContent) else 0
+                current.copy(
                     isLoading = false,
                     noteId = null,
                     subjects = subjects,
-                    subject = if (it.subject.isBlank()) targetSubject else it.subject,
-                    title = "",
-                    content = "",
-                    tags = emptyList(),
-                    imageUrl = null,
-                    imageUri = null,
+                    subject = if (targetSubject.isNotBlank()) targetSubject else current.subject,
+                    title = if (hasDraft) currentTitle else "",
+                    content = if (hasDraft) currentContent else "",
+                    tags = if (hasDraft) current.tags else emptyList(),
+                    imageUrl = if (hasDraft) current.imageUrl else null,
+                    imageUri = if (hasDraft) current.imageUri else null,
                     isPreviewMode = false,
-                    wordCount = 0,
-                    readingTimeMinutes = 0,
+                    wordCount = words,
+                    readingTimeMinutes = calculateReadingTime(words),
                     isSaved = false,
                     error = null
                 )
