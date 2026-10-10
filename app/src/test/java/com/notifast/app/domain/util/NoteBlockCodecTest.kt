@@ -187,4 +187,20 @@ class NoteBlockCodecTest {
         val list = parsed[0] as NoteBlock.BulletList
         assertFalse(list.isOrdered)
     }
+
+    @Test
+    fun `blocksToMarkdown converts checklist with checked and unchecked marks`() {
+        val blocks = listOf(
+            NoteBlock.Checklist(
+                id = "c1",
+                items = listOf(
+                    CheckItem(text = "Pendiente", isChecked = false),
+                    CheckItem(text = "Completado", isChecked = true)
+                )
+            )
+        )
+        val md = NoteBlockCodec.blocksToMarkdown(blocks)
+        assertTrue(md.contains("- [ ] Pendiente"))
+        assertTrue(md.contains("- [x] Completado"))
+    }
 }

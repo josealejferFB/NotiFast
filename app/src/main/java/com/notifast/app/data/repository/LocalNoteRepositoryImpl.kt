@@ -26,6 +26,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "LocalNoteRepository"
+private val CHECKLIST_REGEX = Regex("""^[-*]\s*\[([ xX]?)]""", RegexOption.MULTILINE)
 
 @Singleton
 class LocalNoteRepositoryImpl @Inject constructor(
@@ -116,7 +117,7 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     subjectId = subjectEntity.id,
                     subject = subject,
                     title = title,
-                    content = NoteBlockCodec.extractPlainText(blocks),
+                    content = NoteBlockCodec.blocksToMarkdown(blocks),
                     imageUrl = null,
                     tags = tags,
                     timestamp = now,
@@ -236,6 +237,13 @@ class LocalNoteRepositoryImpl @Inject constructor(
             }
 
             val hasBlocks = note.blocks.isNotEmpty()
+            val contentToSave = if (note.content.isNotBlank()) {
+                note.content
+            } else if (hasBlocks) {
+                NoteBlockCodec.blocksToMarkdown(note.blocks)
+            } else {
+                ""
+            }
             noteDao.updateNote(
                 NoteEntity(
                     id = note.id,
@@ -243,7 +251,7 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     subjectId = subjectId,
                     subject = note.subject,
                     title = note.title,
-                    content = if (hasBlocks) NoteBlockCodec.extractPlainText(note.blocks) else note.content,
+                    content = contentToSave,
                     imageUrl = imageUrl,
                     tags = note.tags,
                     timestamp = note.timestamp ?: existing?.timestamp ?: Date(),
@@ -333,18 +341,32 @@ class LocalNoteRepositoryImpl @Inject constructor(
         } else {
             MarkdownToBlocksParser.parse(content, imageUrl)
         }
+        val resolvedContent = if (schemaVersion >= 2 && blocks.isNotEmpty() && contentNeedsMarkdownRestore(content, blocks)) {
+            NoteBlockCodec.blocksToMarkdown(blocks)
+        } else {
+            content
+        }
         return Note(
             id = id,
             userId = userId,
             subjectId = subjectId,
             subject = subject,
             title = title,
-            content = content,
+            content = resolvedContent,
             imageUrl = imageUrl,
             tags = tags,
             timestamp = timestamp,
             updatedAt = updatedAt,
             blocks = blocks
         )
+    }
+
+    private fun contentNeedsMarkdownRestore(content: String, blocks: List<NoteBlock>): Boolean {
+        if (content.isBlank()) return true
+        val hasChecklistInBlocks = blocks.any { it is NoteBlock.Checklist }
+        if (hasChecklistInBlocks && !CHECKLIST_REGEX.containsMatchIn(content)) {
+            return true
+        }
+        return false
     }
 }

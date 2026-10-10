@@ -205,19 +205,23 @@ class NotesViewModelTest {
     }
 
     @Test
-    fun `when ToggleTaskCheck event dispatched, updates note via repository`() = runTest {
-        val note = Note(
-            id = "1",
+    fun `when ToggleTaskCheck event dispatched, updates note via repository and optimistically updates state`() = runTest {
+        val noteWithTasks = Note(
+            id = "task_note_1",
             subject = "Matemáticas",
             title = "Tareas",
             content = "- [ ] Tarea 1\n- [ ] Tarea 2"
         )
+        coEvery { noteRepository.getNotes("user_123") } returns flowOf(listOf(noteWithTasks))
         coEvery { noteRepository.updateNote(any(), any(), any()) } returns Result.success(Unit)
 
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        viewModel.onEvent(NotesEvent.ToggleTaskCheck(note, taskIndex = 0, isChecked = true))
+        viewModel.onEvent(NotesEvent.ToggleTaskCheck(noteWithTasks, taskIndex = 0, isChecked = true))
+        val updatedFirst = viewModel.uiState.value.rawNotes.find { it.id == "task_note_1" }
+        assertTrue(updatedFirst?.content?.contains("- [x] Tarea 1") == true)
+
         advanceUntilIdle()
 
         io.mockk.coVerify {
@@ -227,5 +231,29 @@ class NotesViewModelTest {
                 null
             )
         }
+    }
+
+    @Test
+    fun `when ToggleTaskCheck dispatched multiple times with original note, both checks are preserved`() = runTest {
+        val noteWithTasks = Note(
+            id = "task_note_1",
+            subject = "Matemáticas",
+            title = "Tareas",
+            content = "- [ ] Tarea 1\n- [ ] Tarea 2"
+        )
+        coEvery { noteRepository.getNotes("user_123") } returns flowOf(listOf(noteWithTasks))
+        coEvery { noteRepository.updateNote(any(), any(), any()) } returns Result.success(Unit)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // Toggle task 0
+        viewModel.onEvent(NotesEvent.ToggleTaskCheck(noteWithTasks, taskIndex = 0, isChecked = true))
+        // Toggle task 1 using the same original note reference (simulating rapid clicks)
+        viewModel.onEvent(NotesEvent.ToggleTaskCheck(noteWithTasks, taskIndex = 1, isChecked = true))
+
+        val current = viewModel.uiState.value.rawNotes.find { it.id == "task_note_1" }
+        assertTrue(current?.content?.contains("- [x] Tarea 1") == true)
+        assertTrue(current?.content?.contains("- [x] Tarea 2") == true)
     }
 }

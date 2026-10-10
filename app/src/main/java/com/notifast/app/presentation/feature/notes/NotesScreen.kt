@@ -38,9 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
-import com.notifast.app.domain.util.MarkdownToBlocksParser
 import com.notifast.app.presentation.atoms.FabAction
-import com.notifast.app.presentation.atoms.MarkdownParser
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastExpandableFab
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
@@ -183,13 +181,17 @@ fun NotesScreen(
             )
         }
 
+        val currentExpandedNote = expandedNote?.let { exp ->
+            uiState.rawNotes.find { it.id == exp.id } ?: exp
+        }
+
         AnimatedVisibility(
-            visible = expandedNote != null,
+            visible = currentExpandedNote != null,
             enter = fadeIn(tween(250)) + scaleIn(animationSpec = spring(dampingRatio = 0.6f, stiffness = 300f), initialScale = 0.85f),
             exit = fadeOut(tween(250)) + scaleOut(animationSpec = spring(stiffness = 300f), targetScale = 0.85f)
         ) {
             Box(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 40.dp), contentAlignment = Alignment.Center) {
-                expandedNote?.let { note ->
+                currentExpandedNote?.let { note ->
                     NoteDetailExpandable(
                         note = note,
                         onClose = { expandedNote = null },
@@ -198,13 +200,6 @@ fun NotesScreen(
                             expandedNote = null
                         },
                         onTaskCheckedChange = { taskIndex, isChecked ->
-                            val updatedContent = MarkdownParser.toggleTaskCheckbox(note.content, taskIndex, isChecked)
-                            val updatedNote = note.copy(
-                                content = updatedContent,
-                                updatedAt = Date(),
-                                blocks = MarkdownToBlocksParser.parse(updatedContent, note.imageUrl)
-                            )
-                            expandedNote = updatedNote
                             viewModel.onEvent(NotesEvent.ToggleTaskCheck(note, taskIndex, isChecked))
                         }
                     )

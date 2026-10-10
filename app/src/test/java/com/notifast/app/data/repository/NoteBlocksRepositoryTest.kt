@@ -149,4 +149,67 @@ class NoteBlocksRepositoryTest {
         assertEquals(2, slotEntity.captured.schemaVersion)
         assertEquals(NoteBlockCodec.toJson(newBlocks), slotEntity.captured.blocksJson)
     }
+
+    @Test
+    fun `updateNote preserves markdown checkboxes in content instead of plain text`() = runTest {
+        val existing = NoteEntity(
+            id = "n1", userId = "u1", subjectId = "s1", subject = "Física",
+            title = "Checks", content = "- [ ] Tarea 1\n- [ ] Tarea 2", imageUrl = null, tags = emptyList(),
+            timestamp = Date(), updatedAt = Date(),
+            blocksJson = "[]", schemaVersion = 1
+        )
+        coEvery { noteDao.getNoteById("u1", "n1") } returns existing
+        coEvery { noteDao.updateNote(any()) } returns 1
+
+        val markdownWithChecks = "- [x] Tarea 1\n- [ ] Tarea 2"
+        val checklistBlocks = listOf(
+            NoteBlock.Checklist(
+                id = "c1",
+                items = listOf(
+                    com.notifast.app.data.model.CheckItem(text = "Tarea 1", isChecked = true),
+                    com.notifast.app.data.model.CheckItem(text = "Tarea 2", isChecked = false)
+                )
+            )
+        )
+        val note = Note(
+            id = "n1", userId = "u1", subjectId = "s1", subject = "Física",
+            title = "Checks", content = markdownWithChecks, imageUrl = null,
+            tags = emptyList(), timestamp = Date(), updatedAt = Date(),
+            blocks = checklistBlocks
+        )
+        val result = repository.updateNote("u1", note, imageUri = null)
+        assertTrue(result.isSuccess)
+
+        val slotEntity = slot<NoteEntity>()
+        coVerify { noteDao.updateNote(capture(slotEntity)) }
+        assertEquals(markdownWithChecks, slotEntity.captured.content)
+        assertTrue(slotEntity.captured.content.contains("- [x] Tarea 1"))
+        assertTrue(slotEntity.captured.content.contains("- [ ] Tarea 2"))
+    }
+
+    @Test
+    fun `getNotes self heals schemaVersion 2 notes where content lost checkboxes`() = runTest {
+        val checklistBlocks = listOf(
+            NoteBlock.Checklist(
+                id = "c1",
+                items = listOf(
+                    com.notifast.app.data.model.CheckItem(text = "Tarea 1", isChecked = true),
+                    com.notifast.app.data.model.CheckItem(text = "Tarea 2", isChecked = false)
+                )
+            )
+        )
+        // Corrupted entity: plain text content without markdown check markers, but blocksJson has checklist
+        val corrupted = NoteEntity(
+            id = "n1", userId = "u1", subjectId = "s1", subject = "Física",
+            title = "Checks", content = "Tarea 1\nTarea 2", imageUrl = null, tags = emptyList(),
+            timestamp = Date(), updatedAt = Date(),
+            blocksJson = NoteBlockCodec.toJson(checklistBlocks), schemaVersion = 2
+        )
+        coEvery { noteDao.getNotes("u1") } returns flowOf(listOf(corrupted))
+
+        val notes = repository.getNotes("u1").first()
+        assertEquals(1, notes.size)
+        assertTrue(notes[0].content.contains("- [x] Tarea 1"))
+        assertTrue(notes[0].content.contains("- [ ] Tarea 2"))
+    }
 }

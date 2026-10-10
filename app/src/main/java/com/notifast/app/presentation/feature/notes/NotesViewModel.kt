@@ -260,15 +260,26 @@ class NotesViewModel @Inject constructor(
     private fun toggleTaskCheck(note: Note, taskIndex: Int, isChecked: Boolean) {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
-            val updatedContent = MarkdownParser.toggleTaskCheckbox(note.content, taskIndex, isChecked)
-            val updatedNote = note.copy(
+            val currentNote = _uiState.value.rawNotes.find { it.id == note.id } ?: note
+            val updatedContent = MarkdownParser.toggleTaskCheckbox(currentNote.content, taskIndex, isChecked)
+            val updatedNote = currentNote.copy(
                 content = updatedContent,
                 updatedAt = Date(),
-                blocks = MarkdownToBlocksParser.parse(updatedContent, note.imageUrl)
+                blocks = MarkdownToBlocksParser.parse(updatedContent, currentNote.imageUrl)
             )
+            _uiState.update { prev ->
+                val newRaw = prev.rawNotes.map { if (it.id == updatedNote.id) updatedNote else it }
+                val newFiltered = prev.notes.mapValues { (_, list) ->
+                    list.map { if (it.id == updatedNote.id) updatedNote else it }
+                }
+                prev.copy(rawNotes = newRaw, notes = newFiltered)
+            }
             noteRepository.updateNote(userId, updatedNote, null).fold(
                 onSuccess = { _uiState.update { it.copy(error = null) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") } }
+                onFailure = { e ->
+                    _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") }
+                    loadNotes()
+                }
             )
         }
     }
