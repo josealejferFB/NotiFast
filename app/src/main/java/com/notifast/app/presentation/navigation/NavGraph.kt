@@ -69,7 +69,6 @@ fun MainContent() {
     var activeScheduleEditorId by remember { mutableStateOf<String?>(null) }
     var activeEvaluationEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
     var showAddSubjectSheetFromEditor by remember { mutableStateOf(false) }
-    var pendingSubjectTarget by remember { mutableStateOf<String?>(null) }
 
     val startDestination = if (authState == true) Screen.Notes.route else Screen.Onboarding.route
 
@@ -198,7 +197,7 @@ fun MainContent() {
             )
         }
         activeNoteEditorArgs?.let { (noteId, subject) ->
-            key(noteId ?: "new", subject ?: "") {
+            key(noteId ?: "new") {
                 NoteEditorBottomSheet(
                     noteId = noteId,
                     subject = subject,
@@ -220,7 +219,7 @@ fun MainContent() {
             }
         }
         activeEvaluationEditorArgs?.let { (evalId, subject) ->
-            key(evalId ?: "new", subject ?: "") {
+            key(evalId ?: "new") {
                 EvaluationEditorBottomSheet(
                     evalId = evalId,
                     initialSubject = subject ?: "",
@@ -235,7 +234,6 @@ fun MainContent() {
                 onDismissRequest = { showAddSubjectSheetFromEditor = false },
                 onSubjectCreated = { createdSubject ->
                     showAddSubjectSheetFromEditor = false
-                    pendingSubjectTarget = createdSubject
                     if (activeEvaluationEditorArgs != null && activeEvaluationEditorArgs?.first == null) {
                         activeEvaluationEditorArgs = Pair(null, createdSubject)
                     }
