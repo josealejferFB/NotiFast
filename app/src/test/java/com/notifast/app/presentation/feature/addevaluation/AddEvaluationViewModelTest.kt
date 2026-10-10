@@ -14,6 +14,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -74,5 +76,31 @@ class AddEvaluationViewModelTest {
                 null
             )
         }
+    }
+
+    @Test
+    fun `ResetState resets form fields and isSaved but preserves loaded subjects`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddEvaluationEvent.SelectSubject("Matemáticas"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateTitle("Parcial 1"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateDescription("Temas 1-3"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateQuickTips("Estudiar"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateWeight("25"))
+
+        assertEquals("Parcial 1", viewModel.uiState.value.title)
+        assertEquals(1, viewModel.uiState.value.subjects.size)
+
+        viewModel.onEvent(AddEvaluationEvent.ResetState)
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.title)
+        assertEquals("", state.description)
+        assertEquals("", state.quickTips)
+        assertEquals("", state.weight)
+        assertEquals("", state.selectedSubject)
+        assertFalse(state.isSaved)
+        assertEquals(1, state.subjects.size)
     }
 }

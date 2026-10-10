@@ -19,6 +19,7 @@ data class AddEvaluationUiState(
 
 sealed interface AddEvaluationEvent {
     data object LoadSubjects : AddEvaluationEvent
+    data object ResetState : AddEvaluationEvent
     data class SelectSubject(val subject: String) : AddEvaluationEvent
     data class UpdateTitle(val value: String) : AddEvaluationEvent
     data class UpdateDescription(val value: String) : AddEvaluationEvent

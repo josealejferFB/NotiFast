@@ -160,4 +160,32 @@ class EditEvaluationViewModelTest {
         assertFalse(viewModel.uiState.value.isSaved)
         assertEquals("Parcial 1", viewModel.uiState.value.title)
     }
+
+    @Test
+    fun `Init clears fields when evaluation not found`() = runTest {
+        coEvery { evaluationRepository.getEvaluation("user_123", "eval_missing") } returns flowOf(null)
+        val savedStateHandle = SavedStateHandle(mapOf("evalId" to "eval_1"))
+        val viewModel = EditEvaluationViewModel(
+            savedStateHandle,
+            noteRepository,
+            evaluationRepository,
+            authRepository,
+            userPrefsRepository,
+            scheduleEvaluationAlertUseCase,
+            cancelAlertUseCase
+        )
+        advanceUntilIdle()
+
+        assertEquals("Parcial 1", viewModel.uiState.value.title)
+
+        viewModel.onEvent(EditEvaluationEvent.Init("eval_missing"))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.title)
+        assertEquals("", state.description)
+        assertEquals("", state.grade)
+        assertEquals("", state.weight)
+        assertEquals("Evaluación no encontrada", state.error)
+    }
 }

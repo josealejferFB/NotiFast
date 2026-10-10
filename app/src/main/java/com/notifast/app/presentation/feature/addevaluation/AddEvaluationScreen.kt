@@ -51,6 +51,10 @@ import com.notifast.app.presentation.feature.addevaluation.components.Evaluation
 import com.notifast.app.presentation.theme.color.Ruby
 import java.util.Date
 
+@Deprecated(
+    message = "Use EvaluationEditorBottomSheet instead for unified modal evaluation editing",
+    replaceWith = ReplaceWith("EvaluationEditorBottomSheet")
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEvaluationScreen(

@@ -94,7 +94,21 @@ class EditEvaluationViewModel @Inject constructor(
         when (event) {
             is EditEvaluationEvent.Init -> {
                 this.evalId = event.evalId
-                _uiState.update { it.copy(isSaved = false, error = null) }
+                _uiState.update {
+                    it.copy(
+                        isSaved = false,
+                        error = null,
+                        title = "",
+                        description = "",
+                        quickTips = "",
+                        grade = "",
+                        weight = "",
+                        isPresented = false,
+                        existingImageUrl = null,
+                        date = null,
+                        subjectName = ""
+                    )
+                }
                 loadEvaluation()
             }
             is EditEvaluationEvent.LoadEvaluation -> loadEvaluation()

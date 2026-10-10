@@ -51,6 +51,9 @@ class AddEvaluationViewModel @Inject constructor(
     fun onEvent(event: AddEvaluationEvent) {
         when (event) {
             is AddEvaluationEvent.LoadSubjects -> loadSubjects()
+            is AddEvaluationEvent.ResetState -> {
+                _uiState.update { AddEvaluationUiState(subjects = it.subjects) }
+            }
             is AddEvaluationEvent.SelectSubject -> _uiState.update { it.copy(selectedSubject = event.subject) }
             is AddEvaluationEvent.UpdateTitle -> _uiState.update { it.copy(title = event.value) }
             is AddEvaluationEvent.UpdateDescription -> _uiState.update { it.copy(description = event.value) }

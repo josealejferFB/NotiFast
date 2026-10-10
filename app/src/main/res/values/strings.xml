@@ -262,6 +262,12 @@
     <string name="evaluation_btn_save_changes">Guardar Cambios</string>
     <string name="evaluation_discard_title">Descartar evaluación</string>
     <string name="evaluation_discard_message">¿Estás seguro de que deseas salir? Se perderán los datos ingresados.</string>
+    <string name="evaluation_saved_success">Evaluación guardada</string>
+    <string name="evaluation_title_placeholder">Ej: Parcial 1 / Entrega Final</string>
+    <string name="evaluation_desc_placeholder">Temas incluidos, requisitos...</string>
+    <string name="evaluation_quick_tips_placeholder">Fórmulas clave, repasar capítulo 4...</string>
+    <string name="evaluation_attach_placeholder">Adjuntar temario o rúbrica</string>
+    <string name="evaluation_change_attachment">Cambiar archivo adjuntado</string>
 
     <!-- NotiFast 3.0 AAA Header & Editorial TopBar -->
     <string name="topbar_greeting">Hola, %1$s</string>
