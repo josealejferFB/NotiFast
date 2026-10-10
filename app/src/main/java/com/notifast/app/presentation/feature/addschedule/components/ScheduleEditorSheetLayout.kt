@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -167,9 +166,9 @@ fun ScheduleEditorSheetLayout(
                 content(handleCreateSubject)
 
                 Spacer(
-                    modifier = Modifier
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
-                        .navigationBarsPadding()
+                    modifier = Modifier.windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
+                    )
                 )
             }
         }

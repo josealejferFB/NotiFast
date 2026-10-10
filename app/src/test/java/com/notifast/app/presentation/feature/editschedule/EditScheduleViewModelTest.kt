@@ -143,4 +143,30 @@ class EditScheduleViewModelTest {
         assertFalse(viewModel.uiState.value.isSaved)
         assertEquals("Matemáticas", viewModel.uiState.value.subjectName)
     }
+
+    @Test
+    fun `when Init is called with different schedule, immediately cleans dirty form fields and reloads new schedule`() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
+        val viewModel = EditScheduleViewModel(
+            scheduleRepository,
+            authRepository,
+            noteRepository,
+            validateScheduleOverlapUseCase,
+            scheduleClassAlertUseCase,
+            cancelAlertUseCase,
+            savedStateHandle
+        )
+        advanceUntilIdle()
+        assertEquals("Matemáticas", viewModel.uiState.value.subjectName)
+
+        viewModel.onEvent(EditScheduleEvent.UpdateClassroom("Aula Dirty"))
+        assertEquals("Aula Dirty", viewModel.uiState.value.classroom)
+
+        viewModel.onEvent(EditScheduleEvent.Init("2"))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isLoading)
+        assertEquals("Física", viewModel.uiState.value.subjectName)
+        assertEquals("", viewModel.uiState.value.classroom)
+    }
 }

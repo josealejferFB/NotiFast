@@ -62,11 +62,12 @@ class EditScheduleViewModel @Inject constructor(
                         endTime = schedule.endTime,
                         classroom = schedule.classroom,
                         teacher = schedule.teacher,
-                        meetingUrl = schedule.meetingUrl ?: ""
+                        meetingUrl = schedule.meetingUrl ?: "",
+                        isLoading = false
                     ) 
                 }
             } else {
-                _uiState.update { it.copy(subjects = subjects, existingSchedules = schedules, error = "Horario no encontrado") }
+                _uiState.update { it.copy(subjects = subjects, existingSchedules = schedules, isLoading = false, error = "Horario no encontrado") }
             }
         }
     }
@@ -75,7 +76,22 @@ class EditScheduleViewModel @Inject constructor(
         when (event) {
             is EditScheduleEvent.Init -> {
                 this.scheduleId = event.scheduleId
-                _uiState.update { it.copy(isSaved = false, error = null) }
+                _uiState.update {
+                    it.copy(
+                        subjectName = "",
+                        modality = Schedule.MODALITY_PRESENCIAL,
+                        dayOfWeek = 1,
+                        startTime = "",
+                        endTime = "",
+                        classroom = "",
+                        teacher = "",
+                        meetingUrl = "",
+                        conflictingSchedules = emptyList(),
+                        isLoading = true,
+                        isSaved = false,
+                        error = null
+                    )
+                }
                 loadData()
             }
             is EditScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }

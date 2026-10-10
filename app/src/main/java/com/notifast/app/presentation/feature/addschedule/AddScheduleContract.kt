@@ -32,4 +32,5 @@ sealed interface AddScheduleEvent {
     data class UpdateMeetingUrl(val url: String) : AddScheduleEvent
     data object SaveSchedule : AddScheduleEvent
     data object ClearError : AddScheduleEvent
+    data object ResetState : AddScheduleEvent
 }

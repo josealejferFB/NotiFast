@@ -12,6 +12,7 @@ data class EditScheduleUiState(
     val classroom: String = "",
     val teacher: String = "",
     val meetingUrl: String = "",
+    val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null,
     val isSaved: Boolean = false,

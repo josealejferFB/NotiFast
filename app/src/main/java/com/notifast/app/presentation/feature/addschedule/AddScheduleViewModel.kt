@@ -82,6 +82,24 @@ class AddScheduleViewModel @Inject constructor(
             is AddScheduleEvent.UpdateMeetingUrl -> _uiState.update { it.copy(meetingUrl = event.url) }
             is AddScheduleEvent.ClearError -> _uiState.update { it.copy(error = null) }
             is AddScheduleEvent.SaveSchedule -> saveSchedule()
+            is AddScheduleEvent.ResetState -> {
+                _uiState.update {
+                    it.copy(
+                        subjectName = "",
+                        modality = Schedule.MODALITY_PRESENCIAL,
+                        dayOfWeek = 1,
+                        startTime = "",
+                        endTime = "",
+                        classroom = "",
+                        teacher = "",
+                        meetingUrl = "",
+                        isSaving = false,
+                        error = null,
+                        isSaved = false,
+                        conflictingSchedules = emptyList()
+                    )
+                }
+            }
         }
     }
 

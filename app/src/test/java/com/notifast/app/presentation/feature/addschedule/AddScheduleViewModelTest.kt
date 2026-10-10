@@ -122,4 +122,30 @@ class AddScheduleViewModelTest {
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(4)) // Viernes
         assertEquals(4, viewModel.uiState.value.dayOfWeek)
     }
+
+    @Test
+    fun `when ResetState is dispatched, resets form fields but preserves loaded subjects and schedules`() = runTest {
+        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
+        viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(3))
+        viewModel.onEvent(AddScheduleEvent.UpdateStartTime("08:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateEndTime("10:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateClassroom("Aula 101"))
+        viewModel.onEvent(AddScheduleEvent.UpdateTeacher("Prof. Gómez"))
+
+        viewModel.onEvent(AddScheduleEvent.ResetState)
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.subjectName)
+        assertEquals(1, state.dayOfWeek)
+        assertEquals("", state.startTime)
+        assertEquals("", state.endTime)
+        assertEquals("", state.classroom)
+        assertEquals("", state.teacher)
+        assertFalse(state.isSaved)
+        assertEquals(1, state.subjects.size)
+        assertEquals(1, state.existingSchedules.size)
+    }
 }

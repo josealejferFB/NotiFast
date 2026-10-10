@@ -49,9 +49,14 @@ private fun AddScheduleEditorSheet(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(AddScheduleEvent.ResetState)
+    }
+
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
             Toast.makeText(context, R.string.schedules_saved_success, Toast.LENGTH_SHORT).show()
+            viewModel.onEvent(AddScheduleEvent.ResetState)
         }
     }
 
