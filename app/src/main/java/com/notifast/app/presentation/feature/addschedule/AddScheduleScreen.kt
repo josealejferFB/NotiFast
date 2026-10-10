@@ -46,6 +46,10 @@ import com.notifast.app.presentation.feature.schedules.components.ScheduleConfli
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
 
+@Deprecated(
+    message = "Use ScheduleEditorBottomSheet instead for modal editing experience",
+    replaceWith = ReplaceWith("ScheduleEditorBottomSheet(onDismiss = onBackClick, onSaved = onScheduleAdded, onCreateSubject = onNavigateToAddSubject)")
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScheduleScreen(

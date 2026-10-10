@@ -86,6 +86,9 @@
     <string name="schedules_field_end_time">Hora Fin</string>
     <string name="schedules_field_classroom">Salón (Opcional)</string>
     <string name="schedules_field_teacher">Profesor (Opcional)</string>
+    <string name="schedules_placeholder_classroom">Ej: Aula 302 / Laboratorio</string>
+    <string name="schedules_placeholder_teacher">Ej: Dr. Pérez</string>
+    <string name="schedules_saved_success">Horario guardado</string>
 
     <!-- Schedules 3.0 Live Beacon & Bento -->
     <string name="schedules_beacon_active_title">En curso ahora</string>
