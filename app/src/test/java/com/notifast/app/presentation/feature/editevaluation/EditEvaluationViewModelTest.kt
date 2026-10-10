@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -129,5 +130,34 @@ class EditEvaluationViewModelTest {
 
         coVerify { evaluationRepository.updateEvaluation("user_123", match { it.title == "Parcial 1 Modificado" }, null) }
         assertTrue(viewModel.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `when Init is called after save, resets isSaved and reloads fresh data`() = runTest {
+        coEvery { evaluationRepository.updateEvaluation(any(), any(), any()) } returns Result.success(Unit)
+        val savedStateHandle = SavedStateHandle(mapOf("evalId" to "eval_1"))
+        val viewModel = EditEvaluationViewModel(
+            savedStateHandle,
+            noteRepository,
+            evaluationRepository,
+            authRepository,
+            userPrefsRepository,
+            scheduleEvaluationAlertUseCase,
+            cancelAlertUseCase
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(EditEvaluationEvent.Save(Date(), null))
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.isSaved)
+
+        viewModel.onEvent(EditEvaluationEvent.UpdateTitle("Título Sucio"))
+        assertEquals("Título Sucio", viewModel.uiState.value.title)
+
+        viewModel.onEvent(EditEvaluationEvent.Init("eval_1"))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSaved)
+        assertEquals("Parcial 1", viewModel.uiState.value.title)
     }
 }

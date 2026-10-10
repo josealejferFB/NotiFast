@@ -93,10 +93,9 @@ class EditEvaluationViewModel @Inject constructor(
     fun onEvent(event: EditEvaluationEvent) {
         when (event) {
             is EditEvaluationEvent.Init -> {
-                if (this.evalId != event.evalId || _uiState.value.evalId.isBlank()) {
-                    this.evalId = event.evalId
-                    loadEvaluation()
-                }
+                this.evalId = event.evalId
+                _uiState.update { it.copy(isSaved = false, error = null) }
+                loadEvaluation()
             }
             is EditEvaluationEvent.LoadEvaluation -> loadEvaluation()
             is EditEvaluationEvent.SelectSubject -> _uiState.update { it.copy(subjectName = event.subject) }

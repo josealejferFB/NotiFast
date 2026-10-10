@@ -114,4 +114,33 @@ class EditScheduleViewModelTest {
         assertEquals("08:00", state.startTime)
         assertEquals("10:00", state.endTime)
     }
+
+    @Test
+    fun `when Init is called after save, resets isSaved and reloads fresh data`() = runTest {
+        coEvery { scheduleRepository.updateSchedule(any(), any()) } returns Result.success(Unit)
+        val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
+        val viewModel = EditScheduleViewModel(
+            scheduleRepository,
+            authRepository,
+            noteRepository,
+            validateScheduleOverlapUseCase,
+            scheduleClassAlertUseCase,
+            cancelAlertUseCase,
+            savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(EditScheduleEvent.SaveSchedule)
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.isSaved)
+
+        viewModel.onEvent(EditScheduleEvent.UpdateSubjectName("Modificado"))
+        assertEquals("Modificado", viewModel.uiState.value.subjectName)
+
+        viewModel.onEvent(EditScheduleEvent.Init("1"))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSaved)
+        assertEquals("Matemáticas", viewModel.uiState.value.subjectName)
+    }
 }

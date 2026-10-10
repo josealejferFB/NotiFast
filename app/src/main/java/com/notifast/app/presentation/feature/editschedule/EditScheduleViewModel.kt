@@ -74,10 +74,9 @@ class EditScheduleViewModel @Inject constructor(
     fun onEvent(event: EditScheduleEvent) {
         when (event) {
             is EditScheduleEvent.Init -> {
-                if (this.scheduleId != event.scheduleId || originalSchedule == null) {
-                    this.scheduleId = event.scheduleId
-                    loadData()
-                }
+                this.scheduleId = event.scheduleId
+                _uiState.update { it.copy(isSaved = false, error = null) }
+                loadData()
             }
             is EditScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
             is EditScheduleEvent.UpdateModality -> _uiState.update {
