@@ -18,11 +18,12 @@ Sprint Design 3.0: Tactile Studio [███████████████
 Fase 3: Features Avanzadas        [████████████████] 100% (18/18 tareas) ✅
 Fase 3.5: Offline-First Local     [████████████████] 100% (9/9 tareas) ✅
 Fase 3.6: Sanitización Lógica     [████████████████] 100% (10/10 tareas) ✅
+Fase 3.7: Normalización Sheets/FAB[████████████████] 100% (5/5 tareas) ✅
 Editor Premium (OneNote-like)     [████████████████] 100% (12/12 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [█████████████░░░]  85% (106/119 tareas)
+PROGRESO TOTAL ESTIMADO:          [██████████████░░]  87% (111/124 tareas)
 ```
 
 ---
@@ -159,6 +160,32 @@ Los promedios pueden **cambiar de valor** respecto a versiones anteriores: antes
 ### Pendiente conocido (no bloqueante)
 - Strings de fallback en ViewModels (solo visibles si `e.message` viene nulo desde repo).
 - Smoke de import P2P / logout→continuar no automatizado.
+
+---
+
+## 🎨 Fase 3.7: Normalización de BottomSheets & FAB Expandible (100% ✅ — 10 Oct 2026)
+
+**Objetivo:** Eliminar la inconsistencia de navegación modal vs pantalla completa unificando la creación y edición de horarios y evaluaciones en `ModalBottomSheet` (alineado con Notas y Materias), sustituir el bottom sheet selector de Agenda por un FAB animado vertical (`NotiFastExpandableFab`), y garantizar persistencia de borradores al encadenar la creación de nuevas materias.
+
+### Entregables implementados
+1. **FAB Expandible en Agenda (`SchedulesScreen`):**
+   - Sustituido el FAB simple y eliminado el modal intermedio redundante (`AgendaCreateActionBottomSheet.kt`).
+   - Integrado `NotiFastExpandableFab` con acciones animadas: arriba *Nuevo Horario* (icono calendario/horario, color primario) y abajo *Nueva Evaluación* (icono tarea/evaluación, color acento/error).
+   - Test unitario de orden y atributos: `SchedulesFabNormalizationTest`.
+2. **`ScheduleEditorBottomSheet`:**
+   - Unificación de creación y edición en modal `ModalBottomSheet` con bordes redondeados (28.dp), drag handle, `imePadding`, detección de cambios y confirmación de descarte con `NotiFastDialog`.
+   - Soporte para preselección de materia (`initialSubject`) y recarga reactiva con auto-selección (`RefreshSubjectsAndSelect`).
+3. **`EvaluationEditorBottomSheet`:**
+   - Unificación de creación y edición de evaluaciones con selector de materia, tipo, fecha, slider de ponderación e ingreso de nota (en modo edición).
+   - Confirmación de descarte con `NotiFastDialog`, soporte para `initialSubject` y `RefreshSubjectsAndSelect`.
+4. **Inicialización Segura & Desacoplamiento de ViewModels:**
+   - `EditScheduleViewModel` y `EditEvaluationViewModel` soportan inicialización sin argumentos en `SavedStateHandle` y evento `Init(id)` con recarga limpia.
+   - `AddScheduleViewModel` y `AddEvaluationViewModel` implementan `ResetState` previniendo cierres prematuros en aperturas consecutivas.
+5. **Hoisting no destructivo en `NavGraph.kt`:**
+   - Estados de editores hoisted en `MainContent` (`activeScheduleEditorArgs`, `activeEvaluationEditorArgs`).
+   - Superposición de `AddSubjectBottomSheet` sobre los editores activos sin descartar campos ni perder texto en progreso.
+   - Preservación de borrador en `NoteEditorViewModel` al seleccionar materia nueva.
+   - Respeto estricto del límite ≤ 250 LOC por archivo composable (`NavGraph.kt` en 244 LOC).
 
 ---
 
