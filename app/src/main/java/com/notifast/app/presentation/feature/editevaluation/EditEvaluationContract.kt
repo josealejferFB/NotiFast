@@ -25,6 +25,7 @@ data class EditEvaluationUiState(
 )
 
 sealed interface EditEvaluationEvent {
+    data class Init(val evalId: String) : EditEvaluationEvent
     data object LoadEvaluation : EditEvaluationEvent
     data class SelectSubject(val subject: String) : EditEvaluationEvent
     data class UpdateTitle(val value: String) : EditEvaluationEvent

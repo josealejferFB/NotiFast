@@ -89,4 +89,29 @@ class EditScheduleViewModelTest {
         coVerify { scheduleRepository.updateSchedule("user_123", any()) }
         assertTrue(viewModel.uiState.value.isSaved)
     }
+
+    @Test
+    fun `when initialized with empty savedStateHandle, does not crash and Init event loads data`() = runTest {
+        val savedStateHandle = SavedStateHandle()
+        val viewModel = EditScheduleViewModel(
+            scheduleRepository,
+            authRepository,
+            noteRepository,
+            validateScheduleOverlapUseCase,
+            scheduleClassAlertUseCase,
+            cancelAlertUseCase,
+            savedStateHandle
+        )
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.uiState.value.subjectName)
+
+        viewModel.onEvent(EditScheduleEvent.Init("1"))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("Matemáticas", state.subjectName)
+        assertEquals("08:00", state.startTime)
+        assertEquals("10:00", state.endTime)
+    }
 }

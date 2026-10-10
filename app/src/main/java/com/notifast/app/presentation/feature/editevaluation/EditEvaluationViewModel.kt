@@ -28,12 +28,14 @@ class EditEvaluationViewModel @Inject constructor(
     private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase
 ) : ViewModel() {
 
-    private val evalId: String = checkNotNull(savedStateHandle["evalId"])
+    private var evalId: String? = savedStateHandle["evalId"]
     private val _uiState = MutableStateFlow(EditEvaluationUiState())
     val uiState: StateFlow<EditEvaluationUiState> = _uiState.asStateFlow()
 
     init {
-        loadEvaluation()
+        if (!evalId.isNullOrBlank()) {
+            loadEvaluation()
+        }
         loadSubjects()
     }
 
@@ -51,6 +53,7 @@ class EditEvaluationViewModel @Inject constructor(
     }
 
     private fun loadEvaluation() {
+        val currentEvalId = evalId ?: return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val userId = authRepository.getCurrentUserId()
@@ -58,7 +61,7 @@ class EditEvaluationViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }
                 return@launch
             }
-            val eval = evaluationRepository.getEvaluation(userId, evalId).first()
+            val eval = evaluationRepository.getEvaluation(userId, currentEvalId).first()
             if (eval == null) {
                 _uiState.update { it.copy(isLoading = false, error = "Evaluación no encontrada") }
                 return@launch
@@ -89,6 +92,12 @@ class EditEvaluationViewModel @Inject constructor(
 
     fun onEvent(event: EditEvaluationEvent) {
         when (event) {
+            is EditEvaluationEvent.Init -> {
+                if (this.evalId != event.evalId || _uiState.value.evalId.isBlank()) {
+                    this.evalId = event.evalId
+                    loadEvaluation()
+                }
+            }
             is EditEvaluationEvent.LoadEvaluation -> loadEvaluation()
             is EditEvaluationEvent.SelectSubject -> _uiState.update { it.copy(subjectName = event.subject) }
             is EditEvaluationEvent.UpdateTitle -> _uiState.update { it.copy(title = event.value) }
@@ -121,13 +130,14 @@ class EditEvaluationViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true) }
             val state = _uiState.value
             val cleanTitle = state.title.trim()
-            if (cleanTitle.isBlank() || state.subjectName.isBlank()) {
+            val currentEvalId = evalId ?: state.evalId
+            if (cleanTitle.isBlank() || state.subjectName.isBlank() || currentEvalId.isBlank()) {
                 _uiState.update { it.copy(isSaving = false) }
                 return@launch
             }
             val scale = com.notifast.app.domain.model.GradeScale.fromId(state.gradeScaleId)
             val updatedEval = com.notifast.app.data.model.Evaluation(
-                id = state.evalId,
+                id = currentEvalId,
                 userId = userId,
                 subjectName = state.subjectName.trim(),
                 title = cleanTitle,

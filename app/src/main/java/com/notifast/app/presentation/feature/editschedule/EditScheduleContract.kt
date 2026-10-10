@@ -21,6 +21,7 @@ data class EditScheduleUiState(
 )
 
 sealed interface EditScheduleEvent {
+    data class Init(val scheduleId: String) : EditScheduleEvent
     data class UpdateSubjectName(val subjectName: String) : EditScheduleEvent
     data class UpdateModality(val modality: String) : EditScheduleEvent
     data class UpdateDayOfWeek(val day: Int) : EditScheduleEvent

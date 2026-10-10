@@ -30,22 +30,25 @@ class EditScheduleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val scheduleId: String = checkNotNull(savedStateHandle["scheduleId"])
+    private var scheduleId: String? = savedStateHandle["scheduleId"]
     private var originalSchedule: Schedule? = null
 
     private val _uiState = MutableStateFlow(EditScheduleUiState())
     val uiState: StateFlow<EditScheduleUiState> = _uiState.asStateFlow()
 
     init {
-        loadData()
+        if (!scheduleId.isNullOrBlank()) {
+            loadData()
+        }
     }
 
     private fun loadData() {
+        val currentId = scheduleId ?: return
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val subjects = noteRepository.getSubjects(userId).first()
             val schedules = scheduleRepository.getSchedules(userId).first()
-            val schedule = schedules.find { it.id == scheduleId }
+            val schedule = schedules.find { it.id == currentId }
             if (schedule != null) {
                 originalSchedule = schedule
                 _uiState.update { 
@@ -70,6 +73,12 @@ class EditScheduleViewModel @Inject constructor(
 
     fun onEvent(event: EditScheduleEvent) {
         when (event) {
+            is EditScheduleEvent.Init -> {
+                if (this.scheduleId != event.scheduleId || originalSchedule == null) {
+                    this.scheduleId = event.scheduleId
+                    loadData()
+                }
+            }
             is EditScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
             is EditScheduleEvent.UpdateModality -> _uiState.update {
                 if (event.modality == Schedule.MODALITY_VIRTUAL) {
@@ -130,8 +139,9 @@ class EditScheduleViewModel @Inject constructor(
             _uiState.update { it.copy(conflictingSchedules = emptyList()) }
             return
         }
+        val currentId = scheduleId ?: ""
         val tempSchedule = Schedule(
-            id = scheduleId,
+            id = currentId,
             subjectName = state.subjectName,
             dayOfWeek = state.dayOfWeek,
             startTime = state.startTime,
@@ -140,7 +150,7 @@ class EditScheduleViewModel @Inject constructor(
         val result = validateScheduleOverlapUseCase(
             existingSchedules = state.existingSchedules,
             newSchedule = tempSchedule,
-            excludeScheduleId = scheduleId
+            excludeScheduleId = currentId
         )
         val conflicts = when (result) {
             is ScheduleOverlapResult.Conflict -> result.conflictingSchedules
@@ -150,6 +160,11 @@ class EditScheduleViewModel @Inject constructor(
     }
 
     private fun saveSchedule() {
+        val currentId = scheduleId
+        if (currentId == null) {
+            _uiState.update { it.copy(error = "Horario no encontrado") }
+            return
+        }
         val state = _uiState.value
         if (state.subjectName.isBlank()) {
             _uiState.update { it.copy(error = "El nombre de la materia es requerido") }
@@ -172,7 +187,7 @@ class EditScheduleViewModel @Inject constructor(
             } else 0L
 
             val schedule = Schedule(
-                id = scheduleId,
+                id = currentId,
                 userId = userId,
                 subjectName = state.subjectName,
                 modality = state.modality,
