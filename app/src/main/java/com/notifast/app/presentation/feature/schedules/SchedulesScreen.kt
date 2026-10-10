@@ -13,13 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -44,10 +38,10 @@ import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.presentation.atoms.NotiFastCardSkeleton
 import com.notifast.app.presentation.atoms.NotiFastDialog
+import com.notifast.app.presentation.atoms.NotiFastExpandableFab
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
-import com.notifast.app.presentation.feature.schedules.components.AgendaCreateActionBottomSheet
 import com.notifast.app.presentation.feature.schedules.components.AgendaEvaluationBottomSheet
 import com.notifast.app.presentation.feature.schedules.components.AgendaMonthCalendarView
 import com.notifast.app.presentation.feature.schedules.components.ScheduleDaySelector
@@ -55,9 +49,7 @@ import com.notifast.app.presentation.feature.schedules.components.ScheduleLiveSt
 import com.notifast.app.presentation.feature.schedules.components.ScheduleTimelineView
 import com.notifast.app.presentation.feature.schedules.components.ScheduleWeekBentoSummary
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,9 +67,6 @@ fun SchedulesScreen(
     var scheduleToDelete by remember { mutableStateOf<Schedule?>(null) }
     var evalToDelete by remember { mutableStateOf<Evaluation?>(null) }
     var selectedEvaluation by remember { mutableStateOf<Evaluation?>(null) }
-    var showCreateSheet by remember { mutableStateOf(false) }
-
-    val createSheetState = rememberModalBottomSheetState()
     val evalSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -114,16 +103,17 @@ fun SchedulesScreen(
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { showCreateSheet = true },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    shape = CircleShape,
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp),
+                NotiFastExpandableFab(
+                    actions = buildSchedulesFabActions(
+                        scheduleLabel = stringResource(R.string.agenda_create_schedule_option),
+                        evaluationLabel = stringResource(R.string.agenda_create_evaluation_option),
+                        scheduleColor = MaterialTheme.colorScheme.primary,
+                        evaluationColor = MaterialTheme.colorScheme.error,
+                        onAddScheduleClick = onAddScheduleClick,
+                        onAddEvaluationClick = onAddEvaluationClick
+                    ),
                     modifier = Modifier.padding(bottom = 72.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.agenda_btn_add))
-                }
+                )
             }
         ) { innerPadding ->
             if (uiState.isLoading) {
@@ -198,19 +188,6 @@ fun SchedulesScreen(
                         }
                     }
                 }
-            }
-        }
-
-        if (showCreateSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showCreateSheet = false },
-                sheetState = createSheetState,
-                containerColor = MaterialTheme.colorScheme.surface
-            ) {
-                AgendaCreateActionBottomSheet(
-                    onAddSchedule = { scope.launch { createSheetState.hide() }.invokeOnCompletion { showCreateSheet = false; onAddScheduleClick() } },
-                    onAddEvaluation = { scope.launch { createSheetState.hide() }.invokeOnCompletion { showCreateSheet = false; onAddEvaluationClick() } }
-                )
             }
         }
 
