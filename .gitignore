@@ -19,3 +19,7 @@ app/google-services.json
 .worktrees/
 .codegraph/
 
+
+# Python cache & testing
+__pycache__/
+*.py[cod]
