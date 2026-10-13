@@ -138,6 +138,10 @@
 
     // A. 3D Magnetic Parallax on Mousemove
     if (!isReducedMotion) {
+      if (typeof gsap !== 'undefined') {
+        gsap.set('.popout-subjects, .popout-alerts', { xPercent: -50 });
+      }
+
       stage.addEventListener('mousemove', (e) => {
         const rect = stage.getBoundingClientRect();
         const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
@@ -145,26 +149,28 @@
 
         if (typeof gsap !== 'undefined') {
           gsap.to(stage, {
-            rotateX: -ny * 6,
-            rotateY: nx * 6,
+            rotateX: -ny * 4,
+            rotateY: nx * 4,
             duration: 0.4,
             ease: 'power1.out'
           });
 
           if (brandCore) {
             gsap.to(brandCore, {
-              x: nx * 10,
-              y: ny * 10,
+              x: nx * 8,
+              y: ny * 8,
               duration: 0.4,
               ease: 'power1.out'
             });
           }
 
           popoutItems.forEach((item, idx) => {
-            const factor = (idx % 2 === 0) ? 1.3 : -1.1;
+            const isCentered = item.classList.contains('popout-subjects') || item.classList.contains('popout-alerts');
+            const factor = (idx % 2 === 0) ? 1.1 : -0.9;
             gsap.to(item, {
-              x: nx * 8 * factor,
-              y: ny * 8 * factor,
+              xPercent: isCentered ? -50 : 0,
+              x: nx * 5 * factor,
+              y: ny * 4 * factor,
               duration: 0.45,
               ease: 'power1.out'
             });
@@ -177,7 +183,14 @@
           gsap.to(stage, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'power2.out' });
           if (brandCore) gsap.to(brandCore, { x: 0, y: 0, duration: 0.7, ease: 'power2.out' });
           popoutItems.forEach(item => {
-            gsap.to(item, { x: 0, y: 0, duration: 0.7, ease: 'power2.out' });
+            const isCentered = item.classList.contains('popout-subjects') || item.classList.contains('popout-alerts');
+            gsap.to(item, {
+              xPercent: isCentered ? -50 : 0,
+              x: 0,
+              y: 0,
+              duration: 0.7,
+              ease: 'power2.out'
+            });
           });
         }
       });
@@ -365,8 +378,8 @@
         gsap.to('.popout-grades', { x: 45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
         gsap.to('.popout-agenda', { x: -55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
         gsap.to('.popout-nearby', { x: 55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-subjects', { y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-alerts', { y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+        gsap.to('.popout-subjects', { xPercent: -50, y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+        gsap.to('.popout-alerts', { xPercent: -50, y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
         gsap.to('.notifast-floating-brand', { scale: 1 - 0.12 * p, opacity: 1 - 0.25 * p, overwrite: 'auto' });
       }
     });

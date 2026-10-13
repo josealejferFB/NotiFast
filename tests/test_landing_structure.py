@@ -187,5 +187,50 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("calculateRequiredGrade", js)
         self.assertIn("#analiticas", js)
 
+    def test_subjects_gallery_bento_alignment(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("subject-card-top-row", html)
+        self.assertIn("subject-grade-pill", html)
+        self.assertIn("subject-progress-block", html)
+        self.assertIn("subj-progress-track", html)
+        self.assertIn("subject-tags-strip", html)
+        self.assertIn("#derivadas", html)
+        self.assertIn("#newton", html)
+
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn("repeat(4, 1fr)", css)
+        self.assertIn(".subject-card-top-row", css)
+        self.assertIn(".subject-grade-pill", css)
+
+    def test_showcase_hover_bounds_and_centering(self):
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".popout-subjects:hover", css)
+        self.assertIn(".popout-alerts:hover", css)
+        self.assertIn("translateX(-50%)", css)
+
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("xPercent: -50", js)
+        self.assertIn(".popout-subjects, .popout-alerts", js)
+
+    def test_enhanced_footer_structure(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("footer-main-grid", html)
+        self.assertIn("footer-col-brand", html)
+        self.assertIn("footer-mission-text", html)
+        self.assertIn("footer-trust-chips", html)
+        self.assertIn("footer-bottom-bar", html)
+        self.assertIn("footer-back-to-top", html)
+
+        with open("landing/css/styles.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".footer-main-grid", css)
+        self.assertIn(".footer-trust-chips", css)
+        self.assertIn(".footer-bottom-bar", css)
+
 if __name__ == "__main__":
     unittest.main()
