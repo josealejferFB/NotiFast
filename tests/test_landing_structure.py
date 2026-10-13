@@ -54,5 +54,20 @@ class TestLandingStructure(unittest.TestCase):
             bg_js = f.read()
         self.assertIn("prefers-reduced-motion", bg_js)
 
+    def test_phone_mockup_screens_exist(self):
+        self.assertTrue(os.path.exists("landing/css/phone-mockup.css"))
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("css/phone-mockup.css", html)
+        self.assertIn("phone-mockup", html)
+        self.assertIn("screen-notes", html)
+        self.assertIn("screen-grades", html)
+        self.assertIn("screen-agenda", html)
+        self.assertIn("Mis Apuntes", html)
+        self.assertIn("Mis Calificaciones", html)
+        self.assertIn("Mi Agenda", html)
+        self.assertIn("8.7", html)
+        self.assertIn("Aprobando", html)
+
 if __name__ == "__main__":
     unittest.main()

@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/phone-mockup.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -81,10 +82,281 @@
   </header>
 
   <main id="main-content">
+    <!-- Hero Section -->
     <section class="hero-section">
-      <div class="hero-content">
-        <h1 class="hero-title">Todo tu estudio, en un solo lugar.</h1>
-        <p class="hero-subtitle">El cuaderno digital táctil que organiza tus apuntes, calcula tus notas y cuida tu tiempo sin fricción.</p>
+      <div class="hero-pill-badge">
+        <svg style="width: 16px; height: 16px; color: var(--brand-secondary);" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bulb"></use></svg>
+        <span>NotiFast 3.0 • El Cuaderno Académico Inteligente</span>
+      </div>
+      <h1 class="hero-title">
+        Todo tu estudio,<br><span class="accent-ruby">en un solo lugar.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Diseñado para eliminar la sobrecarga académica. Apuntes organizados en Bento, cálculo automático de promedios ponderados y agenda sin solapamientos.
+      </p>
+      <div class="hero-ctas">
+        <a href="#descargar" id="btn-download-hero" class="btn btn-primary">
+          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3.609 1.814L13.792 12 3.61 22.186a1.99 1.99 0 0 1-.61-.954V2.768c.112-.375.328-.71.609-.954zm11.605 11.605l2.42 2.42-12.723 7.348 10.303-9.768zm0-2.838L4.91 3.233 17.634 10.58l-2.42 2.421zm1.42 1.419l3.528-2.037a1.996 1.996 0 0 1 0 3.473l-3.528 2.037-1.42-1.42 1.42-1.42v-.633z"/>
+          </svg>
+          Descargar en Google Play
+        </a>
+        <a href="#apuntes" class="btn btn-secondary">
+          Explorar Funciones
+        </a>
+      </div>
+    </section>
+
+    <!-- Scrollytelling Showcase Section -->
+    <section class="showcase-section">
+      <!-- Mobile Switcher -->
+      <div class="mobile-tabs-switcher" role="tablist" aria-label="Pantallas de la aplicación">
+        <button class="mobile-tab-btn active" role="tab" aria-selected="true" data-screen="notes">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24"><use href="#icon-book"></use></svg>
+          Apuntes
+        </button>
+        <button class="mobile-tab-btn" role="tab" aria-selected="false" data-screen="grades">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24"><use href="#icon-trophy"></use></svg>
+          Calificaciones
+        </button>
+        <button class="mobile-tab-btn" role="tab" aria-selected="false" data-screen="agenda">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24"><use href="#icon-calculator"></use></svg>
+          Agenda
+        </button>
+      </div>
+
+      <div class="showcase-grid">
+        <!-- Columna de Narrativa (Pasos) -->
+        <div class="story-steps-column">
+          <!-- Paso 1: Apuntes -->
+          <article class="story-step active-step" id="apuntes" data-screen="notes">
+            <span class="story-tag tag-notes">Cuaderno Táctil</span>
+            <h2 class="story-title">Apuntes limpios que se organizan solos.</h2>
+            <p class="story-desc">
+              Crea notas en Markdown con etiquetas, imágenes y materias personalizadas con paletas cromáticas armónicas. Olvídate de cuadernos extraviados o carpetas desordenadas.
+            </p>
+            <ul class="story-features-list">
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Organización visual con Bento Grid por materias.
+              </li>
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Editor táctil con soporte enriquecido y resaltado.
+              </li>
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Búsqueda global instantánea de conceptos clave.
+              </li>
+            </ul>
+          </article>
+
+          <!-- Paso 2: Calificaciones -->
+          <article class="story-step" id="calificaciones" data-screen="grades">
+            <span class="story-tag tag-grades">Cálculo Ponderado</span>
+            <h2 class="story-title">Tus notas exactas, sin hojas de cálculo.</h2>
+            <p class="story-desc">
+              NotiFast calcula tu promedio ponderado en tiempo real según los porcentajes de cada evaluación. Conoce al instante si estás aprobando y qué nota necesitas en tu próximo examen.
+            </p>
+            <ul class="story-features-list">
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Promedio ponderado en tipografía monoespaciada JetBrains Mono.
+              </li>
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Semáforo de serenidad: Forest Sage para aprobados sin estrés.
+              </li>
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Simulador predictivo de calificaciones mínimas.
+              </li>
+            </ul>
+          </article>
+
+          <!-- Paso 3: Agenda -->
+          <article class="story-step" id="agenda" data-screen="agenda">
+            <span class="story-tag tag-agenda">Agenda Inteligente</span>
+            <h2 class="story-title">Cero choques de clases o entregas sorpresa.</h2>
+            <p class="story-desc">
+              Lleva tu horario semanal y calendario de exámenes en una vista clara. El motor de horarios detecta colisiones de clases y laboratorios antes de que te causen un dolor de cabeza.
+            </p>
+            <ul class="story-features-list">
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Detección proactiva de solapamientos entre clases.
+              </li>
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Timeline diario con badges de tu próxima clase en vivo.
+              </li>
+              <li>
+                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Notificaciones locales WorkManager sin alarmas invasivas.
+              </li>
+            </ul>
+          </article>
+        </div>
+
+        <!-- Columna Fija con el Smartphone Mockup -->
+        <div class="phone-sticky-col">
+          <div class="mockup-wrapper" id="phone-mockup">
+            <div class="device-frame">
+              <!-- Barra de Estado -->
+              <div class="device-status-bar">
+                <span>09:41</span>
+                <div class="device-camera-hole" aria-hidden="true"></div>
+                <div class="device-status-icons" aria-hidden="true">
+                  <span>5G</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              <!-- Viewport Interno de la App -->
+              <div class="device-viewport">
+                <!-- Pantalla 1: Mis Apuntes -->
+                <div class="phone-screen screen-notes active" id="mockup-screen-notes">
+                  <div class="app-topbar">
+                    <h3 class="app-topbar-title">Mis Apuntes</h3>
+                    <span class="app-topbar-chip">Semestre 2</span>
+                  </div>
+
+                  <div class="app-searchbox">
+                    <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <span>Buscar apuntes o materias…</span>
+                  </div>
+
+                  <div class="app-chips-row">
+                    <span class="app-chip selected">Apuntes</span>
+                    <span class="app-chip">Materias</span>
+                    <span class="app-chip">Recientes</span>
+                  </div>
+
+                  <!-- Bento de materias -->
+                  <div class="app-bento-subjects">
+                    <div class="subject-mini-card card-calculus">
+                      <div class="subject-name">Cálculo Dif.</div>
+                      <div class="subject-count">12 apuntes</div>
+                    </div>
+                    <div class="subject-mini-card card-physics">
+                      <div class="subject-name">Física I</div>
+                      <div class="subject-count">8 apuntes</div>
+                    </div>
+                  </div>
+
+                  <!-- Tarjeta de apunte reciente -->
+                  <div class="app-note-card">
+                    <div class="note-card-title">Derivadas y Gradiente</div>
+                    <div class="note-card-snippet">
+                      La derivada direccional alcanza su valor máximo en la dirección del vector gradiente ∇f(x, y)...
+                    </div>
+                    <div class="note-card-footer">
+                      <span class="note-tag">#calculo</span>
+                      <span>Hoy, 10:30 AM</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pantalla 2: Mis Calificaciones -->
+                <div class="phone-screen screen-grades" id="mockup-screen-grades">
+                  <div class="app-topbar">
+                    <h3 class="app-topbar-title">Mis Calificaciones</h3>
+                    <span class="app-topbar-chip">General</span>
+                  </div>
+
+                  <!-- Dashboard Hero -->
+                  <div class="gpa-hero-card">
+                    <span class="gpa-label">Promedio Ponderado</span>
+                    <div class="gpa-score">8.7 <span class="gpa-score-sub">/ 10.0</span></div>
+                    <div class="gpa-badge">
+                      <svg style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      <span>Aprobando</span>
+                    </div>
+                  </div>
+
+                  <!-- Lista de materias calificadas -->
+                  <div class="grades-list">
+                    <div class="grade-row-card">
+                      <div class="grade-row-info">
+                        <span class="grade-row-title">Cálculo Diferencial</span>
+                        <span class="grade-row-weight">Ponderación: 35%</span>
+                      </div>
+                      <span class="grade-row-score">9.2</span>
+                    </div>
+                    <div class="grade-row-card">
+                      <div class="grade-row-info">
+                        <span class="grade-row-title">Mecánica Clásica</span>
+                        <span class="grade-row-weight">Ponderación: 30%</span>
+                      </div>
+                      <span class="grade-row-score">8.4</span>
+                    </div>
+                    <div class="grade-row-card">
+                      <div class="grade-row-info">
+                        <span class="grade-row-title">Literatura Moderna</span>
+                        <span class="grade-row-weight">Ponderación: 35%</span>
+                      </div>
+                      <span class="grade-row-score">8.5</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pantalla 3: Mi Agenda -->
+                <div class="phone-screen screen-agenda" id="mockup-screen-agenda">
+                  <div class="app-topbar">
+                    <h3 class="app-topbar-title">Mi Agenda</h3>
+                    <span class="app-topbar-chip">Hoy</span>
+                  </div>
+
+                  <div class="app-chips-row">
+                    <span class="app-chip selected">Timeline</span>
+                    <span class="app-chip">Calendario</span>
+                    <span class="app-chip">Semana</span>
+                  </div>
+
+                  <!-- Alerta de colisión -->
+                  <div class="agenda-conflict-card">
+                    <svg style="width: 16px; height: 16px; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    <span>Solapamiento resuelto: Clase de Física movida a Aula B</span>
+                  </div>
+
+                  <div class="timeline-list">
+                    <div class="agenda-event-card">
+                      <span class="agenda-badge-live">Próxima</span>
+                      <span class="agenda-event-time">08:00 - 10:00</span>
+                      <span class="agenda-event-title">Cálculo Diferencial</span>
+                      <span class="agenda-event-location">Edificio Central • Aula 204</span>
+                    </div>
+                    <div class="agenda-event-card">
+                      <span class="agenda-event-time">11:30 - 13:00</span>
+                      <span class="agenda-event-title">Laboratorio de Física</span>
+                      <span class="agenda-event-location">Lab 3B • Con Entrega</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Nav del Teléfono -->
+              <nav class="device-bottom-nav" aria-label="Navegación dentro de NotiFast">
+                <a href="#apuntes" class="nav-item active" data-nav="notes">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
+                  <span>Apuntes</span>
+                </a>
+                <a href="#agenda" class="nav-item" data-nav="agenda">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                  <span>Agenda</span>
+                </a>
+                <a href="#calificaciones" class="nav-item" data-nav="grades">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-trophy"></use></svg>
+                  <span>Calificaciones</span>
+                </a>
+                <a href="#settings" class="nav-item" data-nav="settings">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                  <span>Ajustes</span>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>

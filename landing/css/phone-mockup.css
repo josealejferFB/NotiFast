@@ -1,0 +1,422 @@
+/* ==========================================================================
+   NOTIFAST 3.0 — SMARTPHONE MOCKUP & APP SCREEN ENGINE
+   Pixel-perfect recreations of Jetpack Compose screens
+   ========================================================================== */
+
+.mockup-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.device-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 18.5;
+  background-color: var(--bg-surface);
+  border-radius: 46px;
+  border: 10px solid #1E232F;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25),
+              0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-color-scheme: dark) {
+  .device-frame {
+    border-color: #0B0E14;
+    box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  }
+}
+
+/* Status Bar */
+.device-status-bar {
+  height: 38px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  z-index: 20;
+}
+
+.device-camera-hole {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #0E131F;
+}
+
+.device-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+}
+
+/* Pantalla interna */
+.device-viewport {
+  position: relative;
+  flex: 1;
+  background-color: var(--bg-canvas);
+  overflow: hidden;
+}
+
+/* Pantallas alternables */
+.phone-screen {
+  position: absolute;
+  inset: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--bg-canvas);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px) scale(0.98);
+  transition: opacity 0.4s var(--ease-smooth),
+              transform 0.4s var(--ease-smooth),
+              visibility 0.4s;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.phone-screen::-webkit-scrollbar {
+  display: none;
+}
+
+.phone-screen.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Top bar dentro de la app */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+}
+
+.app-topbar-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.app-topbar-chip {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+}
+
+/* Barra de búsqueda */
+.app-searchbox {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Chips de filtro */
+.app-chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.app-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.app-chip.selected {
+  background-color: var(--brand-secondary);
+  color: #ffffff;
+  border-color: var(--brand-secondary);
+}
+
+/* Bento de materias */
+.app-bento-subjects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.subject-mini-card {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  position: relative;
+  overflow: hidden;
+}
+
+.subject-mini-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.card-calculus::before { background-color: var(--subject-calculus); }
+.card-physics::before { background-color: var(--subject-physics); }
+.card-literature::before { background-color: var(--subject-literature); }
+
+.subject-name {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.subject-count {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+/* Tarjeta de apunte */
+.app-note-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note-card-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.note-card-snippet {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.note-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.note-tag {
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+
+/* Dashboard de Calificaciones (MainAverageDashboard) */
+.gpa-hero-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.gpa-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gpa-score {
+  font-family: var(--font-mono);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+  line-height: 1;
+}
+
+.gpa-score-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.gpa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--brand-success-light);
+  color: var(--brand-success);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+/* Lista de calificaciones */
+.grades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grade-row-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.grade-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.grade-row-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.grade-row-weight {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.grade-row-score {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--brand-success);
+}
+
+/* Agenda / Timeline */
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agenda-event-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.agenda-event-time {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--brand-secondary);
+}
+
+.agenda-event-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.agenda-event-location {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.agenda-badge-live {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+}
+
+.agenda-conflict-card {
+  background-color: var(--brand-warning-light);
+  border: 1px solid var(--brand-warning);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--brand-warning);
+}
+
+/* Bottom Nav en el teléfono (Screen.bottomNavItems) */
+.device-bottom-nav {
+  height: 56px;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 20;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  font-weight: 600;
+  transition: color var(--duration-fast);
+}
+
+.nav-item.active {
+  color: var(--brand-primary);
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+}

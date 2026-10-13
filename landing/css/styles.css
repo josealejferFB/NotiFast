@@ -317,3 +317,163 @@ body {
 .sticker-sage { color: var(--brand-success); }
 .sticker-amber { color: var(--brand-warning); }
 .sticker-blue { color: var(--subject-calculus); }
+
+
+/* ==========================================================================
+   SCROLLYTELLING SHOWCASE SECTION (LINEAR STYLE)
+   ========================================================================== */
+
+.showcase-section {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 100px;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 60px;
+  align-items: start;
+}
+
+.story-steps-column {
+  display: flex;
+  flex-direction: column;
+  gap: 120px;
+  padding: 40px 0 200px;
+}
+
+.story-step {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-tactile);
+  transition: transform var(--duration-normal) var(--ease-smooth),
+              border-color var(--duration-normal) var(--ease-smooth);
+}
+
+.story-step.active-step {
+  border-color: var(--brand-primary);
+  transform: translateX(8px);
+}
+
+.story-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 16px;
+}
+
+.tag-notes { background-color: var(--brand-primary-light); color: var(--brand-primary); }
+.tag-grades { background-color: var(--brand-success-light); color: var(--brand-success); }
+.tag-agenda { background-color: var(--brand-secondary-light); color: var(--brand-secondary); }
+
+.story-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.story-desc {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.story-features-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.story-features-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.feature-check-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--brand-success);
+  flex-shrink: 0;
+}
+
+/* Sticky Phone Column */
+.phone-sticky-col {
+  position: sticky;
+  top: 100px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mobile Tabs Switcher (< 992px) */
+.mobile-tabs-switcher {
+  display: none;
+  width: 100%;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.mobile-tab-btn {
+  flex: 1;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--duration-fast);
+}
+
+.mobile-tab-btn.active {
+  background-color: var(--brand-primary);
+  color: #ffffff;
+  border-color: var(--brand-primary);
+}
+
+@media (max-width: 991px) {
+  .showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .phone-sticky-col {
+    position: static;
+    order: -1;
+    margin-bottom: 40px;
+  }
+  .mobile-tabs-switcher {
+    display: flex;
+  }
+  .story-steps-column {
+    gap: 40px;
+    padding: 0;
+  }
+  .story-step {
+    padding: 24px;
+  }
+}
