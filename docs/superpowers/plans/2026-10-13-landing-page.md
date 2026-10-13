@@ -1,4 +1,4 @@
-# Landing Page NotiFast Implementation Plan
+# Landing Page NotiFast Implementation Plan (Hardened with UI/UX Pro Max & Systematic Debugging)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -6,7 +6,7 @@
 
 **Architecture:** Arquitectura Jamstack pura basada en estándares web modernos (HTML5 semántico, CSS3 con tokens de `DESIGN.md`, Vanilla JS modular y GSAP + ScrollTrigger para animaciones suaves a 60fps). Los componentes y pantallas de la app móvil se recrean vectorialmente con micro-bordes táctiles y tipografía de precisión.
 
-**Tech Stack:** HTML5 Semántico, CSS3 Custom Properties (Material 3 + Tactile Papercraft), Vanilla JavaScript (ES6+), GSAP 3.12 + ScrollTrigger, SVG vectoriales, Firebase Hosting.
+**Tech Stack:** HTML5 Semántico, CSS3 Custom Properties (Material 3 + Tactile Papercraft), Vanilla JavaScript (ES6+), GSAP 3.12 + ScrollTrigger, SVG vectoriales inline (zero-CORS), Firebase Hosting.
 
 **Spec:** `docs/superpowers/specs/2026-10-13-landing-page-design.md`
 
@@ -19,23 +19,24 @@
 - Cero dependencias pesadas de empaquetado en tiempo de compilación (cero fallos por falta de Node o npm global).
 - El botón de Google Play no debe romperse: debe abrir un toast interactivo que avisa sobre la disponibilidad o redirige al enlace configurado.
 - La configuración de Firebase Hosting debe estar en `firebase.json` bajo la clave `"hosting": { "public": "landing" }`.
+- Accesibilidad estricta WCAG AA/AAA: contraste de texto $\ge 4.5:1$ ($\ge 7:1$ para títulos), áreas táctiles mínimas de 48px, skip link para navegación por teclado y anillos `:focus-visible` de alto contraste.
 
-## Review Focus
+## Review Focus (Hardened by Systematic Debugging & UI/UX Pro Max)
 
-1. **Pantallas pequeñas (< 768px):** El showcase de scrollytelling debe transformarse fluidamente a un formato legible sin desbordamiento horizontal ni superposiciones de texto.
-2. **Preferencia de movimiento reducido:** Con `prefers-reduced-motion: reduce`, los stickers y el teléfono deben quedar estáticos y accesibles sin saltos bruscos.
-3. **Fidelidad cromática y de datos:** Los promedios ponderados (`8.7 / 10.0`), las materias de ejemplo y las etiquetas de la agenda deben reflejar exactamente la terminología del `PRODUCT.md` y `strings.xml`.
-4. **Resistencia a fallos de red (CDN fallback):** Si GSAP no puede cargarse desde la CDN externa, la landing debe degradarse elegantemente mostrando todas las secciones y pantallas sin pantalla en blanco.
-5. **Cero scrolljacking bloqueante:** La inercia nativa de scroll del navegador debe respetarse al 100%.
+1. **Pantallas pequeñas (< 992px):** No usar pinning forzado en móviles para evitar bloqueos de scroll (scroll-traps). Emplear `gsap.matchMedia()` para activar el pin solo en desktop ($\ge 992px$) y en móvil ofrecer pestañas interactivas accesibles con teclado y toque.
+2. **Preferencia de movimiento reducido (`prefers-reduced-motion`):** Detener inmediatamente flotaciones continuas y parallax en el fondo; renderizar el teléfono y las secciones en su estado final legible sin transiciones intrusivas.
+3. **Prevención de fallos CORS con SVGs:** Utilizar un sistema de sprites SVG embebido inline en el HTML para evitar bloqueos de seguridad de origen en entornos locales (`file://` o puertos dinámicos).
+4. **Resistencia a fallos de red / CDN Fallback (Degradación elegante):** Si GSAP o ScrollTrigger no cargan desde la CDN, el contenido debe mantenerse 100% visible y legible mediante CSS por defecto (`opacity: 1`), con interacción de pestañas mediante Vanilla JS nativo.
+5. **Ergonomía táctil y física de resortes:** Botones con altura mínima de 48px, separación $\ge 8px$ y micro-interacción al presionar de resorte táctil (`scale(0.97)` con easing elástico).
 
 ---
 
-### Task 1: Configuración de Firebase Hosting y Suite de Pruebas de Estructura
+### Task 1: Configuración de Firebase Hosting, Skip Link y Suite de Pruebas de Estructura
 
 **Files:**
 - Create: `tests/test_landing_structure.py`
 - Modify: `firebase.json`
-- Create: `landing/index.html` (esqueleto base inicial)
+- Create: `landing/index.html` (esqueleto base inicial con skip-link)
 
 **Interfaces:**
 - Consumes: Configuración del proyecto `firebase.json`
@@ -43,7 +44,7 @@
 
 - [ ] **Step 1: Write the failing test**
 
-Crear `tests/test_landing_structure.py` validando que `firebase.json` tiene la sección `hosting` apuntando a `landing`, que `landing/index.html` existe con marcado semántico (`<header>`, `<main>`, `<footer>`), etiquetas meta de viewport y título que contenga "NotiFast".
+Crear `tests/test_landing_structure.py` validando que `firebase.json` tiene la sección `hosting` apuntando a `landing`, que `landing/index.html` existe con marcado semántico (`<header>`, `<main id="main-content">`, `<footer>`), skip-link accesible (`<a href="#main-content" class="skip-link">`), etiquetas meta de viewport y título que contenga "NotiFast".
 
 ```python
 import json
@@ -65,8 +66,9 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("<!DOCTYPE html>", content)
         self.assertIn("<meta name=\"viewport\"", content)
         self.assertIn("NotiFast", content)
+        self.assertIn("skip-link", content)
         self.assertIn("<header", content)
-        self.assertIn("<main", content)
+        self.assertIn("<main id=\"main-content\"", content)
         self.assertIn("<footer", content)
 
 if __name__ == "__main__":
@@ -80,7 +82,7 @@ Expected: FAIL (`AssertionError` o `FileNotFoundError` porque `landing/index.htm
 
 - [ ] **Step 3: Implement firebase hosting config & landing scaffolding**
 
-Actualizar `firebase.json` para incluir `"hosting": { "public": "landing", "ignore": ["firebase.json", "**/.*"] }` y crear el esqueleto base `landing/index.html`.
+Actualizar `firebase.json` para incluir `"hosting": { "public": "landing", "ignore": ["firebase.json", "**/.*"] }` y crear el esqueleto base `landing/index.html` con skip link accesible.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -91,12 +93,12 @@ Expected: PASS (OK).
 
 ```bash
 git add firebase.json landing/index.html tests/test_landing_structure.py
-git commit -m "chore: configurar firebase hosting y esqueleto base de landing"
+git commit -m "chore: configurar firebase hosting y esqueleto base accesible de landing"
 ```
 
 ---
 
-### Task 2: Sistema de Tokens CSS, Tipografía y Estilos Base
+### Task 2: Sistema de Tokens CSS, Tipografía, Focus Rings y Estilos Base
 
 **Files:**
 - Create: `landing/css/tokens.css`
@@ -105,12 +107,12 @@ git commit -m "chore: configurar firebase hosting y esqueleto base de landing"
 - Modify: `tests/test_landing_structure.py`
 
 **Interfaces:**
-- Consumes: Tokens de `DESIGN.md` (colores, espaciados, radios de borde)
-- Produces: Variables CSS `:root` con modo claro, modo oscuro y tipografía importada
+- Consumes: Tokens de `DESIGN.md` (colores, espaciados, radios de borde) y guías de UI/UX Pro Max
+- Produces: Variables CSS `:root` con modo claro, modo oscuro, focus rings visibles y tipografía importada
 
 - [ ] **Step 1: Write the failing test**
 
-Agregar test en `tests/test_landing_structure.py` verificando que `landing/css/tokens.css` y `landing/css/styles.css` existen, y que contienen las variables obligatorias `--bg-canvas: #FAF9F6`, `--brand-primary: #9E1B32`, `--brand-secondary: #2A7B7B`, y el selector `@media (prefers-color-scheme: dark)`.
+Agregar test en `tests/test_landing_structure.py` verificando que `landing/css/tokens.css` y `landing/css/styles.css` existen, y que contienen las variables obligatorias `--bg-canvas: #FAF9F6`, `--brand-primary: #9E1B32`, `--brand-secondary: #2A7B7B`, `:focus-visible`, el selector `@media (prefers-color-scheme: dark)` y `@media (prefers-reduced-motion)`.
 
 ```python
     def test_css_tokens_defined(self):
@@ -122,6 +124,10 @@ Agregar test en `tests/test_landing_structure.py` verificando que `landing/css/t
         self.assertIn("#2A7B7B", css)
         self.assertIn("prefers-color-scheme: dark", css)
         self.assertIn("prefers-reduced-motion", css)
+
+        with open("landing/css/styles.css", "r", encoding="utf-8") as f:
+            styles = f.read()
+        self.assertIn(":focus-visible", styles)
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -131,7 +137,7 @@ Expected: FAIL (`tokens.css` no existe).
 
 - [ ] **Step 3: Implement tokens.css and styles.css**
 
-Crear `landing/css/tokens.css` con todas las variables semánticas de `DESIGN.md` (Light y Dark mode, radios, fuentes `Plus Jakarta Sans` y `JetBrains Mono`) y `landing/css/styles.css` con reset moderno, micro-bordes de 1px, botones táctiles con resorte `scale(0.97)` y media queries responsive.
+Crear `landing/css/tokens.css` con todas las variables semánticas de `DESIGN.md` (Light y Dark mode, radios, fuentes `Plus Jakarta Sans` y `JetBrains Mono`) y `landing/css/styles.css` con reset moderno, micro-bordes de 1px, `:focus-visible` ring de 2px, botones táctiles con resorte `scale(0.97)` y áreas de toque mínimas de 48px.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -142,17 +148,17 @@ Expected: PASS (OK).
 
 ```bash
 git add landing/css/ tests/test_landing_structure.py landing/index.html
-git commit -m "feat(landing): implementar sistema de tokens css y tema claro/oscuro"
+git commit -m "feat(landing): implementar sistema de tokens css, tema claro/oscuro y accesibilidad"
 ```
 
 ---
 
-### Task 3: Pack de Stickers de Estudio Vectoriales y Fondo Parallax Reactivo
+### Task 3: Pack de Stickers de Estudio Vectoriales (Zero-CORS) y Fondo Parallax Reactivo
 
 **Files:**
 - Create: `landing/assets/stickers/stickers.svg`
 - Create: `landing/js/background.js`
-- Modify: `landing/index.html`
+- Modify: `landing/index.html` (inclusión de sprite SVG inline para prevenir bloqueos CORS)
 - Modify: `tests/test_landing_structure.py`
 
 **Interfaces:**
@@ -161,28 +167,31 @@ git commit -m "feat(landing): implementar sistema de tokens css y tema claro/osc
 
 - [ ] **Step 1: Write the failing test**
 
-Agregar test validando que `landing/assets/stickers/stickers.svg` contiene las definiciones vectoriales de los 8 símbolos clave de la app: cuaderno (`icon-book`), lápiz (`icon-pencil`), birrete (`icon-school`), matraz (`icon-science`), calculadora (`icon-calculator`), bombilla (`icon-bulb`), funciones matemáticas (`icon-function`) y trofeo de logro (`icon-trophy`). También verificar que `landing/js/background.js` gestiona la animación de flotación y responde al evento scroll.
+Agregar test validando que los 8 símbolos vectoriales clave de la app existen (cuaderno `icon-book`, lápiz `icon-pencil`, birrete `icon-school`, matraz `icon-science`, calculadora `icon-calculator`, bombilla `icon-bulb`, funciones `icon-function`, trofeo `icon-trophy`), embebidos inline en `landing/index.html` para garantizar 0 fallos CORS. También verificar que `landing/js/background.js` gestiona la flotación y atiende `prefers-reduced-motion`.
 
 ```python
     def test_stickers_and_background_js_exist(self):
-        self.assertTrue(os.path.exists("landing/assets/stickers/stickers.svg"))
-        with open("landing/assets/stickers/stickers.svg", "r", encoding="utf-8") as f:
-            svg = f.read()
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
         for icon in ["icon-book", "icon-school", "icon-science", "icon-calculator", "icon-bulb"]:
-            self.assertIn(icon, svg)
+            self.assertIn(f'id="{icon}"', html)
 
         self.assertTrue(os.path.exists("landing/js/background.js"))
+        with open("landing/js/background.js", "r", encoding="utf-8") as f:
+            bg_js = f.read()
+        self.assertIn("prefers-reduced-motion", bg_js)
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `python3 -m unittest tests/test_landing_structure.py`
-Expected: FAIL (`stickers.svg` y `background.js` no existen).
+Expected: FAIL (`icon-book` y `background.js` no se encuentran).
 
 - [ ] **Step 3: Implement vector stickers and dynamic background**
 
-1. Diseñar el archivo SVG con estilo plano, amigable y colorido (estética Duolingo de estudio) con colores de materias de NotiFast.
-2. Implementar `landing/js/background.js` que dispersa los stickers en el fondo, aplica flotación continua con easing senoidal y desplaza su posición vertical en función del scroll (`window.scrollY * parallaxFactor`). Si el usuario tiene `prefers-reduced-motion`, detiene las oscilaciones.
+1. Diseñar el set de vectores en SVG con estilo plano y vibrante de estudio (Duolingo style) con los colores del subject engine de NotiFast.
+2. Embeber el `<svg style="display:none"><defs>...` directamente en `landing/index.html` para máxima fiabilidad (zero CORS).
+3. Implementar `landing/js/background.js` con generación de partículas de fondo flotantes, efecto parallax ligado al scroll y detección automática de `prefers-reduced-motion`.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -193,12 +202,12 @@ Expected: PASS (OK).
 
 ```bash
 git add landing/assets/ landing/js/background.js landing/index.html tests/test_landing_structure.py
-git commit -m "feat(landing): agregar stickers vectoriales y fondo interactivo reactivo"
+git commit -m "feat(landing): agregar stickers vectoriales zero-cors y fondo interactivo reactivo"
 ```
 
 ---
 
-### Task 4: Recreación Vectorial del Smartphone y Pantallas de la App
+### Task 4: Recreación Vectorial del Smartphone y Pantallas de la App con Degradación Elegante
 
 **Files:**
 - Create: `landing/css/phone-mockup.css`
@@ -207,7 +216,7 @@ git commit -m "feat(landing): agregar stickers vectoriales y fondo interactivo r
 
 **Interfaces:**
 - Consumes: Diseños de `NotesScreen`, `GradesScreen` (MainAverageDashboard), `SchedulesScreen`
-- Produces: Componente de smartphone con 3 pantallas hiper-fieles alternables mediante clases CSS
+- Produces: Componente de smartphone con 3 pantallas hiper-fieles alternables mediante clases CSS y visibles sin JS
 
 - [ ] **Step 1: Write the failing test**
 
@@ -237,10 +246,11 @@ Expected: FAIL (`screen-notes`, `screen-grades`, etc. no se encuentran).
 
 Construir en `landing/index.html` y `landing/css/phone-mockup.css`:
 - Chasis de teléfono con borde metálico sutil, isla de cámara o notch pulido, sombra ambiental suave.
-- Pantalla interna de 360x740 aspect ratio adaptable.
+- Pantalla interna con aspect ratio adaptable.
 - **Pantalla 1 (Apuntes):** Top bar "Mis Apuntes", buscador táctil, Bento de materias con acentos cromáticos reales, tarjetas de apuntes recientes con texto en markdown renderizado.
 - **Pantalla 2 (Calificaciones):** Top bar "Mis Calificaciones", tarjeta hero con promedio `8.7`, chip verde Forest Sage "Aprobando", histograma de notas y lista de asignaturas ponderadas.
 - **Pantalla 3 (Agenda):** Top bar "Mi Agenda", selector de día, timeline con bloques de clases y tarjeta de alerta proactiva "Conflicto de horario detectado".
+- Regla CSS de degradación elegante: en modo sin JS o móvil, las pantallas se presentan apiladas o en pestañas interactivas nativas.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -251,12 +261,12 @@ Expected: PASS (OK).
 
 ```bash
 git add landing/css/phone-mockup.css landing/index.html tests/test_landing_structure.py
-git commit -m "feat(landing): recrear mockup de teléfono con pantallas de apuntes, notas y agenda"
+git commit -m "feat(landing): recrear mockup de smartphone con pantallas fieles de apuntes, notas y agenda"
 ```
 
 ---
 
-### Task 5: Motor de Scrollytelling e Integración GSAP ScrollTrigger
+### Task 5: Motor de Scrollytelling con `gsap.matchMedia()` y Fallback Nativo
 
 **Files:**
 - Create: `landing/js/scrollytelling.js`
@@ -266,11 +276,11 @@ git commit -m "feat(landing): recrear mockup de teléfono con pantallas de apunt
 
 **Interfaces:**
 - Consumes: Secciones de texto `.story-step` y pantallas `.screen-*` del teléfono
-- Produces: Transición fluida del smartphone fijado con GSAP ScrollTrigger (y fallback sin GSAP)
+- Produces: Transición fluida del smartphone fijado con GSAP ScrollTrigger en desktop ($\ge 992px$), pestañas en móvil (< 992px) y fallback sin GSAP
 
 - [ ] **Step 1: Write the failing test**
 
-Agregar test validando que `landing/js/scrollytelling.js` y `landing/js/main.js` existen, que inicializan ScrollTrigger conectando los pasos de historia con las clases activas del teléfono, y que incluyen la función de degradación elegante en caso de fallo de red.
+Agregar test validando que `landing/js/scrollytelling.js` y `landing/js/main.js` existen, que utilizan `gsap.matchMedia()` para aislar el pinning en desktop y desactivarlo en móvil, y que incluyen selector de pestañas accesible para teclado y móvil.
 
 ```python
     def test_scrollytelling_js_exists(self):
@@ -279,7 +289,8 @@ Agregar test validando que `landing/js/scrollytelling.js` y `landing/js/main.js`
         with open("landing/js/scrollytelling.js", "r", encoding="utf-8") as f:
             code = f.read()
         self.assertIn("ScrollTrigger", code)
-        self.assertIn("active", code)
+        self.assertIn("matchMedia", code)
+        self.assertIn("992px", code)
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -287,12 +298,13 @@ Agregar test validando que `landing/js/scrollytelling.js` y `landing/js/main.js`
 Run: `python3 -m unittest tests/test_landing_structure.py`
 Expected: FAIL (`scrollytelling.js` no existe).
 
-- [ ] **Step 3: Implement GSAP ScrollTrigger scrollytelling**
+- [ ] **Step 3: Implement GSAP matchMedia scrollytelling**
 
-1. Cargar GSAP 3.12 y ScrollTrigger en `landing/index.html` con CDN optimizado y fallback local inline.
-2. En `landing/js/scrollytelling.js`, configurar `ScrollTrigger.create` para fijar el teléfono en el viewport en pantallas de escritorio mientras el usuario hace scroll por las 3 historias de producto.
-3. Al alcanzar cada punto de activación, disparar la transición elástica de cambio de pantalla en el teléfono (fade + slide vertical suave) y animar los elementos internos (contador de promedio, cards que entran).
-4. En móviles (< 768px), implementar un selector de pestañas táctiles interactivo con auto-avance o scroll horizontal snap.
+1. Cargar GSAP 3.12 y ScrollTrigger en `landing/index.html` con CDN optimizado y fallback condicional en `main.js`.
+2. En `landing/js/scrollytelling.js`, configurar `gsap.matchMedia()`:
+   - `(min-width: 992px)`: pin del smartphone container durante las 3 secciones de historia, scrub suave (1s) y cross-fade elástico entre pantallas.
+   - `(max-width: 991px)`: sin pin; pestañas interactivas sincronizadas con botones táctiles y scroll spy sin atrapar el scroll del usuario.
+   - `(prefers-reduced-motion: reduce)`: mostrar controles de pestañas instantáneas sin animación.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -303,7 +315,7 @@ Expected: PASS (OK).
 
 ```bash
 git add landing/js/ landing/index.html tests/test_landing_structure.py
-git commit -m "feat(landing): implementar motor de scrollytelling con gsap scrolltrigger"
+git commit -m "feat(landing): implementar motor de scrollytelling responsivo con gsap matchmedia"
 ```
 
 ---
@@ -318,13 +330,13 @@ git commit -m "feat(landing): implementar motor de scrollytelling con gsap scrol
 
 **Interfaces:**
 - Consumes: Bento Grid de superpoderes académicos, CTAs y Footer
-- Produces: Landing completa y responsive con micro-interacciones pulidas
+- Produces: Landing completa y responsive con micro-interacciones pulidas y áreas táctiles de 48px
 
 - [ ] **Step 1: Write the failing test**
 
 Validar en `tests/test_landing_structure.py` que existen:
 - La sección Bento Grid (`.bento-grid`) con 4 tarjetas de superpoderes (Ponderación, Sincronización, Notificaciones, Temas).
-- El botón de descarga Google Play con ID `#btn-download-hero` y `#btn-download-cta`.
+- El botón de descarga Google Play con ID `#btn-download-hero` y `#btn-download-cta` con min-height de 48px.
 - El componente modal/toast interactivo `#download-toast`.
 - El footer con copyright de NotiFast y links semánticos.
 
@@ -347,7 +359,7 @@ Expected: FAIL (`bento-grid` o elementos CTA no encontrados).
 - [ ] **Step 3: Implement Bento grid, download interactions and polish**
 
 1. Agregar la cuadrícula Bento en `landing/index.html` con micro-ilustraciones vectoriales y bordes táctiles.
-2. Implementar en `landing/js/main.js` la lógica del toast/modal de descarga: al hacer clic en cualquier botón de Google Play, si no hay enlace directo, despliega un toast accesible con botón para copiar enlace o recibir aviso.
+2. Implementar en `landing/js/main.js` la lógica del toast/modal de descarga: al hacer clic en cualquier botón de Google Play, despliega un toast accesible con botón para copiar enlace o recibir aviso cuando esté lista la versión en tienda.
 3. Añadir el footer con tipografía editorial de alta gama.
 4. Ajustar micro-interacciones de hover, focus visible accesible (`outline: 2px solid var(--brand-primary)`), y resorte táctil al presionar botones.
 
@@ -360,7 +372,7 @@ Expected: PASS (OK).
 
 ```bash
 git add landing/ tests/test_landing_structure.py
-git commit -m "feat(landing): agregar bento grid, modal de descarga interactivo y pulido ui/ux"
+git commit -m "feat(landing): agregar bento grid, modal de descarga interactivo y pulido ui/ux pro max"
 ```
 
 ---
@@ -377,7 +389,7 @@ git commit -m "feat(landing): agregar bento grid, modal de descarga interactivo 
 
 - [ ] **Step 1: Write comprehensive e2e verification tests**
 
-Crear `tests/test_landing_e2e.py` que levanta un servidor HTTP local en Python, realiza peticiones GET a `/`, `/css/tokens.css`, `/css/styles.css`, `/css/phone-mockup.css`, `/js/main.js`, `/js/background.js`, `/js/scrollytelling.js`, `/assets/stickers/stickers.svg`, valida cabeceras `Content-Type`, tamaño de archivos y ausencia de enlaces rotos o referencias 404.
+Crear `tests/test_landing_e2e.py` que levanta un servidor HTTP local en Python, realiza peticiones GET a `/`, `/css/tokens.css`, `/css/styles.css`, `/css/phone-mockup.css`, `/js/main.js`, `/js/background.js`, `/js/scrollytelling.js`, valida cabeceras `Content-Type`, tamaño de archivos y ausencia de enlaces rotos o referencias 404.
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -407,5 +419,9 @@ git commit -m "test(landing): agregar suite de verificación e2e y validación d
 1. **Spec Coverage:** Cubre todos los aspectos de `2026-10-13-landing-page-design.md`: tokens, modo claro/oscuro, stickers vectoriales con física reactiva, scrollytelling con teléfono fijo y pantallas de la app, Bento grid y configuración de Firebase Hosting.
 2. **Step Scan:** Cada tarea contiene pasos de TDD estrictos (test que falla, comando de ejecución, implementación, verificación, commit).
 3. **Type and Token Consistency:** Todos los selectores y variables CSS concuerdan exactamente entre las tareas.
-4. **Review Focus:** Atiende explícitamente pantallas móviles, preferencia de movimiento reducido, fidelidad de datos reales y fallback en caso de fallo de red.
+4. **Review Focus (UI/UX Pro Max & Systematic Debugging):**
+   - Atiende la prevención de scroll-traps en móviles mediante `gsap.matchMedia(992px)`.
+   - Previene bloqueos CORS con sprite SVG inline.
+   - Garantiza degradación elegante sin JS o si falla el CDN.
+   - Cumple accesibilidad WCAG con Skip Link, `:focus-visible` y áreas de toque de 48px.
 5. **Proporción:** Equilibrado, conciso y modular.
