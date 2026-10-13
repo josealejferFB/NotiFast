@@ -23,6 +23,7 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("<footer", content)
         self.assertIn("css/tokens.css", content)
         self.assertIn("css/styles.css", content)
+        self.assertIn("css/dynamic-showcase.css", content)
 
     def test_css_tokens_defined(self):
         self.assertTrue(os.path.exists("landing/css/tokens.css"))
@@ -54,29 +55,33 @@ class TestLandingStructure(unittest.TestCase):
             bg_js = f.read()
         self.assertIn("prefers-reduced-motion", bg_js)
 
-    def test_phone_mockup_screens_exist(self):
-        self.assertTrue(os.path.exists("landing/css/phone-mockup.css"))
+    def test_duolingo_style_interactive_showcase_exists(self):
+        self.assertTrue(os.path.exists("landing/css/dynamic-showcase.css"))
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
-        self.assertIn("css/phone-mockup.css", html)
-        self.assertIn("phone-mockup", html)
-        self.assertIn("screen-notes", html)
-        self.assertIn("screen-grades", html)
-        self.assertIn("screen-agenda", html)
-        self.assertIn("Mis Apuntes", html)
-        self.assertIn("Mis Calificaciones", html)
-        self.assertIn("Mi Agenda", html)
+        # Verificar la caja mágica de estudio / unboxing
+        self.assertIn("magic-box-showcase", html)
+        self.assertIn("study-chest-svg", html)
+        # Verificar sección de flujo de apuntes con desplazamiento
+        self.assertIn("section-notes-flow", html)
+        # Verificar laboratorio interactivo de notas y promedio
+        self.assertIn("section-grades-lab", html)
         self.assertIn("8.7", html)
         self.assertIn("Aprobando", html)
+        # Verificar radar interactivo de agenda y horarios
+        self.assertIn("section-schedule-radar", html)
+        # Verificar galería temática detallada de materias
+        self.assertIn("subjects-gallery", html)
+        self.assertIn("Cálculo", html)
+        self.assertIn("Física", html)
+        self.assertIn("Literatura", html)
 
-    def test_scrollytelling_js_exists(self):
-        self.assertTrue(os.path.exists("landing/js/scrollytelling.js"))
+    def test_interactive_showcase_js_exists(self):
+        self.assertTrue(os.path.exists("landing/js/interactive-showcase.js"))
         self.assertTrue(os.path.exists("landing/js/main.js"))
-        with open("landing/js/scrollytelling.js", "r", encoding="utf-8") as f:
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
             code = f.read()
         self.assertIn("ScrollTrigger", code)
-        self.assertIn("matchMedia", code)
-        self.assertIn("992px", code)
 
     def test_bento_grid_and_cta_elements(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:

@@ -82,7 +82,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
   .header {
-    background-color: rgba(14, 19, 31, 0.85);
+    background-color: rgba(250, 249, 246, 0.85);
   }
 }
 

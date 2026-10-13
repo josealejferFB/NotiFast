@@ -93,51 +93,21 @@
 }
 
 /* ==========================================================================
-   MODO OSCURO — Mesa de Estudio Nocturna / Slate Desk
+   PALETA DE ESTUDIO — SIEMPRE FONDO CLARO (WARM PAPER CANVAS)
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-canvas: #0E131F;
-    --bg-surface: #161E2D;
-    --bg-surface-container: #1C2638;
-    --bg-surface-container-high: #202A3C;
-    --bg-surface-variant: #1C2638;
-
-    --border-hairline: #2A384E;
-    --border-subtle: rgba(241, 245, 249, 0.08);
-
-    --text-primary: #F1F5F9;      /* Tiza Blanca (15.1:1 AAA sobre #0E131F) */
-    --text-secondary: #94A3B8;    /* Plata Lápiz (6.7:1 AAA) */
-    --text-muted: #64748B;
-
-    --brand-primary: #E05A6E;
-    --brand-primary-hover: #EB798A;
-    --brand-primary-light: #5C1120;
-    --brand-on-primary: #3D000F;
-
-    --brand-secondary: #38B2AC;
-    --brand-secondary-hover: #4FD1C5;
-    --brand-secondary-light: #0E4B47;
-    --brand-on-secondary: #042C2A;
-
-    --brand-success: #34D399;
-    --brand-success-light: #065F46;
-    --brand-on-success: #064E3B;
-
-    --brand-warning: #FBBF24;
-    --brand-warning-light: #78350F;
-
-    --brand-error: #F87171;
-    --brand-error-light: #991B1B;
-
-    --subject-calculus: #60A5FA;
-    --subject-physics: #A78BFA;
-    --subject-literature: #FBBF24;
-    --subject-chemistry: #34D399;
-    --subject-history: #F59E0B;
-
-    --shadow-tactile: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
-    --shadow-hover: 0 12px 36px -4px rgba(0, 0, 0, 0.6);
+    /* Mantenemos fondo claro pergamino para máxima legibilidad según directiva de diseño */
+    --bg-canvas: #FAF9F6;
+    --bg-surface: #FFFFFF;
+    --bg-surface-container: #F3EFEA;
+    --bg-surface-container-high: #EBE6DF;
+    --border-hairline: #E5DFD7;
+    --text-primary: #181A1F;
+    --text-secondary: #4B5563;
+    --brand-primary: #9E1B32;
+    --brand-secondary: #2A7B7B;
+    --brand-success: #15803D;
   }
 }
 

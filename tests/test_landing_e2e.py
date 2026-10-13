@@ -46,12 +46,16 @@ class TestLandingE2E(unittest.TestCase):
             body = response.read().decode("utf-8")
             self.assertIn("<!DOCTYPE html>", body)
             self.assertIn("NotiFast", body)
-            self.assertIn("phone-mockup", body)
+            self.assertIn("magic-box-showcase", body)
+            self.assertIn("section-notes-flow", body)
+            self.assertIn("section-grades-lab", body)
+            self.assertIn("section-schedule-radar", body)
+            self.assertIn("subjects-gallery", body)
             self.assertIn("bento-grid", body)
             self.assertIn("download-toast", body)
 
     def test_css_assets_serve_correctly(self):
-        for css_file in ["/css/tokens.css", "/css/styles.css", "/css/phone-mockup.css"]:
+        for css_file in ["/css/tokens.css", "/css/styles.css", "/css/dynamic-showcase.css"]:
             url = self.get_url(css_file)
             with urllib.request.urlopen(url) as response:
                 self.assertEqual(response.status, 200)
@@ -59,7 +63,7 @@ class TestLandingE2E(unittest.TestCase):
                 self.assertGreater(len(content), 100)
 
     def test_js_assets_serve_correctly(self):
-        for js_file in ["/js/background.js", "/js/scrollytelling.js", "/js/main.js"]:
+        for js_file in ["/js/background.js", "/js/interactive-showcase.js", "/js/main.js"]:
             url = self.get_url(js_file)
             with urllib.request.urlopen(url) as response:
                 self.assertEqual(response.status, 200)

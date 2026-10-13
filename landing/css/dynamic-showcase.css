@@ -1,0 +1,616 @@
+/* ==========================================================================
+   NOTIFAST 3.0 — DYNAMIC SHOWCASE (DUOLINGO VIBRANT CLAYMORPHISM STYLE)
+   Playful, animated, 2.5D chunky vector elements with rich interactive depth
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. LA CAJA MÁGICA DE ESTUDIO (THE UNBOXING EXPERIENCE)
+   -------------------------------------------------------------------------- */
+
+.magic-box-showcase {
+  position: relative;
+  max-width: 1100px;
+  margin: 40px auto 100px;
+  padding: 60px 24px;
+  text-align: center;
+  overflow: visible;
+}
+
+.box-stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 440px;
+  margin: 40px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.study-chest-container {
+  position: relative;
+  width: 280px;
+  height: 220px;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.study-chest-container:hover {
+  transform: scale(1.05) translateY(-6px);
+}
+
+.study-chest-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 20px 30px rgba(158, 27, 50, 0.25));
+}
+
+.chest-lid {
+  transform-origin: 50% 30%;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.chest-open .chest-lid {
+  transform: translateY(-40px) rotate(-14deg) scale(1.05);
+}
+
+/* Rayos de luz mágicos */
+.chest-glow-rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 480px;
+  height: 480px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(224, 90, 110, 0.25) 0%, rgba(56, 178, 172, 0.15) 45%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: pulseRays 4s infinite alternate ease-in-out;
+}
+
+@keyframes pulseRays {
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.5; }
+  100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.9; }
+}
+
+/* Elementos que salen disparados de la caja (Pop-out Elements) */
+.popout-item {
+  position: absolute;
+  border-radius: 20px;
+  padding: 12px 18px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-hairline);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 15;
+  user-select: none;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+@media (prefers-color-scheme: dark) {
+  .popout-item {
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  }
+}
+
+.popout-notes {
+  top: 40px;
+  left: 20px;
+  background: linear-gradient(135deg, #FFFFFF, var(--brand-primary-light));
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  animation: floatPop1 4.5s infinite ease-in-out alternate;
+}
+
+.popout-grades {
+  top: 20px;
+  right: 30px;
+  background: linear-gradient(135deg, #FFFFFF, var(--brand-success-light));
+  border-color: var(--brand-success);
+  color: var(--brand-success);
+  font-family: var(--font-mono);
+  animation: floatPop2 5s infinite ease-in-out alternate;
+}
+
+.popout-agenda {
+  bottom: 50px;
+  left: 30px;
+  background: linear-gradient(135deg, #FFFFFF, var(--brand-secondary-light));
+  border-color: var(--brand-secondary);
+  color: var(--brand-secondary);
+  animation: floatPop3 4.2s infinite ease-in-out alternate;
+}
+
+.popout-math {
+  bottom: 40px;
+  right: 20px;
+  background: linear-gradient(135deg, #FFFFFF, #FEF3C7);
+  border-color: #D97706;
+  color: #B45309;
+  font-family: var(--font-mono);
+  animation: floatPop4 4.8s infinite ease-in-out alternate;
+}
+
+@keyframes floatPop1 {
+  0% { transform: translateY(0) rotate(-6deg); }
+  100% { transform: translateY(-16px) rotate(-2deg); }
+}
+
+@keyframes floatPop2 {
+  0% { transform: translateY(0) rotate(5deg); }
+  100% { transform: translateY(-20px) rotate(9deg); }
+}
+
+@keyframes floatPop3 {
+  0% { transform: translateY(0) rotate(-4deg); }
+  100% { transform: translateY(-14px) rotate(-8deg); }
+}
+
+@keyframes floatPop4 {
+  0% { transform: translateY(0) rotate(4deg); }
+  100% { transform: translateY(-18px) rotate(0deg); }
+}
+
+/* --------------------------------------------------------------------------
+   2. FILAS DINÁMICAS EN ZIG-ZAG (DESPLAZAMIENTO IZQUIERDA - DERECHA)
+   -------------------------------------------------------------------------- */
+
+.dynamic-feature-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+}
+
+.row-reverse {
+  grid-template-columns: 1fr 1fr;
+}
+
+.row-reverse .feature-visual {
+  order: -1;
+}
+
+.feature-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feature-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.feature-title {
+  font-size: clamp(2rem, 3.8vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.feature-desc {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.feature-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.feature-bullets li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bullet-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   3. MÓDULO 1: FLUJO DE APUNTES EN ACCIÓN (NOTES FLOW)
+   -------------------------------------------------------------------------- */
+
+.notes-flow-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-hairline);
+  border-radius: 32px;
+  padding: 32px;
+  box-shadow: var(--shadow-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: rotate(-1.5deg);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.notes-flow-card:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.notes-paper-stack {
+  position: relative;
+  background: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+}
+
+.paper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px dashed var(--border-hairline);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.subject-badge-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background-color: #DBEAFE;
+  color: #1E40AF;
+}
+
+.markdown-snippet-block {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-hairline);
+  line-height: 1.5;
+}
+
+.markdown-snippet-block .md-token { color: var(--brand-primary); font-weight: 700; }
+.markdown-snippet-block .md-formula { color: #7C3AED; font-weight: 600; }
+
+.subject-chips-drift {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.drift-chip {
+  padding: 8px 14px;
+  border-radius: 14px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+/* --------------------------------------------------------------------------
+   4. MÓDULO 2: LABORATORIO DE CALIFICACIONES (GRADES LAB)
+   -------------------------------------------------------------------------- */
+
+.grades-lab-visual {
+  position: relative;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-hairline);
+  border-radius: 32px;
+  padding: 36px 28px;
+  box-shadow: var(--shadow-hover);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  transform: rotate(1.5deg);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.grades-lab-visual:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.grade-gauge-container {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-bg-circle {
+  fill: none;
+  stroke: var(--bg-surface-container);
+  stroke-width: 16;
+}
+
+.gauge-fill-circle {
+  fill: none;
+  stroke: var(--brand-success);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-dasharray: 565;
+  stroke-dashoffset: 85; /* Represents 8.7 / 10 */
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gauge-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gauge-number {
+  font-family: var(--font-mono);
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: var(--brand-success);
+  line-height: 1;
+}
+
+.gauge-max {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.grade-status-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background-color: var(--brand-success-light);
+  color: var(--brand-success);
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+
+.weight-sliders-preview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.weight-bar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background-color: var(--bg-surface-container);
+}
+
+/* --------------------------------------------------------------------------
+   5. MÓDULO 3: RADAR DE HORARIOS & CONFLICTOS (SCHEDULE RADAR)
+   -------------------------------------------------------------------------- */
+
+.schedule-radar-visual {
+  position: relative;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-hairline);
+  border-radius: 32px;
+  padding: 32px;
+  box-shadow: var(--shadow-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transform: rotate(-1deg);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.schedule-radar-visual:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.radar-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.radar-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--brand-secondary);
+  box-shadow: 0 0 0 4px rgba(42, 123, 123, 0.2);
+  animation: radarPing 1.8s infinite;
+}
+
+@keyframes radarPing {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.schedule-blocks-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.schedule-block-card {
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.schedule-block-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+}
+
+.block-calculus::before { background-color: var(--subject-calculus); }
+.block-physics::before { background-color: var(--subject-physics); }
+
+.conflict-resolved-tag {
+  background-color: #FEF3C7;
+  color: #B45309;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+/* --------------------------------------------------------------------------
+   6. MÓDULO 4: GALERÍA DE MATERIAS EN 3D / TÁCTIL (SUBJECTS GALLERY)
+   -------------------------------------------------------------------------- */
+
+.subjects-gallery-section {
+  max-width: 1200px;
+  margin: 60px auto 100px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.subjects-gallery-header {
+  max-width: 700px;
+  margin: 0 auto 50px;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.subject-feature-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-hairline);
+  border-radius: 28px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-tactile);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s var(--ease-smooth),
+              border-color 0.4s var(--ease-smooth);
+}
+
+.subject-feature-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+
+.subject-feature-card.card-calculus-detail { border-color: rgba(37, 99, 235, 0.3); }
+.subject-feature-card.card-physics-detail { border-color: rgba(124, 58, 237, 0.3); }
+.subject-feature-card.card-literature-detail { border-color: rgba(217, 119, 6, 0.3); }
+.subject-feature-card.card-chemistry-detail { border-color: rgba(5, 150, 105, 0.3); }
+
+.subject-hero-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.subject-hero-icon svg {
+  width: 38px;
+  height: 38px;
+}
+
+.subject-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.subject-meta-stats {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.subject-description-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .dynamic-feature-row {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .row-reverse .feature-visual {
+    order: 0;
+  }
+  .magic-box-showcase {
+    padding: 40px 16px;
+  }
+  .box-stage {
+    height: 360px;
+  }
+}

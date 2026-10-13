@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/phone-mockup.css">
+  <link rel="stylesheet" href="css/dynamic-showcase.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -107,256 +108,314 @@
       </div>
     </section>
 
-    <!-- Scrollytelling Showcase Section -->
-    <section class="showcase-section">
-      <!-- Mobile Switcher -->
-      <div class="mobile-tabs-switcher" role="tablist" aria-label="Pantallas de la aplicación">
-        <button class="mobile-tab-btn active" role="tab" aria-selected="true" data-screen="notes">
-          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24"><use href="#icon-book"></use></svg>
-          Apuntes
-        </button>
-        <button class="mobile-tab-btn" role="tab" aria-selected="false" data-screen="grades">
-          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24"><use href="#icon-trophy"></use></svg>
-          Calificaciones
-        </button>
-        <button class="mobile-tab-btn" role="tab" aria-selected="false" data-screen="agenda">
-          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24"><use href="#icon-calculator"></use></svg>
-          Agenda
-        </button>
+    <!-- 1. LA CAJA MÁGICA DE ESTUDIO (DUOLINGO UNBOXING EXPERIENCE) -->
+    <section class="magic-box-showcase">
+      <div class="hero-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
+        <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-trophy"></use></svg>
+        <span>Abre la Caja de tu Nuevo Semestre</span>
       </div>
+      <h2 class="section-title" style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-top: 12px;">
+        Todo lo que necesitas para aprobar,<br><span class="accent-ruby">desplegado ante ti.</span>
+      </h2>
+      <p class="section-desc" style="max-width: 640px; margin: 12px auto 0; font-size: 1.125rem; color: var(--text-secondary);">
+        Toca o haz scroll sobre el cofre de estudio para liberar tus apuntes, notas ponderadas, horarios y materias organizadas.
+      </p>
 
-      <div class="showcase-grid">
-        <!-- Columna de Narrativa (Pasos) -->
-        <div class="story-steps-column">
-          <!-- Paso 1: Apuntes -->
-          <article class="story-step active-step" id="apuntes" data-screen="notes">
-            <span class="story-tag tag-notes">Cuaderno Táctil</span>
-            <h2 class="story-title">Apuntes limpios que se organizan solos.</h2>
-            <p class="story-desc">
-              Crea notas en Markdown con etiquetas, imágenes y materias personalizadas con paletas cromáticas armónicas. Olvídate de cuadernos extraviados o carpetas desordenadas.
-            </p>
-            <ul class="story-features-list">
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Organización visual con Bento Grid por materias.
-              </li>
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Editor táctil con soporte enriquecido y resaltado.
-              </li>
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Búsqueda global instantánea de conceptos clave.
-              </li>
-            </ul>
-          </article>
+      <div class="box-stage">
+        <div class="chest-glow-rays" aria-hidden="true"></div>
 
-          <!-- Paso 2: Calificaciones -->
-          <article class="story-step" id="calificaciones" data-screen="grades">
-            <span class="story-tag tag-grades">Cálculo Ponderado</span>
-            <h2 class="story-title">Tus notas exactas, sin hojas de cálculo.</h2>
-            <p class="story-desc">
-              NotiFast calcula tu promedio ponderado en tiempo real según los porcentajes de cada evaluación. Conoce al instante si estás aprobando y qué nota necesitas en tu próximo examen.
-            </p>
-            <ul class="story-features-list">
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Promedio ponderado en tipografía monoespaciada JetBrains Mono.
-              </li>
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Semáforo de serenidad: Forest Sage para aprobados sin estrés.
-              </li>
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Simulador predictivo de calificaciones mínimas.
-              </li>
-            </ul>
-          </article>
-
-          <!-- Paso 3: Agenda -->
-          <article class="story-step" id="agenda" data-screen="agenda">
-            <span class="story-tag tag-agenda">Agenda Inteligente</span>
-            <h2 class="story-title">Cero choques de clases o entregas sorpresa.</h2>
-            <p class="story-desc">
-              Lleva tu horario semanal y calendario de exámenes en una vista clara. El motor de horarios detecta colisiones de clases y laboratorios antes de que te causen un dolor de cabeza.
-            </p>
-            <ul class="story-features-list">
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Detección proactiva de solapamientos entre clases.
-              </li>
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Timeline diario con badges de tu próxima clase en vivo.
-              </li>
-              <li>
-                <svg class="feature-check-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Notificaciones locales WorkManager sin alarmas invasivas.
-              </li>
-            </ul>
-          </article>
+        <!-- Pop-out Floating Badges (Salen disparados de la caja) -->
+        <div class="popout-item popout-notes" title="Tus apuntes organizados">
+          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
+          <span>Apuntes en Markdown</span>
         </div>
 
-        <!-- Columna Fija con el Smartphone Mockup -->
-        <div class="phone-sticky-col">
-          <div class="mockup-wrapper" id="phone-mockup">
-            <div class="device-frame">
-              <!-- Barra de Estado -->
-              <div class="device-status-bar">
-                <span>09:41</span>
-                <div class="device-camera-hole" aria-hidden="true"></div>
-                <div class="device-status-icons" aria-hidden="true">
-                  <span>5G</span>
-                  <span>100%</span>
-                </div>
-              </div>
+        <div class="popout-item popout-grades" title="Tu promedio en vivo">
+          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-trophy"></use></svg>
+          <span>Promedio: 8.7 / 10</span>
+        </div>
 
-              <!-- Viewport Interno de la App -->
-              <div class="device-viewport">
-                <!-- Pantalla 1: Mis Apuntes -->
-                <div class="phone-screen screen-notes active" id="mockup-screen-notes">
-                  <div class="app-topbar">
-                    <h3 class="app-topbar-title">Mis Apuntes</h3>
-                    <span class="app-topbar-chip">Semestre 2</span>
-                  </div>
+        <div class="popout-item popout-agenda" title="Tu horario sin choques">
+          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculator"></use></svg>
+          <span>Horario Inteligente</span>
+        </div>
 
-                  <div class="app-searchbox">
-                    <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    <span>Buscar apuntes o materias…</span>
-                  </div>
+        <div class="popout-item popout-math" title="Fórmulas y cálculo">
+          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-function"></use></svg>
+          <span>∇f(x, y) = Max</span>
+        </div>
 
-                  <div class="app-chips-row">
-                    <span class="app-chip selected">Apuntes</span>
-                    <span class="app-chip">Materias</span>
-                    <span class="app-chip">Recientes</span>
-                  </div>
+        <!-- El Cofre Ilustrado en SVG 2.5D -->
+        <div class="study-chest-container chest-open" title="Toca para abrir/cerrar la caja de estudio">
+          <svg class="study-chest-svg" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Base del cofre -->
+            <rect x="25" y="70" width="190" height="95" rx="20" fill="#9E1B32" stroke="#680D1E" stroke-width="6"/>
+            <!-- Franjas doradas/aqua de refuerzo -->
+            <rect x="55" y="70" width="16" height="95" fill="#38B2AC" opacity="0.9"/>
+            <rect x="169" y="70" width="16" height="95" fill="#38B2AC" opacity="0.9"/>
+            <!-- Cerradura / Cerrojo -->
+            <circle cx="120" cy="100" r="14" fill="#FBBF24" stroke="#B45309" stroke-width="3"/>
+            <rect x="117" y="96" width="6" height="12" rx="2" fill="#78350F"/>
+            <!-- Tapa animada (Lid) -->
+            <g class="chest-lid">
+              <path d="M20 70C20 40 55 25 120 25C185 25 220 40 220 70H20Z" fill="#C22340" stroke="#680D1E" stroke-width="6"/>
+              <!-- Banda central de la tapa -->
+              <path d="M55 31C75 27 100 25 120 25C140 25 165 27 185 31V70H55V31Z" fill="#2A7B7B" opacity="0.4"/>
+              <ellipse cx="120" cy="25" rx="22" ry="7" fill="#FBBF24" stroke="#B45309" stroke-width="2"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
 
-                  <!-- Bento de materias -->
-                  <div class="app-bento-subjects">
-                    <div class="subject-mini-card card-calculus">
-                      <div class="subject-name">Cálculo Dif.</div>
-                      <div class="subject-count">12 apuntes</div>
-                    </div>
-                    <div class="subject-mini-card card-physics">
-                      <div class="subject-name">Física I</div>
-                      <div class="subject-count">8 apuntes</div>
-                    </div>
-                  </div>
+    <!-- 2. MÓDULO 1: FLUJO DE APUNTES EN ACCIÓN (IZQUIERDA A DERECHA) -->
+    <section class="dynamic-feature-row section-notes-flow" id="apuntes">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
+          <span>Cuaderno Táctil</span>
+        </div>
+        <h2 class="feature-title">
+          Tus notas vuelan alto,<br>ordenadas por materia.
+        </h2>
+        <p class="feature-desc">
+          Olvida los cuadernos perdidos y las carpetas caóticas. En NotiFast cada clase tiene su propio lienzo en Markdown con fórmulas, resaltado de conceptos y etiquetas inteligentes.
+        </p>
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Editor con sintaxis Markdown y resaltado en vivo.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Búsqueda instantánea de fórmulas y definiciones clave.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Exportación directa para compartir apuntes entre compañeros.</span>
+          </li>
+        </ul>
+      </div>
 
-                  <!-- Tarjeta de apunte reciente -->
-                  <div class="app-note-card">
-                    <div class="note-card-title">Derivadas y Gradiente</div>
-                    <div class="note-card-snippet">
-                      La derivada direccional alcanza su valor máximo en la dirección del vector gradiente ∇f(x, y)...
-                    </div>
-                    <div class="note-card-footer">
-                      <span class="note-tag">#calculo</span>
-                      <span>Hoy, 10:30 AM</span>
-                    </div>
-                  </div>
-                </div>
+      <div class="feature-visual">
+        <div class="notes-flow-card">
+          <div class="notes-paper-stack">
+            <div class="paper-header">
+              <span class="subject-badge-pill">Cálculo Diferencial</span>
+              <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Hoy • 10:30 AM</span>
+            </div>
+            <div class="markdown-snippet-block">
+              <p><span class="md-token"># Teorema del Valor Medio</span></p>
+              <p>Si f es continua en [a, b] y diferenciable en (a, b), entonces existe c ∈ (a, b) tal que:</p>
+              <p><span class="md-formula">f'(c) = [f(b) - f(a)] / (b - a)</span></p>
+            </div>
+          </div>
 
-                <!-- Pantalla 2: Mis Calificaciones -->
-                <div class="phone-screen screen-grades" id="mockup-screen-grades">
-                  <div class="app-topbar">
-                    <h3 class="app-topbar-title">Mis Calificaciones</h3>
-                    <span class="app-topbar-chip">General</span>
-                  </div>
-
-                  <!-- Dashboard Hero -->
-                  <div class="gpa-hero-card">
-                    <span class="gpa-label">Promedio Ponderado</span>
-                    <div class="gpa-score">8.7 <span class="gpa-score-sub">/ 10.0</span></div>
-                    <div class="gpa-badge">
-                      <svg style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                      <span>Aprobando</span>
-                    </div>
-                  </div>
-
-                  <!-- Lista de materias calificadas -->
-                  <div class="grades-list">
-                    <div class="grade-row-card">
-                      <div class="grade-row-info">
-                        <span class="grade-row-title">Cálculo Diferencial</span>
-                        <span class="grade-row-weight">Ponderación: 35%</span>
-                      </div>
-                      <span class="grade-row-score">9.2</span>
-                    </div>
-                    <div class="grade-row-card">
-                      <div class="grade-row-info">
-                        <span class="grade-row-title">Mecánica Clásica</span>
-                        <span class="grade-row-weight">Ponderación: 30%</span>
-                      </div>
-                      <span class="grade-row-score">8.4</span>
-                    </div>
-                    <div class="grade-row-card">
-                      <div class="grade-row-info">
-                        <span class="grade-row-title">Literatura Moderna</span>
-                        <span class="grade-row-weight">Ponderación: 35%</span>
-                      </div>
-                      <span class="grade-row-score">8.5</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Pantalla 3: Mi Agenda -->
-                <div class="phone-screen screen-agenda" id="mockup-screen-agenda">
-                  <div class="app-topbar">
-                    <h3 class="app-topbar-title">Mi Agenda</h3>
-                    <span class="app-topbar-chip">Hoy</span>
-                  </div>
-
-                  <div class="app-chips-row">
-                    <span class="app-chip selected">Timeline</span>
-                    <span class="app-chip">Calendario</span>
-                    <span class="app-chip">Semana</span>
-                  </div>
-
-                  <!-- Alerta de colisión -->
-                  <div class="agenda-conflict-card">
-                    <svg style="width: 16px; height: 16px; flex-shrink: 0;" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-                    <span>Solapamiento resuelto: Clase de Física movida a Aula B</span>
-                  </div>
-
-                  <div class="timeline-list">
-                    <div class="agenda-event-card">
-                      <span class="agenda-badge-live">Próxima</span>
-                      <span class="agenda-event-time">08:00 - 10:00</span>
-                      <span class="agenda-event-title">Cálculo Diferencial</span>
-                      <span class="agenda-event-location">Edificio Central • Aula 204</span>
-                    </div>
-                    <div class="agenda-event-card">
-                      <span class="agenda-event-time">11:30 - 13:00</span>
-                      <span class="agenda-event-title">Laboratorio de Física</span>
-                      <span class="agenda-event-location">Lab 3B • Con Entrega</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bottom Nav del Teléfono -->
-              <nav class="device-bottom-nav" aria-label="Navegación dentro de NotiFast">
-                <a href="#apuntes" class="nav-item active" data-nav="notes">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
-                  <span>Apuntes</span>
-                </a>
-                <a href="#agenda" class="nav-item" data-nav="agenda">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
-                  <span>Agenda</span>
-                </a>
-                <a href="#calificaciones" class="nav-item" data-nav="grades">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-trophy"></use></svg>
-                  <span>Calificaciones</span>
-                </a>
-                <a href="#settings" class="nav-item" data-nav="settings">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                  <span>Ajustes</span>
-                </a>
-              </nav>
+          <!-- Chips de materias que se desplazan -->
+          <div class="subject-chips-drift">
+            <div class="drift-chip" style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;">
+              <span>📐 Cálculo</span>
+              <span style="font-size: 0.7rem; opacity: 0.8;">12 notas</span>
+            </div>
+            <div class="drift-chip" style="background: #F5F3FF; color: #6D28D9; border: 1px solid #DDD6FE;">
+              <span>⚡ Física</span>
+              <span style="font-size: 0.7rem; opacity: 0.8;">8 notas</span>
+            </div>
+            <div class="drift-chip" style="background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A;">
+              <span>📖 Literatura</span>
+              <span style="font-size: 0.7rem; opacity: 0.8;">5 notas</span>
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- 3. MÓDULO 2: LABORATORIO DE CALIFICACIONES (DERECHA A IZQUIERDA) -->
+    <section class="dynamic-feature-row row-reverse section-grades-lab" id="calificaciones">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-success-light); color: var(--brand-success);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-trophy"></use></svg>
+          <span>Laboratorio de Notas</span>
+        </div>
+        <h2 class="feature-title">
+          Tu promedio ponderado<br>calculado al instante.
+        </h2>
+        <p class="feature-desc">
+          Dile adiós a las hojas de cálculo confusas. NotiFast aplica los pesos exactos de tus exámenes y laboratorios en tiempo real. Sabrás exactamente qué nota necesitas antes del examen final.
+        </p>
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-success-light); color: var(--brand-success);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Ponderación matemática exacta con precisión IEEE 754.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-success-light); color: var(--brand-success);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Semáforo de serenidad: indicador Forest Sage de estado Aprobando.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-success-light); color: var(--brand-success);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Simulador predictivo: "¿Cuánto necesito en el examen final?"</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <div class="grades-lab-visual">
+          <div class="grade-status-banner">
+            <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span>Estado: Aprobando con Honores</span>
+          </div>
+
+          <!-- Medidor Circular SVG Dinámico -->
+          <div class="grade-gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 200 200">
+              <circle class="gauge-bg-circle" cx="100" cy="100" r="90" />
+              <circle class="gauge-fill-circle" cx="100" cy="100" r="90" />
+            </svg>
+            <div class="gauge-center-text">
+              <span class="gauge-number">8.7</span>
+              <span class="gauge-max">de 10.0</span>
+            </div>
+          </div>
+
+          <!-- Desglose interactivo de ponderación -->
+          <div class="weight-sliders-preview">
+            <div class="weight-bar-item">
+              <span>Parcial 1 (35%)</span>
+              <span style="font-family: var(--font-mono); color: var(--brand-success);">9.2</span>
+            </div>
+            <div class="weight-bar-item">
+              <span>Laboratorios (30%)</span>
+              <span style="font-family: var(--font-mono); color: var(--brand-success);">8.4</span>
+            </div>
+            <div class="weight-bar-item">
+              <span>Proyecto Final (35%)</span>
+              <span style="font-family: var(--font-mono); color: var(--brand-success);">8.5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. MÓDULO 3: RADAR DE HORARIOS & CERO CONFLICTOS (IZQUIERDA A DERECHA) -->
+    <section class="dynamic-feature-row section-schedule-radar" id="agenda">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculator"></use></svg>
+          <span>Agenda & Horarios</span>
+        </div>
+        <h2 class="feature-title">
+          Tu horario sincronizado,<br>sin choques de clases.
+        </h2>
+        <p class="feature-desc">
+          El motor de colisiones de NotiFast analiza tus clases, laboratorios y entregas en tiempo real. Si dos asignaturas se solapan, el sistema te avisa proactivamente para resolver el conflicto de inmediato.
+        </p>
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Detección inteligente de colisiones de horario en el aula.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Vistas dinámicas en Timeline, Calendario mensual y Semana.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Notificaciones programadas con WorkManager: cero batería vampiro.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <div class="schedule-radar-visual">
+          <div class="radar-banner">
+            <span>Escáner de Solapamientos Activo</span>
+            <div class="radar-pulse-dot" aria-hidden="true"></div>
+          </div>
+
+          <div class="schedule-blocks-stack">
+            <div class="schedule-block-card block-calculus">
+              <div>
+                <div style="font-weight: 800; font-size: 0.9375rem; color: var(--text-primary);">Cálculo Diferencial</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">08:00 - 10:00 • Aula 204</div>
+              </div>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #1D4ED8; background: #DBEAFE; padding: 4px 10px; border-radius: 9999px;">Confirmada</span>
+            </div>
+
+            <div class="schedule-block-card block-physics">
+              <div>
+                <div style="font-weight: 800; font-size: 0.9375rem; color: var(--text-primary);">Laboratorio de Física</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">10:30 - 12:30 • Laboratorio Central</div>
+              </div>
+              <span class="conflict-resolved-tag">✓ Conflicto Resuelto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. MÓDULO 4: GALERÍA VISUAL Y TEMÁTICA DE MATERIAS -->
+    <section class="subjects-gallery-section subjects-gallery">
+      <div class="subjects-gallery-header">
+        <span class="feature-pill-badge" style="background: #FEF3C7; color: #B45309; margin: 0 auto 12px;">
+          <span>Personalización Total</span>
+        </span>
+        <h2 class="section-title" style="font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 800;">
+          Cada materia, con su propia identidad.
+        </h2>
+        <p class="section-desc" style="color: var(--text-secondary); margin-top: 8px;">
+          Diseña tu propio ecosistema de estudio. Asigna paletas cromáticas accesibles (WCAG AAA) y organiza evaluaciones con personalidad única.
+        </p>
+      </div>
+
+      <div class="subjects-grid">
+        <!-- Cálculo -->
+        <article class="subject-feature-card card-calculus-detail">
+          <div class="subject-hero-icon" style="background: #EFF6FF; color: #2563EB;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-function"></use></svg>
+          </div>
+          <h3 class="subject-title">Cálculo Diferencial</h3>
+          <span class="subject-meta-stats">12 Apuntes • 3 Evaluaciones</span>
+          <p class="subject-description-text">
+            Límites, derivadas, integrales definidas y series con soporte completo de fórmulas y gráficos vectoriales.
+          </p>
+        </article>
+
+        <!-- Física -->
+        <article class="subject-feature-card card-physics-detail">
+          <div class="subject-hero-icon" style="background: #F5F3FF; color: #7C3AED;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
+          </div>
+          <h3 class="subject-title">Física Mecánica</h3>
+          <span class="subject-meta-stats">8 Apuntes • 4 Evaluaciones</span>
+          <p class="subject-description-text">
+            Cinemática, leyes de Newton, energía y rotación con registro de experimentos prácticos de laboratorio.
+          </p>
+        </article>
+
+        <!-- Literatura -->
+        <article class="subject-feature-card card-literature-detail">
+          <div class="subject-hero-icon" style="background: #FFFBEB; color: #D97706;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-pencil"></use></svg>
+          </div>
+          <h3 class="subject-title">Literatura Universal</h3>
+          <span class="subject-meta-stats">5 Apuntes • 2 Ensayos</span>
+          <p class="subject-description-text">
+            Análisis de textos, corrientes narrativas y síntesis críticas organizadas cronológicamente.
+          </p>
+        </article>
+
+        <!-- Química -->
+        <article class="subject-feature-card card-chemistry-detail">
+          <div class="subject-hero-icon" style="background: #ECFDF5; color: #059669;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-bulb"></use></svg>
+          </div>
+          <h3 class="subject-title">Química General</h3>
+          <span class="subject-meta-stats">7 Apuntes • 3 Exámenes</span>
+          <p class="subject-description-text">
+            Estequiometría, enlaces covalentes y equilibrios ácido-base con tablas periódicas interactivas.
+          </p>
+        </article>
       </div>
     </section>
 
@@ -500,6 +559,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
   <script src="js/background.js" defer></script>
   <script src="js/scrollytelling.js" defer></script>
+  <script src="js/interactive-showcase.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 </html>
