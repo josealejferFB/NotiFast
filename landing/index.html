@@ -175,35 +175,130 @@
         Apuntes en Markdown, cálculo de promedios en cualquier escala, horarios en curso y transferencia sin conexión: todo converge de forma armónica en NotiFast.
       </p>
 
-      <div class="box-stage hub-stage">
+      <div class="box-stage hub-stage" id="hub-interactive-stage">
+        <!-- Marco de Entorno de Aplicación NotiFast (Evidencia visual: Todo vive dentro de la app) -->
+        <div class="hub-app-silhouette" aria-hidden="true">
+          <div class="hub-app-status-bar">
+            <span class="hub-status-time">09:41</span>
+            <span class="hub-status-pill">
+              <svg style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
+              NotiFast Android • Workspace Activo
+            </span>
+            <span class="hub-status-indicators">
+              <span class="hub-status-signal">●●●●</span>
+              <span>100% ⚡</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Lienzo de Órbitas y Rayos de Conexión Gravitacional con Paquetes de Datos Animados -->
+        <svg class="hub-orbit-canvas" viewBox="0 0 800 520" aria-hidden="true" focusable="false">
+          <ellipse cx="400" cy="260" rx="350" ry="215" class="orbit-path orbit-outer" />
+          <ellipse cx="400" cy="260" rx="240" ry="150" class="orbit-path orbit-inner" />
+          <line x1="400" y1="260" x2="160" y2="90" class="orbit-beam beam-notes" id="beam-notes" />
+          <line x1="400" y1="260" x2="640" y2="80" class="orbit-beam beam-grades" id="beam-grades" />
+          <line x1="400" y1="260" x2="140" y2="420" class="orbit-beam beam-agenda" id="beam-agenda" />
+          <line x1="400" y1="260" x2="650" y2="430" class="orbit-beam beam-nearby" id="beam-nearby" />
+          <line x1="400" y1="260" x2="400" y2="50" class="orbit-beam beam-subjects" id="beam-subjects" />
+          <line x1="400" y1="260" x2="400" y2="470" class="orbit-beam beam-alerts" id="beam-alerts" />
+          <!-- Paquetes de datos activos -->
+          <circle class="orbit-packet packet-notes" cx="280" cy="175" r="3.5" fill="#BF092F" />
+          <circle class="orbit-packet packet-grades" cx="520" cy="170" r="3.5" fill="#15803D" />
+          <circle class="orbit-packet packet-agenda" cx="270" cy="340" r="3.5" fill="#0F766E" />
+          <circle class="orbit-packet packet-nearby" cx="525" cy="345" r="3.5" fill="#0284C7" />
+          <circle class="orbit-packet packet-subjects" cx="400" cy="155" r="3.5" fill="#B45309" />
+          <circle class="orbit-packet packet-alerts" cx="400" cy="365" r="3.5" fill="#7C3AED" />
+        </svg>
+
         <div class="chest-glow-rays hub-orbit-aura" aria-hidden="true"></div>
 
-        <!-- Badges Flotantes que emanan del icono de NotiFast -->
-        <div class="popout-item popout-notes" title="Tus apuntes organizados">
-          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
-          <span>Apuntes en Markdown</span>
+        <!-- Micro-elementos flotantes del ADN de la app NotiFast -->
+        <div class="hub-micro-chip chip-latex" aria-hidden="true">$$\int x\,dx$$</div>
+        <div class="hub-micro-chip chip-score" aria-hidden="true">10.0 ⭐</div>
+        <div class="hub-micro-chip chip-nearby" aria-hidden="true">P2P Direct ⚡</div>
+        <div class="hub-micro-chip chip-tag" aria-hidden="true">#calculo #parcial1</div>
+        <div class="hub-micro-chip chip-alarm" aria-hidden="true">🔔 24h antes</div>
+
+        <!-- Módulo 1: Apuntes en Markdown (Top-Left) -->
+        <div class="popout-item popout-notes" data-target="#apuntes" role="button" tabindex="0" title="Ver Módulo de Apuntes">
+          <div class="popout-icon-box icon-notes-tint">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
+          </div>
+          <div class="popout-text-stack">
+            <span class="popout-title">Apuntes en Markdown</span>
+            <span class="popout-meta">LaTeX • Resaltado • #tags</span>
+          </div>
+          <span class="popout-explore-hint">Explorar ↓</span>
         </div>
 
-        <div class="popout-item popout-grades" title="Tu promedio en vivo">
-          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
-          <span>Promedio: 8.70</span>
+        <!-- Módulo 2: Promedio Global Multiescala (Top-Right) -->
+        <div class="popout-item popout-grades" data-target="#calificaciones" role="button" tabindex="0" title="Ver Módulo de Calificaciones">
+          <div class="popout-icon-box icon-grades-tint">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
+          </div>
+          <div class="popout-text-stack">
+            <span class="popout-title">Promedio: 8.70</span>
+            <span class="popout-meta">4 Escalas (0-10, 0-20, 100%, A-F)</span>
+          </div>
+          <span class="popout-explore-hint">Explorar ↓</span>
         </div>
 
-        <div class="popout-item popout-agenda" title="Tu horario en curso">
-          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
-          <span>En curso: Cálculo (08:00)</span>
+        <!-- Módulo 3: Horario en Curso y Baliza (Bottom-Left) -->
+        <div class="popout-item popout-agenda" data-target="#agenda" role="button" tabindex="0" title="Ver Horario Activo">
+          <div class="popout-icon-box icon-agenda-tint">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+          </div>
+          <div class="popout-text-stack">
+            <span class="popout-title"><span class="beacon-mini-dot"></span> En curso: Cálculo</span>
+            <span class="popout-meta">08:00 - 10:00 • Tomar notas</span>
+          </div>
+          <span class="popout-explore-hint">Explorar ↓</span>
         </div>
 
-        <div class="popout-item popout-math" title="Compartir Pack P2P">
-          <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
-          <span>Pack P2P Offline</span>
+        <!-- Módulo 4: Pack P2P Offline Nearby (Bottom-Right) -->
+        <div class="popout-item popout-math popout-nearby" data-target="#compartir" role="button" tabindex="0" title="Ver Transferencia P2P">
+          <div class="popout-icon-box icon-nearby-tint">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+          </div>
+          <div class="popout-text-stack">
+            <span class="popout-title">Pack P2P Offline</span>
+            <span class="popout-meta">Android Nearby • .notifast</span>
+          </div>
+          <span class="popout-explore-hint">Explorar ↓</span>
+        </div>
+
+        <!-- Módulo 5: Materias Personalizadas (Top-Center) -->
+        <div class="popout-item popout-subjects" data-target="#materias" role="button" tabindex="0" title="Ver Personalización de Materias">
+          <div class="popout-icon-box icon-subjects-tint">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+          </div>
+          <div class="popout-text-stack">
+            <span class="popout-title">Materias con Identidad</span>
+            <span class="popout-meta">Paleta HSL • WCAG AAA</span>
+          </div>
+          <span class="popout-explore-hint">Explorar ↓</span>
+        </div>
+
+        <!-- Módulo 6: Recordatorios Inteligentes (Bottom-Center) -->
+        <div class="popout-item popout-alerts" data-target="#agenda" role="button" tabindex="0" title="Ver Notificaciones Proactivas">
+          <div class="popout-icon-box icon-alerts-tint">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightbulb"></use></svg>
+          </div>
+          <div class="popout-text-stack">
+            <span class="popout-title">WorkManager Proactivo</span>
+            <span class="popout-meta">Aviso 24h & 2h • Cero Batería</span>
+          </div>
+          <span class="popout-explore-hint">Explorar ↓</span>
         </div>
 
         <!-- El Núcleo Central: Solo el icono y el nombre NotiFast flotando -->
-        <div class="study-chest-container notifast-core-hub" title="NotiFast">
+        <div class="study-chest-container notifast-core-hub" title="NotiFast — El Ecosistema Todo en Uno">
           <div class="notifast-floating-brand">
+            <div class="notifast-icon-aura" aria-hidden="true"></div>
             <img src="assets/logo.png" alt="NotiFast App Icon" class="notifast-core-icon">
             <span class="notifast-core-name">NotiFast</span>
+            <span class="notifast-core-pill">Cuaderno &amp; Hub Académico</span>
+            <span class="notifast-core-subpill">Todo vive dentro de la app</span>
           </div>
         </div>
       </div>
@@ -212,6 +307,7 @@
     <!-- 2. MÓDULO 1: AGENDA & CLASE EN CURSO (ScheduleLiveStatusCard fiel a la app) -->
     <section class="dynamic-feature-row section-schedule-radar" id="agenda">
       <div class="feature-info">
+        <div class="section-origin-indicator"><span class="origin-dot"></span> Desplegado desde NotiFast • Módulo 1</div>
         <div class="feature-pill-badge" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
           <span>Agenda & Horario Activo</span>
@@ -282,6 +378,7 @@
     <!-- 3. MÓDULO 2: CREACIÓN DE APUNTES & EDITOR MARKDOWN (NoteEditorBottomSheet fiel a la app) -->
     <section class="dynamic-feature-row row-reverse section-notes-flow" id="apuntes">
       <div class="feature-info">
+        <div class="section-origin-indicator"><span class="origin-dot"></span> Desplegado desde NotiFast • Módulo 2</div>
         <div class="feature-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
           <span>Editor de Apuntes</span>
@@ -392,6 +489,7 @@
     <!-- 4. MÓDULO 3: CALIFICACIONES (MainAverageDashboard fiel a la app) -->
     <section class="dynamic-feature-row section-grades-lab" id="calificaciones">
       <div class="feature-info">
+        <div class="section-origin-indicator"><span class="origin-dot"></span> Desplegado desde NotiFast • Módulo 3</div>
         <div class="feature-pill-badge" style="background: var(--brand-success-light); color: var(--brand-success);">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
           <span>Calificaciones & Adaptabilidad Global</span>
@@ -495,6 +593,7 @@
     <!-- 5. MÓDULO 4: COMPARTIR MATERIA P2P OFFLINE (Android Nearby & Código QR) -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
+        <div class="section-origin-indicator"><span class="origin-dot"></span> Desplegado desde NotiFast • Módulo 4</div>
         <div class="feature-pill-badge" style="background: #E0F2FE; color: #0284C7;">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
           <span>P2P Offline • Pack Académico</span>
@@ -571,8 +670,9 @@
     </section>
 
     <!-- 6. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper) -->
-    <section class="subjects-gallery-section subjects-gallery">
+    <section class="subjects-gallery-section subjects-gallery" id="materias">
       <div class="subjects-gallery-header">
+        <div class="section-origin-indicator" style="margin: 0 auto 10px;"><span class="origin-dot"></span> Desplegado desde NotiFast • Módulo 5</div>
         <span class="feature-pill-badge" style="background: #FEF3C7; color: #B45309; margin: 0 auto 12px;">
           <span>Personalización Total</span>
         </span>
@@ -734,6 +834,35 @@
         <p class="final-cta-meta">Compatible con Android 8.0 Oreo o superior • 100% Gratuito y Libre de Anuncios</p>
       </div>
     </section>
+
+    <!-- Barra Flotante de Radar Scrollytelling (Sincronizada con el scroll del usuario) -->
+    <nav class="hub-floating-radar" id="hub-floating-radar" aria-label="Navegación de módulos NotiFast">
+      <a href="#hub-interactive-stage" class="radar-brand-mini" title="Volver al Núcleo NotiFast">
+        <img src="assets/logo.png" alt="NotiFast App Icon" class="radar-mini-logo">
+      </a>
+      <div class="radar-links">
+        <a href="#agenda" class="radar-chip" data-target="#agenda" title="Horario en Curso">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+          <span>Agenda</span>
+        </a>
+        <a href="#apuntes" class="radar-chip" data-target="#apuntes" title="Apuntes Markdown">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
+          <span>Apuntes</span>
+        </a>
+        <a href="#calificaciones" class="radar-chip" data-target="#calificaciones" title="Calificaciones Multiescala">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
+          <span>Notas</span>
+        </a>
+        <a href="#compartir" class="radar-chip" data-target="#compartir" title="Compartir P2P Offline">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+          <span>P2P</span>
+        </a>
+        <a href="#materias" class="radar-chip" data-target="#materias" title="Materias con Identidad">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+          <span>Materias</span>
+        </a>
+      </div>
+    </nav>
   </main>
 
   <!-- Download Modal Toast -->

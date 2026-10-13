@@ -111,6 +111,10 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("notifast-core-icon", html)
         self.assertIn("popout-notes", html)
         self.assertIn("popout-grades", html)
+        self.assertIn("hub-app-silhouette", html)
+        self.assertIn("hub-app-status-bar", html)
+        self.assertIn("hub-floating-radar", html)
+        self.assertIn("section-origin-indicator", html)
         self.assertIn("en un solo lugar", html.lower())
 
     def test_bento_grid_and_cta_elements(self):
