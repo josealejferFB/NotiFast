@@ -203,4 +203,43 @@ class RoomDaoInMemoryTest {
         assertEquals(evaluationDao, DatabaseModule.provideEvaluationDao(db))
         assertEquals(scheduleDao, DatabaseModule.provideScheduleDao(db))
     }
+
+    @Test
+    fun insertAndRetrieveTeacher() = runTest {
+        val teacherDao: TeacherDao = mockk(relaxed = true)
+        every { db.teacherDao() } returns teacherDao
+
+        val teacher = com.notifast.app.data.local.entity.TeacherEntity(
+            userId = "u1",
+            id = "t1",
+            firstName = "Carlos",
+            lastName = "Mendoza",
+            phoneNumber = "+584121234567",
+            email = "carlos@universidad.edu",
+            subjectNamesJson = "[\"Cálculo I\"]"
+        )
+
+        coEvery { teacherDao.getTeachers("u1") } returns flowOf(listOf(teacher))
+        coEvery { teacherDao.getTeacherById("u1", "t1") } returns flowOf(teacher)
+
+        teacherDao.insertTeacher(teacher)
+        coVerify { teacherDao.insertTeacher(teacher) }
+
+        val teachers = teacherDao.getTeachers("u1").first()
+        assertEquals(1, teachers.size)
+        assertEquals("Carlos", teachers.first().firstName)
+        assertEquals("+584121234567", teachers.first().phoneNumber)
+
+        val singleTeacher = teacherDao.getTeacherById("u1", "t1").first()
+        assertEquals("Mendoza", singleTeacher?.lastName)
+
+        teacherDao.updateTeacher(teacher.copy(phoneNumber = "+584129999999"))
+        coVerify { teacherDao.updateTeacher(match { it.phoneNumber == "+584129999999" }) }
+
+        teacherDao.deleteTeacher("u1", "t1")
+        coVerify { teacherDao.deleteTeacher("u1", "t1") }
+
+        assertEquals(teacherDao, DatabaseModule.provideTeacherDao(db))
+    }
 }
+

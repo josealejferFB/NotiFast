@@ -140,4 +140,31 @@ object NotiFastMigrations {
             db.execSQL("ALTER TABLE `notes` ADD COLUMN `schemaVersion` INTEGER NOT NULL DEFAULT 1")
         }
     }
+
+    /**
+     * v3 → v4: teachers table for professors directory and subject linkage.
+     */
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `teachers` (
+                    `userId` TEXT NOT NULL,
+                    `id` TEXT NOT NULL,
+                    `firstName` TEXT NOT NULL,
+                    `lastName` TEXT NOT NULL,
+                    `phoneNumber` TEXT NOT NULL,
+                    `email` TEXT NOT NULL,
+                    `subjectNamesJson` TEXT NOT NULL,
+                    `notes` TEXT NOT NULL,
+                    `createdAt` INTEGER,
+                    `updatedAt` INTEGER,
+                    PRIMARY KEY(`userId`, `id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_teachers_userId_firstName_lastName` ON `teachers` (`userId`, `firstName`, `lastName`)")
+        }
+    }
 }
+

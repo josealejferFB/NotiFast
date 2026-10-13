@@ -7,6 +7,7 @@ import com.notifast.app.data.local.dao.EvaluationDao
 import com.notifast.app.data.local.dao.NoteDao
 import com.notifast.app.data.local.dao.ScheduleDao
 import com.notifast.app.data.local.dao.SubjectDao
+import com.notifast.app.data.local.dao.TeacherDao
 import com.notifast.app.data.local.dao.UserDao
 import com.notifast.app.data.local.migrations.NotiFastMigrations
 import dagger.Module
@@ -27,7 +28,11 @@ object DatabaseModule {
             context,
             NotiFastDatabase::class.java,
             "notifast.db"
-        ).addMigrations(NotiFastMigrations.MIGRATION_1_2, NotiFastMigrations.MIGRATION_2_3).build()
+        ).addMigrations(
+            NotiFastMigrations.MIGRATION_1_2,
+            NotiFastMigrations.MIGRATION_2_3,
+            NotiFastMigrations.MIGRATION_3_4
+        ).build()
     }
 
     @Provides
@@ -44,4 +49,7 @@ object DatabaseModule {
 
     @Provides
     fun provideScheduleDao(db: NotiFastDatabase): ScheduleDao = db.scheduleDao()
+
+    @Provides
+    fun provideTeacherDao(db: NotiFastDatabase): TeacherDao = db.teacherDao()
 }
