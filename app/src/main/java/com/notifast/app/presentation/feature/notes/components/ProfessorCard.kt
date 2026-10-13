@@ -10,8 +10,6 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,7 +44,6 @@ import com.notifast.app.R
 import com.notifast.app.data.model.Teacher
 import com.notifast.app.presentation.theme.color.ForestSage
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfessorCard(
     teacher: Teacher,
@@ -180,9 +177,9 @@ fun ProfessorCard(
 
             if (teacher.subjectNames.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
-                FlowRow(
+                Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     val visibleSubjects = teacher.subjectNames.take(3)
                     val remainingCount = teacher.subjectNames.size - visibleSubjects.size

@@ -1,10 +1,9 @@
 package com.notifast.app.presentation.feature.notes.components
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Teacher
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherDetailBottomSheet(
     teacher: Teacher,
@@ -92,9 +91,11 @@ fun TeacherDetailBottomSheet(
 
             if (teacher.subjectNames.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     teacher.subjectNames.forEach { subject ->
                         Surface(
