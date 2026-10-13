@@ -43,21 +43,21 @@
   - `TeacherFormatters.buildWhatsAppUrl(phone: String, teacherName: String, subjectName: String): String`
   - `TeacherFormatters.buildWhatsAppMessage(teacherName: String, subjectName: String): String`
 
-- [ ] **Step 1: Escribir pruebas unitarias que fallen para `TeacherFormatters`**
+- [x] **Step 1: Escribir pruebas unitarias que fallen para `TeacherFormatters`**
   Probar limpieza de teléfono con `+`, guiones y espacios, formateo del saludo de WhatsApp con y sin materia, y codificación URI segura.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que fallen**
+- [x] **Step 2: Ejecutar pruebas y verificar que fallen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.domain.util.TeacherFormattersTest"`
   Expected: FAIL con símbolos no encontrados.
 
-- [ ] **Step 3: Implementar `Teacher.kt` y `TeacherFormatters.kt`**
+- [x] **Step 3: Implementar `Teacher.kt` y `TeacherFormatters.kt`**
   Implementar el modelo inmutable `Teacher` y las funciones utilitarias en `domain/util/TeacherFormatters.kt`.
 
-- [ ] **Step 4: Ejecutar pruebas y verificar que pasen**
+- [x] **Step 4: Ejecutar pruebas y verificar que pasen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.domain.util.TeacherFormattersTest"`
   Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   `git add app/src/main/java/com/notifast/app/data/model/Teacher.kt app/src/main/java/com/notifast/app/domain/util/TeacherFormatters.kt app/src/test/java/com/notifast/app/domain/util/TeacherFormattersTest.kt`
   `git commit -m "feat(domain): add Teacher model and TeacherFormatters with unit tests"`
 
@@ -80,21 +80,21 @@
   - `TeacherDao`: `getTeachers(userId: String): Flow<List<TeacherEntity>>`, `getTeacherById`, `insertTeacher`, `updateTeacher`, `deleteTeacher`.
   - `MIGRATION_3_4`: migración SQL para tabla `teachers`.
 
-- [ ] **Step 1: Escribir pruebas unitarias que fallen para `TeacherDao`**
+- [x] **Step 1: Escribir pruebas unitarias que fallen para `TeacherDao`**
   En `RoomDaoInMemoryTest.kt`, agregar pruebas para inserción, consulta reactiva por `userId`, actualización y borrado de `TeacherEntity`.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que fallen**
+- [x] **Step 2: Ejecutar pruebas y verificar que fallen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.data.local.dao.RoomDaoInMemoryTest"`
   Expected: FAIL (clase `TeacherDao` no encontrada).
 
-- [ ] **Step 3: Implementar `TeacherEntity`, `TeacherDao`, `RoomConverters` y `MIGRATION_3_4`**
+- [x] **Step 3: Implementar `TeacherEntity`, `TeacherDao`, `RoomConverters` y `MIGRATION_3_4`**
   Incrementar la versión de `NotiFastDatabase` a 4, registrar `TeacherEntity`, añadir `teacherDao()`, y definir `MIGRATION_3_4` con `CREATE TABLE IF NOT EXISTS teachers ...`. Inyectar `TeacherDao` en `DatabaseModule.kt`.
 
-- [ ] **Step 4: Ejecutar pruebas y verificar que pasen**
+- [x] **Step 4: Ejecutar pruebas y verificar que pasen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.data.local.dao.RoomDaoInMemoryTest"`
   Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   `git add app/src/main/java/com/notifast/app/data/local/entity/TeacherEntity.kt app/src/main/java/com/notifast/app/data/local/dao/TeacherDao.kt app/src/main/java/com/notifast/app/data/local/NotiFastDatabase.kt app/src/main/java/com/notifast/app/di/DatabaseModule.kt app/src/test/java/com/notifast/app/data/local/dao/RoomDaoInMemoryTest.kt`
   `git commit -m "feat(data): add TeacherEntity, TeacherDao and Room migration 3 to 4"`
 
@@ -116,24 +116,24 @@
   - `NoteRepository.updateSubject(userId: String, oldName: String, newSubject: SubjectData): Result<Unit>`
   - Actualización atómica en Room de `subjects`, `notes`, `evaluations`, `schedules` y `teachers`.
 
-- [ ] **Step 1: Escribir pruebas unitarias que fallen para `updateSubject` en cascada**
+- [x] **Step 1: Escribir pruebas unitarias que fallen para `updateSubject` en cascada**
   Verificar que:
   a) Si `oldName == newSubject.name`, actualiza solo color e icono en `subjects`.
   b) Si `oldName != newSubject.name`, actualiza `subjects`, `notes.subject`, `evaluations.subjectName`, `schedules.subjectName` y `teachers.subjectNames`.
   c) Si `newSubject.name` ya existe en otra materia, retorna `Result.failure` y no modifica ningún registro.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que fallen**
+- [x] **Step 2: Ejecutar pruebas y verificar que fallen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.data.repository.LocalNoteRepositoryImplTest"`
   Expected: FAIL con método no implementado o pruebas que fallan.
 
-- [ ] **Step 3: Implementar queries de actualización en DAOs y la transacción en `LocalNoteRepositoryImpl`**
+- [x] **Step 3: Implementar queries de actualización en DAOs y la transacción en `LocalNoteRepositoryImpl`**
   Añadir `@Query("UPDATE notes SET subject = :newName WHERE userId = :userId AND subject = :oldName")` en `NoteDao` (y análogos en `EvaluationDao` y `ScheduleDao`). Implementar `updateSubject` usando `database.withTransaction`.
 
-- [ ] **Step 4: Ejecutar pruebas y verificar que pasen**
+- [x] **Step 4: Ejecutar pruebas y verificar que pasen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.data.repository.LocalNoteRepositoryImplTest"`
   Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   `git commit -m "feat(data): implement atomic cascading subject rename transaction"`
 
 ---
@@ -155,21 +155,21 @@
     - `saveTeacher(teacher: Teacher): Result<Unit>`
     - `deleteTeacher(userId: String, teacherId: String): Result<Unit>`
 
-- [ ] **Step 1: Escribir pruebas unitarias que fallen para `LocalTeacherRepositoryImpl`**
+- [x] **Step 1: Escribir pruebas unitarias que fallen para `LocalTeacherRepositoryImpl`**
   Pruebas para CRUD, mapeo bidireccional entre `Teacher` y `TeacherEntity`, y filtrado reactivo de profesores por materia.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que fallen**
+- [x] **Step 2: Ejecutar pruebas y verificar que fallen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.data.repository.LocalTeacherRepositoryImplTest"`
   Expected: FAIL.
 
-- [ ] **Step 3: Implementar `TeacherRepository` y `LocalTeacherRepositoryImpl`**
+- [x] **Step 3: Implementar `TeacherRepository` y `LocalTeacherRepositoryImpl`**
   Implementar la interfaz en `domain/repository/` y la implementación local en `data/repository/`. Vincular en `RepositoryModule.kt` con `@Binds`.
 
-- [ ] **Step 4: Ejecutar pruebas y verificar que pasen**
+- [x] **Step 4: Ejecutar pruebas y verificar que pasen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.data.repository.LocalTeacherRepositoryImplTest"`
   Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   `git commit -m "feat(repository): add TeacherRepository and LocalTeacherRepositoryImpl with unit tests"`
 
 ---
@@ -193,23 +193,23 @@
   - `EditSubjectDialog(subject: SubjectData, onDismiss: () -> Unit, onSave: (name: String, colorHex: String, icon: String) -> Unit)`
   - Botón de editar en `SubjectDetailHeroBento` y opción "Editar" en el menú de la tarjeta `SubjectGridBento`.
 
-- [ ] **Step 1: Añadir strings requeridos en `strings.xml`**
+- [x] **Step 1: Añadir strings requeridos en `strings.xml`**
   Textos en español para títulos, campos de edición, advertencias de duplicados y confirmaciones.
 
-- [ ] **Step 2: Implementar composable `EditSubjectDialog.kt` (≤ 250 LOC)**
+- [x] **Step 2: Implementar composable `EditSubjectDialog.kt` (≤ 250 LOC)**
   Usa `NotiFastFormField` para el nombre, `SubjectColorPickerBento` para el color y `SubjectIconGridSelector` para el icono.
 
-- [ ] **Step 3: Conectar eventos y ViewModels en `NotesViewModel` y `SubjectDetailViewModel`**
+- [x] **Step 3: Conectar eventos y ViewModels en `NotesViewModel` y `SubjectDetailViewModel`**
   Añadir `NotesEvent.UpdateSubject` y `SubjectDetailEvent.UpdateSubjectData`. Gestionar el renombrado sin pantallas en blanco.
 
-- [ ] **Step 4: Integrar botón de editar en `SubjectDetailHeroBento` y menú en `SubjectGridBento`**
+- [x] **Step 4: Integrar botón de editar en `SubjectDetailHeroBento` y menú en `SubjectGridBento`**
   Icono de lápiz accesible al lado del botón de compartir en detalles, y opción en el menú contextual de materias.
 
-- [ ] **Step 5: Ejecutar pruebas unitarias de ViewModel**
+- [x] **Step 5: Ejecutar pruebas unitarias de ViewModel**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.notes.NotesViewModelTest"`
   Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
   `git commit -m "feat(ui): add EditSubjectDialog and connect to NotesScreen and SubjectDetailScreen"`
 
 ---
@@ -235,21 +235,21 @@
   - `ScheduleTeacherSelector`: Composable que renderiza dropdown si hay docentes asignados a la materia seleccionada, o tarjeta de aviso con campo rápido si no tiene docentes.
   - Al guardar horario con nuevo docente: crea automáticamente la entidad `Teacher` asociada a esa materia.
 
-- [ ] **Step 1: Escribir pruebas unitarias que fallen en `AddScheduleViewModelTest`**
+- [x] **Step 1: Escribir pruebas unitarias que fallen en `AddScheduleViewModelTest`**
   Comprobar que al seleccionar una materia sin docentes se expone la bandera `hasConfiguredTeacher = false`, y que al guardar el horario se invoca `teacherRepository.saveTeacher`.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que fallen**
+- [x] **Step 2: Ejecutar pruebas y verificar que fallen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.addschedule.AddScheduleViewModelTest"`
   Expected: FAIL.
 
-- [ ] **Step 3: Implementar `ScheduleTeacherSelector.kt` y actualizar ViewModels**
+- [x] **Step 3: Implementar `ScheduleTeacherSelector.kt` y actualizar ViewModels**
   Inyectar `TeacherRepository` en `AddScheduleViewModel` y `EditScheduleViewModel`. Actualizar `AddScheduleScreen` y `EditScheduleScreen`.
 
-- [ ] **Step 4: Ejecutar pruebas y verificar que pasen**
+- [x] **Step 4: Ejecutar pruebas y verificar que pasen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.addschedule.AddScheduleViewModelTest"`
   Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   `git commit -m "feat(schedules): integrate contextual teacher selector and automatic linking"`
 
 ---
@@ -275,24 +275,24 @@
   - Ficha de profesor con botones directos: WhatsApp (saludo prellenado), SMS y Llamar.
   - Formulario de creación/edición de profesor con selector de materias por chips.
 
-- [ ] **Step 1: Escribir pruebas unitarias que fallen para `NotesViewModel` con profesores**
+- [x] **Step 1: Escribir pruebas unitarias que fallen para `NotesViewModel` con profesores**
   Validar carga de profesores, filtrado por búsqueda, selección de docente para BottomSheet y eventos de borrado/guardado.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que fallen**
+- [x] **Step 2: Ejecutar pruebas y verificar que fallen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.notes.NotesViewModelTest"`
   Expected: FAIL.
 
-- [ ] **Step 3: Implementar componentes composables modulares (≤ 250 LOC cada uno)**
+- [x] **Step 3: Implementar componentes composables modulares (≤ 250 LOC cada uno)**
   Crear `ProfessorCard`, `ProfessorDirectoryContent`, `TeacherDetailBottomSheet` y `AddEditTeacherBottomSheet` con tokens M3.
 
-- [ ] **Step 4: Integrar en `NotesScreen.kt` y actualizar `NotesViewModel.kt`**
+- [x] **Step 4: Integrar en `NotesScreen.kt` y actualizar `NotesViewModel.kt`**
   Integrar el control segmentado en la pestaña Materias y la apertura de las hojas modales.
 
-- [ ] **Step 5: Ejecutar pruebas y verificar que pasen**
+- [x] **Step 5: Ejecutar pruebas y verificar que pasen**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.notes.NotesViewModelTest"`
   Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
   `git commit -m "feat(ui): add professors directory subtab and detail sheet with WhatsApp integration"`
 
 ---
@@ -313,20 +313,20 @@
 - Produces:
   - `SubjectFacultyCard`: Tarjeta dentro del cuadrante Panorama que lista los profesores de la materia con avatar y botón rápido de WhatsApp, más botón para asignar otro docente.
 
-- [ ] **Step 1: Escribir pruebas unitarias para `SubjectDetailViewModel` con profesores de la materia**
+- [x] **Step 1: Escribir pruebas unitarias para `SubjectDetailViewModel` con profesores de la materia**
   Validar que `uiState.teachers` cargue los profesores filtrados por el nombre de la materia actual.
 
-- [ ] **Step 2: Ejecutar pruebas y verificar que pasen/fallen según corresponda**
+- [x] **Step 2: Ejecutar pruebas y verificar que pasen/fallen según corresponda**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.subjectdetail.SubjectDetailViewModelTest"`
 
-- [ ] **Step 3: Implementar `SubjectFacultyCard.kt` e integrarla en `SubjectPanoramaTab.kt`**
+- [x] **Step 3: Implementar `SubjectFacultyCard.kt` e integrarla en `SubjectPanoramaTab.kt`**
   Reemplazar/enriquecer la sección de profesor en el panorama para listar docentes reales y conectar el clic a `TeacherDetailBottomSheet`.
 
-- [ ] **Step 4: Ejecutar suite de pruebas de `SubjectDetailViewModel`**
+- [x] **Step 4: Ejecutar suite de pruebas de `SubjectDetailViewModel`**
   Run: `./gradlew testDebugUnitTest --tests "com.notifast.app.presentation.feature.subjectdetail.SubjectDetailViewModelTest"`
   Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   `git commit -m "feat(ui): integrate SubjectFacultyCard in SubjectPanoramaTab"`
 
 ---
@@ -337,16 +337,16 @@
 - Test: Todo el conjunto de pruebas unitarias del proyecto
 - Build: `./gradlew assembleDebug`
 
-- [ ] **Step 1: Ejecutar la suite completa de pruebas unitarias**
+- [x] **Step 1: Ejecutar la suite completa de pruebas unitarias**
   Run: `./gradlew testDebugUnitTest`
   Expected: BUILD SUCCESSFUL con 0 fallos.
 
-- [ ] **Step 2: Compilar el proyecto completo para verificar integración Compose y R8**
+- [x] **Step 2: Compilar el proyecto completo para verificar integración Compose y R8**
   Run: `./gradlew assembleDebug`
   Expected: BUILD SUCCESSFUL.
 
-- [ ] **Step 3: Actualizar `STATUS.md` reflejando las nuevas capacidades añadidas**
+- [x] **Step 3: Actualizar `STATUS.md` reflejando las nuevas capacidades añadidas**
   Registrar las tareas completadas en `docs/prd/STATUS.md`.
 
-- [ ] **Step 4: Commit final de verificación**
+- [x] **Step 4: Commit final de verificación**
   `git commit -m "chore(release): verify subjects sanitization and professors directory implementation"`

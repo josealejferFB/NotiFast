@@ -20,10 +20,11 @@ Fase 3.5: Offline-First Local     [███████████████
 Fase 3.6: Sanitización Lógica     [████████████████] 100% (10/10 tareas) ✅
 Fase 3.7: Normalización Sheets/FAB[████████████████] 100% (5/5 tareas) ✅
 Editor Premium (OneNote-like)     [████████████████] 100% (12/12 tareas) ✅
+Sanitización Materias & Profesores[████████████████] 100% (9/9 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [██████████████░░]  87% (111/124 tareas)
+PROGRESO TOTAL ESTIMADO:          [███████████████░]  90% (120/133 tareas)
 ```
 
 ---
@@ -82,6 +83,50 @@ PROGRESO TOTAL ESTIMADO:          [██████████████░
   `NoteEditorViewModelTest` (22), `NoteEditorImageTest` (3), `PhotoAnnotationCodecTest` (8),
   `DrawingCanvasStateTest` (10), `TextSpanOpsTest` (11), `RichTextSpanTest` (6),
   `ExportNoteMarkdownUseCaseTest` (4). Suite completa: 402 tests en verde.
+
+---
+
+## 👨‍🏫 Sanitización de Materias y Directorio de Profesores — 100% Completado (13 Oct 2026)
+
+**Objetivo:** Sanitizar la gestión de asignaturas garantizando que cada materia muestre su color corporativo e icono temático seleccionados, permitir su edición con actualización atómica en cascada multi-tabla en Room, e introducir el Directorio de Profesores con sub-pestaña `[ Materias | Profesores ]`, fichas de contacto directo (WhatsApp con saludo contextual prellenado, SMS, Llamada), selector contextual en el creador de horarios, y sección de cuerpo docente en el detalle de la asignatura.
+
+### Entregables Completados:
+1. **Modelo de Dominio & Utilidades de Comunicación:**
+   - Modelo inmutable `Teacher` (`id`, `userId`, `firstName`, `lastName`, `fullName`, `phoneNumber`, `email`, `subjectNames`, `notes`).
+   - `TeacherFormatters`: formateo E.164, codificación URI segura y generación de mensajes de saludo académico prellenados para WhatsApp. Tests unitarios en verde.
+2. **Persistencia Local Room v4 & Migración No Destructiva:**
+   - `TeacherEntity` y `TeacherDao` con operaciones reactivas Flow y CRUD completo.
+   - `MIGRATION_3_4` de base de datos Room v3 a v4 preservando la integridad de materias, notas, evaluaciones y horarios existentes. Tests en memoria Room pasando.
+3. **Transacción Multi-Tabla de Renombrado en Cascada:**
+   - `updateSubject` con `database.withTransaction`: sincroniza atómicamente el cambio de nombre en `subjects`, `notes`, `evaluations`, `schedules` y `teachers`.
+   - Detección y prevención estricta de colisiones de nombres de asignaturas duplicadas.
+4. **Repositorio Docente:**
+   - `TeacherRepository` y `LocalTeacherRepositoryImpl` inyectados vía Hilt con suite de tests unitarios completos.
+5. **Edición Visual de Materias:**
+   - `EditSubjectDialog`: diálogo para personalizar nombre, paleta cromática e icono temático.
+   - Integración directa en tarjetas de la cuadrícula Bento (`SubjectGridBento`) y hero del detalle (`SubjectDetailHeroBento`).
+6. **Selector Contextual Docente en Horarios:**
+   - `ScheduleTeacherSelector`: dropdown si la materia ya tiene profesores registrados; tarjeta de advertencia y campo rápido para ingresar un nuevo docente si no tiene.
+   - Vinculación automática en `AddScheduleViewModel` y `EditScheduleViewModel`: al guardar un horario con un profesor nuevo, este se crea y asocia inmediatamente a la materia.
+7. **Sub-pestaña "Profesores" y Directorio Docente:**
+   - Segmented pill bar `[ Materias | Profesores ]` en la pestaña Materias de `NotesScreen`.
+   - `ProfessorDirectoryContent`: buscador en tiempo real, estados vacíos pulidos, listado reactivo con `ProfessorCard`.
+   - `TeacherDetailBottomSheet`: ficha de contacto completa con acciones directas para WhatsApp, SMS, Llamar, Correo, Editar y Eliminar.
+   - `AddEditTeacherBottomSheet`: modal para añadir y editar profesores con selector de materias por FilterChips.
+8. **Cuerpo Docente en `SubjectDetailScreen`:**
+   - Inyección de `TeacherRepository` en `SubjectDetailViewModel` y reactividad combinada.
+   - `SubjectFacultyCard` integrado en el cuadrante Panorama (`SubjectPanoramaTab`), mostrando los profesores asignados con sus avatares, contacto y acceso rápido a WhatsApp y la ficha detallada.
+
+### Tests Unitarios Añadidos (100% pasando):
+- `TeacherFormattersTest` (limpieza de teléfonos, URL e intents de WhatsApp).
+- `RoomDaoInMemoryTest` (operaciones CRUD en `TeacherDao`, consultas por materia).
+- `LocalNoteRepositoryImplTest` (renombrado en cascada multi-tabla y manejo de colisiones).
+- `LocalTeacherRepositoryImplTest` (contrato de repositorio docente y aislamiento multi-usuario).
+- `AddScheduleViewModelTest` & `EditScheduleViewModelTest` (selector contextual y auto-guardado).
+- `NotesViewModelTest` (búsqueda de docentes, selección y borrado).
+- `SubjectDetailViewModelTest` (reactividad de docentes por asignatura).
+
+---
 
 ### Auditoría sistemática (Systematic Debugging) — 2026-10-06
 **7 CRITICAL + 9 HIGH + 8 MEDIUM + 4 LOW encontrados y parchados:**
