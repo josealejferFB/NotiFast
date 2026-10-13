@@ -206,15 +206,15 @@
       const beamEl = targetBeamId ? document.querySelector(targetBeamId) : null;
 
       item.addEventListener('mouseenter', () => {
-        if (beamEl) beamEl.classList.add('beam-active');
+        if (beamEl) beamEl.style.stroke = 'rgba(158, 27, 50, 0.35)';
         if (aura) {
-          aura.style.transform = 'translate(-50%, -50%) scale(1.35)';
-          aura.style.opacity = '1';
+          aura.style.transform = 'translate(-50%, -50%) scale(1.15)';
+          aura.style.opacity = '0.9';
         }
       });
 
       item.addEventListener('mouseleave', () => {
-        if (beamEl) beamEl.classList.remove('beam-active');
+        if (beamEl) beamEl.style.stroke = '';
         if (aura) {
           aura.style.transform = '';
           aura.style.opacity = '';
