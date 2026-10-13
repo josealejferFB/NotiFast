@@ -42,5 +42,17 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".skip-link", styles)
         self.assertIn("min-height", styles)
 
+    def test_stickers_and_background_js_exist(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        required_icons = ["icon-book", "icon-school", "icon-science", "icon-calculator", "icon-bulb", "icon-pencil"]
+        for icon in required_icons:
+            self.assertIn(f'id="{icon}"', html)
+
+        self.assertTrue(os.path.exists("landing/js/background.js"))
+        with open("landing/js/background.js", "r", encoding="utf-8") as f:
+            bg_js = f.read()
+        self.assertIn("prefers-reduced-motion", bg_js)
+
 if __name__ == "__main__":
     unittest.main()
