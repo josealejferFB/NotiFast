@@ -1118,7 +1118,907 @@
 }
 
 /* --------------------------------------------------------------------------
-   6. COMPARTIR P2P OFFLINE (Android Nearby & Código QR)
+   6. CALENDARIO DE EVALUACIONES: AgendaMonthCalendarView.kt & AgendaEvaluationCard.kt
+   -------------------------------------------------------------------------- */
+
+.section-evaluations-calendar {
+  position: relative;
+}
+
+/* Filtros Rápidos de Evaluaciones */
+.eval-filters-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.eval-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-hairline);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.eval-filter-chip:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  transform: translateY(-1px);
+}
+
+.eval-filter-chip.active {
+  background: var(--brand-primary-light);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  box-shadow: 0 4px 10px rgba(158, 27, 50, 0.15);
+}
+
+.chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-exam {
+  background-color: var(--brand-primary);
+}
+
+.dot-project {
+  background-color: var(--brand-secondary);
+}
+
+.dot-graded {
+  background-color: var(--brand-success);
+}
+
+/* Tarjeta Contenedora del Calendario */
+.evaluations-calendar-container {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.evaluations-calendar-container:hover {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.09);
+}
+
+/* Cabecera del Mes (Chevron Left / Mes Año / Hoy / Chevron Right) */
+.calendar-month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.cal-month-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cal-month-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.cal-month-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.cal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cal-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cal-nav-btn:hover {
+  background: var(--bg-surface-container);
+  color: var(--text-primary);
+}
+
+.cal-nav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cal-today-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hairline);
+  background: var(--bg-surface-container);
+  color: var(--brand-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cal-today-btn:hover {
+  background: var(--brand-primary-light);
+  border-color: var(--brand-primary);
+}
+
+.cal-today-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Matriz de Días */
+.calendar-matrix-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: 0 4px;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.cal-day-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  padding: 0;
+}
+
+.cal-day-cell:hover:not(.cal-day-empty) {
+  background: var(--bg-surface-container);
+  transform: scale(1.1);
+}
+
+.cal-day-cell.cal-day-empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+.cal-day-num {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.cal-day-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  margin-top: 3px;
+  display: block;
+}
+
+.dot-ruby-eval {
+  background-color: var(--brand-primary);
+}
+
+.dot-aqua-eval {
+  background-color: var(--brand-secondary);
+}
+
+.dot-amber-eval {
+  background-color: #D97706;
+}
+
+/* Día Seleccionado Activo */
+.cal-day-cell.cal-day-selected {
+  background: var(--brand-primary);
+  box-shadow: 0 4px 12px rgba(158, 27, 50, 0.35);
+  transform: scale(1.08);
+}
+
+.cal-day-cell.cal-day-selected .cal-day-num {
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.cal-day-cell.cal-day-selected .cal-day-dot {
+  background-color: #FFFFFF;
+}
+
+/* Hoy / Próximo Examen */
+.cal-day-cell.cal-day-today:not(.cal-day-selected) {
+  background: var(--brand-primary-light);
+}
+
+.cal-day-cell.cal-day-today:not(.cal-day-selected) .cal-day-num {
+  color: var(--brand-primary);
+  font-weight: 800;
+}
+
+/* Panel de Evaluaciones del Día */
+.daily-evaluations-panel {
+  border-top: 1px solid var(--border-hairline);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.daily-evals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.daily-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.evals-header-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--brand-primary);
+}
+
+.daily-title {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.daily-count-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+}
+
+.daily-status-hint {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+/* Tarjeta Tactil Fiel a AgendaEvaluationCard.kt */
+.eval-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.agenda-eval-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+
+.agenda-eval-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.agenda-eval-card:active {
+  transform: scale(0.97); /* 0.97f Compose Spring Physics */
+}
+
+.eval-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.eval-icon-circle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.eval-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.eval-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.eval-card-title {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.eval-weight-chip {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.eval-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+
+.eval-subject-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+}
+
+.eval-subject-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.eval-time-status {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+
+.eval-time-status.status-graded {
+  color: var(--brand-secondary);
+}
+
+/* Estado Vacío de Evaluaciones */
+.eval-empty-card {
+  padding: 24px 16px;
+  border-radius: 16px;
+  border: 1px dashed var(--border-hairline);
+  background: #FAFAF9;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.eval-empty-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--text-muted);
+}
+
+.eval-empty-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.eval-empty-desc {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  max-width: 280px;
+}
+
+/* --------------------------------------------------------------------------
+   7. ANALÍTICAS Y PROYECCIONES: AcademicAnalyticsContent.kt & GradeSimulatorCard.kt
+   -------------------------------------------------------------------------- */
+
+.section-analytics-dashboard {
+  position: relative;
+}
+
+/* Presets del Simulador de Nota */
+.sim-presets-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.sim-preset-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-hairline);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+  text-align: left;
+}
+
+.sim-preset-chip:hover {
+  border-color: var(--brand-secondary);
+  background: #F0FDFA;
+  transform: translateY(-2px);
+}
+
+.sim-preset-chip.active {
+  border-color: var(--brand-secondary);
+  background: #F0FDFA;
+  box-shadow: 0 4px 12px rgba(42, 123, 123, 0.18);
+}
+
+.preset-label {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.sim-preset-chip.active .preset-label {
+  color: var(--brand-secondary);
+}
+
+.preset-sub {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+/* Contenedor del Dashboard Analítico */
+.analytics-dashboard-container {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.analytics-dashboard-container:hover {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.09);
+}
+
+/* 1. Hero de Diagnóstico Predictivo (AnalyticsHeroCard.kt) */
+.analytics-hero-banner {
+  background: #F0FDFA;
+  border: 1px solid rgba(42, 123, 123, 0.22);
+  border-radius: 18px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-diag-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hero-diag-label {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--brand-secondary);
+  text-transform: uppercase;
+  display: block;
+}
+
+.hero-diag-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.hero-diag-stat {
+  font-family: var(--font-mono);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--brand-secondary);
+  line-height: 1;
+}
+
+.diag-progress-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgba(42, 123, 123, 0.15);
+  overflow: hidden;
+}
+
+.diag-progress-fill {
+  height: 100%;
+  background: var(--brand-secondary);
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 2. Simulador Interactivo de Calificación Requerida (GradeSimulatorCard.kt) */
+.grade-simulator-card {
+  background: #FAFAF9;
+  border: 1px solid var(--border-hairline);
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.simulator-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sim-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(42, 123, 123, 0.12);
+  color: var(--brand-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sim-icon-box svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sim-header-text {
+  text-align: left;
+}
+
+.sim-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.sim-subject-name {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Banner de Estado Dinámico */
+.sim-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+.sim-status-banner.status-achievable {
+  background: #ECFDF5;
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.sim-status-banner.status-at-risk {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.sim-status-banner.status-impossible {
+  background: #FFF1F2;
+  color: #9E1B32;
+  border: 1px solid rgba(158, 27, 50, 0.2);
+}
+
+.sim-status-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sim-status-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Fila de Estadísticas */
+.sim-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sim-stat-box {
+  background: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.sim-stat-box.stat-highlight {
+  border-color: rgba(42, 123, 123, 0.3);
+  background: #F0FDFA;
+}
+
+.sim-stat-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.sim-stat-val {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.sim-stat-val small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.sim-stat-val.val-required {
+  color: var(--brand-secondary);
+}
+
+.sim-stat-sub {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+/* Slider Interactivo */
+.sim-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.sim-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sim-slider-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sim-slider-badge {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  background: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.sim-range-input {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-surface-container);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.sim-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-secondary);
+  box-shadow: 0 2px 6px rgba(42, 123, 123, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.sim-range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.sim-range-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-secondary);
+  box-shadow: 0 2px 6px rgba(42, 123, 123, 0.4);
+  cursor: pointer;
+  border: none;
+}
+
+.sim-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 3. Histograma de Distribución de Notas (GradeDistributionHistogram.kt) */
+.histogram-preview-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hist-title {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.hist-meta {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.hist-bars-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  align-items: flex-end;
+  height: 100px;
+  padding-bottom: 4px;
+}
+
+.hist-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.hist-bar-wrapper {
+  flex: 1;
+  width: 100%;
+  max-width: 36px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg-surface-container);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.hist-bar-fill {
+  width: 100%;
+  border-radius: 6px;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bar-excellent {
+  background: #3B9797;
+}
+
+.bar-good {
+  background: #2563EB;
+}
+
+.bar-regular {
+  background: #D97706;
+}
+
+.bar-risk {
+  background: #BF092F;
+}
+
+.hist-bar-count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.hist-bar-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.15;
+}
+
+.accent-aqua {
+  color: var(--brand-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   8. COMPARTIR P2P OFFLINE (Android Nearby & Código QR)
    -------------------------------------------------------------------------- */
 
 .nearby-transfer-card {

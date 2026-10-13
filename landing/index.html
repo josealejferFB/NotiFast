@@ -111,6 +111,46 @@
       <symbol id="icon-check" viewBox="0 0 24 24">
         <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
       </symbol>
+
+      <!-- Event / Calendar (AgendaMonthCalendarView.kt) -->
+      <symbol id="icon-event" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+      </symbol>
+
+      <!-- Today (AgendaMonthCalendarView.kt) -->
+      <symbol id="icon-today" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+      </symbol>
+
+      <!-- Quiz / Exam (EvaluationType.kt & NotiFastStudyBackground.kt) -->
+      <symbol id="icon-quiz" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-6 13h-2v-2h2v2zm1.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+      </symbol>
+
+      <!-- Assignment / Project (EvaluationType.kt) -->
+      <symbol id="icon-assignment" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+      </symbol>
+
+      <!-- AutoAwesome / Sparkles -->
+      <symbol id="icon-autoawesome" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/>
+      </symbol>
+
+      <!-- Chevron Left (AgendaMonthCalendarView.kt) -->
+      <symbol id="icon-chevron-left" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </symbol>
+
+      <!-- Chevron Right (AgendaMonthCalendarView.kt) -->
+      <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+      </symbol>
+
+      <!-- Analytics / Trending Up (AcademicProgressChart.kt & AutoGraph) -->
+      <symbol id="icon-analytics" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -125,9 +165,11 @@
         <span class="logo-text">NotiFast</span>
       </a>
       <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#agenda">Agenda</a>
         <a href="#apuntes">Apuntes</a>
         <a href="#calificaciones">Calificaciones</a>
-        <a href="#agenda">Agenda</a>
+        <a href="#evaluaciones">Evaluaciones</a>
+        <a href="#analiticas">Analíticas</a>
         <a href="#compartir">Compartir P2P</a>
       </nav>
       <div class="nav-actions">
@@ -245,14 +287,14 @@
           </div>
         </div>
 
-        <!-- Módulo 6: Recordatorios Inteligentes (Bottom-Center) -->
-        <div class="popout-item popout-alerts" data-target="#agenda" role="button" tabindex="0" title="Ver Notificaciones Proactivas">
+        <!-- Módulo 6: Calendario de Exámenes y Alertas (Bottom-Center) -->
+        <div class="popout-item popout-alerts" data-target="#evaluaciones" role="button" tabindex="0" title="Ver Calendario de Evaluaciones">
           <div class="popout-icon-box icon-alerts-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightbulb"></use></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
           </div>
           <div class="popout-text-stack">
-            <span class="popout-title">WorkManager Proactivo</span>
-            <span class="popout-meta">Avisos 24h & 2h • Cero Batería</span>
+            <span class="popout-title">Calendario de Exámenes</span>
+            <span class="popout-meta">35% Parcial • Avisos 24h &amp; 2h</span>
           </div>
         </div>
 
@@ -551,7 +593,267 @@
       </div>
     </section>
 
-    <!-- 5. MÓDULO 4: COMPARTIR MATERIA P2P OFFLINE (Android Nearby & Código QR) -->
+    <!-- 5. MÓDULO 4: CALENDARIO DE EVALUACIONES (AgendaMonthCalendarView.kt & AgendaEvaluationCard.kt) -->
+    <section class="dynamic-feature-row row-reverse section-evaluations-calendar" id="evaluaciones">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+          <span>Calendario &amp; Evaluaciones</span>
+        </div>
+        <h2 class="feature-title">
+          Fechas de examen y entregas,<br><span class="accent-ruby">siempre en tu horizonte.</span>
+        </h2>
+        <p class="feature-desc">
+          No más sorpresas el fin de semana. NotiFast reúne tus parciales, quizes, proyectos y exposiciones en un calendario mensual interactivo. Visualiza la ponderación porcentual de cada prueba sobre tu nota final y mantén tus entregas bajo control con recordatorios proactivos.
+        </p>
+
+        <!-- Filtros Rápidos de Fecha / Tipo de Prueba -->
+        <div class="eval-filters-strip" role="tablist" aria-label="Filtro rápido de evaluaciones">
+          <button class="eval-filter-chip active" data-filter="all" role="tab" aria-selected="true" title="Ver todas las evaluaciones de Octubre">
+            <span>Todo el mes (4)</span>
+          </button>
+          <button class="eval-filter-chip" data-day="15" role="tab" aria-selected="false" title="Ver Parcial II de Cálculo">
+            <span class="chip-dot dot-exam" aria-hidden="true"></span>
+            <span>Parcial II (15 Oct)</span>
+          </button>
+          <button class="eval-filter-chip" data-day="22" role="tab" aria-selected="false" title="Ver Proyecto de Física">
+            <span class="chip-dot dot-project" aria-hidden="true"></span>
+            <span>Proyecto (22 Oct)</span>
+          </button>
+          <button class="eval-filter-chip" data-day="8" role="tab" aria-selected="false" title="Ver Quiz de Química ya calificado">
+            <span class="chip-dot dot-graded" aria-hidden="true"></span>
+            <span>Calificada (8 Oct)</span>
+          </button>
+        </div>
+
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Matriz mensual interactiva:</strong> Puntos táctiles en Ruby (pruebas por rendir) y Aqua (evaluaciones calificadas).</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Ponderación académica transparente:</strong> Cada tarjeta muestra su impacto en porcentaje (ej. 35% del curso) para priorizar tu estudio.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Alertas WorkManager:</strong> Notificaciones locales programadas a 24 horas y 2 horas del evento, sin consumo de batería.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Componente de Calendario Fiel a AgendaMonthCalendarView.kt -->
+        <div class="evaluations-calendar-container" id="evaluations-calendar-component">
+          <!-- Cabecera de Navegación del Mes -->
+          <div class="calendar-month-header">
+            <button class="cal-nav-btn" id="btn-cal-prev" aria-label="Mes anterior" title="Mes anterior">
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-left"></use></svg>
+            </button>
+            <div class="cal-month-title-wrap">
+              <h3 class="cal-month-title" id="cal-month-title">Octubre 2026</h3>
+              <span class="cal-month-badge" id="cal-month-badge">4 Evaluaciones en agenda</span>
+            </div>
+            <div class="cal-header-actions">
+              <button class="cal-today-btn" id="btn-cal-today" title="Saltar al examen más próximo">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-today"></use></svg>
+                <span>Hoy</span>
+              </button>
+              <button class="cal-nav-btn" id="btn-cal-next" aria-label="Mes siguiente" title="Mes siguiente">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-right"></use></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Matriz de Días (L M X J V S D) -->
+          <div class="calendar-matrix-wrapper">
+            <div class="calendar-weekdays-row" aria-hidden="true">
+              <span>L</span>
+              <span>M</span>
+              <span>X</span>
+              <span>J</span>
+              <span>V</span>
+              <span>S</span>
+              <span>D</span>
+            </div>
+            <div class="calendar-days-grid" id="calendar-days-grid" role="grid" aria-label="Días de Octubre 2026">
+              <!-- Celdas de días renderizadas dinámicamente -->
+            </div>
+          </div>
+
+          <!-- Panel de Evaluaciones del Día (AgendaDayEvaluationsSection.kt) -->
+          <div class="daily-evaluations-panel" id="daily-evaluations-panel">
+            <div class="daily-evals-header">
+              <div class="daily-title-row">
+                <svg class="evals-header-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+                <h4 class="daily-title" id="daily-evals-title">Evaluaciones del 15 de Octubre</h4>
+                <span class="daily-count-badge" id="daily-evals-count">(1)</span>
+              </div>
+              <span class="daily-status-hint" id="daily-status-hint">Toca un día con punto para explorar</span>
+            </div>
+
+            <!-- Lista de Tarjetas fieles a AgendaEvaluationCard.kt -->
+            <div class="eval-cards-list" id="eval-cards-list">
+              <!-- Renderizado interactivo -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MÓDULO 5: ANALÍTICAS Y PROYECCIONES PREDICTIVAS (AcademicAnalyticsContent.kt & GradeSimulatorCard.kt) -->
+    <section class="dynamic-feature-row section-analytics-dashboard" id="analiticas">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg>
+          <span>Dashboard Predictivo &amp; Proyecciones</span>
+        </div>
+        <h2 class="feature-title">
+          Analíticas de rendimiento,<br><span class="accent-aqua">simula tu nota antes de rendir.</span>
+        </h2>
+        <p class="feature-desc">
+          Anticípate al final del semestre. NotiFast no solo promedia tus notas: proyecta tu tasa de éxito semestral, evalúa la distribución de calificaciones y calcula en tiempo real qué calificación exacta necesitas sacar en tus próximas evaluaciones para asegurar tu meta académica.
+        </p>
+
+        <!-- Presets del Simulador de Nota Requerida -->
+        <div class="sim-presets-strip" role="tablist" aria-label="Escenarios de simulación de notas">
+          <button class="sim-preset-chip active" data-target-grade="8.5" role="tab" aria-selected="true" title="Simular meta de 8.5 puntos">
+            <span class="preset-label">Meta: 8.5 pts</span>
+            <span class="preset-sub">Aprobación Holgada</span>
+          </button>
+          <button class="sim-preset-chip" data-target-grade="9.5" role="tab" aria-selected="false" title="Simular meta de 9.5 puntos">
+            <span class="preset-label">Meta: 9.5 pts</span>
+            <span class="preset-sub">Cuadro de Honor</span>
+          </button>
+          <button class="sim-preset-chip" data-target-grade="7.0" role="tab" aria-selected="false" title="Simular meta de 7.0 puntos">
+            <span class="preset-label">Meta: 7.0 pts</span>
+            <span class="preset-sub">Mínimo Aprobatorio</span>
+          </button>
+        </div>
+
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Fórmula de proyección en vivo:</strong> Resuelve <code>(Meta - Acumulado) / Peso Restante</code> al mover el slider o elegir una meta.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Histograma en Canvas por bandas:</strong> Visualiza el balance de evaluaciones en rango Sobresaliente, Notable, Regular y En Riesgo.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Diagnóstico temprano inteligente:</strong> Alertas preventivas que identifican qué materias demandan más horas de estudio antes del cierre.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Componente Fiel a AcademicAnalyticsContent.kt y GradeSimulatorCard.kt -->
+        <div class="analytics-dashboard-container" id="analytics-dashboard-component">
+          <!-- 1. Tarjeta Hero de Diagnóstico (AnalyticsHeroCard) -->
+          <div class="analytics-hero-banner">
+            <div class="hero-diag-top">
+              <div>
+                <span class="hero-diag-label">TASA DE ÉXITO PROYECTADA</span>
+                <p class="hero-diag-desc" id="diag-passing-desc">4 de 4 materias en camino a aprobar</p>
+              </div>
+              <div class="hero-diag-stat" id="diag-stat-percent">94%</div>
+            </div>
+            <div class="diag-progress-bar" role="progressbar" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100">
+              <div class="diag-progress-fill" id="diag-progress-fill" style="width: 94%;"></div>
+            </div>
+          </div>
+
+          <!-- 2. Simulador Interactivo de Calificación Requerida (GradeSimulatorCard) -->
+          <div class="grade-simulator-card" id="interactive-grade-simulator">
+            <div class="simulator-header">
+              <div class="sim-icon-box">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+              </div>
+              <div class="sim-header-text">
+                <h4 class="sim-title">Simulador de Nota Requerida</h4>
+                <p class="sim-subject-name">Cálculo Diferencial • Parcial II (35% restante)</p>
+              </div>
+            </div>
+
+            <!-- Banner de Estado Táctil (SimulatorStatus) -->
+            <div class="sim-status-banner status-achievable" id="sim-status-banner">
+              <svg class="sim-status-icon" id="sim-status-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-check"></use></svg>
+              <span class="sim-status-text" id="sim-status-text">Meta alcanzable • Necesitas 7.2 en lo restante</span>
+            </div>
+
+            <!-- Fila de Estadísticas (Acumulado vs Requerido) -->
+            <div class="sim-stats-row">
+              <div class="sim-stat-box">
+                <span class="sim-stat-label">Puntos Acumulados</span>
+                <span class="sim-stat-val" id="sim-stat-accumulated">5.70 <small>/ 10</small></span>
+                <span class="sim-stat-sub">65% ya calificado</span>
+              </div>
+              <div class="sim-stat-box stat-highlight">
+                <span class="sim-stat-label">Nota Mínima Requerida</span>
+                <span class="sim-stat-val val-required" id="sim-stat-required">7.20 <small>/ 10</small></span>
+                <span class="sim-stat-sub" id="sim-stat-weight-sub">En el 35% restante</span>
+              </div>
+            </div>
+
+            <!-- Slider Interactivo de Meta Deseada -->
+            <div class="sim-slider-container">
+              <div class="sim-slider-header">
+                <label for="sim-target-slider" class="sim-slider-label">Ajustar Nota Meta Deseada:</label>
+                <span class="sim-slider-badge" id="sim-slider-badge">8.5 pts</span>
+              </div>
+              <input type="range" class="sim-range-input" id="sim-target-slider" min="6.0" max="10.0" step="0.1" value="8.5" aria-label="Ajustar calificación meta">
+              <div class="sim-slider-ticks" aria-hidden="true">
+                <span>6.0 (Mínimo)</span>
+                <span>8.0</span>
+                <span>9.0</span>
+                <span>10.0 (Máximo)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Histograma de Distribución de Notas (GradeDistributionHistogram) -->
+          <div class="histogram-preview-card">
+            <div class="hist-header">
+              <span class="hist-title">Distribución por Rangos de Desempeño</span>
+              <span class="hist-meta">9 Evaluaciones en el Semestre</span>
+            </div>
+            <div class="hist-bars-row">
+              <div class="hist-bar-col">
+                <div class="hist-bar-wrapper">
+                  <div class="hist-bar-fill bar-excellent" style="height: 85%;" title="5 evaluaciones sobresalientes"></div>
+                </div>
+                <span class="hist-bar-count">5</span>
+                <span class="hist-bar-label">Sobresaliente<br><small>(9 - 10)</small></span>
+              </div>
+              <div class="hist-bar-col">
+                <div class="hist-bar-wrapper">
+                  <div class="hist-bar-fill bar-good" style="height: 52%;" title="3 evaluaciones notables"></div>
+                </div>
+                <span class="hist-bar-count">3</span>
+                <span class="hist-bar-label">Notable<br><small>(7 - 8.9)</small></span>
+              </div>
+              <div class="hist-bar-col">
+                <div class="hist-bar-wrapper">
+                  <div class="hist-bar-fill bar-regular" style="height: 20%;" title="1 evaluación regular"></div>
+                </div>
+                <span class="hist-bar-count">1</span>
+                <span class="hist-bar-label">Regular<br><small>(5 - 6.9)</small></span>
+              </div>
+              <div class="hist-bar-col">
+                <div class="hist-bar-wrapper">
+                  <div class="hist-bar-fill bar-risk" style="height: 4%;" title="0 evaluaciones en riesgo"></div>
+                </div>
+                <span class="hist-bar-count">0</span>
+                <span class="hist-bar-label">En Riesgo<br><small>(&lt; 5.0)</small></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. MÓDULO 6: COMPARTIR MATERIA P2P OFFLINE (Android Nearby & Código QR) -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
         <div class="feature-pill-badge" style="background: #E0F2FE; color: #0284C7;">
@@ -812,6 +1114,14 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
           <span>Notas</span>
         </a>
+        <a href="#evaluaciones" class="radar-chip" data-target="#evaluaciones" title="Calendario de Evaluaciones">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+          <span>Exámenes</span>
+        </a>
+        <a href="#analiticas" class="radar-chip" data-target="#analiticas" title="Analíticas & Proyecciones">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg>
+          <span>Analíticas</span>
+        </a>
         <a href="#compartir" class="radar-chip" data-target="#compartir" title="Compartir P2P Offline">
           <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
           <span>P2P</span>
@@ -850,9 +1160,11 @@
         <span class="logo-badge">v3.0</span>
       </div>
       <ul class="footer-links" aria-label="Enlaces del pie de página">
+        <li><a href="#agenda">Agenda</a></li>
         <li><a href="#apuntes">Apuntes</a></li>
         <li><a href="#calificaciones">Calificaciones</a></li>
-        <li><a href="#agenda">Agenda</a></li>
+        <li><a href="#evaluaciones">Evaluaciones</a></li>
+        <li><a href="#analiticas">Analíticas</a></li>
         <li><a href="#compartir">Compartir P2P</a></li>
         <li><a href="#descargar">Descarga</a></li>
       </ul>

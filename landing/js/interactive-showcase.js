@@ -234,7 +234,7 @@
 
         // Highlight main visual feature card
         const spotlightTarget = targetSection.querySelector(
-          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .nearby-transfer-card, .subjects-grid'
+          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .nearby-transfer-card, .subjects-grid'
         );
 
         if (spotlightTarget) {
@@ -295,7 +295,7 @@
 
         // Highlight target feature card
         const spotlightTarget = targetSection.querySelector(
-          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .nearby-transfer-card, .subjects-grid'
+          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .nearby-transfer-card, .subjects-grid'
         );
         if (spotlightTarget) {
           spotlightTarget.classList.remove('section-spotlight-active');
@@ -307,7 +307,7 @@
     });
 
     // Active Section Spy using IntersectionObserver
-    const sectionIds = ['#agenda', '#apuntes', '#calificaciones', '#compartir', '#materias'];
+    const sectionIds = ['#agenda', '#apuntes', '#calificaciones', '#evaluaciones', '#analiticas', '#compartir', '#materias'];
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -566,6 +566,415 @@
     startAutoCycle();
   }
 
+  // 7. Interactive Evaluations Calendar (AgendaMonthCalendarView.kt & AgendaEvaluationCard.kt)
+  const EVALUATIONS_DATA = [
+    {
+      id: 'eval-1',
+      day: 8,
+      dateStr: '8 de Octubre',
+      title: 'Quiz I: Equilibrios Ácido-Base',
+      type: 'EXAM',
+      icon: '#icon-quiz',
+      subject: 'Química Orgánica',
+      subjectColor: '#059669',
+      weight: 15,
+      isPresented: true,
+      grade: '9.8 / 10',
+      timeText: 'Jueves 11:00 AM • Lab 102',
+      statusText: '✓ Calificada • 9.8 pts',
+      isGraded: true,
+      tintBg: '#ECFDF5',
+      iconTint: '#059669',
+      dotClass: 'dot-aqua-eval'
+    },
+    {
+      id: 'eval-2',
+      day: 15,
+      dateStr: '15 de Octubre',
+      title: 'Parcial II: Derivadas y Optimización',
+      type: 'EXAM',
+      icon: '#icon-quiz',
+      subject: 'Cálculo Diferencial',
+      subjectColor: '#2563EB',
+      weight: 35,
+      isPresented: false,
+      grade: null,
+      timeText: 'Jueves 08:00 AM • Aula 204',
+      statusText: '⏰ En 2 días • Alta Ponderación',
+      isGraded: false,
+      tintBg: '#FFF1F2',
+      iconTint: '#9E1B32',
+      dotClass: 'dot-ruby-eval'
+    },
+    {
+      id: 'eval-3',
+      day: 22,
+      dateStr: '22 de Octubre',
+      title: 'Entrega de Proyecto: Péndulo Doble',
+      type: 'PROJECT',
+      icon: '#icon-assignment',
+      subject: 'Física Mecánica',
+      subjectColor: '#7C3AED',
+      weight: 30,
+      isPresented: false,
+      grade: null,
+      timeText: 'Jueves 14:00 • Informe + Código',
+      statusText: '📅 En 9 días • Trabajo Grupal',
+      isGraded: false,
+      tintBg: '#F0FDFA',
+      iconTint: '#2A7B7B',
+      dotClass: 'dot-ruby-eval'
+    },
+    {
+      id: 'eval-4',
+      day: 28,
+      dateStr: '28 de Octubre',
+      title: 'Exposición: Narrativa Contemporánea',
+      type: 'PRESENTATION',
+      icon: '#icon-school',
+      subject: 'Literatura Universal',
+      subjectColor: '#D97706',
+      weight: 20,
+      isPresented: false,
+      grade: null,
+      timeText: 'Miércoles 10:00 AM • Auditorio',
+      statusText: '📅 En 15 días • Diapositivas',
+      isGraded: false,
+      tintBg: '#FFFBEB',
+      iconTint: '#D97706',
+      dotClass: 'dot-amber-eval'
+    }
+  ];
+
+  function setupEvaluationsCalendar() {
+    const calendarGrid = document.getElementById('calendar-days-grid');
+    const panelTitle = document.getElementById('daily-evals-title');
+    const panelCount = document.getElementById('daily-evals-count');
+    const panelHint = document.getElementById('daily-status-hint');
+    const cardsList = document.getElementById('eval-cards-list');
+    const filterChips = document.querySelectorAll('.eval-filter-chip');
+    const btnToday = document.getElementById('btn-cal-today');
+    const btnPrev = document.getElementById('btn-cal-prev');
+    const btnNext = document.getElementById('btn-cal-next');
+
+    if (!calendarGrid || !cardsList) return;
+
+    let selectedDay = 15; // Default selected day (Parcial II de Cálculo)
+    let isMonthView = false;
+
+    // October 2026 starts on Thursday (index 3 with Monday=0, so 3 empty padding cells)
+    const paddingDaysCount = 3;
+    const totalDaysInMonth = 31;
+
+    // Render Calendar Grid
+    function renderCalendarGrid() {
+      calendarGrid.innerHTML = '';
+
+      // Padding cells
+      for (let p = 0; p < paddingDaysCount; p++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cal-day-cell cal-day-empty';
+        emptyCell.setAttribute('aria-hidden', 'true');
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      // Day cells
+      for (let d = 1; d <= totalDaysInMonth; d++) {
+        const dayBtn = document.createElement('button');
+        dayBtn.className = 'cal-day-cell';
+        dayBtn.setAttribute('data-day', d);
+        dayBtn.setAttribute('aria-label', `Día ${d} de Octubre`);
+
+        if (d === selectedDay && !isMonthView) {
+          dayBtn.classList.add('cal-day-selected');
+        } else if (d === 15) {
+          dayBtn.classList.add('cal-day-today');
+        }
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'cal-day-num';
+        numSpan.textContent = d;
+        dayBtn.appendChild(numSpan);
+
+        // Check if there are evaluations on this day
+        const dayEvals = EVALUATIONS_DATA.filter(ev => ev.day === d);
+        if (dayEvals.length > 0) {
+          const dot = document.createElement('span');
+          dot.className = `cal-day-dot ${dayEvals[0].dotClass}`;
+          dayBtn.appendChild(dot);
+          dayBtn.title = dayEvals.map(ev => `${ev.title} (${ev.weight}%)`).join(' • ');
+        }
+
+        dayBtn.addEventListener('click', () => {
+          selectDay(d);
+        });
+
+        calendarGrid.appendChild(dayBtn);
+      }
+    }
+
+    // Helper to generate an evaluation card HTML
+    function buildEvalCardHtml(ev) {
+      return `
+        <div class="agenda-eval-card" data-eval-id="${ev.id}" role="button" tabindex="0">
+          <div class="eval-icon-circle" style="background: ${ev.tintBg}; color: ${ev.iconTint};">
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="${ev.icon}"></use></svg>
+          </div>
+          <div class="eval-body">
+            <div class="eval-top-row">
+              <span class="eval-card-title">${ev.title}</span>
+              <span class="eval-weight-chip">${ev.weight}%</span>
+            </div>
+            <div class="eval-bottom-row">
+              <span class="eval-subject-row">
+                <span class="eval-subject-dot" style="background: ${ev.subjectColor};"></span>
+                <span>${ev.subject}</span>
+              </span>
+              <span class="eval-time-status ${ev.isGraded ? 'status-graded' : ''}">
+                ${ev.statusText}
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render cards list for a specific day or all
+    function renderCards(dayNumber, showAll = false) {
+      isMonthView = showAll;
+
+      if (showAll) {
+        if (panelTitle) panelTitle.textContent = 'Todas las Evaluaciones de Octubre';
+        if (panelCount) panelCount.textContent = `(${EVALUATIONS_DATA.length})`;
+        if (panelHint) panelHint.textContent = '4 pruebas distribuidas en el semestre';
+
+        cardsList.innerHTML = EVALUATIONS_DATA.map(buildEvalCardHtml).join('');
+      } else {
+        const evals = EVALUATIONS_DATA.filter(ev => ev.day === dayNumber);
+
+        if (panelTitle) panelTitle.textContent = `Evaluaciones del ${dayNumber} de Octubre`;
+        if (panelCount) panelCount.textContent = `(${evals.length})`;
+
+        if (evals.length > 0) {
+          if (panelHint) panelHint.textContent = evals[0].timeText;
+          cardsList.innerHTML = evals.map(buildEvalCardHtml).join('');
+        } else {
+          if (panelHint) panelHint.textContent = 'Sin exámenes ni entregas';
+          cardsList.innerHTML = `
+            <div class="eval-empty-card">
+              <svg class="eval-empty-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+              <span class="eval-empty-title">Sin evaluaciones este día</span>
+              <span class="eval-empty-desc">Día libre de exámenes y entregas. ¡Buen momento para repasar apuntes!</span>
+            </div>
+          `;
+        }
+      }
+
+      // Add tactile press microfeedback
+      cardsList.querySelectorAll('.agenda-eval-card').forEach(card => {
+        card.addEventListener('click', () => {
+          card.style.transform = 'scale(0.97)';
+          setTimeout(() => { card.style.transform = ''; }, 180);
+        });
+      });
+    }
+
+    // Select a specific day
+    function selectDay(dayNumber) {
+      selectedDay = dayNumber;
+      isMonthView = false;
+
+      // Update grid selection classes
+      const allDayCells = calendarGrid.querySelectorAll('.cal-day-cell');
+      allDayCells.forEach(cell => {
+        const cellDay = parseInt(cell.getAttribute('data-day'), 10);
+        cell.classList.toggle('cal-day-selected', cellDay === selectedDay);
+      });
+
+      // Update filter chips active state
+      filterChips.forEach(chip => {
+        const chipDay = parseInt(chip.getAttribute('data-day'), 10);
+        chip.classList.toggle('active', chipDay === selectedDay);
+        chip.setAttribute('aria-selected', chipDay === selectedDay ? 'true' : 'false');
+      });
+
+      // Render cards with smooth transition
+      cardsList.style.opacity = '0';
+      setTimeout(() => {
+        renderCards(selectedDay, false);
+        cardsList.style.transition = 'opacity 0.25s ease';
+        cardsList.style.opacity = '1';
+      }, 80);
+    }
+
+    // Filter Chips Handlers
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.classList.remove('active');
+          c.setAttribute('aria-selected', 'false');
+        });
+        chip.classList.add('active');
+        chip.setAttribute('aria-selected', 'true');
+
+        const filterType = chip.getAttribute('data-filter');
+        const dayVal = chip.getAttribute('data-day');
+
+        if (filterType === 'all') {
+          // Deselect day in grid, show all cards
+          calendarGrid.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('cal-day-selected'));
+          renderCards(null, true);
+        } else if (dayVal) {
+          selectDay(parseInt(dayVal, 10));
+        }
+      });
+    });
+
+    // "Hoy" button handler
+    if (btnToday) {
+      btnToday.addEventListener('click', () => {
+        selectDay(15);
+      });
+    }
+
+    // Month Navigation mock triggers
+    function monthNavFeedback(direction) {
+      const title = document.getElementById('cal-month-title');
+      if (title) {
+        title.style.transition = 'transform 0.15s, opacity 0.15s';
+        title.style.transform = `translateX(${direction * 15}px)`;
+        title.style.opacity = '0.4';
+        setTimeout(() => {
+          title.style.transform = '';
+          title.style.opacity = '';
+        }, 200);
+      }
+    }
+
+    if (btnPrev) btnPrev.addEventListener('click', () => monthNavFeedback(-1));
+    if (btnNext) btnNext.addEventListener('click', () => monthNavFeedback(1));
+
+    // Initial render
+    renderCalendarGrid();
+    renderCards(15, false);
+  }
+
+  // 8. Interactive Academic Analytics & Grade Simulator (AcademicAnalyticsContent.kt & GradeSimulatorCard.kt)
+  function setupAnalyticsDashboard() {
+    const slider = document.getElementById('sim-target-slider');
+    const badge = document.getElementById('sim-slider-badge');
+    const statRequired = document.getElementById('sim-stat-required');
+    const statWeightSub = document.getElementById('sim-stat-weight-sub');
+    const statusBanner = document.getElementById('sim-status-banner');
+    const statusText = document.getElementById('sim-status-text');
+    const statusIcon = document.getElementById('sim-status-icon');
+    const presetChips = document.querySelectorAll('.sim-preset-chip');
+    const diagFill = document.getElementById('diag-progress-fill');
+    const histFills = document.querySelectorAll('.hist-bar-fill');
+
+    if (!slider || !statRequired) return;
+
+    // Simulation constants for Cálculo Diferencial (mirroring RequiredGradeResult)
+    const ACCUMULATED = 5.70; // 65% evaluated with weighted score 5.70
+    const REMAINING_WEIGHT = 0.35; // 35% remaining in Parcial II
+
+    function calculateRequiredGrade(target) {
+      // Formula: Required = (Target - Accumulated) / RemainingWeight
+      return (target - ACCUMULATED) / REMAINING_WEIGHT;
+    }
+
+    function updateSimulation(target) {
+      const required = calculateRequiredGrade(target);
+      const formattedRequired = Math.max(0, required).toFixed(2);
+
+      // Update slider and badge
+      slider.value = target.toFixed(1);
+      if (badge) badge.textContent = `${target.toFixed(1)} pts`;
+
+      // Update required score display
+      if (statRequired) {
+        if (required <= 0) {
+          statRequired.innerHTML = `0.00 <small>/ 10</small>`;
+          statRequired.style.color = 'var(--brand-secondary)';
+        } else if (required > 10.0) {
+          statRequired.innerHTML = `${formattedRequired} <small>/ 10</small>`;
+          statRequired.style.color = 'var(--brand-primary)';
+        } else {
+          statRequired.innerHTML = `${formattedRequired} <small>/ 10</small>`;
+          statRequired.style.color = required >= 8.5 ? '#D97706' : 'var(--brand-secondary)';
+        }
+      }
+
+      // Update status banner
+      if (statusBanner && statusText && statusIcon) {
+        statusBanner.className = 'sim-status-banner';
+
+        if (required <= 0) {
+          statusBanner.classList.add('status-achievable');
+          statusText.textContent = '¡Materia ya aprobada! Todo lo demás sumará a tu promedio final';
+        } else if (required <= 8.0) {
+          statusBanner.classList.add('status-achievable');
+          statusText.textContent = `Meta alcanzable • Necesitas sacar ${formattedRequired} en el 35% restante`;
+        } else if (required <= 10.0) {
+          statusBanner.classList.add('status-at-risk');
+          statusText.textContent = `Atención • Requiere ${formattedRequired} pts (estudio intensivo recomendado)`;
+        } else {
+          statusBanner.classList.add('status-impossible');
+          statusText.textContent = `Meta inalcanzable (${formattedRequired} supera la escala máxima de 10.0)`;
+        }
+      }
+
+      // Sync preset chips
+      presetChips.forEach(chip => {
+        const chipVal = parseFloat(chip.getAttribute('data-target-grade'));
+        const matches = Math.abs(chipVal - target) < 0.05;
+        chip.classList.toggle('active', matches);
+        chip.setAttribute('aria-selected', matches ? 'true' : 'false');
+      });
+    }
+
+    // Slider input event
+    slider.addEventListener('input', (e) => {
+      const target = parseFloat(e.target.value);
+      updateSimulation(target);
+    });
+
+    // Preset chips click
+    presetChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const target = parseFloat(chip.getAttribute('data-target-grade'));
+        updateSimulation(target);
+      });
+    });
+
+    // Animate diagnostic bar when in view
+    if (typeof ScrollTrigger !== 'undefined' && diagFill) {
+      ScrollTrigger.create({
+        trigger: '#analiticas',
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          diagFill.style.width = '0%';
+          setTimeout(() => {
+            diagFill.style.width = '94%';
+          }, 150);
+
+          // Histogram bounce animation
+          histFills.forEach((fill, idx) => {
+            const h = fill.style.height;
+            fill.style.height = '0%';
+            setTimeout(() => {
+              fill.style.height = h;
+            }, 200 + idx * 80);
+          });
+        }
+      });
+    }
+
+    // Initial calculation with 8.5
+    updateSimulation(8.5);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setupStudioBox();
     setupHubInteractions();
@@ -573,6 +982,8 @@
     setupTakeNotesAction();
     setupEditorSimulator();
     setupGradeScaleSwitcher();
+    setupEvaluationsCalendar();
+    setupAnalyticsDashboard();
     initGSAPAnimations();
   });
 })();

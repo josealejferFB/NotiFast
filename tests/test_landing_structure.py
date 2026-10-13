@@ -126,5 +126,66 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("download-toast", html)
         self.assertIn("Google Play", html)
 
+    def test_evaluations_calendar_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        # 1. Sección y títulos de evaluaciones
+        self.assertIn('id="evaluaciones"', html)
+        self.assertIn("Calendario &amp; Evaluaciones", html)
+        self.assertIn("Fechas de examen y entregas", html)
+        self.assertIn("eval-filters-strip", html)
+        self.assertIn("Parcial II", html)
+
+        # 2. Componente de calendario interactivo fiel a AgendaMonthCalendarView
+        self.assertIn("evaluations-calendar-container", html)
+        self.assertIn("calendar-month-header", html)
+        self.assertIn("Octubre 2026", html)
+        self.assertIn("calendar-days-grid", html)
+        self.assertIn("daily-evaluations-panel", html)
+        self.assertIn("eval-cards-list", html)
+
+        # 3. Integración en navegación y radar
+        self.assertIn('href="#evaluaciones"', html)
+        self.assertIn('data-target="#evaluaciones"', html)
+
+        # 4. Datos y funciones interactivas en JS
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("EVALUATIONS_DATA", js)
+        self.assertIn("setupEvaluationsCalendar", js)
+        self.assertIn("Parcial II: Derivadas y Optimización", js)
+        self.assertIn("#evaluaciones", js)
+
+    def test_analytics_and_projections_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        # 1. Sección y títulos de Analíticas
+        self.assertIn('id="analiticas"', html)
+        self.assertIn("Dashboard Predictivo &amp; Proyecciones", html)
+        self.assertIn("simula tu nota antes de rendir", html)
+        self.assertIn("sim-presets-strip", html)
+        self.assertIn("Meta: 8.5 pts", html)
+
+        # 2. Simulador y Dashboard interactivo fiel a GradeSimulatorCard y AcademicAnalyticsContent
+        self.assertIn("analytics-dashboard-container", html)
+        self.assertIn("analytics-hero-banner", html)
+        self.assertIn("TASA DE ÉXITO PROYECTADA", html)
+        self.assertIn("interactive-grade-simulator", html)
+        self.assertIn("Simulador de Nota Requerida", html)
+        self.assertIn("sim-target-slider", html)
+        self.assertIn("histogram-preview-card", html)
+        self.assertIn("Distribución por Rangos de Desempeño", html)
+
+        # 3. Integración en navegación y radar
+        self.assertIn('href="#analiticas"', html)
+        self.assertIn('data-target="#analiticas"', html)
+
+        # 4. Lógica de cálculo en JS
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("setupAnalyticsDashboard", js)
+        self.assertIn("calculateRequiredGrade", js)
+        self.assertIn("#analiticas", js)
+
 if __name__ == "__main__":
     unittest.main()
