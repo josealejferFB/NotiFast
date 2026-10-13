@@ -103,14 +103,15 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("0-100", js)
         self.assertIn("A-F", js)
 
-    def test_minimalist_studio_box_present(self):
+    def test_notifast_central_hub_present(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
         self.assertIn("magic-box-showcase", html)
-        self.assertIn("study-chest-container", html)
-        self.assertIn("chest-lid", html)
+        self.assertIn("notifast-core-hub", html)
+        self.assertIn("notifast-core-icon", html)
         self.assertIn("popout-notes", html)
         self.assertIn("popout-grades", html)
+        self.assertIn("en un solo lugar", html.lower())
 
     def test_bento_grid_and_cta_elements(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:

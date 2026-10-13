@@ -29,30 +29,83 @@
 
 .study-chest-container {
   position: relative;
-  width: 260px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .study-chest-container:hover {
-  transform: scale(1.04) translateY(-6px);
+  transform: scale(1.05) translateY(-4px);
 }
 
-.study-chest-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 16px 28px rgba(158, 27, 50, 0.18));
+.notifast-core-card {
+  position: relative;
+  background: #FFFFFF;
+  border: 2px solid rgba(158, 27, 50, 0.2);
+  border-radius: 36px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 16px 36px rgba(158, 27, 50, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04);
+  user-select: none;
 }
 
-.chest-lid {
-  transform-origin: 50% 60px;
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+.notifast-core-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 22px;
+  box-shadow: 0 8px 20px rgba(158, 27, 50, 0.2);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.chest-open .chest-lid {
-  transform: translateY(-34px) rotate(-12deg);
+.study-chest-container:hover .notifast-core-icon {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.notifast-core-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+}
+
+.notifast-core-tagline {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--brand-primary);
+  background: var(--brand-primary-light);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.notifast-core-pulse-rings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 125%;
+  height: 125%;
+  transform: translate(-50%, -50%);
+  border-radius: 42px;
+  border: 1.5px solid rgba(158, 27, 50, 0.25);
+  pointer-events: none;
+  animation: hubPulse 2.8s infinite ease-out;
+}
+
+@keyframes hubPulse {
+  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.8; }
+  70% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
 }
 
 /* Rayos de luz interior de la caja */
