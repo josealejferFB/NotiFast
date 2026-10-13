@@ -153,22 +153,26 @@ fun SubjectFacultyCard(
                         }
 
                         if (teacher.hasPhoneNumber && onWhatsAppClick != null) {
-                            IconButton(
+                            Surface(
+                                shape = CircleShape,
+                                color = ForestSage.copy(alpha = 0.12f),
                                 onClick = { onWhatsAppClick(teacher) },
-                                modifier = Modifier.size(36.dp)
+                                modifier = Modifier.size(40.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                                    contentDescription = stringResource(R.string.teacher_action_whatsapp),
-                                    tint = ForestSage,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                                        contentDescription = stringResource(R.string.teacher_action_whatsapp),
+                                        tint = ForestSage,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         } else {
                             Icon(
                                 imageVector = Icons.Default.ChevronRight,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 modifier = Modifier.size(18.dp)
                             )
                         }

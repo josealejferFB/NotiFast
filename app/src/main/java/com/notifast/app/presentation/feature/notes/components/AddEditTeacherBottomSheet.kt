@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -72,7 +72,8 @@ fun AddEditTeacherBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp)
+                .padding(bottom = 24.dp)
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -87,14 +88,14 @@ fun AddEditTeacherBottomSheet(
                 NotiFastFormField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = "Nombre *",
+                    label = "${stringResource(R.string.teacher_first_name_label)} *",
                     leadingIcon = Icons.Default.Person,
                     modifier = Modifier.weight(1f)
                 )
                 NotiFastFormField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = "Apellido",
+                    label = stringResource(R.string.teacher_last_name_label),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -102,7 +103,7 @@ fun AddEditTeacherBottomSheet(
             NotiFastFormField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
-                label = "Teléfono / WhatsApp",
+                label = stringResource(R.string.teacher_phone_label),
                 leadingIcon = Icons.Default.Phone,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
             )
@@ -110,7 +111,7 @@ fun AddEditTeacherBottomSheet(
             NotiFastFormField(
                 value = email,
                 onValueChange = { email = it },
-                label = "Correo electrónico",
+                label = stringResource(R.string.teacher_email_label),
                 leadingIcon = Icons.Default.Email,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
@@ -118,7 +119,7 @@ fun AddEditTeacherBottomSheet(
             if (availableSubjects.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Materias impartidas",
+                        text = stringResource(R.string.teacher_subjects_label),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -153,7 +154,7 @@ fun AddEditTeacherBottomSheet(
             NotiFastFormField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = "Notas u observaciones",
+                label = stringResource(R.string.teacher_notes_label),
                 leadingIcon = Icons.AutoMirrored.Filled.Notes,
                 singleLine = false,
                 maxLines = 3

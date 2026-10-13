@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -71,25 +70,32 @@ fun ProfessorCard(
             .fillMaxWidth()
             .graphicsLayer { scaleX = scale; scaleY = scale }
             .clickable(interactionSource = interactionSource, indication = null) { onClick() },
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Initials Avatar
+                // Initials Avatar with container
                 Surface(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(46.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        val initials = "${teacher.firstName.take(1)}${teacher.lastName.take(1)}".uppercase()
+                        val firstChar = teacher.firstName.trim().take(1)
+                        val lastChar = teacher.lastName.trim().take(1)
+                        val initials = if (firstChar.isNotBlank() && lastChar.isNotBlank()) {
+                            "$firstChar$lastChar"
+                        } else {
+                            teacher.firstName.trim().take(2).ifBlank { "P" }
+                        }.uppercase()
+
                         Text(
-                            text = initials.ifBlank { "P" },
+                            text = initials,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -107,7 +113,7 @@ fun ProfessorCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(3.dp))
                     if (teacher.hasPhoneNumber) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
@@ -116,9 +122,9 @@ fun ProfessorCard(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(13.dp)
                             )
-                            Spacer(Modifier.width(4.dp))
+                            Spacer(Modifier.width(5.dp))
                             Text(
-                                text = teacher.phoneNumber,
+                                text = teacher.formattedPhoneNumber,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
@@ -133,7 +139,7 @@ fun ProfessorCard(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(13.dp)
                             )
-                            Spacer(Modifier.width(4.dp))
+                            Spacer(Modifier.width(5.dp))
                             Text(
                                 text = teacher.email,
                                 style = MaterialTheme.typography.bodySmall,
@@ -146,22 +152,27 @@ fun ProfessorCard(
                 }
 
                 if (teacher.hasPhoneNumber && onWhatsAppClick != null) {
-                    IconButton(
+                    Spacer(Modifier.width(8.dp))
+                    Surface(
+                        shape = CircleShape,
+                        color = ForestSage.copy(alpha = 0.12f),
                         onClick = onWhatsAppClick,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(44.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Chat,
-                            contentDescription = stringResource(R.string.teacher_action_whatsapp),
-                            tint = ForestSage,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Chat,
+                                contentDescription = stringResource(R.string.teacher_action_whatsapp),
+                                tint = ForestSage,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 } else {
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -173,10 +184,13 @@ fun ProfessorCard(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    teacher.subjectNames.forEach { subjectName ->
+                    val visibleSubjects = teacher.subjectNames.take(3)
+                    val remainingCount = teacher.subjectNames.size - visibleSubjects.size
+
+                    visibleSubjects.forEach { subjectName ->
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f)
                         ) {
                             Text(
                                 text = subjectName,
@@ -185,6 +199,21 @@ fun ProfessorCard(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    if (remainingCount > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Text(
+                                text = "+$remainingCount",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                             )
                         }
                     }

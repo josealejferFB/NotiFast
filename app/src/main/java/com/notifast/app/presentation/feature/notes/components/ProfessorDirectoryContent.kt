@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,10 +19,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -54,11 +52,11 @@ fun ProfessorDirectoryContent(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        // Search bar & Add Button
+        // Search bar & Quick Add Action (adaptive & spacious)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp),
+                .padding(vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -100,27 +98,24 @@ fun ProfessorDirectoryContent(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
                 ),
                 modifier = Modifier.weight(1f)
             )
 
-            Button(
+            FilledTonalIconButton(
                 onClick = onAddTeacherClick,
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 14.dp)
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.size(52.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
                     contentDescription = stringResource(R.string.teachers_btn_add),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = stringResource(R.string.teachers_btn_add),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
@@ -136,12 +131,12 @@ fun ProfessorDirectoryContent(
                     title = if (searchQuery.isBlank()) {
                         stringResource(R.string.teachers_empty_title)
                     } else {
-                        "Sin resultados"
+                        stringResource(R.string.search_no_results_title)
                     },
                     message = if (searchQuery.isBlank()) {
                         stringResource(R.string.teachers_empty_subtitle)
                     } else {
-                        "No se encontró ningún profesor para \"$searchQuery\""
+                        stringResource(R.string.search_no_results_desc, searchQuery)
                     },
                     actionLabel = stringResource(R.string.teachers_btn_add),
                     onActionClick = onAddTeacherClick
@@ -150,7 +145,7 @@ fun ProfessorDirectoryContent(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 4.dp, bottom = 100.dp),
+                contentPadding = PaddingValues(top = 2.dp, bottom = 100.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(

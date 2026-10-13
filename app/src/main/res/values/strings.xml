@@ -663,6 +663,7 @@
     <string name="teacher_action_whatsapp">WhatsApp</string>
     <string name="teacher_action_sms">SMS</string>
     <string name="teacher_action_call">Llamar</string>
+    <string name="teacher_action_email">Correo</string>
     <string name="teacher_no_phone_warning">Sin teléfono registrado — Edita para añadir WhatsApp y llamadas</string>
     <string name="teacher_delete_title">¿Eliminar profesor?</string>
     <string name="teacher_delete_message">¿Deseas eliminar al profesor %1$s? Esta acción no se puede deshacer.</string>
