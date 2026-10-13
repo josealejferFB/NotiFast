@@ -31,7 +31,9 @@ interface NoteRepository {
         colorHex: String = "",
         cycle: String = ""
     ): Result<String>
-    suspend fun updateSubject(userId: String, subject: SubjectData): Result<Unit>
+    suspend fun updateSubject(userId: String, subject: SubjectData): Result<Unit> =
+        updateSubject(userId, subject.name, subject)
+    suspend fun updateSubject(userId: String, oldName: String, newSubject: SubjectData): Result<Unit>
     suspend fun deleteNote(userId: String, note: Note): Result<Unit>
     suspend fun updateNote(userId: String, note: Note, imageUri: Uri?): Result<Unit>
     fun getNotesBySubject(userId: String, subject: String): Flow<List<Note>>

@@ -26,6 +26,9 @@ interface ScheduleDao {
     @Query("DELETE FROM schedules WHERE userId = :userId AND subjectName = :subjectName")
     suspend fun deleteSchedulesBySubject(userId: String, subjectName: String): Int
 
+    @Query("UPDATE schedules SET subjectName = :newName WHERE userId = :userId AND subjectName = :oldName")
+    suspend fun updateSubjectName(userId: String, oldName: String, newName: String): Int
+
     @Query("DELETE FROM schedules WHERE userId = :userId AND subjectId = :subjectId")
     suspend fun deleteSchedulesBySubjectId(userId: String, subjectId: String): Int
 

@@ -8,6 +8,7 @@ import com.notifast.app.data.local.dao.EvaluationDao
 import com.notifast.app.data.local.dao.NoteDao
 import com.notifast.app.data.local.dao.ScheduleDao
 import com.notifast.app.data.local.dao.SubjectDao
+import com.notifast.app.data.local.dao.TeacherDao
 import com.notifast.app.data.local.entity.NoteEntity
 import com.notifast.app.data.local.entity.SubjectEntity
 import com.notifast.app.data.model.Note
@@ -35,7 +36,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
     private val subjectDao: SubjectDao,
     private val imageRepository: ImageRepository,
     private val evaluationDao: EvaluationDao = db.evaluationDao(),
-    private val scheduleDao: ScheduleDao = db.scheduleDao()
+    private val scheduleDao: ScheduleDao = db.scheduleDao(),
+    private val teacherDao: TeacherDao = db.teacherDao()
 ) : NoteRepository {
 
     override fun getNotes(userId: String): Flow<List<Note>> {
@@ -165,20 +167,58 @@ class LocalNoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateSubject(userId: String, subject: SubjectData): Result<Unit> {
-        return try {
+        val oldName = if (subject.name.isNotBlank()) subject.name else {
             val existing = subjectDao.getSubjectById(userId, subject.id)
+            existing?.name.orEmpty()
+        }
+        return updateSubject(userId, oldName, subject)
+    }
+
+    override suspend fun updateSubject(
+        userId: String,
+        oldName: String,
+        newSubject: SubjectData
+    ): Result<Unit> {
+        return try {
+            val existing = subjectDao.getSubjectByName(userId, oldName)
+                ?: (if (newSubject.id.isNotBlank()) subjectDao.getSubjectById(userId, newSubject.id) else null)
                 ?: return Result.failure(Exception("La materia no existe"))
-            subjectDao.updateSubject(
-                existing.copy(
-                    name = subject.name,
-                    icon = subject.icon,
-                    colorHex = subject.colorHex,
-                    cycle = subject.cycle
+
+            val isRenaming = !oldName.equals(newSubject.name, ignoreCase = false)
+            if (isRenaming) {
+                val clash = subjectDao.getSubjectByName(userId, newSubject.name)
+                if (clash != null && clash.id != existing.id) {
+                    return Result.failure(Exception("Ya existe una materia con ese nombre"))
+                }
+            }
+
+            db.withTransaction {
+                subjectDao.updateSubject(
+                    existing.copy(
+                        name = newSubject.name,
+                        icon = newSubject.icon,
+                        colorHex = newSubject.colorHex,
+                        cycle = newSubject.cycle
+                    )
                 )
-            )
+
+                if (isRenaming) {
+                    noteDao.updateSubjectName(userId, oldName, newSubject.name)
+                    evaluationDao.updateSubjectName(userId, oldName, newSubject.name)
+                    scheduleDao.updateSubjectName(userId, oldName, newSubject.name)
+
+                    val teachers = teacherDao.getTeachers(userId).first()
+                    teachers.forEach { teacherEntity ->
+                        if (teacherEntity.subjectNamesJson.contains("\"$oldName\"")) {
+                            val updatedJson = teacherEntity.subjectNamesJson.replace("\"$oldName\"", "\"${newSubject.name}\"")
+                            teacherDao.updateTeacher(teacherEntity.copy(subjectNamesJson = updatedJson))
+                        }
+                    }
+                }
+            }
             Result.success(Unit)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to update subject '${subject.id}'", e)
+            Log.e(TAG, "Failed to update subject '$oldName'", e)
             Result.failure(e)
         }
     }

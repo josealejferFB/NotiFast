@@ -26,6 +26,9 @@ interface NoteDao {
     @Query("DELETE FROM notes WHERE userId = :userId AND subject = :subject")
     suspend fun deleteNotesBySubject(userId: String, subject: String): Int
 
+    @Query("UPDATE notes SET subject = :newName WHERE userId = :userId AND subject = :oldName")
+    suspend fun updateSubjectName(userId: String, oldName: String, newName: String): Int
+
     @Query("DELETE FROM notes WHERE userId = :userId AND subjectId = :subjectId")
     suspend fun deleteNotesBySubjectId(userId: String, subjectId: String): Int
 

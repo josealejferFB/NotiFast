@@ -32,6 +32,9 @@ interface EvaluationDao {
     @Query("DELETE FROM evaluations WHERE userId = :userId AND subjectName = :subjectName")
     suspend fun deleteEvaluationsBySubject(userId: String, subjectName: String): Int
 
+    @Query("UPDATE evaluations SET subjectName = :newName WHERE userId = :userId AND subjectName = :oldName")
+    suspend fun updateSubjectName(userId: String, oldName: String, newName: String): Int
+
     @Query("DELETE FROM evaluations WHERE userId = :userId AND subjectId = :subjectId")
     suspend fun deleteEvaluationsBySubjectId(userId: String, subjectId: String): Int
 

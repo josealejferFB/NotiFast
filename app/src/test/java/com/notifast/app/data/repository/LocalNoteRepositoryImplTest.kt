@@ -38,6 +38,7 @@ class LocalNoteRepositoryImplTest {
     private val subjectDao: SubjectDao = mockk(relaxed = true)
     private val evaluationDao: EvaluationDao = mockk(relaxed = true)
     private val scheduleDao: ScheduleDao = mockk(relaxed = true)
+    private val teacherDao: com.notifast.app.data.local.dao.TeacherDao = mockk(relaxed = true)
     private val imageRepository: ImageRepository = mockk(relaxed = true)
 
     private lateinit var repository: LocalNoteRepositoryImpl
@@ -50,13 +51,16 @@ class LocalNoteRepositoryImplTest {
             transactionSlot.captured.invoke()
         }
 
+        coEvery { teacherDao.getTeachers(any()) } returns flowOf(emptyList())
+
         repository = LocalNoteRepositoryImpl(
             db = db,
             noteDao = noteDao,
             subjectDao = subjectDao,
             imageRepository = imageRepository,
             evaluationDao = evaluationDao,
-            scheduleDao = scheduleDao
+            scheduleDao = scheduleDao,
+            teacherDao = teacherDao
         )
     }
 
@@ -267,4 +271,58 @@ class LocalNoteRepositoryImplTest {
         coVerify { scheduleDao.deleteSchedulesBySubjectId("u1", "s1") }
         coVerify { subjectDao.deleteSubjectById("u1", "s1") }
     }
+
+    @Test
+    fun `updateSubject with same name updates only subject color and icon`() = runTest {
+        val subject = SubjectEntity(userId = "u1", id = "s1", name = "Física", icon = "📚", colorHex = "#000000")
+        coEvery { subjectDao.getSubjectByName("u1", "Física") } returns subject
+        coEvery { subjectDao.getSubjectById("u1", "s1") } returns subject
+        coEvery { subjectDao.updateSubject(any()) } returns 1
+
+        val result = repository.updateSubject("u1", "Física", com.notifast.app.data.model.SubjectData(id = "s1", name = "Física", colorHex = "#BF092F", icon = "🔬"))
+        assertTrue(result.isSuccess)
+
+        val slot = slot<SubjectEntity>()
+        coVerify { subjectDao.updateSubject(capture(slot)) }
+        assertEquals("#BF092F", slot.captured.colorHex)
+        assertEquals("🔬", slot.captured.icon)
+        assertEquals("Física", slot.captured.name)
+        coVerify(exactly = 0) { noteDao.updateSubjectName(any(), any(), any()) }
+    }
+
+    @Test
+    fun `updateSubject with new name cascades across notes, evaluations, and schedules`() = runTest {
+        val subject = SubjectEntity(userId = "u1", id = "s1", name = "Física", icon = "📚", colorHex = "#000000")
+        coEvery { subjectDao.getSubjectByName("u1", "Física") } returns subject
+        coEvery { subjectDao.getSubjectById("u1", "s1") } returns subject
+        coEvery { subjectDao.getSubjectByName("u1", "Física II") } returns null
+        coEvery { subjectDao.updateSubject(any()) } returns 1
+        coEvery { noteDao.updateSubjectName("u1", "Física", "Física II") } returns 2
+        coEvery { evaluationDao.updateSubjectName("u1", "Física", "Física II") } returns 1
+        coEvery { scheduleDao.updateSubjectName("u1", "Física", "Física II") } returns 1
+
+        val result = repository.updateSubject("u1", "Física", com.notifast.app.data.model.SubjectData(id = "s1", name = "Física II", colorHex = "#BF092F", icon = "🔬"))
+        assertTrue(result.isSuccess)
+
+        val slot = slot<SubjectEntity>()
+        coVerify { subjectDao.updateSubject(capture(slot)) }
+        assertEquals("Física II", slot.captured.name)
+        coVerify { noteDao.updateSubjectName("u1", "Física", "Física II") }
+        coVerify { evaluationDao.updateSubjectName("u1", "Física", "Física II") }
+        coVerify { scheduleDao.updateSubjectName("u1", "Física", "Física II") }
+    }
+
+    @Test
+    fun `updateSubject fails when new subject name already exists`() = runTest {
+        val subject = SubjectEntity(userId = "u1", id = "s1", name = "Física")
+        val existingClash = SubjectEntity(userId = "u1", id = "s2", name = "Química")
+        coEvery { subjectDao.getSubjectByName("u1", "Física") } returns subject
+        coEvery { subjectDao.getSubjectByName("u1", "Química") } returns existingClash
+
+        val result = repository.updateSubject("u1", "Física", com.notifast.app.data.model.SubjectData(id = "s1", name = "Química"))
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { subjectDao.updateSubject(any()) }
+        coVerify(exactly = 0) { noteDao.updateSubjectName(any(), any(), any()) }
+    }
 }
+
