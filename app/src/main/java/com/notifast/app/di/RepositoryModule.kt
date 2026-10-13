@@ -51,4 +51,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAnalyticsTracker(impl: FirebaseAnalyticsTracker): AnalyticsTracker
+
+    @Binds
+    @Singleton
+    abstract fun bindTeacherRepository(impl: com.notifast.app.data.repository.LocalTeacherRepositoryImpl): com.notifast.app.domain.repository.TeacherRepository
 }
