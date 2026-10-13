@@ -69,5 +69,14 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("8.7", html)
         self.assertIn("Aprobando", html)
 
+    def test_scrollytelling_js_exists(self):
+        self.assertTrue(os.path.exists("landing/js/scrollytelling.js"))
+        self.assertTrue(os.path.exists("landing/js/main.js"))
+        with open("landing/js/scrollytelling.js", "r", encoding="utf-8") as f:
+            code = f.read()
+        self.assertIn("ScrollTrigger", code)
+        self.assertIn("matchMedia", code)
+        self.assertIn("992px", code)
+
 if __name__ == "__main__":
     unittest.main()
