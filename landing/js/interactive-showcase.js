@@ -1,22 +1,26 @@
 /**
  * NotiFast 3.0 — Interactive Showcase Script
- * Duolingo playful vector dynamics, unboxing animations, grade gauge counter, and interactive subjects.
+ * Handles:
+ * - Studio Box opening / unboxing animation
+ * - Live Class beacon interactions & "Tomar apuntes" quick action jump
+ * - Markdown editor preview toggle and interactive task checklist
+ * - GSAP ScrollTrigger animations
  */
 
 (function () {
   'use strict';
 
-  // 1. Unboxing Animation (Magic Study Chest)
-  function setupMagicChest() {
+  // 1. Studio Box Unboxing
+  function setupStudioBox() {
     const chestContainer = document.querySelector('.study-chest-container');
     if (!chestContainer) return;
 
-    // Open on click for instant delight
+    // Toggle on click
     chestContainer.addEventListener('click', () => {
       chestContainer.classList.toggle('chest-open');
     });
 
-    // Auto-open as user scrolls into view
+    // Auto-open on scroll into view
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -32,53 +36,97 @@
     }
   }
 
-  // 2. Animated Grade Gauge & Number Counter
-  function setupGradeGauge() {
-    const gaugeCircle = document.querySelector('.gauge-fill-circle');
-    const gaugeNumber = document.querySelector('.gauge-number');
-    if (!gaugeCircle || !gaugeNumber) return;
+  // 2. "Tomar Apuntes" Quick Action from Schedule Card
+  function setupTakeNotesAction() {
+    const takeNotesBtn = document.getElementById('btn-take-notes-demo');
+    const editorSection = document.getElementById('apuntes');
+    const editorSimulator = document.querySelector('.note-editor-simulator');
 
-    let animated = false;
+    if (!takeNotesBtn || !editorSection) return;
 
-    function runAnimation() {
-      if (animated) return;
-      animated = true;
+    takeNotesBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      editorSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-      // Circle fill animation (565 is circumference, 85 is ~8.7/10)
-      gaugeCircle.style.strokeDashoffset = '85';
+      if (editorSimulator) {
+        editorSimulator.style.transition = 'box-shadow 0.4s, transform 0.4s';
+        editorSimulator.style.boxShadow = '0 0 0 4px rgba(158, 27, 50, 0.4), 0 20px 40px rgba(0,0,0,0.12)';
+        editorSimulator.style.transform = 'scale(1.02)';
 
-      // Number count-up
-      let current = 0.0;
-      const target = 8.7;
-      const step = 0.1;
-      const interval = setInterval(() => {
-        current += step;
-        if (current >= target) {
-          current = target;
-          clearInterval(interval);
-        }
-        gaugeNumber.textContent = current.toFixed(1);
-      }, 25);
-    }
-
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            runAnimation();
-          }
-        });
-      }, { threshold: 0.4 });
-
-      const gaugeContainer = document.querySelector('.grade-gauge-container');
-      if (gaugeContainer) observer.observe(gaugeContainer);
-    } else {
-      runAnimation();
-    }
+        setTimeout(() => {
+          editorSimulator.style.boxShadow = '';
+          editorSimulator.style.transform = '';
+        }, 1500);
+      }
+    });
   }
 
-  // 3. GSAP ScrollTrigger Integration for Zig-Zag Rows & Floating Popouts
-  function initGSAPShowcase() {
+  // 3. Interactive Markdown Editor Simulator
+  function setupEditorSimulator() {
+    const toggleViewBtn = document.getElementById('btn-toggle-editor-view');
+    const editorSheet = document.querySelector('.rich-editor-sheet');
+    const toolbarButtons = document.querySelectorAll('.markdown-toolbar .tb-btn');
+
+    if (toggleViewBtn && editorSheet) {
+      let isPreview = true;
+      toggleViewBtn.addEventListener('click', () => {
+        isPreview = !isPreview;
+        if (isPreview) {
+          toggleViewBtn.textContent = 'Vista previa';
+          toggleViewBtn.classList.add('active');
+          editorSheet.innerHTML = `
+            <div class="rendered-markdown-content">
+              <h5># Teorema de Lagrange</h5>
+              <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto <em>c</em> tal que:</p>
+              <div class="math-latex-card">
+                <code>f'(c) = [f(b) - f(a)] / (b - a)</code>
+              </div>
+              <div class="interactive-todo-list">
+                <label class="todo-item checked">
+                  <input type="checkbox" checked disabled>
+                  <span>Demostración con el Teorema de Rolle</span>
+                </label>
+                <label class="todo-item checked">
+                  <input type="checkbox" checked disabled>
+                  <span>Ejercicios resueltos de optimización de costos</span>
+                </label>
+                <label class="todo-item">
+                  <input type="checkbox" disabled>
+                  <span>Revisar guía para el examen del viernes</span>
+                </label>
+              </div>
+              <blockquote class="editor-quote-card">
+                "La recta secante es paralela a la recta tangente en el punto c."
+              </blockquote>
+            </div>
+          `;
+        } else {
+          toggleViewBtn.textContent = 'Modo edición';
+          toggleViewBtn.classList.remove('active');
+          editorSheet.innerHTML = `
+            <div style="font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.6; color: var(--text-primary);">
+              <p style="color: var(--brand-primary); font-weight: 700;"># Teorema de Lagrange</p>
+              <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto *c* tal que:</p>
+              <p style="color: #7C3AED; background: #F5F3FF; padding: 4px 8px; border-radius: 4px;">$$ f'(c) = \\frac{f(b) - f(a)}{b - a} $$</p>
+              <p>- [x] Demostración con el Teorema de Rolle<br>- [x] Ejercicios resueltos de optimización de costos<br>- [ ] Revisar guía para el examen del viernes</p>
+              <p style="color: #881337;">> "La recta secante es paralela a la recta tangente en el punto c."</p>
+            </div>
+          `;
+        }
+      });
+    }
+
+    // Microfeedback on toolbar button clicks
+    toolbarButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.style.transform = 'scale(0.88)';
+        setTimeout(() => { btn.style.transform = ''; }, 150);
+      });
+    });
+  }
+
+  // 4. GSAP Animations for Zig-zag Rows and Popouts
+  function initGSAPAnimations() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
       return;
     }
@@ -88,12 +136,12 @@
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReducedMotion) return;
 
-    // Popout items explosion from chest
+    // Popout items explosion from studio box
     gsap.from('.popout-item', {
       scale: 0,
       opacity: 0,
       duration: 0.8,
-      stagger: 0.15,
+      stagger: 0.12,
       ease: 'back.out(1.7)',
       scrollTrigger: {
         trigger: '.magic-box-showcase',
@@ -101,19 +149,18 @@
       }
     });
 
-    // Alternating Zig-zag rows: Slide in with spring physics
+    // Zig-zag rows animation
     const rows = document.querySelectorAll('.dynamic-feature-row');
-    rows.forEach((row, i) => {
+    rows.forEach((row) => {
       const visual = row.querySelector('.feature-visual');
       const info = row.querySelector('.feature-info');
       const isReverse = row.classList.contains('row-reverse');
 
-      // Slide visual from left or right
       if (visual) {
         gsap.from(visual, {
-          x: isReverse ? -60 : 60,
+          x: isReverse ? -50 : 50,
           opacity: 0,
-          duration: 0.9,
+          duration: 0.85,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: row,
@@ -126,7 +173,7 @@
         gsap.from(info, {
           x: isReverse ? 40 : -40,
           opacity: 0,
-          duration: 0.9,
+          duration: 0.85,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: row,
@@ -138,10 +185,10 @@
 
     // Subjects cards stagger
     gsap.from('.subject-feature-card', {
-      y: 40,
+      y: 35,
       opacity: 0,
-      duration: 0.7,
-      stagger: 0.12,
+      duration: 0.65,
+      stagger: 0.1,
       ease: 'back.out(1.4)',
       scrollTrigger: {
         trigger: '.subjects-gallery-section',
@@ -151,8 +198,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    setupMagicChest();
-    setupGradeGauge();
-    initGSAPShowcase();
+    setupStudioBox();
+    setupTakeNotesAction();
+    setupEditorSimulator();
+    initGSAPAnimations();
   });
 })();

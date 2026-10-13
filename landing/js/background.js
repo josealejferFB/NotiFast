@@ -1,10 +1,10 @@
 /**
  * NotiFast 3.0 — Dynamic Background Particle System
- * Inspired by NotiFastStudyBackground.kt & Duolingo playful vector stickers.
- * Features:
- * - Floating study stickers with organic sine-wave hovering
- * - Scroll-driven parallax with spring physics
- * - Full respect for prefers-reduced-motion (disables animation for accessibility)
+ * Strictly mirrors NotiFastStudyBackground.kt icons:
+ * MenuBook, Edit, School, HistoryEdu, Science, AutoStories, Lightbulb,
+ * Calculate, Functions, Psychology, Biotech, EmojiEvents.
+ * 
+ * Respects prefers-reduced-motion for complete accessibility.
  */
 
 (function () {
@@ -16,14 +16,18 @@
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const ICONS = [
-    'icon-book',
-    'icon-pencil',
+    'icon-menubook',
     'icon-school',
     'icon-science',
-    'icon-calculator',
-    'icon-bulb',
-    'icon-function',
-    'icon-trophy'
+    'icon-calculate',
+    'icon-lightbulb',
+    'icon-functions',
+    'icon-emojievents',
+    'icon-edit',
+    'icon-historyedu',
+    'icon-autostories',
+    'icon-psychology',
+    'icon-biotech'
   ];
 
   const COLOR_CLASSES = [
