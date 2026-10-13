@@ -631,7 +631,52 @@
     <string name="editor_format_bullet">Lista de viñetas</string>
     <string name="editor_format_latex">Fórmula LaTeX</string>
     <string name="editor_format_divider">Separador horizontal</string>
-    <string name="editor_format_photo">Adjuntar foto de pizarra</string>
+    <string name="editor_format_photo">Adjuntar foto</string>
     <string name="editor_toggle_reading_mode">Modo lectura</string>
     <string name="editor_toggle_edit_mode">Modo edición</string>
+
+    <!-- Subjects Sanitization & Edit Subject -->
+    <string name="edit_subject_title">Editar Materia</string>
+    <string name="edit_subject_name_label">Nombre de la materia</string>
+    <string name="edit_subject_color_title">Color corporativo</string>
+    <string name="edit_subject_icon_title">Icono temático</string>
+    <string name="edit_subject_btn_save">Guardar Cambios</string>
+    <string name="edit_subject_action">Editar</string>
+    <string name="edit_subject_success">Materia actualizada</string>
+    <string name="edit_subject_duplicate_error">Ya existe una materia con ese nombre</string>
+
+    <!-- Professors Directory & WhatsApp/SMS Actions -->
+    <string name="teachers_tab_title">Profesores</string>
+    <string name="teachers_subtab_subjects">Materias</string>
+    <string name="teachers_subtab_professors">Profesores</string>
+    <string name="teachers_empty_title">Sin profesores agendados</string>
+    <string name="teachers_empty_subtitle">Agrega a tus profesores para tener a mano su contacto y WhatsApp</string>
+    <string name="teachers_btn_add">Añadir Profesor</string>
+    <string name="teachers_search_placeholder">Buscar por nombre o materia...</string>
+    <string name="teacher_detail_title">Ficha del Docente</string>
+    <string name="teacher_first_name_label">Nombre</string>
+    <string name="teacher_last_name_label">Apellido</string>
+    <string name="teacher_phone_label">Teléfono (WhatsApp)</string>
+    <string name="teacher_email_label">Correo (Opcional)</string>
+    <string name="teacher_subjects_label">Materias que imparte</string>
+    <string name="teacher_notes_label">Notas / Cubículo (Opcional)</string>
+    <string name="teacher_action_whatsapp">WhatsApp</string>
+    <string name="teacher_action_sms">SMS</string>
+    <string name="teacher_action_call">Llamar</string>
+    <string name="teacher_no_phone_warning">Sin teléfono registrado — Edita para añadir WhatsApp y llamadas</string>
+    <string name="teacher_delete_title">¿Eliminar profesor?</string>
+    <string name="teacher_delete_message">¿Deseas eliminar al profesor %1$s? Esta acción no se puede deshacer.</string>
+    <string name="teacher_save_success">Profesor guardado</string>
+    <string name="teacher_delete_success">Profesor eliminado</string>
+
+    <!-- Contextual Schedule Teacher Sync -->
+    <string name="schedule_no_teacher_warning">Esta materia aún no tiene un profesor asignado</string>
+    <string name="schedule_no_teacher_subtitle">Escribe el nombre del docente para vincularlo automáticamente</string>
+    <string name="schedule_select_teacher_label">Profesor asignado</string>
+    <string name="schedule_add_new_teacher_option">➕ Nuevo Profesor</string>
+
+    <!-- Subject Detail Faculty Section -->
+    <string name="subject_faculty_title">Cuerpo Docente</string>
+    <string name="subject_faculty_empty">Sin profesores asignados a esta materia</string>
+    <string name="subject_faculty_btn_add">Asignar Profesor</string>
 </resources>

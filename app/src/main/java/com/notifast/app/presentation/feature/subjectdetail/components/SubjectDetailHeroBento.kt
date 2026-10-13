@@ -27,6 +27,7 @@ import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.type.monoAcademicLarge
 import com.notifast.app.presentation.util.GradeFormatters
 
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 
 @Composable
@@ -42,6 +43,7 @@ fun SubjectDetailHeroBento(
     onAddEvaluationClick: () -> Unit,
     onAddScheduleClick: () -> Unit,
     onShareClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val isDark = isSystemInDarkTheme()
@@ -76,6 +78,9 @@ fun SubjectDetailHeroBento(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
+                IconButton(onClick = onEditClick, modifier = Modifier.size(38.dp)) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.btn_edit), tint = Color.White)
+                }
                 IconButton(onClick = onShareClick, modifier = Modifier.size(38.dp)) {
                     Icon(imageVector = Icons.Default.Share, contentDescription = stringResource(R.string.share_subject_title), tint = Color.White)
                 }

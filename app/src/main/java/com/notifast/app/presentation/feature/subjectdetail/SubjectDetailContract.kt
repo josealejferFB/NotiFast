@@ -49,8 +49,10 @@ data class SubjectDetailUiState(
     val simulationResult: RequiredGradeResult? = null,
     val classroom: String = "",
     val teacher: String = "",
+    val teachers: List<com.notifast.app.data.model.Teacher> = emptyList(),
     val modality: String = Schedule.MODALITY_PRESENCIAL,
     val meetingUrl: String? = null,
+    val isRenaming: Boolean = false,
     val error: String? = null
 )
 
@@ -63,5 +65,7 @@ sealed interface SubjectDetailEvent {
     data class DeleteEvaluation(val evaluationId: String) : SubjectDetailEvent
     data class DeleteSchedule(val schedule: Schedule) : SubjectDetailEvent
     data class UpdateTargetGrade(val targetGrade: Double) : SubjectDetailEvent
+    data class UpdateSubjectData(val newName: String, val newColorHex: String, val newIcon: String) : SubjectDetailEvent
     data object ClearError : SubjectDetailEvent
 }
+

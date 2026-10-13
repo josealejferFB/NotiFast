@@ -63,6 +63,7 @@ fun NotesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var subjectToDelete by remember { mutableStateOf<String?>(null) }
+    var subjectToEdit by remember { mutableStateOf<com.notifast.app.presentation.feature.notes.SubjectInfo?>(null) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
     var expandedNote by remember { mutableStateOf<Note?>(null) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -132,6 +133,7 @@ fun NotesScreen(
                         SubjectGridBento(
                             subjectInfos = uiState.subjectInfos,
                             onSubjectClick = onSubjectClick,
+                            onEditSubject = { subjectToEdit = it },
                             onAddNoteClick = { onAddNoteClick(it) },
                             onAddEvaluationClick = onAddEvaluationClick,
                             onDeleteSubject = { subjectToDelete = it },
@@ -151,6 +153,21 @@ fun NotesScreen(
                     showAddSubjectSheet = false
                     viewModel.onEvent(NotesEvent.LoadNotes)
                     onSubjectClick(name)
+                }
+            )
+        }
+
+        subjectToEdit?.let { info ->
+            com.notifast.app.presentation.feature.notes.components.EditSubjectDialog(
+                subject = com.notifast.app.data.model.SubjectData(
+                    name = info.name,
+                    colorHex = info.colorHex,
+                    icon = info.icon
+                ),
+                onDismiss = { subjectToEdit = null },
+                onSave = { newName, newColor, newIcon ->
+                    viewModel.onEvent(NotesEvent.UpdateSubject(info.name, newName, newColor, newIcon))
+                    subjectToEdit = null
                 }
             )
         }

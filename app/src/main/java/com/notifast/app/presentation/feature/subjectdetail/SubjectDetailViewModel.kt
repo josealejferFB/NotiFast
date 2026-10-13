@@ -43,8 +43,8 @@ class SubjectDetailViewModel @Inject constructor(
     private val cancelAlertUseCase: CancelAlertUseCase? = null
 ) : ViewModel() {
 
-    private val subjectName: String = checkNotNull(savedStateHandle["subjectName"])
-    private val _uiState = MutableStateFlow(SubjectDetailUiState(subjectName = subjectName))
+    private var currentSubjectName: String = checkNotNull(savedStateHandle["subjectName"])
+    private val _uiState = MutableStateFlow(SubjectDetailUiState(subjectName = currentSubjectName))
     val uiState: StateFlow<SubjectDetailUiState> = _uiState.asStateFlow()
 
     // Single source of filter/UI inputs lives inside UiState (MVI). These private
@@ -79,7 +79,7 @@ class SubjectDetailViewModel @Inject constructor(
             ) { scaleId, minPassing -> ScalePrefs(scaleId, minPassing) }
 
             val dataFlow = combine(
-                noteRepository.getNotesBySubject(userId, subjectName),
+                noteRepository.getNotesBySubject(userId, currentSubjectName),
                 evaluationRepository.getEvaluations(userId),
                 scheduleRepository.getSchedules(userId),
                 noteRepository.getSubjects(userId),
@@ -89,10 +89,10 @@ class SubjectDetailViewModel @Inject constructor(
             }
 
             combine(dataFlow, filterInputs) { domain, filter ->
-                val subjectEvals = domain.evaluations.filter { it.subjectName.equals(subjectName, ignoreCase = true) }
-                val subjectSchedules = domain.schedules.filter { it.subjectName.equals(subjectName, ignoreCase = true) }
-                val subjectData = domain.subjects.find { it.name.equals(subjectName, ignoreCase = true) }
-                    ?: SubjectData(name = subjectName)
+                val subjectEvals = domain.evaluations.filter { it.subjectName.equals(currentSubjectName, ignoreCase = true) }
+                val subjectSchedules = domain.schedules.filter { it.subjectName.equals(currentSubjectName, ignoreCase = true) }
+                val subjectData = domain.subjects.find { it.name.equals(currentSubjectName, ignoreCase = true) }
+                    ?: SubjectData(name = currentSubjectName)
                 val scale = GradeScale.fromId(domain.scaleId)
                 val customMinPassing = domain.minPassing.toDouble().takeIf {
                     it > scale.minGrade && it <= scale.maxGrade
@@ -125,7 +125,7 @@ class SubjectDetailViewModel @Inject constructor(
                         userId = userId,
                         isLoading = false,
                         error = prev.error,
-                        subjectName = subjectName,
+                        subjectName = currentSubjectName,
                         subjectIcon = subjectData.icon,
                         subjectColorHex = subjectData.colorHex,
                         selectedQuadrant = filter.quadrant,
@@ -191,7 +191,30 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
             is SubjectDetailEvent.DeleteSchedule -> deleteSchedule(event.schedule)
             is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGradeOverride = event.targetGrade) }
+            is SubjectDetailEvent.UpdateSubjectData -> updateSubjectData(event.newName, event.newColorHex, event.newIcon)
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun updateSubjectData(newName: String, newColorHex: String, newIcon: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val oldName = currentSubjectName
+            _uiState.update { it.copy(isRenaming = true) }
+            val updatedSubject = SubjectData(
+                name = newName,
+                colorHex = newColorHex,
+                icon = newIcon
+            )
+            noteRepository.updateSubject(userId, oldName, updatedSubject)
+                .onSuccess {
+                    currentSubjectName = newName
+                    _uiState.update { it.copy(isRenaming = false, subjectName = newName, subjectIcon = newIcon, subjectColorHex = newColorHex) }
+                    loadData()
+                }
+                .onFailure { e ->
+                    _uiState.update { it.copy(isRenaming = false, error = e.message ?: "Error al actualizar materia") }
+                }
         }
     }
 

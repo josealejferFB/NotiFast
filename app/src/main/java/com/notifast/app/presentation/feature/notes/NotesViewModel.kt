@@ -253,7 +253,23 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.SelectTag -> _selectedTag.value = event.tag
             is NotesEvent.DeleteNote -> deleteNote(event.note)
             is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
+            is NotesEvent.UpdateSubject -> updateSubject(event.oldName, event.newName, event.newColorHex, event.newIcon)
             is NotesEvent.ToggleTaskCheck -> toggleTaskCheck(event.note, event.taskIndex, event.isChecked)
+        }
+    }
+
+    private fun updateSubject(oldName: String, newName: String, newColorHex: String, newIcon: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val updatedSubject = SubjectData(
+                name = newName,
+                colorHex = newColorHex,
+                icon = newIcon
+            )
+            noteRepository.updateSubject(userId, oldName, updatedSubject).fold(
+                onSuccess = { _uiState.update { it.copy(error = null) } },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al actualizar materia") } }
+            )
         }
     }
 

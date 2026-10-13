@@ -40,6 +40,7 @@ fun SubjectDetailScreen(
     var deleteEval by remember { mutableStateOf<Evaluation?>(null) }
     var deleteSchedule by remember { mutableStateOf<Schedule?>(null) }
     var showShareSheet by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -64,7 +65,8 @@ fun SubjectDetailScreen(
                     onAddNoteClick = { onAddNoteClick(uiState.subjectName) },
                     onAddEvaluationClick = { onAddEvaluationClick(uiState.subjectName) },
                     onAddScheduleClick = { onAddScheduleClick(uiState.subjectName) },
-                    onShareClick = { showShareSheet = true }
+                    onShareClick = { showShareSheet = true },
+                    onEditClick = { showEditDialog = true }
                 )
             }
         ) { padding ->
@@ -177,6 +179,22 @@ fun SubjectDetailScreen(
                 subjectColorHex = uiState.subjectColorHex,
                 exportUseCase = viewModel.exportSubjectPackageUseCase,
                 onDismiss = { showShareSheet = false }
+            )
+        }
+
+        if (showEditDialog) {
+            com.notifast.app.presentation.feature.notes.components.EditSubjectDialog(
+                subject = com.notifast.app.data.model.SubjectData(
+                    name = uiState.subjectName,
+                    colorHex = uiState.subjectColorHex,
+                    icon = uiState.subjectIcon
+                ),
+                isSaving = uiState.isRenaming,
+                onDismiss = { showEditDialog = false },
+                onSave = { newName, newColor, newIcon ->
+                    viewModel.onEvent(SubjectDetailEvent.UpdateSubjectData(newName, newColor, newIcon))
+                    showEditDialog = false
+                }
             )
         }
     }

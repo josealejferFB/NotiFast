@@ -58,6 +58,7 @@ import com.notifast.app.presentation.theme.color.MutedCrimson
 import com.notifast.app.presentation.theme.color.AquaGreen
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import com.notifast.app.presentation.theme.type.monoAcademic
+import androidx.compose.material.icons.filled.Edit
 import com.notifast.app.presentation.util.GradeFormatters
 
 @Composable
@@ -68,6 +69,7 @@ fun SubjectGridBento(
     onAddEvaluationClick: (String) -> Unit,
     onDeleteSubject: (String) -> Unit,
     onAddSubjectClick: () -> Unit,
+    onEditSubject: (SubjectInfo) -> Unit = {},
     displayScale: GradeScale = GradeScale.SCALE_0_10,
     minPassingGrade: Double = displayScale.minPassingGrade,
     modifier: Modifier = Modifier
@@ -93,6 +95,7 @@ fun SubjectGridBento(
                 SubjectBentoCard(
                     subjectInfo = subjectInfo,
                     onClick = { onSubjectClick(subjectInfo.name) },
+                    onEdit = { onEditSubject(subjectInfo) },
                     onAddNote = { onAddNoteClick(subjectInfo.name) },
                     onAddEval = { onAddEvaluationClick(subjectInfo.name) },
                     onDelete = { onDeleteSubject(subjectInfo.name) },
@@ -108,6 +111,7 @@ fun SubjectGridBento(
 private fun SubjectBentoCard(
     subjectInfo: SubjectInfo,
     onClick: () -> Unit,
+    onEdit: () -> Unit,
     onAddNote: () -> Unit,
     onAddEval: () -> Unit,
     onDelete: () -> Unit,
@@ -136,7 +140,12 @@ private fun SubjectBentoCard(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = CircleShape, color = accentColor.copy(alpha = 0.16f), modifier = Modifier.size(36.dp)) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(subjectInfo.name.take(2).uppercase(), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = accentColor)
+                        Icon(
+                            imageVector = SubjectIconMapper.getIcon(subjectInfo.icon),
+                            contentDescription = subjectInfo.name,
+                            tint = accentColor,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
                 subjectInfo.averageGrade?.let { avg ->
@@ -163,6 +172,10 @@ private fun SubjectBentoCard(
 
             Spacer(Modifier.height(6.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = onEdit, modifier = Modifier.size(24.dp)) {
+                    Icon(Icons.Default.Edit, stringResource(R.string.btn_edit), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(15.dp))
+                }
+                Spacer(Modifier.width(2.dp))
                 IconButton(onClick = onAddNote, modifier = Modifier.size(24.dp)) {
                     Icon(Icons.AutoMirrored.Filled.NoteAdd, stringResource(R.string.notes_bento_add_note), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(15.dp))
                 }

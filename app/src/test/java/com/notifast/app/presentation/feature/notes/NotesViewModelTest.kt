@@ -256,4 +256,22 @@ class NotesViewModelTest {
         assertTrue(current?.content?.contains("- [x] Tarea 1") == true)
         assertTrue(current?.content?.contains("- [x] Tarea 2") == true)
     }
+
+    @Test
+    fun `when UpdateSubject event dispatched, invokes repository updateSubject`() = runTest {
+        coEvery { noteRepository.updateSubject(any(), any(), any()) } returns Result.success(Unit)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.UpdateSubject("Matemáticas", "Álgebra", "#112233", "Calculate"))
+        advanceUntilIdle()
+
+        io.mockk.coVerify {
+            noteRepository.updateSubject(
+                userId = "user_123",
+                oldName = "Matemáticas",
+                newSubject = match { it.name == "Álgebra" && it.colorHex == "#112233" && it.icon == "Calculate" }
+            )
+        }
+    }
 }
