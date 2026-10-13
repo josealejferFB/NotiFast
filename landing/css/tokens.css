@@ -1,0 +1,153 @@
+/* ==========================================================================
+   NOTIFAST 3.0 DESIGN SYSTEM — DESIGN TOKENS
+   Archetype: Tactile Papercraft / Muted Crimson & Aqua Green 3.0
+   ========================================================================== */
+
+:root {
+  /* Lienzo y Superficies — Warm Paper Canvas (Modo Claro) */
+  --bg-canvas: #FAF9F6;
+  --bg-surface: #FFFFFF;
+  --bg-surface-container: #F3EFEA;
+  --bg-surface-container-high: #EBE6DF;
+  --bg-surface-variant: #F3EFEA;
+
+  /* Micro-Bordes Táctiles (1px optical weight 12-16%) */
+  --border-hairline: #E5DFD7;
+  --border-subtle: rgba(24, 26, 31, 0.08);
+
+  /* Tintas Tipográficas de Alto Énfasis */
+  --text-primary: #181A1F;      /* Tinta Oxford (16.2:1 AAA sobre #FAF9F6) */
+  --text-secondary: #4B5563;    /* Grafito Muted (6.8:1 AAA) */
+  --text-muted: #6B7280;        /* Grafito Suave */
+
+  /* Identidad Primaria — Muted Crimson / Tenue Ruby */
+  --brand-primary: #9E1B32;
+  --brand-primary-hover: #801528;
+  --brand-primary-light: #FDE8EB;
+  --brand-on-primary: #FFFFFF;
+
+  /* Identidad Secundaria — Studio Aqua Green */
+  --brand-secondary: #2A7B7B;
+  --brand-secondary-hover: #1F6161;
+  --brand-secondary-light: #D6F2F0;
+  --brand-on-secondary: #FFFFFF;
+
+  /* Estados Semánticos */
+  --brand-success: #15803D;      /* Forest Sage (Aprobando) */
+  --brand-success-light: #DCFCE7;
+  --brand-on-success: #FFFFFF;
+
+  --brand-warning: #D97706;      /* Ámbar Estudio */
+  --brand-warning-light: #FEF3C7;
+
+  --brand-error: #B91C1C;        /* Ladrillo Carmesí */
+  --brand-error-light: #FEE2E2;
+
+  /* Paleta de Materias (Subject Palette Engine Normalizado) */
+  --subject-calculus: #2563EB;
+  --subject-physics: #7C3AED;
+  --subject-literature: #D97706;
+  --subject-chemistry: #059669;
+  --subject-history: #B45309;
+
+  /* Tipografía */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Escala Tipográfica Fluida */
+  --text-display: clamp(2.25rem, 5vw, 3.5rem);     /* 36px - 56px */
+  --text-headline: clamp(1.75rem, 3.5vw, 2.5rem);  /* 28px - 40px */
+  --text-title: clamp(1.25rem, 2vw, 1.5rem);       /* 20px - 24px */
+  --text-body: 1rem;                               /* 16px */
+  --text-small: 0.875rem;                          /* 14px */
+  --text-caption: 0.75rem;                         /* 12px */
+
+  /* Radios de Esquina Táctiles */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  /* Espaciados */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-3xl: 64px;
+
+  /* Sombras y Elevaciones Táctiles */
+  --shadow-tactile: 0 4px 20px -2px rgba(24, 26, 31, 0.05);
+  --shadow-hover: 0 12px 32px -4px rgba(24, 26, 31, 0.08);
+
+  /* Transiciones y Físicas */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+}
+
+/* ==========================================================================
+   MODO OSCURO — Mesa de Estudio Nocturna / Slate Desk
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-canvas: #0E131F;
+    --bg-surface: #161E2D;
+    --bg-surface-container: #1C2638;
+    --bg-surface-container-high: #202A3C;
+    --bg-surface-variant: #1C2638;
+
+    --border-hairline: #2A384E;
+    --border-subtle: rgba(241, 245, 249, 0.08);
+
+    --text-primary: #F1F5F9;      /* Tiza Blanca (15.1:1 AAA sobre #0E131F) */
+    --text-secondary: #94A3B8;    /* Plata Lápiz (6.7:1 AAA) */
+    --text-muted: #64748B;
+
+    --brand-primary: #E05A6E;
+    --brand-primary-hover: #EB798A;
+    --brand-primary-light: #5C1120;
+    --brand-on-primary: #3D000F;
+
+    --brand-secondary: #38B2AC;
+    --brand-secondary-hover: #4FD1C5;
+    --brand-secondary-light: #0E4B47;
+    --brand-on-secondary: #042C2A;
+
+    --brand-success: #34D399;
+    --brand-success-light: #065F46;
+    --brand-on-success: #064E3B;
+
+    --brand-warning: #FBBF24;
+    --brand-warning-light: #78350F;
+
+    --brand-error: #F87171;
+    --brand-error-light: #991B1B;
+
+    --subject-calculus: #60A5FA;
+    --subject-physics: #A78BFA;
+    --subject-literature: #FBBF24;
+    --subject-chemistry: #34D399;
+    --subject-history: #F59E0B;
+
+    --shadow-tactile: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 12px 36px -4px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ==========================================================================
+   PREFERENCIA DE MOVIMIENTO REDUCIDO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+}
