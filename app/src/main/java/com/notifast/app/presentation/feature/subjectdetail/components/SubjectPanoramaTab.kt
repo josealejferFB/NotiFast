@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.usecase.RequiredGradeResult
 import com.notifast.app.presentation.atoms.NotiFastCard
@@ -38,6 +39,9 @@ fun SubjectPanoramaTab(
     classroom: String,
     teacher: String,
     modality: String,
+    teachers: List<Teacher> = emptyList(),
+    onTeacherClick: (Teacher) -> Unit = {},
+    onWhatsAppClick: ((Teacher) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -73,9 +77,13 @@ fun SubjectPanoramaTab(
             onTargetGradeChange = onTargetGradeChange
         )
 
-        if (classroom.isNotBlank() || teacher.isNotBlank()) {
-            FacultyCard(classroom = classroom, teacher = teacher)
-        }
+        SubjectFacultyCard(
+            teachers = teachers,
+            legacyTeacherName = teacher,
+            classroom = classroom,
+            onTeacherClick = onTeacherClick,
+            onWhatsAppClick = onWhatsAppClick
+        )
     }
 }
 
@@ -126,32 +134,6 @@ private fun MilestoneCard(milestone: SubjectMilestone) {
                     Column {
                         Text(text = stringResource(R.string.subject_detail_no_milestones_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Text(text = stringResource(R.string.subject_detail_no_milestones_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun FacultyCard(classroom: String, teacher: String) {
-    NotiFastCard(modifier = Modifier.fillMaxWidth(), contentPadding = 16.dp) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.subject_detail_faculty_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (classroom.isNotBlank()) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Room, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(4.dp))
-                        Text(text = stringResource(R.string.subject_detail_classroom_label, classroom), style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-                if (teacher.isNotBlank()) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(4.dp))
-                        Text(text = stringResource(R.string.subject_detail_teacher_label, teacher), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

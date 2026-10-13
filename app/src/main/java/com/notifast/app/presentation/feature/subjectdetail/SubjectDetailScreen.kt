@@ -41,6 +41,7 @@ fun SubjectDetailScreen(
     var deleteSchedule by remember { mutableStateOf<Schedule?>(null) }
     var showShareSheet by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var selectedTeacher by remember { mutableStateOf<com.notifast.app.data.model.Teacher?>(null) }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -95,7 +96,10 @@ fun SubjectDetailScreen(
                                     onTargetGradeChange = { viewModel.onEvent(SubjectDetailEvent.UpdateTargetGrade(it)) },
                                     classroom = uiState.classroom,
                                     teacher = uiState.teacher,
-                                    modality = uiState.modality
+                                    modality = uiState.modality,
+                                    teachers = uiState.teachers,
+                                    onTeacherClick = { selectedTeacher = it },
+                                    onWhatsAppClick = { selectedTeacher = it }
                                 )
                                 SubjectQuadrant.EVALUATIONS -> SubjectEvaluationsTab(
                                     evaluations = uiState.evaluations,
@@ -195,6 +199,15 @@ fun SubjectDetailScreen(
                     viewModel.onEvent(SubjectDetailEvent.UpdateSubjectData(newName, newColor, newIcon))
                     showEditDialog = false
                 }
+            )
+        }
+
+        selectedTeacher?.let { teacher ->
+            com.notifast.app.presentation.feature.notes.components.TeacherDetailBottomSheet(
+                teacher = teacher,
+                onDismiss = { selectedTeacher = null },
+                onEditClick = { selectedTeacher = null },
+                onDeleteClick = { selectedTeacher = null }
             )
         }
     }

@@ -40,6 +40,7 @@ class SubjectDetailViewModelTest {
     private val noteRepository: NoteRepository = mockk(relaxed = true)
     private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
     private val scheduleRepository: ScheduleRepository = mockk(relaxed = true)
+    private val teacherRepository: com.notifast.app.domain.repository.TeacherRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
@@ -68,6 +69,7 @@ class SubjectDetailViewModelTest {
         coEvery { noteRepository.getNotesBySubject("user_123", "Matemáticas") } returns flowOf(sampleNotes)
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(sampleEvaluations)
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(sampleSchedules)
+        coEvery { teacherRepository.getTeachersBySubject("user_123", "Matemáticas") } returns flowOf(emptyList())
         coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
         // 0.0 is invalid for any active scale → falls back to scale.minPassingGrade
         coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
@@ -80,6 +82,7 @@ class SubjectDetailViewModelTest {
             noteRepository,
             evaluationRepository,
             scheduleRepository,
+            teacherRepository,
             authRepository,
             userPrefsRepository,
             calculateWeightedAverageUseCase,
@@ -239,5 +242,23 @@ class SubjectDetailViewModelTest {
         advanceUntilIdle()
 
         coVerify { scheduleRepository.deleteSchedule("user_123", scheduleToDelete) }
+    }
+
+    @Test
+    fun `loads teachers for the current subject`() = runTest {
+        val sampleTeachers = listOf(
+            com.notifast.app.data.model.Teacher(
+                id = "t1",
+                firstName = "Carl",
+                lastName = "Gauss",
+                subjectNames = listOf("Matemáticas")
+            )
+        )
+        coEvery { teacherRepository.getTeachersBySubject("user_123", "Matemáticas") } returns flowOf(sampleTeachers)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.uiState.value.teachers.size)
+        assertEquals("Carl Gauss", viewModel.uiState.value.teachers.first().fullName)
     }
 }

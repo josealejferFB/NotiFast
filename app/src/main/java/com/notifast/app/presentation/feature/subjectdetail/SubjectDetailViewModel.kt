@@ -13,6 +13,7 @@ import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CancelAlertUseCase
 import com.notifast.app.domain.usecase.CalculateRequiredGradeUseCase
@@ -35,6 +36,7 @@ class SubjectDetailViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
     private val scheduleRepository: ScheduleRepository,
+    private val teacherRepository: TeacherRepository,
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
@@ -88,7 +90,11 @@ class SubjectDetailViewModel @Inject constructor(
                 DomainData(notes, evals, schedules, subjects, prefs.scaleId, prefs.minPassing)
             }
 
-            combine(dataFlow, filterInputs) { domain, filter ->
+            combine(
+                dataFlow,
+                filterInputs,
+                teacherRepository.getTeachersBySubject(userId, currentSubjectName)
+            ) { domain, filter, subjectTeachers ->
                 val subjectEvals = domain.evaluations.filter { it.subjectName.equals(currentSubjectName, ignoreCase = true) }
                 val subjectSchedules = domain.schedules.filter { it.subjectName.equals(currentSubjectName, ignoreCase = true) }
                 val subjectData = domain.subjects.find { it.name.equals(currentSubjectName, ignoreCase = true) }
@@ -157,6 +163,7 @@ class SubjectDetailViewModel @Inject constructor(
                         ),
                         classroom = firstSchedule?.classroom.orEmpty(),
                         teacher = firstSchedule?.teacher.orEmpty(),
+                        teachers = subjectTeachers,
                         modality = firstSchedule?.modality ?: Schedule.MODALITY_PRESENCIAL,
                         meetingUrl = firstSchedule?.meetingUrl
                     )
