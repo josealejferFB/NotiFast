@@ -197,10 +197,141 @@
     });
   }
 
+  // 4. Adaptable Grading Scale Switcher (Decimal 0-10, Vigesimal 0-20, Porcentual 0-100%, Letras A-F)
+  const GRADE_SCALES = [
+    {
+      id: '0-10',
+      label: 'PROMEDIO GLOBAL • ESCALA DECIMAL (0 - 10)',
+      score: '8.70',
+      maxText: 'Escala 0.0 - 10.0 pts',
+      progress: 87,
+      status: '¡Excelente rendimiento!',
+      scores: { calculus: '8.8', physics: '8.5', literature: '9.1' }
+    },
+    {
+      id: '0-20',
+      label: 'PROMEDIO GLOBAL • ESCALA VIGESIMAL (0 - 20)',
+      score: '17.4',
+      maxText: 'Escala 0.0 - 20.0 pts',
+      progress: 87,
+      status: '¡Aprobado con Distinción!',
+      scores: { calculus: '17.6', physics: '17.0', literature: '18.2' }
+    },
+    {
+      id: '0-100',
+      label: 'PROMEDIO GLOBAL • ESCALA PORCENTUAL (100%)',
+      score: '87%',
+      maxText: 'Escala 0% - 100%',
+      progress: 87,
+      status: '¡Desempeño Sobresaliente!',
+      scores: { calculus: '88%', physics: '85%', literature: '91%' }
+    },
+    {
+      id: 'A-F',
+      label: 'PROMEDIO GLOBAL • ESCALA ALFABÉTICA (A - F)',
+      score: 'A',
+      maxText: 'Escala GPA 3.7 / 4.0',
+      progress: 87,
+      status: 'Honors / Dean\'s List',
+      scores: { calculus: 'A', physics: 'B+', literature: 'A' }
+    }
+  ];
+
+  function setupGradeScaleSwitcher() {
+    const chips = document.querySelectorAll('.scale-chip');
+    const heroCard = document.getElementById('main-average-hero-card');
+    const titleEl = document.getElementById('average-scale-title');
+    const scoreEl = document.getElementById('average-score-display');
+    const maxEl = document.getElementById('average-scale-max');
+    const progressEl = document.getElementById('grades-progress-fill');
+    const statusEl = document.getElementById('average-status-text');
+    const calculusScoreEl = document.getElementById('score-calculus');
+    const physicsScoreEl = document.getElementById('score-physics');
+    const literatureScoreEl = document.getElementById('score-literature');
+
+    if (!chips.length || !scoreEl) return;
+
+    let currentIndex = 0;
+    let autoInterval = null;
+    let isUserPaused = false;
+
+    function applyScale(scaleId, triggerAnimation = true) {
+      const scaleObj = GRADE_SCALES.find(s => s.id === scaleId) || GRADE_SCALES[0];
+      currentIndex = GRADE_SCALES.findIndex(s => s.id === scaleId);
+
+      // Update active chip
+      chips.forEach(chip => {
+        const isActive = chip.getAttribute('data-scale') === scaleId;
+        chip.classList.toggle('active', isActive);
+        chip.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      // Update values
+      if (titleEl) titleEl.textContent = scaleObj.label;
+      if (scoreEl) {
+        scoreEl.textContent = scaleObj.score;
+        if (triggerAnimation) {
+          scoreEl.classList.remove('scale-value-morph');
+          void scoreEl.offsetWidth; // Trigger reflow
+          scoreEl.classList.add('scale-value-morph');
+        }
+      }
+      if (maxEl) maxEl.textContent = scaleObj.maxText;
+      if (progressEl) progressEl.style.width = `${scaleObj.progress}%`;
+      if (statusEl) statusEl.textContent = scaleObj.status;
+
+      if (calculusScoreEl) {
+        calculusScoreEl.textContent = scaleObj.scores.calculus;
+        if (triggerAnimation) {
+          calculusScoreEl.classList.remove('scale-value-morph');
+          void calculusScoreEl.offsetWidth;
+          calculusScoreEl.classList.add('scale-value-morph');
+        }
+      }
+      if (physicsScoreEl) physicsScoreEl.textContent = scaleObj.scores.physics;
+      if (literatureScoreEl) literatureScoreEl.textContent = scaleObj.scores.literature;
+    }
+
+    // Auto-cycle through scales
+    function startAutoCycle() {
+      if (autoInterval) clearInterval(autoInterval);
+      autoInterval = setInterval(() => {
+        if (!isUserPaused) {
+          currentIndex = (currentIndex + 1) % GRADE_SCALES.length;
+          applyScale(GRADE_SCALES[currentIndex].id);
+        }
+      }, 3500);
+    }
+
+    // Manual click on scale chip
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const scaleId = chip.getAttribute('data-scale');
+        isUserPaused = true;
+        applyScale(scaleId);
+
+        // Resume auto-cycle after 12 seconds of inactivity
+        setTimeout(() => {
+          isUserPaused = false;
+        }, 12000);
+      });
+    });
+
+    // Pause on hover over hero card
+    if (heroCard) {
+      heroCard.addEventListener('mouseenter', () => { isUserPaused = true; });
+      heroCard.addEventListener('mouseleave', () => { isUserPaused = false; });
+    }
+
+    // Start auto-cycle
+    startAutoCycle();
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setupStudioBox();
     setupTakeNotesAction();
     setupEditorSimulator();
+    setupGradeScaleSwitcher();
     initGSAPAnimations();
   });
 })();

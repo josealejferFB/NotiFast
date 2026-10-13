@@ -87,6 +87,22 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("Física", html)
         self.assertIn("Literatura", html)
 
+    def test_grade_scales_adaptation_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("grade-scale-selector", html)
+        self.assertIn("0 a 10", html)
+        self.assertIn("0 a 20", html)
+        self.assertIn("100%", html)
+        self.assertIn("A - F", html)
+
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("GRADE_SCALES", js)
+        self.assertIn("0-20", js)
+        self.assertIn("0-100", js)
+        self.assertIn("A-F", js)
+
     def test_minimalist_studio_box_present(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()

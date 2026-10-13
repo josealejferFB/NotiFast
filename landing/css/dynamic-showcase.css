@@ -629,6 +629,101 @@
    5. CALIFICACIONES: MainAverageDashboard.kt
    -------------------------------------------------------------------------- */
 
+/* Selector de Escalas de Calificación Adaptable (0-10, 0-20, 100%, A-F) */
+.grade-scale-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.scale-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-hairline);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s var(--ease-smooth);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.scale-chip:hover {
+  border-color: var(--brand-secondary);
+  background: #F0FDF4;
+  transform: translateY(-2px);
+}
+
+.scale-chip.active {
+  border-color: var(--brand-success);
+  background: #F0FDF4;
+  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.15);
+}
+
+.scale-chip-title {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.scale-chip.active .scale-chip-title {
+  color: var(--brand-success);
+}
+
+.scale-chip-meta {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.scale-cycle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-surface-container);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  width: fit-content;
+}
+
+.cycle-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--brand-success);
+  box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.6);
+  animation: cyclePulse 1.8s infinite;
+}
+
+@keyframes cyclePulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.6); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(21, 128, 61, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(21, 128, 61, 0); }
+}
+
+.average-scale-max {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.scale-value-morph {
+  animation: scaleValuePop 0.35s ease-out;
+}
+
+@keyframes scaleValuePop {
+  0% { transform: scale(0.92); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .grades-dashboard-stack {
   display: flex;
   flex-direction: column;
