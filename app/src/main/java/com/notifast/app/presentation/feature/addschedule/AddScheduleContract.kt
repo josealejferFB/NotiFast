@@ -2,6 +2,7 @@ package com.notifast.app.presentation.feature.addschedule
 
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 
 data class AddScheduleUiState(
     val subjectName: String = "",
@@ -17,7 +18,9 @@ data class AddScheduleUiState(
     val isSaved: Boolean = false,
     val subjects: List<SubjectData> = emptyList(),
     val existingSchedules: List<Schedule> = emptyList(),
-    val conflictingSchedules: List<Schedule> = emptyList()
+    val conflictingSchedules: List<Schedule> = emptyList(),
+    val availableTeachers: List<Teacher> = emptyList(),
+    val hasConfiguredTeacher: Boolean = true
 )
 
 sealed interface AddScheduleEvent {

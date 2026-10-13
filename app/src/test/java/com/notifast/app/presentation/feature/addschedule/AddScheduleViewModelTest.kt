@@ -2,9 +2,11 @@ package com.notifast.app.presentation.feature.addschedule
 
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.usecase.ValidateScheduleOverlapUseCase
 import com.notifast.app.util.MainDispatcherRule
 import io.mockk.coEvery
@@ -30,6 +32,7 @@ class AddScheduleViewModelTest {
     private val scheduleRepository: ScheduleRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val noteRepository: NoteRepository = mockk(relaxed = true)
+    private val teacherRepository: TeacherRepository = mockk(relaxed = true)
     private val validateScheduleOverlapUseCase = ValidateScheduleOverlapUseCase()
     private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase = mockk(relaxed = true)
 
@@ -40,16 +43,27 @@ class AddScheduleViewModelTest {
         Schedule(id = "1", subjectName = "Física", dayOfWeek = 1, startTime = "08:00", endTime = "10:00")
     )
 
+    private fun createViewModel() = AddScheduleViewModel(
+        scheduleRepository,
+        authRepository,
+        noteRepository,
+        teacherRepository,
+        validateScheduleOverlapUseCase,
+        scheduleClassAlertUseCase
+    )
+
     @Before
     fun setUp() {
         coEvery { authRepository.getCurrentUserId() } returns "user_123"
         coEvery { noteRepository.getSubjects("user_123") } returns flowOf(sampleSubjects)
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(sampleSchedules)
+        coEvery { teacherRepository.getTeachersBySubject("user_123", any()) } returns flowOf(emptyList())
+        coEvery { teacherRepository.getTeachers("user_123") } returns flowOf(emptyList())
     }
 
     @Test
     fun `when times set and overlap with existing, conflictingSchedules is populated`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(1))
@@ -62,7 +76,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when times set and no overlap, conflictingSchedules is empty`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(1))
@@ -76,7 +90,7 @@ class AddScheduleViewModelTest {
     fun `when saving with valid data, calls repository addSchedule and sets isSaved`() = runTest {
         coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success("sch-1")
 
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
@@ -93,7 +107,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when endTime is less than or equal to startTime, autocorrects endTime`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateStartTime("10:00"))
@@ -105,7 +119,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when updateTimeRange is called with invalid range, autocorrects endTime`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateTimeRange("14:00", "14:00"))
@@ -116,7 +130,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when dayOfWeek is updated, dayOfWeek in state reflects change`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(4)) // Viernes
@@ -125,7 +139,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when ResetState is dispatched, resets form fields but preserves loaded subjects and schedules`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
@@ -151,7 +165,7 @@ class AddScheduleViewModelTest {
 
     @Test
     fun `when RefreshSubjectsAndSelect is dispatched, reloads subjects and updates subjectName preserving other fields`() = runTest {
-        val viewModel = AddScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         viewModel.onEvent(AddScheduleEvent.UpdateStartTime("08:00"))
@@ -173,5 +187,59 @@ class AddScheduleViewModelTest {
         assertEquals("08:00", state.startTime)
         assertEquals("10:00", state.endTime)
         assertEquals("Aula 202", state.classroom)
+    }
+
+    @Test
+    fun `when subject selected has no teachers, hasConfiguredTeacher is false`() = runTest {
+        coEvery { teacherRepository.getTeachersBySubject("user_123", "Matemáticas") } returns flowOf(emptyList())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.hasConfiguredTeacher)
+        assertTrue(viewModel.uiState.value.availableTeachers.isEmpty())
+    }
+
+    @Test
+    fun `when subject selected has teachers, hasConfiguredTeacher is true and availableTeachers is populated`() = runTest {
+        val teacher = Teacher(id = "t1", firstName = "Dr.", lastName = "Euler", subjectNames = listOf("Matemáticas"))
+        coEvery { teacherRepository.getTeachersBySubject("user_123", "Matemáticas") } returns flowOf(listOf(teacher))
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.hasConfiguredTeacher)
+        assertEquals(1, viewModel.uiState.value.availableTeachers.size)
+        assertEquals("Dr. Euler", viewModel.uiState.value.availableTeachers.first().fullName)
+    }
+
+    @Test
+    fun `when saving schedule with new teacher, invokes teacherRepository saveTeacher`() = runTest {
+        coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success("sch-1")
+        coEvery { teacherRepository.getTeachers("user_123") } returns flowOf(emptyList())
+        coEvery { teacherRepository.saveTeacher(any()) } returns Result.success(Unit)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
+        viewModel.onEvent(AddScheduleEvent.UpdateTeacher("Prof. Gauss"))
+        viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(1))
+        viewModel.onEvent(AddScheduleEvent.UpdateStartTime("10:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateEndTime("12:00"))
+        viewModel.onEvent(AddScheduleEvent.SaveSchedule)
+        advanceUntilIdle()
+
+        coVerify {
+            teacherRepository.saveTeacher(
+                match { it.fullName == "Prof. Gauss" && it.subjectNames.contains("Matemáticas") }
+            )
+        }
     }
 }

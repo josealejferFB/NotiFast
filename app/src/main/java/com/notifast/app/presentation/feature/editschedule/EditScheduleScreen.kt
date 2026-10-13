@@ -157,13 +157,12 @@ fun EditScheduleScreen(
                         )
 
                         // Teacher
-                        NotiFastTextField(
-                            value = uiState.teacher,
-                            onValueChange = { viewModel.onEvent(EditScheduleEvent.UpdateTeacher(it)) },
-                            label = stringResource(R.string.schedules_field_teacher),
-                            placeholder = "Ej: Dr. Pérez",
-                            leadingIcon = Icons.Default.Person,
-                            modifier = Modifier.fillMaxWidth()
+                        com.notifast.app.presentation.feature.addschedule.components.ScheduleTeacherSelector(
+                            subjectName = uiState.subjectName,
+                            selectedTeacher = uiState.teacher,
+                            availableTeachers = uiState.availableTeachers,
+                            hasConfiguredTeacher = uiState.hasConfiguredTeacher,
+                            onTeacherSelected = { viewModel.onEvent(EditScheduleEvent.UpdateTeacher(it)) }
                         )
                     }
                 }

@@ -4,9 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.usecase.ScheduleOverlapResult
 import com.notifast.app.domain.usecase.ValidateScheduleOverlapUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,7 @@ class EditScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val authRepository: AuthRepository,
     private val noteRepository: NoteRepository,
+    private val teacherRepository: TeacherRepository,
     private val validateScheduleOverlapUseCase: ValidateScheduleOverlapUseCase,
     private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase,
     private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase,
@@ -32,6 +35,7 @@ class EditScheduleViewModel @Inject constructor(
 
     private var scheduleId: String? = savedStateHandle["scheduleId"]
     private var originalSchedule: Schedule? = null
+    private var teachersJob: kotlinx.coroutines.Job? = null
 
     private val _uiState = MutableStateFlow(EditScheduleUiState())
     val uiState: StateFlow<EditScheduleUiState> = _uiState.asStateFlow()
@@ -66,8 +70,28 @@ class EditScheduleViewModel @Inject constructor(
                         isLoading = false
                     ) 
                 }
+                loadTeachersForSubject(schedule.subjectName)
             } else {
                 _uiState.update { it.copy(subjects = subjects, existingSchedules = schedules, isLoading = false, error = "Horario no encontrado") }
+            }
+        }
+    }
+
+    private fun loadTeachersForSubject(subjectName: String) {
+        teachersJob?.cancel()
+        if (subjectName.isBlank()) {
+            _uiState.update { it.copy(availableTeachers = emptyList(), hasConfiguredTeacher = true) }
+            return
+        }
+        teachersJob = viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            teacherRepository.getTeachersBySubject(userId, subjectName).collect { teachers ->
+                _uiState.update {
+                    it.copy(
+                        availableTeachers = teachers,
+                        hasConfiguredTeacher = teachers.isNotEmpty()
+                    )
+                }
             }
         }
     }
@@ -94,7 +118,10 @@ class EditScheduleViewModel @Inject constructor(
                 }
                 loadData()
             }
-            is EditScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
+            is EditScheduleEvent.UpdateSubjectName -> {
+                _uiState.update { it.copy(subjectName = event.subjectName) }
+                loadTeachersForSubject(event.subjectName)
+            }
             is EditScheduleEvent.UpdateModality -> _uiState.update {
                 if (event.modality == Schedule.MODALITY_VIRTUAL) {
                     it.copy(modality = event.modality, classroom = "", conflictingSchedules = emptyList())
@@ -215,6 +242,32 @@ class EditScheduleViewModel @Inject constructor(
                 color = subjectColor,
                 createdAt = originalSchedule?.createdAt ?: Date()
             )
+
+            val teacherName = state.teacher.trim()
+            if (teacherName.isNotBlank() && state.subjectName.isNotBlank()) {
+                try {
+                    val allTeachers = teacherRepository.getTeachers(userId).first()
+                    val existing = allTeachers.find { it.fullName.equals(teacherName, ignoreCase = true) }
+                    if (existing != null) {
+                        if (!existing.subjectNames.any { it.equals(state.subjectName, ignoreCase = true) }) {
+                            teacherRepository.saveTeacher(
+                                existing.copy(subjectNames = (existing.subjectNames + state.subjectName).distinct())
+                            )
+                        }
+                    } else {
+                        val parts = teacherName.split(" ", limit = 2)
+                        val newTeacher = Teacher(
+                            userId = userId,
+                            firstName = parts.getOrNull(0).orEmpty(),
+                            lastName = parts.getOrNull(1).orEmpty(),
+                            subjectNames = listOf(state.subjectName)
+                        )
+                        teacherRepository.saveTeacher(newTeacher)
+                    }
+                } catch (_: Exception) {
+                    // Best-effort teacher sync
+                }
+            }
 
             scheduleRepository.updateSchedule(userId, schedule).fold(
                 onSuccess = {

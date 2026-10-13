@@ -41,6 +41,7 @@ import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.feature.addschedule.components.ScheduleDaySegmentedBar
 import com.notifast.app.presentation.feature.addschedule.components.ScheduleSubjectChips
+import com.notifast.app.presentation.feature.addschedule.components.ScheduleTeacherSelector
 import com.notifast.app.presentation.feature.addschedule.components.ScheduleTimeRangePicker
 import com.notifast.app.presentation.feature.schedules.components.ScheduleConflictBanner
 import com.notifast.app.presentation.theme.color.Aqua
@@ -157,13 +158,12 @@ fun AddScheduleScreen(
                         )
 
                         // Teacher
-                        NotiFastTextField(
-                            value = uiState.teacher,
-                            onValueChange = { viewModel.onEvent(AddScheduleEvent.UpdateTeacher(it)) },
-                            label = stringResource(R.string.schedules_field_teacher),
-                            placeholder = "Ej: Dr. Pérez",
-                            leadingIcon = Icons.Default.Person,
-                            modifier = Modifier.fillMaxWidth()
+                        ScheduleTeacherSelector(
+                            subjectName = uiState.subjectName,
+                            selectedTeacher = uiState.teacher,
+                            availableTeachers = uiState.availableTeachers,
+                            hasConfiguredTeacher = uiState.hasConfiguredTeacher,
+                            onTeacherSelected = { viewModel.onEvent(AddScheduleEvent.UpdateTeacher(it)) }
                         )
                     }
                 }

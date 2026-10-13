@@ -3,9 +3,11 @@ package com.notifast.app.presentation.feature.addschedule
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.usecase.ScheduleOverlapResult
 import com.notifast.app.domain.usecase.ValidateScheduleOverlapUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,12 +25,15 @@ class AddScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val authRepository: AuthRepository,
     private val noteRepository: NoteRepository,
+    private val teacherRepository: TeacherRepository,
     private val validateScheduleOverlapUseCase: ValidateScheduleOverlapUseCase,
     private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddScheduleUiState())
     val uiState: StateFlow<AddScheduleUiState> = _uiState.asStateFlow()
+
+    private var teachersJob: kotlinx.coroutines.Job? = null
 
     init {
         loadData()
@@ -45,7 +50,10 @@ class AddScheduleViewModel @Inject constructor(
 
     fun onEvent(event: AddScheduleEvent) {
         when (event) {
-            is AddScheduleEvent.UpdateSubjectName -> _uiState.update { it.copy(subjectName = event.subjectName) }
+            is AddScheduleEvent.UpdateSubjectName -> {
+                _uiState.update { it.copy(subjectName = event.subjectName) }
+                loadTeachersForSubject(event.subjectName)
+            }
             is AddScheduleEvent.UpdateModality -> _uiState.update {
                 // Virtual classes still have a day/time slot (D10); only classroom vs meetingUrl differs
                 if (event.modality == Schedule.MODALITY_VIRTUAL) {
@@ -113,6 +121,28 @@ class AddScheduleViewModel @Inject constructor(
                     subjects = subjects,
                     subjectName = if (subjectName.isNotBlank()) subjectName else current.subjectName
                 )
+            }
+            if (subjectName.isNotBlank()) {
+                loadTeachersForSubject(subjectName)
+            }
+        }
+    }
+
+    private fun loadTeachersForSubject(subjectName: String) {
+        teachersJob?.cancel()
+        if (subjectName.isBlank()) {
+            _uiState.update { it.copy(availableTeachers = emptyList(), hasConfiguredTeacher = true) }
+            return
+        }
+        teachersJob = viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            teacherRepository.getTeachersBySubject(userId, subjectName).collect { teachers ->
+                _uiState.update {
+                    it.copy(
+                        availableTeachers = teachers,
+                        hasConfiguredTeacher = teachers.isNotEmpty()
+                    )
+                }
             }
         }
     }
@@ -187,6 +217,32 @@ class AddScheduleViewModel @Inject constructor(
                 color = subjectColor,
                 createdAt = Date()
             )
+
+            val teacherName = state.teacher.trim()
+            if (teacherName.isNotBlank() && state.subjectName.isNotBlank()) {
+                try {
+                    val allTeachers = teacherRepository.getTeachers(userId).first()
+                    val existing = allTeachers.find { it.fullName.equals(teacherName, ignoreCase = true) }
+                    if (existing != null) {
+                        if (!existing.subjectNames.any { it.equals(state.subjectName, ignoreCase = true) }) {
+                            teacherRepository.saveTeacher(
+                                existing.copy(subjectNames = (existing.subjectNames + state.subjectName).distinct())
+                            )
+                        }
+                    } else {
+                        val parts = teacherName.split(" ", limit = 2)
+                        val newTeacher = Teacher(
+                            userId = userId,
+                            firstName = parts.getOrNull(0).orEmpty(),
+                            lastName = parts.getOrNull(1).orEmpty(),
+                            subjectNames = listOf(state.subjectName)
+                        )
+                        teacherRepository.saveTeacher(newTeacher)
+                    }
+                } catch (_: Exception) {
+                    // Best-effort teacher sync
+                }
+            }
 
             scheduleRepository.addSchedule(userId, schedule).fold(
                 onSuccess = { scheduleId ->

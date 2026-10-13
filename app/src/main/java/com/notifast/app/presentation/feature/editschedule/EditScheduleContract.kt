@@ -2,6 +2,7 @@ package com.notifast.app.presentation.feature.editschedule
 
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 
 data class EditScheduleUiState(
     val subjectName: String = "",
@@ -18,7 +19,9 @@ data class EditScheduleUiState(
     val isSaved: Boolean = false,
     val subjects: List<SubjectData> = emptyList(),
     val existingSchedules: List<Schedule> = emptyList(),
-    val conflictingSchedules: List<Schedule> = emptyList()
+    val conflictingSchedules: List<Schedule> = emptyList(),
+    val availableTeachers: List<Teacher> = emptyList(),
+    val hasConfiguredTeacher: Boolean = true
 )
 
 sealed interface EditScheduleEvent {

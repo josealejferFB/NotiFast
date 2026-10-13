@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastTextField
@@ -35,6 +36,8 @@ fun ScheduleEditorForm(
     onClassroomChange: (String) -> Unit,
     teacher: String,
     onTeacherChange: (String) -> Unit,
+    availableTeachers: List<Teacher> = emptyList(),
+    hasConfiguredTeacher: Boolean = true,
     conflictingSchedules: List<Schedule>,
     isSaving: Boolean,
     onSaveClick: () -> Unit,
@@ -78,13 +81,12 @@ fun ScheduleEditorForm(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                NotiFastTextField(
-                    value = teacher,
-                    onValueChange = onTeacherChange,
-                    label = stringResource(R.string.schedules_field_teacher),
-                    placeholder = stringResource(R.string.schedules_placeholder_teacher),
-                    leadingIcon = Icons.Default.Person,
-                    modifier = Modifier.fillMaxWidth()
+                ScheduleTeacherSelector(
+                    subjectName = selectedSubject,
+                    selectedTeacher = teacher,
+                    availableTeachers = availableTeachers,
+                    hasConfiguredTeacher = hasConfiguredTeacher,
+                    onTeacherSelected = onTeacherChange
                 )
             }
         }

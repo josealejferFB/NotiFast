@@ -107,6 +107,8 @@ private fun AddScheduleEditorSheet(
             onClassroomChange = { viewModel.onEvent(AddScheduleEvent.UpdateClassroom(it)) },
             teacher = uiState.teacher,
             onTeacherChange = { viewModel.onEvent(AddScheduleEvent.UpdateTeacher(it)) },
+            availableTeachers = uiState.availableTeachers,
+            hasConfiguredTeacher = uiState.hasConfiguredTeacher,
             conflictingSchedules = uiState.conflictingSchedules,
             isSaving = uiState.isSaving,
             onSaveClick = { viewModel.onEvent(AddScheduleEvent.SaveSchedule) }
@@ -193,6 +195,8 @@ private fun EditScheduleEditorSheet(
             onClassroomChange = { viewModel.onEvent(EditScheduleEvent.UpdateClassroom(it)) },
             teacher = uiState.teacher,
             onTeacherChange = { viewModel.onEvent(EditScheduleEvent.UpdateTeacher(it)) },
+            availableTeachers = uiState.availableTeachers,
+            hasConfiguredTeacher = uiState.hasConfiguredTeacher,
             conflictingSchedules = uiState.conflictingSchedules,
             isSaving = uiState.isSaving,
             onSaveClick = { viewModel.onEvent(EditScheduleEvent.SaveSchedule) }

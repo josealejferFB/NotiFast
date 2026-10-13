@@ -6,6 +6,7 @@ import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
+import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.usecase.ValidateScheduleOverlapUseCase
 import com.notifast.app.util.MainDispatcherRule
 import io.mockk.coEvery
@@ -31,6 +32,7 @@ class EditScheduleViewModelTest {
     private val scheduleRepository: ScheduleRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val noteRepository: NoteRepository = mockk(relaxed = true)
+    private val teacherRepository: TeacherRepository = mockk(relaxed = true)
     private val validateScheduleOverlapUseCase = ValidateScheduleOverlapUseCase()
     private val scheduleClassAlertUseCase: com.notifast.app.domain.usecase.ScheduleClassAlertUseCase = mockk(relaxed = true)
     private val cancelAlertUseCase: com.notifast.app.domain.usecase.CancelAlertUseCase = mockk(relaxed = true)
@@ -43,17 +45,30 @@ class EditScheduleViewModelTest {
         Schedule(id = "2", subjectName = "Física", dayOfWeek = 1, startTime = "10:00", endTime = "12:00")
     )
 
+    private fun createViewModel(savedStateHandle: SavedStateHandle = SavedStateHandle()) = EditScheduleViewModel(
+        scheduleRepository,
+        authRepository,
+        noteRepository,
+        teacherRepository,
+        validateScheduleOverlapUseCase,
+        scheduleClassAlertUseCase,
+        cancelAlertUseCase,
+        savedStateHandle
+    )
+
     @Before
     fun setUp() {
         coEvery { authRepository.getCurrentUserId() } returns "user_123"
         coEvery { noteRepository.getSubjects("user_123") } returns flowOf(sampleSubjects)
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(sampleSchedules)
+        coEvery { teacherRepository.getTeachersBySubject("user_123", any()) } returns flowOf(emptyList())
+        coEvery { teacherRepository.getTeachers("user_123") } returns flowOf(emptyList())
     }
 
     @Test
     fun `when initialized with scheduleId, loads existing schedule fields`() = runTest {
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase, cancelAlertUseCase, savedStateHandle)
+        val viewModel = createViewModel(savedStateHandle)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -65,7 +80,7 @@ class EditScheduleViewModelTest {
     @Test
     fun `when time changed to overlap with different schedule, conflictingSchedules populated`() = runTest {
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase, cancelAlertUseCase, savedStateHandle)
+        val viewModel = createViewModel(savedStateHandle)
         advanceUntilIdle()
 
         viewModel.onEvent(EditScheduleEvent.UpdateStartTime("10:30"))
@@ -79,7 +94,7 @@ class EditScheduleViewModelTest {
     fun `when saving updated schedule, calls updateSchedule`() = runTest {
         coEvery { scheduleRepository.updateSchedule(any(), any()) } returns Result.success(Unit)
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(scheduleRepository, authRepository, noteRepository, validateScheduleOverlapUseCase, scheduleClassAlertUseCase, cancelAlertUseCase, savedStateHandle)
+        val viewModel = createViewModel(savedStateHandle)
         advanceUntilIdle()
 
         viewModel.onEvent(EditScheduleEvent.UpdateClassroom("Aula 302"))
@@ -93,15 +108,7 @@ class EditScheduleViewModelTest {
     @Test
     fun `when initialized with empty savedStateHandle, does not crash and Init event loads data`() = runTest {
         val savedStateHandle = SavedStateHandle()
-        val viewModel = EditScheduleViewModel(
-            scheduleRepository,
-            authRepository,
-            noteRepository,
-            validateScheduleOverlapUseCase,
-            scheduleClassAlertUseCase,
-            cancelAlertUseCase,
-            savedStateHandle
-        )
+        val viewModel = createViewModel(savedStateHandle)
         advanceUntilIdle()
 
         assertEquals("", viewModel.uiState.value.subjectName)
@@ -119,15 +126,7 @@ class EditScheduleViewModelTest {
     fun `when Init is called after save, resets isSaved and reloads fresh data`() = runTest {
         coEvery { scheduleRepository.updateSchedule(any(), any()) } returns Result.success(Unit)
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(
-            scheduleRepository,
-            authRepository,
-            noteRepository,
-            validateScheduleOverlapUseCase,
-            scheduleClassAlertUseCase,
-            cancelAlertUseCase,
-            savedStateHandle
-        )
+        val viewModel = createViewModel(savedStateHandle)
         advanceUntilIdle()
 
         viewModel.onEvent(EditScheduleEvent.SaveSchedule)
@@ -147,15 +146,7 @@ class EditScheduleViewModelTest {
     @Test
     fun `when Init is called with different schedule, immediately cleans dirty form fields and reloads new schedule`() = runTest {
         val savedStateHandle = SavedStateHandle(mapOf("scheduleId" to "1"))
-        val viewModel = EditScheduleViewModel(
-            scheduleRepository,
-            authRepository,
-            noteRepository,
-            validateScheduleOverlapUseCase,
-            scheduleClassAlertUseCase,
-            cancelAlertUseCase,
-            savedStateHandle
-        )
+        val viewModel = createViewModel(savedStateHandle)
         advanceUntilIdle()
         assertEquals("Matemáticas", viewModel.uiState.value.subjectName)
 
