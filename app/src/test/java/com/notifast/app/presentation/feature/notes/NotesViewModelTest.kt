@@ -40,6 +40,7 @@ class NotesViewModelTest {
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
     private val importSubjectPackageUseCase: com.notifast.app.domain.usecase.ImportSubjectPackageUseCase = mockk(relaxed = true)
+    private val teacherRepository: com.notifast.app.domain.repository.TeacherRepository = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797"),
@@ -49,6 +50,9 @@ class NotesViewModelTest {
         Note(id = "1", subject = "Matemáticas", title = "Álgebra Lineal", content = "Matrices y determinantes", tags = listOf("Examen", "Fórmula")),
         Note(id = "2", subject = "Física", title = "Cinemática", content = "Velocidad y aceleración", tags = listOf("Resumen"))
     )
+    private val sampleTeachers = listOf(
+        com.notifast.app.data.model.Teacher(id = "t1", firstName = "Richard", lastName = "Feynman", subjectNames = listOf("Física"))
+    )
 
     private fun createViewModel(): NotesViewModel = NotesViewModel(
         noteRepository,
@@ -57,7 +61,8 @@ class NotesViewModelTest {
         scheduleRepository,
         userPrefsRepository,
         calculateWeightedAverageUseCase,
-        importSubjectPackageUseCase
+        importSubjectPackageUseCase,
+        teacherRepository
     )
 
     @Before
@@ -68,6 +73,7 @@ class NotesViewModelTest {
         coEvery { noteRepository.getNotes("user_123") } returns flowOf(sampleNotes)
         coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(emptyList())
         coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(emptyList())
+        coEvery { teacherRepository.getTeachers("user_123") } returns flowOf(sampleTeachers)
         coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
         // 0.0 is invalid for any active scale → falls back to scale.minPassingGrade
         coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(0f)
@@ -273,5 +279,57 @@ class NotesViewModelTest {
                 newSubject = match { it.name == "Álgebra" && it.colorHex == "#112233" && it.icon == "Calculate" }
             )
         }
+    }
+
+    @Test
+    fun `when initialized, loads teachers and populates filteredTeachers`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(1, state.teachers.size)
+        assertEquals(1, state.filteredTeachers.size)
+        assertEquals("Richard Feynman", state.filteredTeachers.first().fullName)
+    }
+
+    @Test
+    fun `when SearchTeachers query provided, filters teachers list`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.SearchTeachers("Einstein"))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.filteredTeachers.isEmpty())
+
+        viewModel.onEvent(NotesEvent.SearchTeachers("Feynman"))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.uiState.value.filteredTeachers.size)
+    }
+
+    @Test
+    fun `when SaveTeacher dispatched, invokes teacherRepository saveTeacher`() = runTest {
+        coEvery { teacherRepository.saveTeacher(any()) } returns Result.success(Unit)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val teacherToSave = com.notifast.app.data.model.Teacher(firstName = "Marie", lastName = "Curie")
+        viewModel.onEvent(NotesEvent.SaveTeacher(teacherToSave))
+        advanceUntilIdle()
+
+        io.mockk.coVerify { teacherRepository.saveTeacher(match { it.fullName == "Marie Curie" }) }
+    }
+
+    @Test
+    fun `when DeleteTeacher dispatched, invokes teacherRepository deleteTeacher`() = runTest {
+        coEvery { teacherRepository.deleteTeacher(any(), any()) } returns Result.success(Unit)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.DeleteTeacher("t1"))
+        advanceUntilIdle()
+
+        io.mockk.coVerify { teacherRepository.deleteTeacher("user_123", "t1") }
     }
 }

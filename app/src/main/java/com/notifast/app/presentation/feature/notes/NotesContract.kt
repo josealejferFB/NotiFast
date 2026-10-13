@@ -3,7 +3,13 @@ package com.notifast.app.presentation.feature.notes
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.model.GradeScale
+
+enum class NotesSubTab {
+    SUBJECTS,
+    PROFESSORS
+}
 
 sealed interface NextActivity {
     data class ClassActivity(
@@ -39,6 +45,12 @@ data class NotesUiState(
     val rawNotes: List<Note> = emptyList(),
     val subjects: List<String> = emptyList(),
     val subjectInfos: List<SubjectInfo> = emptyList(),
+    val teachers: List<Teacher> = emptyList(),
+    val filteredTeachers: List<Teacher> = emptyList(),
+    val teacherSearchQuery: String = "",
+    val selectedTeacherForDetail: Teacher? = null,
+    val teacherBeingEdited: Teacher? = null,
+    val selectedSubTab: NotesSubTab = NotesSubTab.SUBJECTS,
     val nextActivity: NextActivity = NextActivity.FreeDay,
     val globalAverage: Double? = null,
     val gradeScale: GradeScale = GradeScale.SCALE_0_10,
@@ -62,5 +74,11 @@ sealed interface NotesEvent {
     data class DeleteSubject(val subjectName: String) : NotesEvent
     data class UpdateSubject(val oldName: String, val newName: String, val newColorHex: String, val newIcon: String) : NotesEvent
     data class ToggleTaskCheck(val note: Note, val taskIndex: Int, val isChecked: Boolean) : NotesEvent
+    data class SelectSubTab(val subTab: NotesSubTab) : NotesEvent
+    data class SearchTeachers(val query: String) : NotesEvent
+    data class SelectTeacherForDetail(val teacher: Teacher?) : NotesEvent
+    data class OpenAddEditTeacher(val teacher: Teacher?) : NotesEvent
+    data class SaveTeacher(val teacher: Teacher) : NotesEvent
+    data class DeleteTeacher(val teacherId: String) : NotesEvent
 }
 

@@ -27,6 +27,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import com.notifast.app.data.model.Teacher
+import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.usecase.ImportSubjectPackageUseCase
 import com.notifast.app.domain.util.MarkdownToBlocksParser
 import com.notifast.app.presentation.atoms.MarkdownParser
@@ -39,7 +41,8 @@ class NotesViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
-    val importSubjectPackageUseCase: ImportSubjectPackageUseCase
+    val importSubjectPackageUseCase: ImportSubjectPackageUseCase,
+    private val teacherRepository: TeacherRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -47,6 +50,7 @@ class NotesViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
     private val _selectedTag = MutableStateFlow<String?>(null)
+    private val _teacherSearchQuery = MutableStateFlow("")
 
     private var loadJob: kotlinx.coroutines.Job? = null
 
@@ -95,11 +99,30 @@ class NotesViewModel @Inject constructor(
                 DomainData(notes, subjects, evaluations, schedules, prefs.scaleId, prefs.minPassing)
             }
 
+            val teachersFlow = combine(
+                teacherRepository.getTeachers(userId),
+                _teacherSearchQuery
+            ) { teachers, query ->
+                val cleanQ = query.trim()
+                val filtered = if (cleanQ.isBlank()) {
+                    teachers
+                } else {
+                    teachers.filter {
+                        it.fullName.contains(cleanQ, ignoreCase = true) ||
+                        it.subjectNames.any { sub -> sub.contains(cleanQ, ignoreCase = true) } ||
+                        it.email.contains(cleanQ, ignoreCase = true)
+                    }
+                }
+                teachers to filtered
+            }
+
             combine(
                 dataFlow,
-                combine(_searchQuery, _selectedTag) { query, tag -> query to tag }
-            ) { domain, params ->
+                combine(_searchQuery, _selectedTag) { query, tag -> query to tag },
+                teachersFlow
+            ) { domain, params, teacherData ->
                 val (query, tag) = params
+                val (allTeachers, filteredTeachers) = teacherData
                 val scale = GradeScale.fromId(domain.scaleId)
                 val customMinPassing = domain.minPassing.toDouble().takeIf {
                     it > scale.minGrade && it <= scale.maxGrade
@@ -123,6 +146,9 @@ class NotesViewModel @Inject constructor(
                         rawNotes = notes,
                         subjects = subjectNames,
                         subjectInfos = subjectInfos,
+                        teachers = allTeachers,
+                        filteredTeachers = filteredTeachers,
+                        teacherSearchQuery = _teacherSearchQuery.value,
                         nextActivity = nextActivity,
                         globalAverage = globalAverage,
                         gradeScale = scale,
@@ -255,6 +281,41 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
             is NotesEvent.UpdateSubject -> updateSubject(event.oldName, event.newName, event.newColorHex, event.newIcon)
             is NotesEvent.ToggleTaskCheck -> toggleTaskCheck(event.note, event.taskIndex, event.isChecked)
+            is NotesEvent.SelectSubTab -> _uiState.update { it.copy(selectedSubTab = event.subTab) }
+            is NotesEvent.SearchTeachers -> _teacherSearchQuery.value = event.query
+            is NotesEvent.SelectTeacherForDetail -> _uiState.update { it.copy(selectedTeacherForDetail = event.teacher) }
+            is NotesEvent.OpenAddEditTeacher -> _uiState.update { it.copy(teacherBeingEdited = event.teacher) }
+            is NotesEvent.SaveTeacher -> saveTeacher(event.teacher)
+            is NotesEvent.DeleteTeacher -> deleteTeacher(event.teacherId)
+        }
+    }
+
+    private fun saveTeacher(teacher: Teacher) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val toSave = if (teacher.userId.isBlank()) teacher.copy(userId = userId) else teacher
+            teacherRepository.saveTeacher(toSave).fold(
+                onSuccess = {
+                    _uiState.update { it.copy(teacherBeingEdited = null, error = null) }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(error = e.message ?: "Error al guardar profesor") }
+                }
+            )
+        }
+    }
+
+    private fun deleteTeacher(teacherId: String) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            teacherRepository.deleteTeacher(userId, teacherId).fold(
+                onSuccess = {
+                    _uiState.update { it.copy(selectedTeacherForDetail = null, error = null) }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(error = e.message ?: "Error al eliminar profesor") }
+                }
+            )
         }
     }
 

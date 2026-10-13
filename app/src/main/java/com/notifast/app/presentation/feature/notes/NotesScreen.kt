@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.CreateNewFolder
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,16 +39,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.presentation.atoms.FabAction
-import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastExpandableFab
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.feature.notes.components.NoteDetailExpandable
+import com.notifast.app.presentation.feature.notes.components.NotesDialogs
 import com.notifast.app.presentation.feature.notes.components.NotesTabContent
+import com.notifast.app.presentation.feature.notes.components.ProfessorDirectoryContent
 import com.notifast.app.presentation.feature.notes.components.SubjectGridBento
-import java.util.Date
+import com.notifast.app.presentation.feature.notes.components.SubjectsSubTabSegment
 
 @Composable
 fun NotesScreen(
@@ -63,8 +66,9 @@ fun NotesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var subjectToDelete by remember { mutableStateOf<String?>(null) }
-    var subjectToEdit by remember { mutableStateOf<com.notifast.app.presentation.feature.notes.SubjectInfo?>(null) }
+    var subjectToEdit by remember { mutableStateOf<SubjectInfo?>(null) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
+    var teacherToDelete by remember { mutableStateOf<Teacher?>(null) }
     var expandedNote by remember { mutableStateOf<Note?>(null) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -89,8 +93,9 @@ fun NotesScreen(
             floatingActionButton = {
                 NotiFastExpandableFab(
                     actions = listOf(
+                        FabAction(stringResource(R.string.teachers_btn_add), Icons.Default.PersonAdd, { viewModel.onEvent(NotesEvent.OpenAddEditTeacher(Teacher())) }, stringResource(R.string.teachers_btn_add), MaterialTheme.colorScheme.primary),
                         FabAction(stringResource(R.string.fab_add_subject), Icons.Default.CreateNewFolder, { showAddSubjectSheet = true }, stringResource(R.string.fab_add_subject), MaterialTheme.colorScheme.secondary),
-                        FabAction(stringResource(R.string.import_subject_title), androidx.compose.material.icons.Icons.Default.QrCode2, { showImportSubjectSheet = true }, stringResource(R.string.import_subject_title), MaterialTheme.colorScheme.tertiary),
+                        FabAction(stringResource(R.string.import_subject_title), Icons.Default.QrCode2, { showImportSubjectSheet = true }, stringResource(R.string.import_subject_title), MaterialTheme.colorScheme.tertiary),
                         FabAction(stringResource(R.string.fab_add_note), Icons.AutoMirrored.Filled.NoteAdd, { onAddNoteClick(null) }, stringResource(R.string.fab_add_note), MaterialTheme.colorScheme.primary)
                     ),
                     modifier = Modifier.padding(bottom = 72.dp)
@@ -130,73 +135,66 @@ fun NotesScreen(
                             onAddSubjectClick = { showAddSubjectSheet = true }
                         )
                     } else {
-                        SubjectGridBento(
-                            subjectInfos = uiState.subjectInfos,
-                            onSubjectClick = onSubjectClick,
-                            onEditSubject = { subjectToEdit = it },
-                            onAddNoteClick = { onAddNoteClick(it) },
-                            onAddEvaluationClick = onAddEvaluationClick,
-                            onDeleteSubject = { subjectToDelete = it },
-                            onAddSubjectClick = { showAddSubjectSheet = true },
-                            displayScale = uiState.gradeScale,
-                            minPassingGrade = uiState.minPassingGrade
+                        SubjectsSubTabSegment(
+                            selectedSubTab = uiState.selectedSubTab,
+                            onSelectSubTab = { viewModel.onEvent(NotesEvent.SelectSubTab(it)) }
                         )
+
+                        if (uiState.selectedSubTab == NotesSubTab.SUBJECTS) {
+                            SubjectGridBento(
+                                subjectInfos = uiState.subjectInfos,
+                                onSubjectClick = onSubjectClick,
+                                onEditSubject = { subjectToEdit = it },
+                                onAddNoteClick = { onAddNoteClick(it) },
+                                onAddEvaluationClick = onAddEvaluationClick,
+                                onDeleteSubject = { subjectToDelete = it },
+                                onAddSubjectClick = { showAddSubjectSheet = true },
+                                displayScale = uiState.gradeScale,
+                                minPassingGrade = uiState.minPassingGrade
+                            )
+                        } else {
+                            ProfessorDirectoryContent(
+                                teachers = uiState.filteredTeachers,
+                                searchQuery = uiState.teacherSearchQuery,
+                                onSearchQueryChange = { viewModel.onEvent(NotesEvent.SearchTeachers(it)) },
+                                onTeacherClick = { viewModel.onEvent(NotesEvent.SelectTeacherForDetail(it)) },
+                                onAddTeacherClick = { viewModel.onEvent(NotesEvent.OpenAddEditTeacher(Teacher())) },
+                                onWhatsAppClick = { teacher ->
+                                    viewModel.onEvent(NotesEvent.SelectTeacherForDetail(teacher))
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
 
-        if (showAddSubjectSheet) {
-            com.notifast.app.presentation.feature.addsubject.AddSubjectBottomSheet(
-                onDismissRequest = { showAddSubjectSheet = false },
-                onSubjectCreated = { name ->
-                    showAddSubjectSheet = false
-                    viewModel.onEvent(NotesEvent.LoadNotes)
-                    onSubjectClick(name)
-                }
-            )
-        }
-
-        subjectToEdit?.let { info ->
-            com.notifast.app.presentation.feature.notes.components.EditSubjectDialog(
-                subject = com.notifast.app.data.model.SubjectData(
-                    name = info.name,
-                    colorHex = info.colorHex,
-                    icon = info.icon
-                ),
-                onDismiss = { subjectToEdit = null },
-                onSave = { newName, newColor, newIcon ->
-                    viewModel.onEvent(NotesEvent.UpdateSubject(info.name, newName, newColor, newIcon))
-                    subjectToEdit = null
-                }
-            )
-        }
-
-        subjectToDelete?.let { name ->
-            NotiFastDialog(
-                title = stringResource(R.string.delete_subject_title),
-                message = stringResource(R.string.delete_subject_message, name),
-                confirmText = stringResource(R.string.delete_subject_confirm),
-                dismissText = stringResource(R.string.delete_subject_cancel),
-                confirmColor = MaterialTheme.colorScheme.error,
-                confirmWeight = FontWeight.Bold,
-                onConfirm = { viewModel.onEvent(NotesEvent.DeleteSubject(name)); subjectToDelete = null },
-                onDismiss = { subjectToDelete = null }
-            )
-        }
-
-        noteToDelete?.let { note ->
-            NotiFastDialog(
-                title = stringResource(R.string.delete_note_title),
-                message = stringResource(R.string.delete_note_message, note.title),
-                confirmText = stringResource(R.string.delete_note_confirm),
-                dismissText = stringResource(R.string.delete_note_cancel),
-                confirmColor = MaterialTheme.colorScheme.error,
-                confirmWeight = FontWeight.Bold,
-                onConfirm = { viewModel.onEvent(NotesEvent.DeleteNote(note)); noteToDelete = null },
-                onDismiss = { noteToDelete = null }
-            )
-        }
+        NotesDialogs(
+            uiState = uiState,
+            viewModel = viewModel,
+            showAddSubjectSheet = showAddSubjectSheet,
+            onDismissAddSubjectSheet = { showAddSubjectSheet = false },
+            onSubjectCreated = { name ->
+                showAddSubjectSheet = false
+                viewModel.onEvent(NotesEvent.LoadNotes)
+                onSubjectClick(name)
+            },
+            subjectToEdit = subjectToEdit,
+            onDismissEditSubject = { subjectToEdit = null },
+            subjectToDelete = subjectToDelete,
+            onDismissDeleteSubject = { subjectToDelete = null },
+            noteToDelete = noteToDelete,
+            onDismissDeleteNote = { noteToDelete = null },
+            onDeleteTeacherPrompt = { teacherToDelete = it },
+            teacherToDelete = teacherToDelete,
+            onDismissDeleteTeacher = { teacherToDelete = null },
+            showImportSubjectSheet = showImportSubjectSheet,
+            onDismissImportSubjectSheet = { showImportSubjectSheet = false },
+            onSubjectImported = { importedName ->
+                viewModel.onEvent(NotesEvent.LoadNotes)
+                onSubjectClick(importedName)
+            }
+        )
 
         val currentExpandedNote = expandedNote?.let { exp ->
             uiState.rawNotes.find { it.id == exp.id } ?: exp
@@ -223,18 +221,5 @@ fun NotesScreen(
                 }
             }
         }
-
-        if (showImportSubjectSheet) {
-            com.notifast.app.presentation.feature.share.ImportSubjectBottomSheet(
-                userId = uiState.userId,
-                importUseCase = viewModel.importSubjectPackageUseCase,
-                onDismiss = { showImportSubjectSheet = false },
-                onSubjectImported = { importedName ->
-                    viewModel.onEvent(NotesEvent.LoadNotes)
-                    onSubjectClick(importedName)
-                }
-            )
-        }
     }
 }
-
