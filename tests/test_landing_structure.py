@@ -78,5 +78,14 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("matchMedia", code)
         self.assertIn("992px", code)
 
+    def test_bento_grid_and_cta_elements(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("bento-grid", html)
+        self.assertIn("btn-download-hero", html)
+        self.assertIn("btn-download-cta", html)
+        self.assertIn("download-toast", html)
+        self.assertIn("Google Play", html)
+
 if __name__ == "__main__":
     unittest.main()

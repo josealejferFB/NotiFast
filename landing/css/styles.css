@@ -477,3 +477,349 @@ body {
     padding: 24px;
   }
 }
+
+
+/* ==========================================================================
+   BENTO GRID DE SUPERPODERES ACADÉMICOS
+   ========================================================================== */
+
+.bento-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.bento-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 50px;
+}
+
+.bento-header .section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+  margin-bottom: 16px;
+}
+
+.bento-header .section-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.bento-header .section-desc {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.bento-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-tactile);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--duration-normal) var(--ease-spring),
+              box-shadow var(--duration-normal) var(--ease-smooth);
+}
+
+.bento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.bento-col-8 {
+  grid-column: span 8;
+}
+
+.bento-col-4 {
+  grid-column: span 4;
+}
+
+.bento-col-6 {
+  grid-column: span 6;
+}
+
+.bento-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.bento-icon-wrapper svg {
+  width: 26px;
+  height: 26px;
+}
+
+.icon-bg-ruby { background-color: var(--brand-primary-light); color: var(--brand-primary); }
+.icon-bg-aqua { background-color: var(--brand-secondary-light); color: var(--brand-secondary); }
+.icon-bg-sage { background-color: var(--brand-success-light); color: var(--brand-success); }
+.icon-bg-amber { background-color: var(--brand-warning-light); color: var(--brand-warning); }
+
+.bento-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.bento-card-desc {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Micro-visual dentro de las bento cards */
+.bento-visual-preview {
+  margin-top: 24px;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.preview-pill {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+}
+
+.pill-calc { background-color: var(--brand-primary-light); color: var(--brand-primary); }
+.pill-sync { background-color: var(--brand-secondary-light); color: var(--brand-secondary); }
+.pill-bell { background-color: var(--brand-warning-light); color: var(--brand-warning); }
+
+/* ==========================================================================
+   FINAL CTA SECTION
+   ========================================================================== */
+
+.final-cta-section {
+  max-width: 1000px;
+  margin: 60px auto 100px;
+  padding: 0 24px;
+}
+
+.final-cta-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  padding: 64px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-hover);
+  position: relative;
+  overflow: hidden;
+}
+
+.final-cta-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+}
+
+.final-cta-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.final-cta-desc {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 36px;
+}
+
+.final-cta-meta {
+  margin-top: 20px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   DOWNLOAD MODAL / TOAST
+   ========================================================================== */
+
+.download-toast-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--duration-normal) var(--ease-smooth),
+              visibility var(--duration-normal);
+}
+
+.download-toast-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.download-toast-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  width: 100%;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: relative;
+  transform: translateY(20px) scale(0.96);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.download-toast-overlay.visible .download-toast-card {
+  transform: translateY(0) scale(1);
+}
+
+.toast-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-surface-container);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.125rem;
+  transition: background-color var(--duration-fast);
+}
+
+.toast-close-btn:hover {
+  background-color: var(--border-hairline);
+  color: var(--text-primary);
+}
+
+.toast-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.toast-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.toast-message {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Footer Editorial */
+.footer {
+  border-top: 1px solid var(--border-hairline);
+  background-color: var(--bg-surface);
+  padding: 40px 24px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  transition: color var(--duration-fast);
+}
+
+.footer-links a:hover {
+  color: var(--brand-primary);
+}
+
+.footer-copy {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+@media (max-width: 991px) {
+  .bento-col-8, .bento-col-4, .bento-col-6 {
+    grid-column: span 12;
+  }
+  .final-cta-card {
+    padding: 40px 20px;
+  }
+}
