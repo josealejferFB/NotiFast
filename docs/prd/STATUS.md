@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.0
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.0**  
-> **Última actualización:** 6 de Octubre, 2026  
+> **Última actualización:** 14 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/NotiFast/PRODUCT.md)
 
 ---
@@ -21,10 +21,11 @@ Fase 3.6: Sanitización Lógica     [██████████████�
 Fase 3.7: Normalización Sheets/FAB[████████████████] 100% (5/5 tareas) ✅
 Editor Premium (OneNote-like)     [████████████████] 100% (12/12 tareas) ✅
 Sanitización Materias & Profesores[████████████████] 100% (9/9 tareas) ✅
+Auditoría Global & Pipelines CI/CD[████████████████] 100% (6/6 pilares) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
-Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (0/16 tareas)
+Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [███████████████░]  90% (120/133 tareas)
+PROGRESO TOTAL ESTIMADO:          [████████████████]  92% (126/137 tareas)
 ```
 
 ---
@@ -461,6 +462,43 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
   * **Fix:** Se reestructuró la evaluación para pre-computar `bottomNavRoutes` con `mapNotNull { it?.route }` y usar `dest.route in bottomNavRoutes` — eliminando el acceso anidado a `Screen.route` dentro del lambda de `hierarchy.any`.
   * **Archivo:** `presentation/navigation/NavGraph.kt:85-88`
   * **Verificación:** `assembleDebug` ✅ + `testDebugUnitTest` ✅ + installDebug + launch en dispositivo ✅ (1er y 2do inicio sin crash)
+
+---
+
+## 🛡️ Auditoría Global de Calidad, Pipelines y Remediación (100% Completado)
+
+> **Documento de Auditoría:** [`audit-global-notifast.md`](file:///home/p0xd/.gemini/antigravity/brain/320a28ab-17a7-4cef-ba4d-84e12f05929f/audit-global-notifast.md)
+
+- [x] **Pilar 1: Erradicación de Estados Bloqueantes y Ciclo de Vida Crítico**
+  * `BootCompletedReceiver.kt`: Refactorizado con `goAsync()` y ejecución en coroutine `CoroutineScope(Dispatchers.IO).launch` con `pendingResult.finish()` en bloque `finally`, previniendo ANR y terminación prematura del proceso por parte del sistema operativo al reprogramar alarmas tras reinicio del dispositivo.
+  * Eliminación de bloques `catch` vacíos o silenciados en `AddScheduleViewModel.kt`, `EditScheduleViewModel.kt`, `SettingsSectionsContent.kt`, `ImportSubjectBottomSheet.kt`, `SchedulesScreen.kt` y `SubjectSchedulesTab.kt`; registro explícito de advertencias (`Log.w`) y propagación al usuario mediante Toast/Snackbar.
+
+- [x] **Pilar 2: Purgado de Dependencias Muertas y Reducción de Bloat**
+  * Eliminación total de artefactos Firebase obsoletos en `app/build.gradle.kts` (`firebase-firestore`, `firebase-auth`, `firebase-storage`) tras la migración a Room offline-first. Conservados únicamente Crashlytics y Analytics.
+  * Remoción de proveedores muertos `provideFirebaseAuth` y `provideFirestore` en `AppModule.kt`.
+  * Eliminación de 4 pantallas legacy redundantes (~862 LOC purgadas): `AddEvaluationScreen.kt`, `AddScheduleScreen.kt`, `EditEvaluationScreen.kt`, `EditScheduleScreen.kt`.
+  * Purga de `logcat_dump.txt` (20.4 MB) del árbol git y reforzamiento de `.gitignore`.
+
+- [x] **Pilar 3: Prevención de Crashes en Navegación (Búsqueda Global)**
+  * Solución de ruta inválida `note_editor?noteId=...`: `NavGraph.kt` intercepta selecciones de notas, evaluaciones y horarios en `GlobalSearchBottomSheet` asignando reactivamente los argumentos a los BottomSheets modulares correspondientes.
+  * Eliminación de rutas fantasmas borradas en `NavHost`.
+
+- [x] **Pilar 4: Sanitización de UI, Internacionalización y Tokens de Diseño**
+  * Cero strings quemados: Localización al 100% en `res/values/strings.xml` para feedback de feedback dialogs, edición de perfil, tarjetas de simulador de notas, contactos docentes, códigos QR, detalles de agenda y resúmenes de worker.
+  * Cero colores arbitrarios: Sustitución de `Ruby` directo en `NavGraph.kt` por `MaterialTheme.colorScheme.primary`.
+  * Cero wildcard imports: Erradicación del 100% de `import .*` en `SubjectDetailScreen.kt`, `SubjectDetailHeroBento.kt`, `SubjectNotesTab.kt`, `SubjectPanoramaTab.kt`, `SubjectSegmentedTabs.kt`.
+
+- [x] **Pilar 5: Modularización Arquitectónica (Límite $\le 250$ LOC)**
+  * `AgendaMonthCalendarView.kt` (269 LOC $\rightarrow$ 229 LOC): Extracción de `CalendarDayCell.kt` como componente atómico reusable.
+  * `ImportSubjectBottomSheet.kt` (321 LOC $\rightarrow$ 244 LOC): Extracción de `ImportPayloadPreview.kt` e `ImportCameraScanButton.kt`.
+
+- [x] **Pilar 6: Pipeline CI/CD Automatizado y Optimización Gradle**
+  * Creación del workflow `.github/workflows/ci.yml` con ejecución paralela:
+    1. `python-tests`: Validación de landing page y testing documental (18 tests).
+    2. `android-tests`: Ejecución de suite unitaria (`./gradlew testDebugUnitTest`) con subida de reportes en caso de fallo.
+    3. `android-build`: Ensamblado de release debuggable (`./gradlew assembleDebug`) con almacenamiento de APK compilada.
+  * Activación de paralelismo y cache en `gradle.properties`: `org.gradle.parallel=true`, `org.gradle.caching=true`.
+  * Configuración de `signingConfigs` en `build.gradle.kts` para compilación release con keystore debug fallback.
 
 ---
 

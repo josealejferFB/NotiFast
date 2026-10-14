@@ -3,6 +3,8 @@ package com.notifast.app.presentation.feature.settings.components
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -217,7 +219,10 @@ fun SettingsSectionsContent(
                     }
                     try {
                         context.startActivity(Intent.createChooser(intent, "Feedback"))
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.w("SettingsSections", "Failed to launch feedback email chooser", e)
+                        Toast.makeText(context, context.getString(R.string.settings_about_feedback_error), Toast.LENGTH_SHORT).show()
+                    }
                 }
             )
             SettingsRowItem(

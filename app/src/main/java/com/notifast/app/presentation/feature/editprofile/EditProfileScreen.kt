@@ -38,6 +38,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.notifast.app.R
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,7 +76,7 @@ fun EditProfileScreen(
             topBar = {
                 com.notifast.app.presentation.atoms.NotiFastTopBar(
                     type = com.notifast.app.presentation.atoms.TopBarType.Detail(
-                        title = "Mi Perfil",
+                        title = stringResource(R.string.edit_profile_title),
                         onBackClick = onBack
                     )
                 )
@@ -105,7 +107,7 @@ fun EditProfileScreen(
                     } else if (uiState.userProfile?.profilePictureUrl != null) {
                         AsyncImage(model = uiState.userProfile?.profilePictureUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                     } else {
-                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.Gray)
+                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
                         Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
@@ -117,7 +119,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.firstName,
                     onValueChange = { viewModel.onEvent(EditProfileEvent.UpdateFirstName(it)) },
-                    label = { Text("Nombre") },
+                    label = { Text(stringResource(R.string.edit_profile_first_name_label)) },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     shape = RoundedCornerShape(28.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -134,7 +136,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.lastName,
                     onValueChange = { viewModel.onEvent(EditProfileEvent.UpdateLastName(it)) },
-                    label = { Text("Apellido") },
+                    label = { Text(stringResource(R.string.edit_profile_last_name_label)) },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     shape = RoundedCornerShape(28.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -158,7 +160,7 @@ fun EditProfileScreen(
                     if (uiState.isSaving) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
-                        Text("Actualizar Perfil", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(stringResource(R.string.edit_profile_btn_update), fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }

@@ -128,8 +128,9 @@ fun SubjectSchedulesTab(
                                 onClick = {
                                     try {
                                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(schedule.meetingUrl)))
-                                    } catch (_: Exception) {
-                                        Toast.makeText(context, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
+                                    } catch (e: Exception) {
+                                        android.util.Log.w("SubjectSchedulesTab", "Could not open meeting link: ${schedule.meetingUrl}", e)
+                                        Toast.makeText(context, context.getString(R.string.error_open_link), Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 shape = RoundedCornerShape(10.dp),

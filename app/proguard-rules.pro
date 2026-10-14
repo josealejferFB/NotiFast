@@ -42,3 +42,18 @@
 # Jetpack Compose
 -dontwarn androidx.compose.**
 -keep class androidx.compose.** { *; }
+
+# Room
+-dontwarn androidx.room.**
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao class * { *; }
+
+# WorkManager
+-keep class * extends androidx.work.Worker { *; }
+-keep class * extends androidx.work.CoroutineWorker { *; }
+-keep class * extends androidx.work.ListenableWorker { *; }
+
+# ML Kit Google Code Scanner
+-keep class com.google.mlkit.** { *; }
+-dontwarn com.google.mlkit.**

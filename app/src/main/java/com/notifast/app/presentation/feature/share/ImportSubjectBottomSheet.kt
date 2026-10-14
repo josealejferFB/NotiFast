@@ -1,10 +1,7 @@
 package com.notifast.app.presentation.feature.share
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,11 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCode2
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -37,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,9 +44,9 @@ import com.notifast.app.data.model.package_data.SubjectPackage
 import com.notifast.app.data.model.package_data.SubjectPackageCodec
 import com.notifast.app.domain.model.package_data.ConflictStrategy
 import com.notifast.app.domain.usecase.ImportSubjectPackageUseCase
-import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
+import com.notifast.app.presentation.feature.share.components.ImportCameraScanButton
+import com.notifast.app.presentation.feature.share.components.ImportPayloadPreview
 import com.notifast.app.presentation.feature.share.components.SubjectConflictDialog
-import com.notifast.app.presentation.theme.ThemeUtils
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +83,8 @@ fun ImportSubjectBottomSheet(
         if (trimmed.length > 20) {
             try {
                 parsedPackage = SubjectPackageCodec.decodeFromCompressedString(trimmed)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                android.util.Log.w("ImportSubjectBottomSheet", "Failed to decode compressed payload", e)
                 parsedPackage = null
             }
         } else {
@@ -178,29 +172,7 @@ fun ImportSubjectBottomSheet(
             Spacer(Modifier.height(18.dp))
 
             // Primary Action: Camera QR Scan Button
-            Button(
-                onClick = { launchCameraScanner() },
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.QrCodeScanner,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    text = stringResource(R.string.import_scan_camera_btn),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-            }
+            ImportCameraScanButton(onClick = { launchCameraScanner() })
 
             Spacer(Modifier.height(14.dp))
 
@@ -234,55 +206,7 @@ fun ImportSubjectBottomSheet(
             )
 
             // Preview Card if valid
-            val isDark = androidx.compose.foundation.isSystemInDarkTheme()
-            AnimatedVisibility(visible = parsedPackage != null) {
-                val pkg = parsedPackage
-                if (pkg != null) {
-                    val subjectColor = ThemeUtils.getAccessibleColor(pkg.subject.colorHex, isDark)
-                    Spacer(Modifier.height(14.dp))
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                        .background(subjectColor.copy(alpha = 0.15f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = SubjectIconMapper.getIcon(pkg.subject.icon),
-                                        contentDescription = pkg.subject.name,
-                                        tint = subjectColor,
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                }
-
-                                Column {
-                                    Text(
-                                        text = pkg.subject.name,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Text(
-                                        text = "${pkg.schedules.size} horarios • ${pkg.evaluations.size} evaluaciones • ${pkg.notes.size} apuntes",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            ImportPayloadPreview(pkg = parsedPackage)
 
             Spacer(Modifier.height(24.dp))
 

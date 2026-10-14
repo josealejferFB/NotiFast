@@ -113,14 +113,14 @@ fun AgendaEvaluationBottomSheet(
 
         DetailRow(
             icon = Icons.AutoMirrored.Filled.Subject,
-            label = "Descripción",
+            label = stringResource(R.string.agenda_eval_sheet_description),
             content = eval.description,
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(14.dp))
         DetailRow(
             icon = Icons.Default.Lightbulb,
-            label = "Consejos Rápidos",
+            label = stringResource(R.string.agenda_eval_sheet_quick_tips),
             content = eval.quickTips,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -140,7 +140,7 @@ fun AgendaEvaluationBottomSheet(
             Spacer(modifier = Modifier.height(14.dp))
             DetailRow(
                 icon = Icons.Default.Event,
-                label = "Ponderación",
+                label = stringResource(R.string.agenda_eval_sheet_weight),
                 content = "${eval.weight}%",
                 color = MaterialTheme.colorScheme.primary,
                 isMono = true

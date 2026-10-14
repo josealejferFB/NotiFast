@@ -1,15 +1,13 @@
 package com.notifast.app.presentation.feature.schedules.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +40,7 @@ import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.atoms.NotiFastEmptyState
-import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
+
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -210,51 +208,14 @@ private fun CalendarMatrix(
                         val allPresented = hasEvals && dayEvals.all { it.isPresented }
                         val dotColor = if (allPresented) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
                         val isToday = dateStr == todayStr
-
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .clip(CircleShape)
-                                .background(
-                                    when {
-                                        isSelected -> MaterialTheme.colorScheme.primary
-                                        isToday -> MaterialTheme.colorScheme.primaryContainer
-                                        else -> Color.Transparent
-                                    }
-                                )
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) { onDateSelected(date) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = day.toString(),
-                                    fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
-                                    fontFamily = JetBrainsMonoFamily,
-                                    fontSize = 12.sp,
-                                    color = when {
-                                        isSelected -> MaterialTheme.colorScheme.onPrimary
-                                        isToday -> MaterialTheme.colorScheme.onPrimaryContainer
-                                        else -> MaterialTheme.colorScheme.onSurface
-                                    }
-                                )
-                                if (hasEvals) {
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Box(
-                                        modifier = Modifier
-                                            .size(4.dp)
-                                            .clip(CircleShape)
-                                            .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else dotColor)
-                                    )
-                                }
-                            }
-                        }
+                        CalendarDayCell(
+                            day = day,
+                            isSelected = isSelected,
+                            isToday = isToday,
+                            hasEvals = hasEvals,
+                            dotColor = dotColor,
+                            onClick = { onDateSelected(date) }
+                        )
                     } else {
                         Spacer(modifier = Modifier.weight(1f))
                     }

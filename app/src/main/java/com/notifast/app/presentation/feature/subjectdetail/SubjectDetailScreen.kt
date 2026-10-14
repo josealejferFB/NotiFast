@@ -5,11 +5,20 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -23,7 +32,13 @@ import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
-import com.notifast.app.presentation.feature.subjectdetail.components.*
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectDetailHeroBento
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectEvaluationsTab
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectGradeQuickDialog
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectNotesTab
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectPanoramaTab
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectSchedulesTab
+import com.notifast.app.presentation.feature.subjectdetail.components.SubjectSegmentedTabs
 
 @Composable
 fun SubjectDetailScreen(

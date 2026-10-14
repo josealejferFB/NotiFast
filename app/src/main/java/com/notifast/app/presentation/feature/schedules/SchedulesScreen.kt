@@ -81,8 +81,9 @@ fun SchedulesScreen(
     val openMeeting: (String) -> Unit = { url ->
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        } catch (_: Exception) {
-            Toast.makeText(context, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            android.util.Log.w("SchedulesScreen", "Could not open meeting link: $url", e)
+            Toast.makeText(context, context.getString(R.string.error_open_link), Toast.LENGTH_SHORT).show()
         }
     }
 

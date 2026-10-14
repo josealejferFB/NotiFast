@@ -24,8 +24,8 @@ fun EmptyGradesState() {
     ) {
         NotiFastEmptyState(
             icon = Icons.Rounded.School,
-            title = "Sin evaluaciones registradas",
-            message = "Agrega evaluaciones con nota o ponderación en tus materias para visualizar tu promedio académico."
+            title = stringResource(R.string.grades_empty_no_evaluations),
+            message = stringResource(R.string.grades_empty_message)
         )
     }
 }

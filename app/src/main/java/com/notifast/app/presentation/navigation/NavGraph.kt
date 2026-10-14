@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,15 +28,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.notifast.app.presentation.atoms.NotiFastBottomNav
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
-import com.notifast.app.presentation.feature.addevaluation.AddEvaluationScreen
 import com.notifast.app.presentation.feature.addevaluation.EvaluationEditorBottomSheet
-import com.notifast.app.presentation.feature.addschedule.AddScheduleScreen
 import com.notifast.app.presentation.feature.addschedule.ScheduleEditorBottomSheet
 import com.notifast.app.presentation.feature.addsubject.AddSubjectBottomSheet
 import com.notifast.app.presentation.feature.addsubject.AddSubjectScreen
-import com.notifast.app.presentation.feature.editevaluation.EditEvaluationScreen
 import com.notifast.app.presentation.feature.editprofile.EditProfileScreen
-import com.notifast.app.presentation.feature.editschedule.EditScheduleScreen
 import com.notifast.app.presentation.feature.grades.GradesScreen
 import com.notifast.app.presentation.feature.main.MainViewModel
 import com.notifast.app.presentation.feature.noteeditor.NoteEditorBottomSheet
@@ -45,7 +42,7 @@ import com.notifast.app.presentation.feature.schedules.SchedulesScreen
 import com.notifast.app.presentation.feature.search.GlobalSearchBottomSheet
 import com.notifast.app.presentation.feature.settings.SettingsScreen
 import com.notifast.app.presentation.feature.subjectdetail.SubjectDetailScreen
-import com.notifast.app.presentation.theme.color.Ruby
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +53,7 @@ fun MainContent() {
     if (authState == null) {
         Box(modifier = Modifier.fillMaxSize()) {
             NotiFastStudyBackground()
-            CircularProgressIndicator(color = Ruby, modifier = Modifier.align(Alignment.Center))
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, modifier = Modifier.align(Alignment.Center))
         }
         return
     }
@@ -158,12 +155,6 @@ fun MainContent() {
                     onSearchClick = { showGlobalSearchSheet = true }
                 )
             }
-            composable(Screen.AddSchedule.route) {
-                AddScheduleScreen(onBackClick = { navController.popBackStack() }, onScheduleAdded = { navController.popBackStack() })
-            }
-            composable(route = Screen.EditSchedule.route, arguments = listOf(navArgument("scheduleId") { type = NavType.StringType })) {
-                EditScheduleScreen(onBackClick = { navController.popBackStack() }, onScheduleAdded = { navController.popBackStack() })
-            }
             composable(Screen.Grades.route) {
                 GradesScreen(
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
@@ -182,18 +173,37 @@ fun MainContent() {
                     onLogout = { navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } } }
                 )
             }
-            composable(route = Screen.AddEvaluation.route, arguments = listOf(navArgument("subject") { type = NavType.StringType; defaultValue = "" })) { entry ->
-                AddEvaluationScreen(subject = Uri.decode(entry.arguments?.getString("subject") ?: ""), onEvaluationAdded = { navController.popBackStack() }, onBack = { navController.popBackStack() })
-            }
-            composable(route = Screen.EditEvaluation.route, arguments = listOf(navArgument("evalId") { type = NavType.StringType })) {
-                EditEvaluationScreen(onEvaluationUpdated = { navController.popBackStack() }, onBack = { navController.popBackStack() })
-            }
         }
 
         if (showGlobalSearchSheet) {
             GlobalSearchBottomSheet(
                 onDismiss = { showGlobalSearchSheet = false },
-                onNavigateToRoute = { route -> showGlobalSearchSheet = false; navController.navigate(route) }
+                onNavigateToRoute = { route ->
+                    showGlobalSearchSheet = false
+                    when {
+                        route.startsWith("note_editor?noteId=") -> {
+                            val noteId = route.substringAfter("note_editor?noteId=")
+                            activeNoteEditorArgs = Pair(Uri.decode(noteId), null)
+                        }
+                        route.startsWith("edit_evaluation/") -> {
+                            val evalId = route.substringAfter("edit_evaluation/")
+                            activeEvaluationEditorArgs = Pair(Uri.decode(evalId), null)
+                        }
+                        route.startsWith("edit_schedule/") -> {
+                            val scheduleId = route.substringAfter("edit_schedule/")
+                            activeScheduleEditorArgs = Pair(Uri.decode(scheduleId), null)
+                        }
+                        route.startsWith("add_evaluation") -> {
+                            activeEvaluationEditorArgs = Pair(null, null)
+                        }
+                        route.startsWith("add_schedule") -> {
+                            activeScheduleEditorArgs = Pair(null, null)
+                        }
+                        else -> {
+                            navController.navigate(route)
+                        }
+                    }
+                }
             )
         }
         activeNoteEditorArgs?.let { (noteId, subject) ->

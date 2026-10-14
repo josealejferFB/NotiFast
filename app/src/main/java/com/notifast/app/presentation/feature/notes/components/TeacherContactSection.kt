@@ -86,7 +86,7 @@ fun TeacherContactSection(
                         subjectName = teacher.subjectNames.firstOrNull().orEmpty()
                     )
                     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
-                        .onFailure { Toast.makeText(context, "WhatsApp no disponible", Toast.LENGTH_SHORT).show() }
+                        .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_whatsapp_unavailable), Toast.LENGTH_SHORT).show() }
                 }
             )
             TeacherActionButton(
@@ -95,7 +95,7 @@ fun TeacherContactSection(
                 tint = MaterialTheme.colorScheme.primary,
                 onClick = {
                     runCatching { context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${teacher.formattedPhoneNumber}"))) }
-                        .onFailure { Toast.makeText(context, "Llamada no disponible", Toast.LENGTH_SHORT).show() }
+                        .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_call_unavailable), Toast.LENGTH_SHORT).show() }
                 }
             )
             TeacherActionButton(
@@ -104,7 +104,7 @@ fun TeacherContactSection(
                 tint = MaterialTheme.colorScheme.tertiary,
                 onClick = {
                     runCatching { context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${teacher.formattedPhoneNumber}"))) }
-                        .onFailure { Toast.makeText(context, "SMS no disponible", Toast.LENGTH_SHORT).show() }
+                        .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_sms_unavailable), Toast.LENGTH_SHORT).show() }
                 }
             )
             if (teacher.email.isNotBlank()) {
@@ -114,7 +114,7 @@ fun TeacherContactSection(
                     tint = MaterialTheme.colorScheme.secondary,
                     onClick = {
                         runCatching { context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${teacher.email}"))) }
-                            .onFailure { Toast.makeText(context, "Correo no disponible", Toast.LENGTH_SHORT).show() }
+                            .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_email_unavailable), Toast.LENGTH_SHORT).show() }
                     }
                 )
             }

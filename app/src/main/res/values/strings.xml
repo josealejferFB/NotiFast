@@ -680,4 +680,28 @@
     <string name="subject_faculty_title">Cuerpo Docente</string>
     <string name="subject_faculty_empty">Sin profesores asignados a esta materia</string>
     <string name="subject_faculty_btn_add">Asignar Profesor</string>
+
+    <!-- Global Sanitization & Audit Cleanups -->
+    <string name="settings_about_feedback_error">No se encontró una aplicación de correo para enviar feedback</string>
+    <string name="edit_profile_title">Mi Perfil</string>
+    <string name="edit_profile_first_name_label">Nombre</string>
+    <string name="edit_profile_last_name_label">Apellido</string>
+    <string name="edit_profile_btn_update">Actualizar Perfil</string>
+    <string name="teacher_contact_whatsapp_unavailable">WhatsApp no disponible</string>
+    <string name="teacher_contact_call_unavailable">Llamada no disponible</string>
+    <string name="teacher_contact_sms_unavailable">SMS no disponible</string>
+    <string name="teacher_contact_email_unavailable">Correo no disponible</string>
+    <string name="qr_code_copied_to_clipboard">Código copiado al portapapeles</string>
+    <string name="qr_code_copy_button">Copiar Código de Texto</string>
+    <string name="agenda_eval_sheet_description">Descripción</string>
+    <string name="agenda_eval_sheet_quick_tips">Consejos Rápidos</string>
+    <string name="agenda_eval_sheet_weight">Ponderación</string>
+    <string name="grades_empty_no_evaluations">Sin evaluaciones registradas</string>
+    <string name="grades_empty_message">Agrega evaluaciones con nota o ponderación en tus materias para visualizar tu promedio académico.</string>
+    <string name="error_open_link">No se pudo abrir el enlace</string>
+    <string name="daily_summary_classes_count">%1$d clase(s) hoy</string>
+    <string name="daily_summary_classes_none">Sin clases hoy</string>
+    <string name="daily_summary_evals_count">%1$d evaluación(es) en 48h</string>
+    <string name="daily_summary_evals_none">Sin entregas inminentes</string>
+    <string name="import_preview_summary">%1$d horarios • %2$d evaluaciones • %3$d apuntes</string>
 </resources>

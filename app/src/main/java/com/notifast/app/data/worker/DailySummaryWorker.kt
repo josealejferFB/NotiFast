@@ -13,6 +13,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import java.util.Calendar
+import com.notifast.app.R
 
 @HiltWorker
 class DailySummaryWorker @AssistedInject constructor(
@@ -45,8 +46,16 @@ class DailySummaryWorker @AssistedInject constructor(
 
         if (schedules.isEmpty() && pendingEvals.isEmpty()) return Result.success()
 
-        val classesSummary = if (schedules.isNotEmpty()) "${schedules.size} clase(s) hoy" else "Sin clases hoy"
-        val evalsSummary = if (pendingEvals.isNotEmpty()) "${pendingEvals.size} evaluación(es) en 48h" else "Sin entregas inminentes"
+        val classesSummary = if (schedules.isNotEmpty()) {
+            applicationContext.getString(R.string.daily_summary_classes_count, schedules.size)
+        } else {
+            applicationContext.getString(R.string.daily_summary_classes_none)
+        }
+        val evalsSummary = if (pendingEvals.isNotEmpty()) {
+            applicationContext.getString(R.string.daily_summary_evals_count, pendingEvals.size)
+        } else {
+            applicationContext.getString(R.string.daily_summary_evals_none)
+        }
         val body = "$classesSummary • $evalsSummary"
 
         notificationSender.sendDailySummaryNotification(

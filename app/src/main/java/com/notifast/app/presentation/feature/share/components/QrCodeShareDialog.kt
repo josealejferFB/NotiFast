@@ -176,14 +176,14 @@ fun QrCodeShareDialog(
                 OutlinedButton(
                     onClick = {
                         clipboardManager.setText(AnnotatedString(payload))
-                        Toast.makeText(context, "Código copiado al portapapeles", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.qr_code_copied_to_clipboard), Toast.LENGTH_SHORT).show()
                     },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.size(8.dp))
-                    Text("Copiar Código de Texto")
+                    Text(stringResource(R.string.qr_code_copy_button))
                 }
             }
         }

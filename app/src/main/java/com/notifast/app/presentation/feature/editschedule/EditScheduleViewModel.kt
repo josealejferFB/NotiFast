@@ -1,5 +1,6 @@
 package com.notifast.app.presentation.feature.editschedule
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+
+private const val TAG = "EditScheduleViewModel"
 
 @HiltViewModel
 class EditScheduleViewModel @Inject constructor(
@@ -264,8 +267,8 @@ class EditScheduleViewModel @Inject constructor(
                         )
                         teacherRepository.saveTeacher(newTeacher)
                     }
-                } catch (_: Exception) {
-                    // Best-effort teacher sync
+                } catch (e: Exception) {
+                    Log.w(TAG, "Best-effort teacher sync failed for teacher '$teacherName'", e)
                 }
             }
 

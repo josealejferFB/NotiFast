@@ -95,9 +95,9 @@ fun GradeSimulatorCard(
                 val (statusColor, statusIcon, statusText) = when (simulationResult.status) {
                     SimulatorStatus.ALREADY_PASSED -> Triple(Aqua, Icons.Default.CheckCircle, stringResource(R.string.simulator_status_passed))
                     SimulatorStatus.ACHIEVABLE -> Triple(Aqua, Icons.Default.CheckCircle, stringResource(R.string.simulator_status_achievable))
-                    SimulatorStatus.AT_RISK -> Triple(Color(0xFFE67E22), Icons.Default.Warning, stringResource(R.string.simulator_status_at_risk))
+                    SimulatorStatus.AT_RISK -> Triple(MaterialTheme.colorScheme.tertiary, Icons.Default.Warning, stringResource(R.string.simulator_status_at_risk))
                     SimulatorStatus.IMPOSSIBLE -> Triple(Ruby, Icons.Default.Warning, stringResource(R.string.simulator_status_impossible))
-                    SimulatorStatus.NO_PENDING_EVALUATIONS -> Triple(Color.Gray, Icons.Default.Info, stringResource(R.string.simulator_no_pending_weight))
+                    SimulatorStatus.NO_PENDING_EVALUATIONS -> Triple(MaterialTheme.colorScheme.outline, Icons.Default.Info, stringResource(R.string.simulator_no_pending_weight))
                 }
 
                 Surface(
