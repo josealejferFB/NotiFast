@@ -51,6 +51,7 @@ import com.notifast.app.data.model.package_data.SubjectPackage
 import com.notifast.app.data.model.package_data.SubjectPackageCodec
 import com.notifast.app.domain.model.package_data.ConflictStrategy
 import com.notifast.app.domain.usecase.ImportSubjectPackageUseCase
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.feature.share.components.SubjectConflictDialog
 import com.notifast.app.presentation.theme.ThemeUtils
 import kotlinx.coroutines.launch
@@ -256,11 +257,11 @@ fun ImportSubjectBottomSheet(
                                         .background(subjectColor.copy(alpha = 0.15f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = pkg.subject.name.take(2).uppercase(),
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = subjectColor
+                                    Icon(
+                                        imageVector = SubjectIconMapper.getIcon(pkg.subject.icon),
+                                        contentDescription = pkg.subject.name,
+                                        tint = subjectColor,
+                                        modifier = Modifier.size(22.dp)
                                     )
                                 }
 

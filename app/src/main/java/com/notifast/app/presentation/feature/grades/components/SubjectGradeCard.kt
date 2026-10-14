@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Pending
-import androidx.compose.material.icons.rounded.School
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
+import com.notifast.app.presentation.theme.ThemeUtils
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -61,6 +63,8 @@ fun SubjectGradeCard(
     val subject = subjectGrade.subject
     val evaluations = subjectGrade.evaluations
     val subjectAverage = subjectGrade.average
+    val isDark = isSystemInDarkTheme()
+    val subjectColor = ThemeUtils.getAccessibleColor(subjectGrade.colorHex, isDark)
 
     Card(
         modifier = Modifier
@@ -79,14 +83,14 @@ fun SubjectGradeCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Surface(
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = subjectColor.copy(alpha = 0.16f),
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.School,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            imageVector = SubjectIconMapper.getIcon(subjectGrade.icon),
+                            contentDescription = subject,
+                            tint = subjectColor,
                             modifier = Modifier.padding(12.dp)
                         )
                     }

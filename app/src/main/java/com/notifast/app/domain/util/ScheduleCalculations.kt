@@ -1,6 +1,7 @@
 package com.notifast.app.domain.util
 
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.SubjectData
 import com.notifast.app.presentation.feature.schedules.LiveClassStatus
 import com.notifast.app.presentation.feature.schedules.ScheduleTimelineItem
 import com.notifast.app.presentation.feature.schedules.WeeklyDayMetric
@@ -44,7 +45,8 @@ object ScheduleCalculations {
         dayOfWeek: Int,
         currentDay: Int,
         currentTimeStr: String,
-        conflicts: List<Schedule>
+        conflicts: List<Schedule>,
+        subjectMap: Map<String, SubjectData> = emptyMap()
     ): List<ScheduleTimelineItem> {
         if (daySchedules.isEmpty()) return emptyList()
         val sorted = daySchedules.sortedBy { timeToMinutes(it.startTime) }
@@ -58,12 +60,16 @@ object ScheduleCalculations {
             val startMin = timeToMinutes(current.startTime)
             val endMin = timeToMinutes(current.endTime)
             val isCurrent = isToday && (nowMin in startMin until endMin)
+            val subjectData = subjectMap[current.subjectName.lowercase().trim()]
+                ?: subjectMap.values.find { it.id.isNotBlank() && it.id == current.subjectId }
 
             items.add(
                 ScheduleTimelineItem.ClassItem(
                     schedule = current,
                     isCurrent = isCurrent,
-                    isConflicted = conflictIds.contains(current.id)
+                    isConflicted = conflictIds.contains(current.id),
+                    subjectIcon = subjectData?.icon ?: "📚",
+                    subjectColorHex = subjectData?.colorHex.orEmpty()
                 )
             )
 

@@ -181,6 +181,7 @@ fun SubjectDetailScreen(
                 userId = uiState.userId,
                 subjectName = uiState.subjectName,
                 subjectColorHex = uiState.subjectColorHex,
+                subjectIcon = uiState.subjectIcon,
                 exportUseCase = viewModel.exportSubjectPackageUseCase,
                 onDismiss = { showShareSheet = false }
             )

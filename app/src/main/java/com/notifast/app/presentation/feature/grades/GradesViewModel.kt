@@ -81,10 +81,13 @@ class GradesViewModel @Inject constructor(
                 }
                 val globalAverage = calculateWeightedAverageUseCase(evaluations, scale) ?: 0.0
                 val subjectGrades = evalsBySubject.map { (subject, evals) ->
+                    val subjData = subjects.find { it.name.equals(subject, ignoreCase = true) }
                     SubjectGradeInfo(
                         subject = subject,
                         evaluations = evals,
-                        average = calculateWeightedAverageUseCase(evals, scale) ?: 0.0
+                        average = calculateWeightedAverageUseCase(evals, scale) ?: 0.0,
+                        icon = subjData?.icon ?: "📚",
+                        colorHex = subjData?.colorHex.orEmpty()
                     )
                 }.sortedBy { it.subject }
 

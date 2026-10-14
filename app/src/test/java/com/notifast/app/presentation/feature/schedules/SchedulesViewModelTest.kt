@@ -2,8 +2,10 @@ package com.notifast.app.presentation.feature.schedules
 
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.util.MainDispatcherRule
 import com.notifast.app.util.TestDataFactory
@@ -299,5 +301,38 @@ class SchedulesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(com.notifast.app.domain.model.GradeScale.SCALE_0_100, viewModel.uiState.value.gradeScale)
+    }
+
+    @Test
+    fun `when noteRepository emits subjects, maps subject icon and colorHex to timeline items`() = runTest {
+        val noteRepo = mockk<NoteRepository>()
+        val sampleSubjects = listOf(
+            SubjectData(id = "sub_math", name = "Matemáticas", icon = "Calculate", colorHex = "#BF092F"),
+            SubjectData(id = "sub_phys", name = "Física", icon = "Science", colorHex = "#3B9797")
+        )
+        coEvery { noteRepo.getSubjects("user_123") } returns flowOf(sampleSubjects)
+
+        val viewModel = SchedulesViewModel(
+            scheduleRepository = scheduleRepository,
+            evaluationRepository = evaluationRepository,
+            authRepository = authRepository,
+            userPrefsRepository = null,
+            cancelAlertUseCase = null,
+            noteRepository = noteRepo
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(SchedulesEvent.SelectDay(1))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(2, state.subjects.size)
+        val classItems = state.timelineItems.filterIsInstance<ScheduleTimelineItem.ClassItem>()
+        assertTrue(classItems.isNotEmpty())
+
+        val mathClass = classItems.find { it.schedule.subjectName == "Matemáticas" }
+        assertNotNull(mathClass)
+        assertEquals("Calculate", mathClass?.subjectIcon)
+        assertEquals("#BF092F", mathClass?.subjectColorHex)
     }
 }

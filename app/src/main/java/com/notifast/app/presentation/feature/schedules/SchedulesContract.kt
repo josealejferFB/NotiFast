@@ -2,6 +2,7 @@ package com.notifast.app.presentation.feature.schedules
 
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.SubjectData
 import com.notifast.app.domain.model.GradeScale
 import java.util.Calendar
 
@@ -34,7 +35,9 @@ sealed interface ScheduleTimelineItem {
     data class ClassItem(
         val schedule: Schedule,
         val isCurrent: Boolean = false,
-        val isConflicted: Boolean = false
+        val isConflicted: Boolean = false,
+        val subjectIcon: String = "📚",
+        val subjectColorHex: String = ""
     ) : ScheduleTimelineItem
 
     data class GapItem(
@@ -74,6 +77,8 @@ data class SchedulesUiState(
     val evaluations: List<Evaluation> = emptyList(),
     val evaluationsByDate: Map<String, List<Evaluation>> = emptyMap(),
     val dailyEvaluations: List<Evaluation> = emptyList(),
+    val subjects: List<SubjectData> = emptyList(),
+    val subjectMap: Map<String, SubjectData> = emptyMap(),
     val selectedDay: Int = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it },
     val selectedDate: Calendar = Calendar.getInstance(),
     val currentMonth: Calendar = Calendar.getInstance(),

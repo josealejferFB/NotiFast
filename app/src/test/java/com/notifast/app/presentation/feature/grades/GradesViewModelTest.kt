@@ -40,7 +40,7 @@ class GradesViewModelTest {
     private val calculateAcademicStatsUseCase = CalculateAcademicStatsUseCase()
 
     private val sampleSubjects = listOf(
-        SubjectData(name = "Matemáticas", colorHex = "#3B9797")
+        SubjectData(name = "Matemáticas", colorHex = "#3B9797", icon = "Calculate")
     )
     private val sampleEvaluations = listOf(
         Evaluation(id = "1", subjectName = "Matemáticas", title = "Parcial 1", isPresented = true, grade = 14.0, weight = 100.0, gradeScaleId = "0-20")
@@ -77,6 +77,8 @@ class GradesViewModelTest {
         assertEquals(14.0, state.globalAverage, 0.01)
         assertEquals(GradeScale.SCALE_0_20, state.gradeScale)
         assertEquals(1, state.subjectGrades.size)
+        assertEquals("Calculate", state.subjectGrades[0].icon)
+        assertEquals("#3B9797", state.subjectGrades[0].colorHex)
         assertEquals(1, state.academicStats.totalSubjectsCount)
         assertEquals(1, state.academicStats.approvedSubjectsCount)
         assertEquals(2.0, state.academicStats.totalWeeklyClassHours, 0.01)

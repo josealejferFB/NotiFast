@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.theme.ThemeUtils
+import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
 
 @Composable
@@ -53,10 +55,18 @@ fun ScheduleCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onJoinMeeting: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subjectIcon: String = "📚",
+    subjectColorHex: String = ""
 ) {
     val isDark = isSystemInDarkTheme()
-    val rawColor = if (schedule.color != 0L) Color(schedule.color) else MaterialTheme.colorScheme.primary
+    val rawColor = if (schedule.color != 0L) {
+        Color(schedule.color)
+    } else if (subjectColorHex.isNotBlank()) {
+        subjectColorHex.toSafeComposeColor(default = MaterialTheme.colorScheme.primary)
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
     val accessibleColor = ThemeUtils.getAccessibleColor(rawColor, isDark)
 
     Card(
@@ -80,11 +90,11 @@ fun ScheduleCard(
                     modifier = Modifier.size(42.dp).clip(CircleShape).background(accessibleColor.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = schedule.subjectName.take(2).uppercase(),
-                        fontWeight = FontWeight.Bold,
-                        color = accessibleColor,
-                        fontSize = 15.sp
+                    Icon(
+                        imageVector = SubjectIconMapper.getIcon(subjectIcon),
+                        contentDescription = schedule.subjectName,
+                        tint = accessibleColor,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))

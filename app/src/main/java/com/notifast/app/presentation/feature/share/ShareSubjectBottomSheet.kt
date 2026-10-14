@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.domain.usecase.ExportSubjectPackageUseCase
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.feature.share.components.QrCodeShareDialog
 import com.notifast.app.presentation.theme.ThemeUtils
 import kotlinx.coroutines.launch
@@ -62,7 +63,8 @@ fun ShareSubjectBottomSheet(
     subjectColorHex: String,
     exportUseCase: ExportSubjectPackageUseCase,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subjectIcon: String = "📚"
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -113,11 +115,11 @@ fun ShareSubjectBottomSheet(
                         .background(subjectColor.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = subjectName.take(2).uppercase(),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = subjectColor
+                    Icon(
+                        imageVector = SubjectIconMapper.getIcon(subjectIcon),
+                        contentDescription = subjectName,
+                        tint = subjectColor,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -168,9 +170,7 @@ fun ShareSubjectBottomSheet(
                     Switch(
                         checked = includeNotes,
                         onCheckedChange = { includeNotes = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary
-                        )
+                        colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary)
                     )
                 }
             }
