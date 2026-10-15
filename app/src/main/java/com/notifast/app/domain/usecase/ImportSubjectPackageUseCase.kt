@@ -28,30 +28,8 @@ class ImportSubjectPackageUseCase @Inject constructor(
     ): Result<String> {
         return try {
             val pkg = SubjectPackageCodec.decodeFromCompressedString(compressedPayload)
+            validatePackage(pkg).getOrThrow()
             val rawName = pkg.subject.name.trim()
-            if (rawName.isBlank()) {
-                return Result.failure(IllegalArgumentException("El paquete no contiene un nombre de asignatura válido"))
-            }
-
-            pkg.evaluations.forEach { e ->
-                if (e.weight != null && (e.weight < 0.0 || e.weight > 100.0)) {
-                    return Result.failure(IllegalArgumentException("Peso inválido en evaluación '${e.title}': ${e.weight}"))
-                }
-                if (e.grade != null) {
-                    val src = GradeScale.fromId(e.gradeScaleId)
-                    if (!GradePolicy.validateGrade(e.grade, src)) {
-                        return Result.failure(IllegalArgumentException("Nota inválida en evaluación '${e.title}'"))
-                    }
-                }
-            }
-            pkg.schedules.forEach { s ->
-                if (s.dayOfWeek !in 0..6) {
-                    return Result.failure(IllegalArgumentException("Día inválido en horario de '${s.subjectName}'"))
-                }
-                if (!TimeParser.isValidRange(s.startTime, s.endTime)) {
-                    return Result.failure(IllegalArgumentException("Horario inválido: ${s.startTime} - ${s.endTime}"))
-                }
-            }
 
             val existingSubjects = noteRepository.getSubjects(userId).first()
             val nameExists = existingSubjects.any { it.name.equals(rawName, ignoreCase = true) }
@@ -131,4 +109,32 @@ class ImportSubjectPackageUseCase @Inject constructor(
             Result.failure(e)
         }
     }
+}
+
+internal fun validatePackage(pkg: com.notifast.app.data.model.package_data.SubjectPackage): Result<Unit> {
+    val rawName = pkg.subject.name.trim()
+    if (rawName.isBlank()) {
+        return Result.failure(IllegalArgumentException("El paquete no contiene un nombre de asignatura válido"))
+    }
+
+    pkg.evaluations.forEach { e ->
+        if (e.weight != null && (e.weight < 0.0 || e.weight > 100.0)) {
+            return Result.failure(IllegalArgumentException("Peso inválido en evaluación '${e.title}': ${e.weight}"))
+        }
+        if (e.grade != null) {
+            val src = com.notifast.app.domain.model.GradeScale.fromId(e.gradeScaleId)
+            if (!com.notifast.app.domain.model.GradePolicy.validateGrade(e.grade, src)) {
+                return Result.failure(IllegalArgumentException("Nota inválida en evaluación '${e.title}'"))
+            }
+        }
+    }
+    pkg.schedules.forEach { s ->
+        if (s.dayOfWeek !in 0..6) {
+            return Result.failure(IllegalArgumentException("Día inválido en horario de '${s.subjectName}'"))
+        }
+        if (!com.notifast.app.domain.util.TimeParser.isValidRange(s.startTime, s.endTime)) {
+            return Result.failure(IllegalArgumentException("Horario inválido: ${s.startTime} - ${s.endTime}"))
+        }
+    }
+    return Result.success(Unit)
 }
