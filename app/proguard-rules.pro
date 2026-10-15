@@ -57,3 +57,15 @@
 # ML Kit Google Code Scanner
 -keep class com.google.mlkit.** { *; }
 -dontwarn com.google.mlkit.**
+
+# Cloud Backup & Drive REST DTOs (Gson reflection)
+-keep class com.notifast.app.data.backup.** { *; }
+-keepclassmembers class com.notifast.app.data.backup.** {
+    <fields>;
+    <init>(...);
+}
+-keep class com.notifast.app.data.remote.drive.** { *; }
+-keepclassmembers class com.notifast.app.data.remote.drive.** {
+    <fields>;
+    <init>(...);
+}

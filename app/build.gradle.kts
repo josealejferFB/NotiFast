@@ -30,7 +30,9 @@ android {
             FileInputStream(localPropertiesFile).use { localProperties.load(it) }
         }
         val webClientId = localProperties.getProperty("WEB_CLIENT_ID", "").replace("\"", "")
+        val googleWebClientId = localProperties.getProperty("google.webClientId", webClientId).replace("\"", "")
         buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
     }
 
     signingConfigs {
@@ -72,6 +74,7 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -95,6 +98,14 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+
+    // Google Credential Manager & Google ID
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    // OkHttp (Google Drive REST Client)
+    implementation(libs.okhttp)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -132,6 +143,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
