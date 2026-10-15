@@ -31,7 +31,8 @@ object DatabaseModule {
         ).addMigrations(
             NotiFastMigrations.MIGRATION_1_2,
             NotiFastMigrations.MIGRATION_2_3,
-            NotiFastMigrations.MIGRATION_3_4
+            NotiFastMigrations.MIGRATION_3_4,
+            NotiFastMigrations.MIGRATION_4_5
         ).build()
     }
 
@@ -52,4 +53,9 @@ object DatabaseModule {
 
     @Provides
     fun provideTeacherDao(db: NotiFastDatabase): TeacherDao = db.teacherDao()
+
+    @Provides
+    fun provideSubjectCloudStateDao(
+        db: NotiFastDatabase
+    ): com.notifast.app.data.local.dao.SubjectCloudStateDao = db.subjectCloudStateDao()
 }

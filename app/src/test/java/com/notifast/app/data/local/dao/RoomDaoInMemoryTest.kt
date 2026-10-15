@@ -241,5 +241,40 @@ class RoomDaoInMemoryTest {
 
         assertEquals(teacherDao, DatabaseModule.provideTeacherDao(db))
     }
+
+    @Test
+    fun insertAndRetrieveSubjectCloudState() = runTest {
+        val cloudDao: com.notifast.app.data.local.dao.SubjectCloudStateDao = mockk(relaxed = true)
+        every { db.subjectCloudStateDao() } returns cloudDao
+
+        val state = com.notifast.app.data.local.entity.SubjectCloudStateEntity(
+            accountId = "acc-1",
+            subjectId = "sub-1",
+            driveFileId = "drive-1",
+            lastUploadedHash = "hash-1",
+            lastSyncedAt = 12345L
+        )
+
+        coEvery { cloudDao.getAll("acc-1") } returns listOf(state)
+        coEvery { cloudDao.observe("acc-1") } returns flowOf(listOf(state))
+
+        cloudDao.upsert(state)
+        coVerify { cloudDao.upsert(state) }
+
+        val list = cloudDao.getAll("acc-1")
+        assertEquals(1, list.size)
+        assertEquals("drive-1", list.first().driveFileId)
+
+        val flowList = cloudDao.observe("acc-1").first()
+        assertEquals("hash-1", flowList.first().lastUploadedHash)
+
+        cloudDao.deleteBySubject("sub-1")
+        coVerify { cloudDao.deleteBySubject("sub-1") }
+
+        cloudDao.deleteByAccount("acc-1")
+        coVerify { cloudDao.deleteByAccount("acc-1") }
+
+        assertEquals(cloudDao, DatabaseModule.provideSubjectCloudStateDao(db))
+    }
 }
 

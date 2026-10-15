@@ -166,5 +166,26 @@ object NotiFastMigrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_teachers_userId_firstName_lastName` ON `teachers` (`userId`, `firstName`, `lastName`)")
         }
     }
+
+    /**
+     * v4 → v5: subject_cloud_state table for Google Drive sync tracking.
+     */
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `subject_cloud_state` (
+                    `accountId` TEXT NOT NULL,
+                    `subjectId` TEXT NOT NULL,
+                    `driveFileId` TEXT NOT NULL,
+                    `lastUploadedHash` TEXT NOT NULL,
+                    `lastSyncedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`accountId`, `subjectId`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_subject_cloud_state_subjectId` ON `subject_cloud_state` (`subjectId`)")
+        }
+    }
 }
 
