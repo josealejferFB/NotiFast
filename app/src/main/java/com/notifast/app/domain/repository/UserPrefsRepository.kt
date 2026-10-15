@@ -135,5 +135,15 @@ interface UserPrefsRepository {
      * Sets whether completed evaluations should be shown.
      */
     suspend fun setShowCompletedEvaluations(show: Boolean): Result<Unit>
+
+    /**
+     * Exports all current preference keys and values as a string map.
+     */
+    suspend fun exportAll(): Map<String, String>
+
+    /**
+     * Imports preference values from a string map. Unknown keys are ignored.
+     */
+    suspend fun importAll(values: Map<String, String>): Result<Unit>
 }
 

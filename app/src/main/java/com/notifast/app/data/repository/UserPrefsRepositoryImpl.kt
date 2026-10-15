@@ -14,6 +14,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.notifast.app.domain.repository.UserPrefsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -286,6 +287,55 @@ class UserPrefsRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save show completed evaluations preference", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun exportAll(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        try {
+            val prefs = safeDataFlow { it }.first()
+            prefs[PreferencesKeys.IS_DARK_MODE]?.let { map["is_dark_mode"] = it.toString() }
+            prefs[PreferencesKeys.HAS_DARK_MODE_SET]?.let { map["has_dark_mode_set"] = it.toString() }
+            prefs[PreferencesKeys.THEME_ACCENT]?.let { map["theme_accent"] = it }
+            prefs[PreferencesKeys.HAPTICS_ENABLED]?.let { map["haptics_enabled"] = it.toString() }
+            prefs[PreferencesKeys.CLASS_ALERTS_ENABLED]?.let { map["class_alerts_enabled"] = it.toString() }
+            prefs[PreferencesKeys.CLASS_ALERT_MINUTES]?.let { map["class_alert_minutes"] = it.toString() }
+            prefs[PreferencesKeys.EVAL_ALERTS_ENABLED]?.let { map["eval_alerts_enabled"] = it.toString() }
+            prefs[PreferencesKeys.EVAL_ALERT_DAYS]?.let { map["eval_alert_days"] = it.toString() }
+            prefs[PreferencesKeys.DAILY_SUMMARY_ENABLED]?.let { map["daily_summary_enabled"] = it.toString() }
+            prefs[PreferencesKeys.DEFAULT_GRADE_SCALE]?.let { map["default_grade_scale"] = it }
+            prefs[PreferencesKeys.MIN_PASSING_GRADE]?.let { map["min_passing_grade"] = it.toString() }
+            prefs[PreferencesKeys.ACTIVE_ACADEMIC_CYCLE]?.let { map["active_academic_cycle"] = it }
+            prefs[PreferencesKeys.FIRST_DAY_OF_WEEK]?.let { map["first_day_of_week"] = it }
+            prefs[PreferencesKeys.SHOW_COMPLETED_EVALUATIONS]?.let { map["show_completed_evaluations"] = it.toString() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to export preferences", e)
+        }
+        return map
+    }
+
+    override suspend fun importAll(values: Map<String, String>): Result<Unit> {
+        return try {
+            dataStore.edit { prefs ->
+                values["is_dark_mode"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.IS_DARK_MODE] = it }
+                values["has_dark_mode_set"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.HAS_DARK_MODE_SET] = it }
+                values["theme_accent"]?.let { prefs[PreferencesKeys.THEME_ACCENT] = it }
+                values["haptics_enabled"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.HAPTICS_ENABLED] = it }
+                values["class_alerts_enabled"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.CLASS_ALERTS_ENABLED] = it }
+                values["class_alert_minutes"]?.toIntOrNull()?.let { prefs[PreferencesKeys.CLASS_ALERT_MINUTES] = it }
+                values["eval_alerts_enabled"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.EVAL_ALERTS_ENABLED] = it }
+                values["eval_alert_days"]?.toIntOrNull()?.let { prefs[PreferencesKeys.EVAL_ALERT_DAYS] = it }
+                values["daily_summary_enabled"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.DAILY_SUMMARY_ENABLED] = it }
+                values["default_grade_scale"]?.let { prefs[PreferencesKeys.DEFAULT_GRADE_SCALE] = it }
+                values["min_passing_grade"]?.toFloatOrNull()?.let { prefs[PreferencesKeys.MIN_PASSING_GRADE] = it }
+                values["active_academic_cycle"]?.let { prefs[PreferencesKeys.ACTIVE_ACADEMIC_CYCLE] = it }
+                values["first_day_of_week"]?.let { prefs[PreferencesKeys.FIRST_DAY_OF_WEEK] = it }
+                values["show_completed_evaluations"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.SHOW_COMPLETED_EVALUATIONS] = it }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to import preferences", e)
             Result.failure(e)
         }
     }
