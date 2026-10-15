@@ -75,4 +75,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindCloudBackupRepository(impl: com.notifast.app.data.repository.DriveCloudBackupRepositoryImpl): com.notifast.app.domain.repository.CloudBackupRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNetworkMonitor(impl: com.notifast.app.data.remote.DefaultNetworkMonitor): com.notifast.app.domain.util.NetworkMonitor
 }
