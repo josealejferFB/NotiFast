@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.domain.model.cloud.CloudSubjectItem
 import com.notifast.app.domain.model.cloud.CloudSubjectStatus
+import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.theme.ThemeUtils
 
 @Composable
@@ -73,9 +74,11 @@ fun CloudSubjectRow(
                 .background(subjectColor.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = item.icon.ifBlank { "📚" },
-                fontSize = 18.sp
+            Icon(
+                imageVector = SubjectIconMapper.getIcon(item.icon),
+                contentDescription = null,
+                tint = subjectColor,
+                modifier = Modifier.size(20.dp)
             )
         }
 

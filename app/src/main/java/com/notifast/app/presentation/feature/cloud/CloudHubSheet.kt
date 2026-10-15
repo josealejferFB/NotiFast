@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
-import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastCard
+import com.notifast.app.presentation.feature.cloud.components.CloudActionBar
 import com.notifast.app.presentation.feature.cloud.components.CloudAccountHeader
 import com.notifast.app.presentation.feature.cloud.components.CloudConfirmDialog
 import com.notifast.app.presentation.feature.cloud.components.CloudErrorDialog
@@ -183,40 +183,22 @@ fun CloudHubSheet(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(onClick = { viewModel.onEvent(CloudEvent.SelectAll) }) {
-                        val allSelected = uiState.selected.size == uiState.items.size && uiState.items.isNotEmpty()
-                        Text(
-                            text = if (allSelected) {
-                                stringResource(R.string.cloud_action_deselect_all)
-                            } else {
-                                stringResource(R.string.cloud_action_select_all)
-                            }
-                        )
-                    }
+                val selectedCount = uiState.selected.size + (if (uiState.globalSelected) 1 else 0)
+                val allSelected = uiState.selected.size == uiState.items.size && uiState.items.isNotEmpty()
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        NotiFastButton(
-                            text = stringResource(R.string.cloud_action_restore),
-                            onClick = { viewModel.onEvent(CloudEvent.Restore) },
-                            enabled = uiState.canRestore && !uiState.isOffline && !uiState.isLoading,
-                            isLoading = false
-                        )
-
-                        NotiFastButton(
-                            text = stringResource(R.string.cloud_action_upload),
-                            onClick = { viewModel.onEvent(CloudEvent.Upload) },
-                            enabled = uiState.canUpload && !uiState.isOffline && !uiState.isLoading,
-                            isLoading = uiState.isLoading && uiState.progress == null
-                        )
-                    }
-                }
+                CloudActionBar(
+                    allSelected = allSelected,
+                    selectedCount = selectedCount,
+                    canRestore = uiState.canRestore,
+                    canUpload = uiState.canUpload,
+                    isOffline = uiState.isOffline,
+                    isLoading = uiState.isLoading && uiState.progress == null,
+                    onToggleSelectAll = { viewModel.onEvent(CloudEvent.SelectAll) },
+                    onRestore = { viewModel.onEvent(CloudEvent.Restore) },
+                    onUpload = { viewModel.onEvent(CloudEvent.Upload) }
+                )
             }
         }
     }

@@ -733,6 +733,7 @@
     <string name="cloud_status_cloud_only">Solo en la nube</string>
     <string name="cloud_action_select_all">Seleccionar todas</string>
     <string name="cloud_action_deselect_all">Deseleccionar</string>
+    <string name="cloud_selected_count">%1$d seleccionadas</string>
     <string name="cloud_action_upload">Subir a la nube</string>
     <string name="cloud_action_restore">Restaurar al teléfono</string>
     <string name="cloud_action_delete_cloud">Borrar de la nube</string>
