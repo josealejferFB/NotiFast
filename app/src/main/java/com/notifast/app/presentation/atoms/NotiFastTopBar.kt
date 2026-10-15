@@ -29,17 +29,20 @@ import com.notifast.app.presentation.atoms.header.HeaderContextPill
 import com.notifast.app.presentation.atoms.header.HeaderHomeActions
 import java.util.Locale
 
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
+
 sealed class TopBarType {
     data class Home(
         val firstName: String,
         val email: String,
         val profilePictureUrl: String?,
         val hasUnreadNotifications: Boolean = false,
-        val isCloudSynced: Boolean = true,
+        val syncSummary: LocalSyncSummary = LocalSyncSummary.NO_ACCOUNT,
         val contextText: String? = null,
         val onProfileClick: () -> Unit,
         val onNotificationsClick: () -> Unit = {},
-        val onSearchClick: (() -> Unit)? = null
+        val onSearchClick: (() -> Unit)? = null,
+        val onCloudClick: () -> Unit = {}
     ) : TopBarType()
 
     data class Detail(
@@ -123,7 +126,7 @@ private fun HomeTopBarContent(
                 HeaderAvatar(
                     displayName = displayName,
                     profilePictureUrl = type.profilePictureUrl,
-                    isCloudSynced = type.isCloudSynced,
+                    syncSummary = type.syncSummary,
                     onClick = type.onProfileClick
                 )
 
@@ -143,9 +146,10 @@ private fun HomeTopBarContent(
             // Right Group: Cloud Sync + Notifications Bell + Search
             HeaderHomeActions(
                 hasUnreadNotifications = type.hasUnreadNotifications,
-                isCloudSynced = type.isCloudSynced,
+                syncSummary = type.syncSummary,
                 onNotificationsClick = type.onNotificationsClick,
-                onSearchClick = type.onSearchClick
+                onSearchClick = type.onSearchClick,
+                onCloudClick = type.onCloudClick
             )
         }
 

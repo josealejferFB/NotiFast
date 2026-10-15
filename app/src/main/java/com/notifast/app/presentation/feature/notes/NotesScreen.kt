@@ -85,8 +85,10 @@ fun NotesScreen(
                         firstName = uiState.userFirstName,
                         email = uiState.userEmail,
                         profilePictureUrl = uiState.userProfilePictureUrl,
+                        syncSummary = uiState.syncSummary,
                         onProfileClick = onEditProfile,
-                        onSearchClick = onSearchClick
+                        onSearchClick = onSearchClick,
+                        onCloudClick = { viewModel.onEvent(NotesEvent.CloudClick) }
                     )
                 )
             },
@@ -220,6 +222,12 @@ fun NotesScreen(
                     )
                 }
             }
+        }
+
+        if (uiState.showCloudHub) {
+            com.notifast.app.presentation.feature.cloud.CloudHubSheet(
+                onDismiss = { viewModel.onEvent(NotesEvent.DismissCloudHub) }
+            )
         }
     }
 }

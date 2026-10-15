@@ -169,6 +169,7 @@
     <!-- General -->
     <string name="general_error">Ocurrió un error</string>
     <string name="btn_save">Guardar</string>
+    <string name="btn_accept">Aceptar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_delete">Eliminar</string>
     <string name="btn_close">Cerrar</string>
@@ -705,4 +706,59 @@
     <string name="daily_summary_evals_count">%1$d evaluación(es) en 48h</string>
     <string name="daily_summary_evals_none">Sin entregas inminentes</string>
     <string name="import_preview_summary">%1$d horarios • %2$d evaluaciones • %3$d apuntes</string>
+
+    <!-- Google Drive Cloud Backup (Fase 3.3) -->
+    <string name="cloud_hub_title">Copia de Seguridad</string>
+    <string name="cloud_hub_subtitle">Google Drive (Privado)</string>
+    <string name="cloud_link_prompt_title">Guarda tus materias en la nube</string>
+    <string name="cloud_link_prompt_desc">Copia de seguridad en tu Google Drive personal. Gratis, privado y accesible solo por NotiFast.</string>
+    <string name="cloud_link_btn_continue">Continuar con Google</string>
+    <string name="cloud_account_last_backup">Última copia: %1$s</string>
+    <string name="cloud_account_no_backup">Sin copias registradas</string>
+    <string name="cloud_banner_found_copies">Encontramos %1$d materias en tu nube. ¿Quieres restaurarlas?</string>
+    <string name="cloud_global_item_title">Perfil y preferencias</string>
+    <string name="cloud_global_item_desc">Nombre, foto, escala de notas y directorio de profesores</string>
+    <string name="cloud_section_subjects">Materias</string>
+    <string name="cloud_status_synced">Sincronizada</string>
+    <string name="cloud_status_local_changes">Cambios sin subir</string>
+    <string name="cloud_status_cloud_newer">Nube más reciente</string>
+    <string name="cloud_status_both_unlinked">Conflicto</string>
+    <string name="cloud_status_local_only">Solo en el teléfono</string>
+    <string name="cloud_status_cloud_only">Solo en la nube</string>
+    <string name="cloud_action_select_all">Seleccionar todas</string>
+    <string name="cloud_action_deselect_all">Deseleccionar</string>
+    <string name="cloud_action_upload">Subir a la nube</string>
+    <string name="cloud_action_restore">Restaurar al teléfono</string>
+    <string name="cloud_action_delete_cloud">Borrar de la nube</string>
+    <string name="cloud_offline_banner">Sin conexión a internet. Acciones en la nube pausadas.</string>
+    <string name="cloud_confirm_newer_title">¿Reemplazar copia en la nube?</string>
+    <string name="cloud_confirm_newer_msg">La copia en la nube es más reciente. ¿Deseas reemplazarla con la versión actual de este teléfono?</string>
+    <string name="cloud_confirm_metered_title">Aviso de datos móviles</string>
+    <string name="cloud_confirm_metered_msg">El tamaño estimado es mayor a 20 MB y estás usando datos móviles. ¿Deseas continuar?</string>
+    <string name="cloud_confirm_restore_global_title">¿Restaurar perfil y ajustes?</string>
+    <string name="cloud_confirm_restore_global_msg">Esto reemplazará tu nombre, foto y preferencias locales por las guardadas en la nube. Los profesores se fusionarán sin duplicar.</string>
+    <string name="cloud_confirm_delete_cloud_title">¿Eliminar de la nube?</string>
+    <string name="cloud_confirm_delete_cloud_msg">¿Deseas eliminar la copia en la nube de «%1$s»? Los datos en este teléfono no se modificarán.</string>
+    <string name="cloud_conflict_title">Ya existe «%1$s»</string>
+    <string name="cloud_conflict_has_changes_warning">Esta materia local tiene cambios que aún no has subido.</string>
+    <string name="cloud_conflict_option_overwrite">Sobrescribir copia local</string>
+    <string name="cloud_conflict_option_add_as">Agregar como nueva materia</string>
+    <string name="cloud_conflict_option_skip">Omitir restauración</string>
+    <string name="cloud_conflict_apply_to_rest">Aplicar a las demás materias en conflicto</string>
+    <string name="cloud_conflict_new_name_label">Nuevo nombre</string>
+    <string name="cloud_summary_title">Resumen de sincronización</string>
+    <string name="cloud_summary_success_count">%1$d materias procesadas con éxito</string>
+    <string name="cloud_summary_failure_count">%1$d materias con error</string>
+    <string name="cloud_summary_btn_retry">Reintentar fallidas</string>
+    <string name="cloud_progress_title">Sincronizando con Google Drive…</string>
+    <string name="cloud_progress_status">%1$d de %2$d: %3$s</string>
+    <string name="cloud_error_cancelled">Operación cancelada</string>
+    <string name="cloud_error_no_play_services">Tu dispositivo no permite iniciar sesión con Google</string>
+    <string name="cloud_error_permission_denied">Permiso denegado para Google Drive</string>
+    <string name="cloud_error_reauth_required">Tu sesión expiró. Vuelve a vincular tu cuenta</string>
+    <string name="cloud_error_quota_full">Tu espacio en Google Drive está lleno</string>
+    <string name="cloud_error_offline">Sin conexión a internet</string>
+    <string name="cloud_error_generic">Ocurrió un error inesperado al conectar con Google Drive</string>
+    <string name="topbar_sync_pending_cd">Cambios pendientes por sincronizar con la nube</string>
+    <string name="topbar_sync_no_account_cd">Copia de seguridad en Google Drive sin vincular</string>
 </resources>

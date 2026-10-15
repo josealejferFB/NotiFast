@@ -63,7 +63,9 @@ data class NotesUiState(
     val userFirstName: String = "",
     val userLastName: String = "",
     val userEmail: String = "",
-    val userProfilePictureUrl: String? = null
+    val userProfilePictureUrl: String? = null,
+    val syncSummary: com.notifast.app.domain.model.cloud.LocalSyncSummary = com.notifast.app.domain.model.cloud.LocalSyncSummary.NO_ACCOUNT,
+    val showCloudHub: Boolean = false
 )
 
 sealed interface NotesEvent {
@@ -80,5 +82,7 @@ sealed interface NotesEvent {
     data class OpenAddEditTeacher(val teacher: Teacher?) : NotesEvent
     data class SaveTeacher(val teacher: Teacher) : NotesEvent
     data class DeleteTeacher(val teacherId: String) : NotesEvent
+    data object CloudClick : NotesEvent
+    data object DismissCloudHub : NotesEvent
 }
 

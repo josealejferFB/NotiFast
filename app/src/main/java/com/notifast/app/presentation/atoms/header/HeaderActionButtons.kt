@@ -32,7 +32,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Search
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
 
 /**
  * NotiFast 3.0 Header Action Buttons.
@@ -41,10 +43,11 @@ import androidx.compose.material.icons.filled.Search
 @Composable
 fun HeaderHomeActions(
     hasUnreadNotifications: Boolean,
-    isCloudSynced: Boolean,
+    syncSummary: LocalSyncSummary = LocalSyncSummary.NO_ACCOUNT,
     onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onSearchClick: (() -> Unit)? = null
+    onSearchClick: (() -> Unit)? = null,
+    onCloudClick: () -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -102,20 +105,70 @@ fun HeaderHomeActions(
         }
 
         // Storage & sync indicator (honest local storage vs cloud sync)
-        val syncDescription = if (isCloudSynced) {
-            stringResource(R.string.topbar_sync_synced_cd)
-        } else {
-            stringResource(R.string.topbar_local_storage_cd)
+        val syncDescription = when (syncSummary) {
+            LocalSyncSummary.NO_ACCOUNT -> stringResource(R.string.topbar_sync_no_account_cd)
+            LocalSyncSummary.ALL_SYNCED -> stringResource(R.string.topbar_sync_synced_cd)
+            LocalSyncSummary.PENDING -> stringResource(R.string.topbar_sync_pending_cd)
         }
 
-        Icon(
-            imageVector = if (isCloudSynced) Icons.Default.CloudDone else Icons.Default.PhoneAndroid,
-            contentDescription = syncDescription,
-            tint = if (isCloudSynced) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .size(20.dp)
+        val syncIcon = when (syncSummary) {
+            LocalSyncSummary.NO_ACCOUNT -> Icons.Default.PhoneAndroid
+            LocalSyncSummary.ALL_SYNCED -> Icons.Default.CloudDone
+            LocalSyncSummary.PENDING -> Icons.Default.CloudSync
+        }
+
+        val syncTint = when (syncSummary) {
+            LocalSyncSummary.NO_ACCOUNT -> MaterialTheme.colorScheme.onSurfaceVariant
+            LocalSyncSummary.ALL_SYNCED -> MaterialTheme.colorScheme.tertiary
+            LocalSyncSummary.PENDING -> MaterialTheme.colorScheme.primary
+        }
+
+        val cloudInteractionSource = remember { MutableInteractionSource() }
+        val isCloudPressed by cloudInteractionSource.collectIsPressedAsState()
+        val cloudScale by animateFloatAsState(
+            targetValue = if (isCloudPressed) 0.95f else 1.0f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            ),
+            label = "cloud_press_scale"
         )
+
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .graphicsLayer {
+                    scaleX = cloudScale
+                    scaleY = cloudScale
+                }
+                .clip(CircleShape)
+                .clickable(
+                    interactionSource = cloudInteractionSource,
+                    indication = null,
+                    role = Role.Button,
+                    onClickLabel = syncDescription,
+                    onClick = onCloudClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            BadgedBox(
+                badge = {
+                    if (syncSummary == LocalSyncSummary.PENDING) {
+                        Badge(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(6.dp)
+                        )
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = syncIcon,
+                    contentDescription = syncDescription,
+                    tint = syncTint,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
 
         // Notification Bell with Badge and Tactile Spring
         Box(

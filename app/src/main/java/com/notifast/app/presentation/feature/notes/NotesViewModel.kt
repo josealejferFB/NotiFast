@@ -42,7 +42,8 @@ class NotesViewModel @Inject constructor(
     private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
     val importSubjectPackageUseCase: ImportSubjectPackageUseCase,
-    private val teacherRepository: TeacherRepository
+    private val teacherRepository: TeacherRepository,
+    private val observeLocalSyncSummaryUseCase: com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -57,6 +58,7 @@ class NotesViewModel @Inject constructor(
     init {
         loadNotes()
         loadUserProfile()
+        observeSyncSummary()
     }
 
     private fun loadUserProfile() {
@@ -287,6 +289,17 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.OpenAddEditTeacher -> _uiState.update { it.copy(teacherBeingEdited = event.teacher) }
             is NotesEvent.SaveTeacher -> saveTeacher(event.teacher)
             is NotesEvent.DeleteTeacher -> deleteTeacher(event.teacherId)
+            is NotesEvent.CloudClick -> _uiState.update { it.copy(showCloudHub = true) }
+            is NotesEvent.DismissCloudHub -> _uiState.update { it.copy(showCloudHub = false) }
+        }
+    }
+
+    private fun observeSyncSummary() {
+        viewModelScope.launch {
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            observeLocalSyncSummaryUseCase(uid).collect { summary ->
+                _uiState.update { it.copy(syncSummary = summary) }
+            }
         }
     }
 

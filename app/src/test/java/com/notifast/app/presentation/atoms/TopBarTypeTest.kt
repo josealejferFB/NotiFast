@@ -6,6 +6,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
+
 /**
  * Unit tests for TopBarType model and contracts.
  */
@@ -15,23 +17,25 @@ class TopBarTypeTest {
     fun `home top bar contract preserves properties correctly`() {
         var profileClicked = false
         var notificationsClicked = false
+        var cloudClicked = false
 
         val home = TopBarType.Home(
             firstName = "Carlos",
             email = "carlos@universidad.edu",
             profilePictureUrl = "https://example.com/avatar.jpg",
             hasUnreadNotifications = true,
-            isCloudSynced = false,
+            syncSummary = LocalSyncSummary.PENDING,
             contextText = "Semestre 2026-II",
             onProfileClick = { profileClicked = true },
-            onNotificationsClick = { notificationsClicked = true }
+            onNotificationsClick = { notificationsClicked = true },
+            onCloudClick = { cloudClicked = true }
         )
 
         assertEquals("Carlos", home.firstName)
         assertEquals("carlos@universidad.edu", home.email)
         assertEquals("https://example.com/avatar.jpg", home.profilePictureUrl)
         assertTrue(home.hasUnreadNotifications)
-        assertFalse(home.isCloudSynced)
+        assertEquals(LocalSyncSummary.PENDING, home.syncSummary)
         assertEquals("Semestre 2026-II", home.contextText)
 
         home.onProfileClick()
@@ -39,20 +43,23 @@ class TopBarTypeTest {
 
         home.onNotificationsClick()
         assertTrue(notificationsClicked)
+
+        home.onCloudClick()
+        assertTrue(cloudClicked)
     }
 
     @Test
-    fun `home top bar contract preserves isCloudSynced false for local offline storage`() {
+    fun `home top bar contract defaults to NO_ACCOUNT and allows ALL_SYNCED`() {
         val defaultHome = TopBarType.Home(
             firstName = "Ana",
             email = "ana@universidad.edu",
             profilePictureUrl = null,
             onProfileClick = {}
         )
-        assertTrue(defaultHome.isCloudSynced)
+        assertEquals(LocalSyncSummary.NO_ACCOUNT, defaultHome.syncSummary)
 
-        val offlineHome = defaultHome.copy(isCloudSynced = false)
-        assertFalse(offlineHome.isCloudSynced)
+        val syncedHome = defaultHome.copy(syncSummary = LocalSyncSummary.ALL_SYNCED)
+        assertEquals(LocalSyncSummary.ALL_SYNCED, syncedHome.syncSummary)
     }
 
     @Test

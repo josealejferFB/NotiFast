@@ -41,6 +41,7 @@ class NotesViewModelTest {
     private val calculateWeightedAverageUseCase = CalculateWeightedAverageUseCase()
     private val importSubjectPackageUseCase: com.notifast.app.domain.usecase.ImportSubjectPackageUseCase = mockk(relaxed = true)
     private val teacherRepository: com.notifast.app.domain.repository.TeacherRepository = mockk(relaxed = true)
+    private val observeLocalSyncSummaryUseCase: com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797"),
@@ -62,7 +63,8 @@ class NotesViewModelTest {
         userPrefsRepository,
         calculateWeightedAverageUseCase,
         importSubjectPackageUseCase,
-        teacherRepository
+        teacherRepository,
+        observeLocalSyncSummaryUseCase
     )
 
     @Before
@@ -331,5 +333,19 @@ class NotesViewModelTest {
         advanceUntilIdle()
 
         io.mockk.coVerify { teacherRepository.deleteTeacher("user_123", "t1") }
+    }
+
+    @Test
+    fun `when CloudClick and DismissCloudHub dispatched, updates showCloudHub`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        org.junit.Assert.assertFalse(viewModel.uiState.value.showCloudHub)
+
+        viewModel.onEvent(NotesEvent.CloudClick)
+        assertTrue(viewModel.uiState.value.showCloudHub)
+
+        viewModel.onEvent(NotesEvent.DismissCloudHub)
+        org.junit.Assert.assertFalse(viewModel.uiState.value.showCloudHub)
     }
 }

@@ -32,6 +32,8 @@ import coil.compose.SubcomposeAsyncImage
 import com.notifast.app.R
 import java.util.Locale
 
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
+
 /**
  * NotiFast 3.0 Tactile Header Avatar with Cloud Sync Ring.
  * Features 0.97f spring tactile response, dynamic sync ring, and high-contrast monogram fallback.
@@ -40,7 +42,7 @@ import java.util.Locale
 fun HeaderAvatar(
     displayName: String,
     profilePictureUrl: String?,
-    isCloudSynced: Boolean,
+    syncSummary: LocalSyncSummary = LocalSyncSummary.NO_ACCOUNT,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -56,10 +58,10 @@ fun HeaderAvatar(
         label = "avatar_press_scale"
     )
 
-    val syncRingColor = if (isCloudSynced) {
-        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.85f)
-    } else {
-        MaterialTheme.colorScheme.error.copy(alpha = 0.85f)
+    val syncRingColor = when (syncSummary) {
+        LocalSyncSummary.NO_ACCOUNT -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        LocalSyncSummary.ALL_SYNCED -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.85f)
+        LocalSyncSummary.PENDING -> MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
     }
 
     val initial = remember(displayName) {
