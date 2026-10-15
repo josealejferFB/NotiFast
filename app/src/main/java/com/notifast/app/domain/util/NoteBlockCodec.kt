@@ -28,10 +28,11 @@ object NoteBlockCodec {
     private const val TYPE_MATH = "math"
     private const val TYPE_DIVIDER = "divider"
 
-    private val gson: Gson = GsonBuilder()
+    fun registerAdapters(builder: GsonBuilder): GsonBuilder = builder
         .registerTypeAdapter(NoteBlock::class.java, NoteBlockAdapter())
         .registerTypeAdapter(TextStyle::class.java, TextStyleAdapter())
-        .create()
+
+    private val gson: Gson = registerAdapters(GsonBuilder()).create()
 
     private val listType = object : TypeToken<List<NoteBlock>>() {}.type
 

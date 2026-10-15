@@ -17,7 +17,8 @@ import javax.inject.Inject
 class ImportSubjectPackageUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
     private val evaluationRepository: EvaluationRepository,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val resolveSubjectNameUseCase: ResolveSubjectNameUseCase = ResolveSubjectNameUseCase()
 ) {
 
     suspend operator fun invoke(
@@ -67,14 +68,7 @@ class ImportSubjectPackageUseCase @Inject constructor(
                     return Result.failure(IllegalStateException("La asignatura \"$rawName\" ya existe en tu cuaderno"))
                 }
                 else -> {
-                    var suffix = " (Copia)"
-                    var candidate = "$rawName$suffix"
-                    var counter = 2
-                    while (existingSubjects.any { it.name.equals(candidate, ignoreCase = true) }) {
-                        candidate = "$rawName (Copia $counter)"
-                        counter++
-                    }
-                    candidate
+                    resolveSubjectNameUseCase.suggest(rawName, existingSubjects.map { it.name })
                 }
             }
 
@@ -112,14 +106,24 @@ class ImportSubjectPackageUseCase @Inject constructor(
             }
 
             pkg.notes.forEach { n ->
-                noteRepository.addNote(
-                    userId = userId,
-                    subject = targetName,
-                    title = n.title,
-                    content = n.content,
-                    imageUri = null,
-                    tags = n.tags
-                ).getOrElse { return Result.failure(it) }
+                if (n.blocks.isNotEmpty()) {
+                    noteRepository.addNoteWithBlocks(
+                        userId = userId,
+                        subject = targetName,
+                        title = n.title,
+                        blocks = n.blocks,
+                        tags = n.tags
+                    ).getOrElse { return Result.failure(it) }
+                } else {
+                    noteRepository.addNote(
+                        userId = userId,
+                        subject = targetName,
+                        title = n.title,
+                        content = n.content,
+                        imageUri = null,
+                        tags = n.tags
+                    ).getOrElse { return Result.failure(it) }
+                }
             }
 
             Result.success(targetName)

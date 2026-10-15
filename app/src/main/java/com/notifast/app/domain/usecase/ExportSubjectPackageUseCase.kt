@@ -34,7 +34,13 @@ class ExportSubjectPackageUseCase @Inject constructor(
 
             val notes = if (includeNotes) {
                 noteRepository.getNotesBySubject(userId, targetSubject.name).first()
-                    .map { it.copy(userId = "", imageUrl = null) }
+                    .map { note ->
+                        note.copy(
+                            userId = "",
+                            imageUrl = null,
+                            blocks = note.blocks.filterNot { it is com.notifast.app.data.model.NoteBlock.Image }
+                        )
+                    }
             } else {
                 emptyList()
             }

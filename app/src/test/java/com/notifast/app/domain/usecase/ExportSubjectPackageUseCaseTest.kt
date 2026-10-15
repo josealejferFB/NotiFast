@@ -72,4 +72,76 @@ class ExportSubjectPackageUseCaseTest {
         val result = exportSubjectPackageUseCase("u1", "Inexistente")
         assertTrue(result.isFailure)
     }
+
+    @Test
+    fun `export strips image blocks and local paths from exported notes`() = runTest {
+        val noteWithImage = Note(
+            id = "n2",
+            userId = "u1",
+            subject = "Física II",
+            title = "Óptica",
+            content = "Leyes de reflexión",
+            imageUrl = "file:///data/user/0/com.notifast.app/files/images/legacy.jpg",
+            blocks = listOf(
+                com.notifast.app.data.model.NoteBlock.Paragraph(id = "b1", text = "Texto introductorio"),
+                com.notifast.app.data.model.NoteBlock.Image(id = "b2", path = "file:///data/user/0/com.notifast.app/files/images/diagram.jpg", caption = "Diagrama")
+            )
+        )
+        every { noteRepository.getNotesBySubject("u1", "Física II") } returns flowOf(listOf(noteWithImage))
+
+        val result = exportSubjectPackageUseCase("u1", "Física II", includeNotes = true)
+        assertTrue(result.isSuccess)
+        val payload = result.getOrThrow()
+
+        val decoded = SubjectPackageCodec.decodeFromCompressedString(payload)
+        val exportedNote = decoded.notes.first()
+        org.junit.Assert.assertNull(exportedNote.imageUrl)
+        assertEquals("", exportedNote.userId)
+        assertTrue(exportedNote.blocks.none { it is com.notifast.app.data.model.NoteBlock.Image })
+        assertEquals(1, exportedNote.blocks.size)
+        assertTrue(exportedNote.blocks.first() is com.notifast.app.data.model.NoteBlock.Paragraph)
+    }
+
+    @Test
+    fun `export then import roundtrip with notes preserves counts and decodes note blocks`() = runTest {
+        val note = Note(
+            id = "n-rt",
+            userId = "u1",
+            subject = "Física II",
+            title = "Termodinámica",
+            content = "Leyes térmicas",
+            blocks = listOf(
+                com.notifast.app.data.model.NoteBlock.Paragraph(id = "p1", text = "Primera ley de la termodinámica")
+            )
+        )
+        every { noteRepository.getNotesBySubject("u1", "Física II") } returns flowOf(listOf(note))
+
+        val exportResult = exportSubjectPackageUseCase("u1", "Física II", includeNotes = true)
+        assertTrue(exportResult.isSuccess)
+        val payload = exportResult.getOrThrow()
+
+        val destNoteRepo = mockk<NoteRepository>()
+        val destEvalRepo = mockk<EvaluationRepository>()
+        val destSchedRepo = mockk<ScheduleRepository>()
+
+        every { destNoteRepo.getSubjects("u2") } returns flowOf(emptyList())
+        io.mockk.coEvery { destNoteRepo.addSubject("u2", "Física II", "⚡", "#3B9797", any()) } returns Result.success("sub-u2")
+        io.mockk.coEvery { destSchedRepo.addSchedule("u2", any()) } returns Result.success("sch-u2")
+        io.mockk.coEvery { destEvalRepo.addEvaluation("u2", any(), any()) } returns Result.success("ev-u2")
+        io.mockk.coEvery { destNoteRepo.addNoteWithBlocks("u2", "Física II", any(), any(), any()) } returns Result.success("note-u2")
+
+        val importer = ImportSubjectPackageUseCase(
+            destNoteRepo,
+            destEvalRepo,
+            destSchedRepo
+        )
+
+        val importResult = importer("u2", payload, com.notifast.app.domain.model.package_data.ConflictStrategy.RENAME)
+        assertTrue(importResult.isSuccess)
+        assertEquals("Física II", importResult.getOrThrow())
+
+        io.mockk.coVerify(exactly = 1) { destSchedRepo.addSchedule("u2", any()) }
+        io.mockk.coVerify(exactly = 1) { destEvalRepo.addEvaluation("u2", any(), null) }
+        io.mockk.coVerify(exactly = 1) { destNoteRepo.addNoteWithBlocks("u2", "Física II", "Termodinámica", any(), any()) }
+    }
 }

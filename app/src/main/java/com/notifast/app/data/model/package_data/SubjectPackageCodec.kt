@@ -41,9 +41,9 @@ object SubjectPackageCodec {
         }
     }
 
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(Date::class.java, utcFormat)
-        .create()
+    private val gson: Gson = com.notifast.app.domain.util.NoteBlockCodec.registerAdapters(
+        GsonBuilder().registerTypeAdapter(Date::class.java, utcFormat)
+    ).create()
 
     fun toJson(pkg: SubjectPackage): String = gson.toJson(pkg)
 

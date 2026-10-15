@@ -74,9 +74,9 @@ class ImportSubjectPackageUseCaseTest {
         val result = importSubjectPackageUseCase("u1", validCompressedPayload, ConflictStrategy.RENAME)
         assertTrue(result.isSuccess)
         val importedName = result.getOrThrow()
-        assertTrue(importedName.startsWith("Química Orgánica (Copia"))
+        assertEquals("Química Orgánica (1)", importedName)
 
-        coVerify { noteRepository.addSubject("u1", importedName, "🧪", "#15803D") }
+        coVerify { noteRepository.addSubject("u1", "Química Orgánica (1)", "🧪", "#15803D") }
     }
 
     @Test
