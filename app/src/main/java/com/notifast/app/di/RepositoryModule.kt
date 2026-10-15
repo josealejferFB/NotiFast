@@ -55,4 +55,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindTeacherRepository(impl: com.notifast.app.data.repository.LocalTeacherRepositoryImpl): com.notifast.app.domain.repository.TeacherRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSubjectBackupStore(impl: com.notifast.app.data.local.backup.RoomSubjectBackupStore): com.notifast.app.domain.repository.SubjectBackupStore
 }
