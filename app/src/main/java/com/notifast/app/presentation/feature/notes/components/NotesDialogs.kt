@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.SubjectData
@@ -56,6 +57,78 @@ fun NotesDialogs(
                 onDismissEditSubject()
             }
         )
+    }
+
+    if (uiState.cloudDeleteFailed && uiState.deleteTarget != null) {
+        NotiFastDialog(
+            title = stringResource(R.string.delete_subject_cloud_failed_title),
+            message = stringResource(R.string.delete_subject_cloud_failed_message),
+            confirmText = stringResource(R.string.delete_subject_cloud_failed_confirm),
+            dismissText = stringResource(R.string.btn_cancel),
+            confirmColor = MaterialTheme.colorScheme.error,
+            confirmWeight = FontWeight.Bold,
+            onConfirm = { viewModel.onEvent(NotesEvent.DeleteFallbackLocal) },
+            onDismiss = { viewModel.onEvent(NotesEvent.CancelDeleteSubject) }
+        )
+    } else uiState.deleteTarget?.let { target ->
+        if (!target.hasCloudCopy) {
+            NotiFastDialog(
+                title = stringResource(R.string.delete_subject_title),
+                message = stringResource(R.string.delete_subject_message, target.subjectName),
+                confirmText = stringResource(R.string.delete_subject_confirm),
+                dismissText = stringResource(R.string.delete_subject_cancel),
+                confirmColor = MaterialTheme.colorScheme.error,
+                confirmWeight = FontWeight.Bold,
+                onConfirm = { viewModel.onEvent(NotesEvent.DeleteLocalOnly) },
+                onDismiss = { viewModel.onEvent(NotesEvent.CancelDeleteSubject) }
+            )
+        } else {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { viewModel.onEvent(NotesEvent.CancelDeleteSubject) },
+                title = {
+                    androidx.compose.material3.Text(
+                        text = stringResource(R.string.delete_subject_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    androidx.compose.material3.Text(
+                        text = stringResource(R.string.delete_subject_has_cloud_message, target.subjectName),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.onEvent(NotesEvent.DeleteLocalAndCloud) },
+                        colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = stringResource(R.string.delete_subject_option_local_and_cloud),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.foundation.layout.Row {
+                        androidx.compose.material3.TextButton(
+                            onClick = { viewModel.onEvent(NotesEvent.CancelDeleteSubject) }
+                        ) {
+                            androidx.compose.material3.Text(stringResource(R.string.delete_subject_cancel))
+                        }
+                        androidx.compose.material3.TextButton(
+                            onClick = { viewModel.onEvent(NotesEvent.DeleteLocalOnly) }
+                        ) {
+                            androidx.compose.material3.Text(stringResource(R.string.delete_subject_option_local_only))
+                        }
+                    }
+                },
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        }
     }
 
     subjectToDelete?.let { name ->

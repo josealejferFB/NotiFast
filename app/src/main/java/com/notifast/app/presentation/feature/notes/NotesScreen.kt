@@ -149,7 +149,7 @@ fun NotesScreen(
                                 onEditSubject = { subjectToEdit = it },
                                 onAddNoteClick = { onAddNoteClick(it) },
                                 onAddEvaluationClick = onAddEvaluationClick,
-                                onDeleteSubject = { subjectToDelete = it },
+                                onDeleteSubject = { viewModel.onEvent(NotesEvent.RequestDeleteSubject(it)) },
                                 onAddSubjectClick = { showAddSubjectSheet = true },
                                 displayScale = uiState.gradeScale,
                                 minPassingGrade = uiState.minPassingGrade

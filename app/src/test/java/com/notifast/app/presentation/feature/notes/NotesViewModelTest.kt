@@ -42,6 +42,10 @@ class NotesViewModelTest {
     private val importSubjectPackageUseCase: com.notifast.app.domain.usecase.ImportSubjectPackageUseCase = mockk(relaxed = true)
     private val teacherRepository: com.notifast.app.domain.repository.TeacherRepository = mockk(relaxed = true)
     private val observeLocalSyncSummaryUseCase: com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase = mockk(relaxed = true)
+    private val deleteCloudSubjectUseCase: com.notifast.app.domain.usecase.cloud.DeleteCloudSubjectUseCase = mockk(relaxed = true)
+    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository = mockk(relaxed = true)
+    private val subjectCloudStateDao: com.notifast.app.data.local.dao.SubjectCloudStateDao = mockk(relaxed = true)
+    private val subjectBackupStore: com.notifast.app.domain.repository.SubjectBackupStore = mockk(relaxed = true)
 
     private val sampleSubjects = listOf(
         SubjectData(name = "Matemáticas", colorHex = "#3B9797"),
@@ -64,7 +68,11 @@ class NotesViewModelTest {
         calculateWeightedAverageUseCase,
         importSubjectPackageUseCase,
         teacherRepository,
-        observeLocalSyncSummaryUseCase
+        observeLocalSyncSummaryUseCase,
+        deleteCloudSubjectUseCase,
+        googleAccountRepository,
+        subjectCloudStateDao,
+        subjectBackupStore
     )
 
     @Before
@@ -347,5 +355,82 @@ class NotesViewModelTest {
 
         viewModel.onEvent(NotesEvent.DismissCloudHub)
         org.junit.Assert.assertFalse(viewModel.uiState.value.showCloudHub)
+    }
+
+    @Test
+    fun `when RequestDeleteSubject with no cloud copy, sets hasCloudCopy false and DeleteLocalOnly deletes locally`() = runTest {
+        coEvery { googleAccountRepository.account } returns flowOf(null)
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.RequestDeleteSubject("Matemáticas"))
+        advanceUntilIdle()
+
+        val target = viewModel.uiState.value.deleteTarget
+        org.junit.Assert.assertNotNull(target)
+        org.junit.Assert.assertEquals("Matemáticas", target?.subjectName)
+        org.junit.Assert.assertFalse(target?.hasCloudCopy ?: true)
+
+        viewModel.onEvent(NotesEvent.DeleteLocalOnly)
+        advanceUntilIdle()
+
+        org.junit.Assert.assertNull(viewModel.uiState.value.deleteTarget)
+        io.mockk.coVerify { noteRepository.deleteSubject("user_123", "Matemáticas") }
+    }
+
+    @Test
+    fun `when RequestDeleteSubject with cloud copy, sets hasCloudCopy true and driveFileId`() = runTest {
+        val account = com.notifast.app.domain.model.cloud.CloudAccount("acc_1", "test@test.com", "Test", null)
+        coEvery { googleAccountRepository.account } returns flowOf(account)
+        coEvery { subjectBackupStore.listSubjectIds("user_123") } returns listOf("sub_1" to "Matemáticas")
+        coEvery { subjectCloudStateDao.getAll("acc_1") } returns listOf(
+            com.notifast.app.data.local.entity.SubjectCloudStateEntity("acc_1", "sub_1", "drive_file_999", "hash1", 100L)
+        )
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.RequestDeleteSubject("Matemáticas"))
+        advanceUntilIdle()
+
+        val target = viewModel.uiState.value.deleteTarget
+        org.junit.Assert.assertNotNull(target)
+        org.junit.Assert.assertTrue(target?.hasCloudCopy ?: false)
+        org.junit.Assert.assertEquals("drive_file_999", target?.driveFileId)
+    }
+
+    @Test
+    fun `when DeleteLocalAndCloud fails, cloudDeleteFailed becomes true and does not delete locally`() = runTest {
+        val account = com.notifast.app.domain.model.cloud.CloudAccount("acc_1", "test@test.com", "Test", null)
+        coEvery { googleAccountRepository.account } returns flowOf(account)
+        coEvery { subjectBackupStore.listSubjectIds("user_123") } returns listOf("sub_1" to "Matemáticas")
+        coEvery { subjectCloudStateDao.getAll("acc_1") } returns listOf(
+            com.notifast.app.data.local.entity.SubjectCloudStateEntity("acc_1", "sub_1", "drive_file_999", "hash1", 100L)
+        )
+        coEvery { deleteCloudSubjectUseCase.localAndCloud(any(), any(), any()) } returns Result.failure(
+            com.notifast.app.domain.usecase.cloud.CloudDeleteFailed
+        )
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.RequestDeleteSubject("Matemáticas"))
+        advanceUntilIdle()
+
+        viewModel.onEvent(NotesEvent.DeleteLocalAndCloud)
+        advanceUntilIdle()
+
+        org.junit.Assert.assertTrue(viewModel.uiState.value.cloudDeleteFailed)
+        org.junit.Assert.assertNotNull(viewModel.uiState.value.deleteTarget)
+        // noteRepository.deleteSubject should not be called directly since cloud delete failed
+        io.mockk.coVerify(exactly = 0) { noteRepository.deleteSubject("user_123", "Matemáticas") }
+
+        // Now test fallback local delete
+        viewModel.onEvent(NotesEvent.DeleteFallbackLocal)
+        advanceUntilIdle()
+
+        org.junit.Assert.assertFalse(viewModel.uiState.value.cloudDeleteFailed)
+        org.junit.Assert.assertNull(viewModel.uiState.value.deleteTarget)
+        io.mockk.coVerify(exactly = 1) { noteRepository.deleteSubject("user_123", "Matemáticas") }
     }
 }

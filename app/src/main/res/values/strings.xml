@@ -39,6 +39,12 @@
     <string name="delete_subject_message">¿Estás seguro de eliminar %1$s? También se borrarán todos los apuntes y evaluaciones asociadas.</string>
     <string name="delete_subject_confirm">Eliminar</string>
     <string name="delete_subject_cancel">Cancelar</string>
+    <string name="delete_subject_has_cloud_message">¿Estás seguro de eliminar %1$s? Esta materia tiene una copia de seguridad en tu Google Drive.</string>
+    <string name="delete_subject_option_local_only">Solo en este teléfono</string>
+    <string name="delete_subject_option_local_and_cloud">En el teléfono y en la nube</string>
+    <string name="delete_subject_cloud_failed_title">Error al borrar de la nube</string>
+    <string name="delete_subject_cloud_failed_message">No se pudo borrar la copia en Google Drive. ¿Deseas eliminarla solo en este teléfono?</string>
+    <string name="delete_subject_cloud_failed_confirm">Borrar solo en este teléfono</string>
     
     <!-- FAB -->
     <string name="fab_add_subject">Nueva Materia</string>

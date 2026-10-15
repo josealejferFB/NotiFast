@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -43,7 +44,11 @@ class NotesViewModel @Inject constructor(
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
     val importSubjectPackageUseCase: ImportSubjectPackageUseCase,
     private val teacherRepository: TeacherRepository,
-    private val observeLocalSyncSummaryUseCase: com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase
+    private val observeLocalSyncSummaryUseCase: com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase,
+    private val deleteCloudSubjectUseCase: com.notifast.app.domain.usecase.cloud.DeleteCloudSubjectUseCase,
+    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository,
+    private val subjectCloudStateDao: com.notifast.app.data.local.dao.SubjectCloudStateDao,
+    private val subjectBackupStore: com.notifast.app.domain.repository.SubjectBackupStore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -291,6 +296,87 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.DeleteTeacher -> deleteTeacher(event.teacherId)
             is NotesEvent.CloudClick -> _uiState.update { it.copy(showCloudHub = true) }
             is NotesEvent.DismissCloudHub -> _uiState.update { it.copy(showCloudHub = false) }
+            is NotesEvent.RequestDeleteSubject -> onRequestDeleteSubject(event.subjectName)
+            is NotesEvent.CancelDeleteSubject -> _uiState.update { it.copy(deleteTarget = null, cloudDeleteFailed = false) }
+            is NotesEvent.DeleteLocalOnly -> onDeleteLocalOnly()
+            is NotesEvent.DeleteLocalAndCloud -> onDeleteLocalAndCloud()
+            is NotesEvent.DeleteFallbackLocal -> onDeleteFallbackLocal()
+        }
+    }
+
+    private fun onRequestDeleteSubject(subjectName: String) {
+        viewModelScope.launch {
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            val account = googleAccountRepository.account.firstOrNull()
+            if (account == null) {
+                _uiState.update {
+                    it.copy(
+                        deleteTarget = DeleteTarget(subjectName, hasCloudCopy = false, driveFileId = null),
+                        cloudDeleteFailed = false
+                    )
+                }
+                return@launch
+            }
+            val subjectIds = subjectBackupStore.listSubjectIds(uid)
+            val subjectId = subjectIds.firstOrNull { it.second.trim().equals(subjectName.trim(), ignoreCase = true) }?.first
+            if (subjectId == null) {
+                _uiState.update {
+                    it.copy(
+                        deleteTarget = DeleteTarget(subjectName, hasCloudCopy = false, driveFileId = null),
+                        cloudDeleteFailed = false
+                    )
+                }
+                return@launch
+            }
+            val states = subjectCloudStateDao.getAll(account.accountId)
+            val state = states.firstOrNull { it.subjectId == subjectId }
+            val driveFileId = state?.driveFileId
+            val hasCloud = !driveFileId.isNullOrBlank()
+            _uiState.update {
+                it.copy(
+                    deleteTarget = DeleteTarget(subjectName, hasCloudCopy = hasCloud, driveFileId = driveFileId),
+                    cloudDeleteFailed = false
+                )
+            }
+        }
+    }
+
+    private fun onDeleteLocalOnly() {
+        viewModelScope.launch {
+            val target = _uiState.value.deleteTarget ?: return@launch
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            noteRepository.deleteSubject(uid, target.subjectName)
+            _uiState.update { it.copy(deleteTarget = null, cloudDeleteFailed = false) }
+            loadNotes()
+        }
+    }
+
+    private fun onDeleteLocalAndCloud() {
+        viewModelScope.launch {
+            val target = _uiState.value.deleteTarget ?: return@launch
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            val fileId = target.driveFileId
+            if (fileId.isNullOrBlank()) {
+                onDeleteLocalOnly()
+                return@launch
+            }
+            val result = deleteCloudSubjectUseCase.localAndCloud(uid, target.subjectName, fileId)
+            if (result.isFailure) {
+                _uiState.update { it.copy(cloudDeleteFailed = true) }
+            } else {
+                _uiState.update { it.copy(deleteTarget = null, cloudDeleteFailed = false) }
+                loadNotes()
+            }
+        }
+    }
+
+    private fun onDeleteFallbackLocal() {
+        viewModelScope.launch {
+            val target = _uiState.value.deleteTarget ?: return@launch
+            val uid = authRepository.getCurrentUserId() ?: return@launch
+            noteRepository.deleteSubject(uid, target.subjectName)
+            _uiState.update { it.copy(deleteTarget = null, cloudDeleteFailed = false) }
+            loadNotes()
         }
     }
 

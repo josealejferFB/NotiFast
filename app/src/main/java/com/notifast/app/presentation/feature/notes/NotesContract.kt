@@ -37,6 +37,12 @@ data class SubjectInfo(
     val upcomingEvaluations: List<Evaluation>
 )
 
+data class DeleteTarget(
+    val subjectName: String,
+    val hasCloudCopy: Boolean,
+    val driveFileId: String?
+)
+
 data class NotesUiState(
     val userId: String = "",
     val isLoading: Boolean = false,
@@ -65,7 +71,9 @@ data class NotesUiState(
     val userEmail: String = "",
     val userProfilePictureUrl: String? = null,
     val syncSummary: com.notifast.app.domain.model.cloud.LocalSyncSummary = com.notifast.app.domain.model.cloud.LocalSyncSummary.NO_ACCOUNT,
-    val showCloudHub: Boolean = false
+    val showCloudHub: Boolean = false,
+    val deleteTarget: DeleteTarget? = null,
+    val cloudDeleteFailed: Boolean = false
 )
 
 sealed interface NotesEvent {
@@ -84,5 +92,10 @@ sealed interface NotesEvent {
     data class DeleteTeacher(val teacherId: String) : NotesEvent
     data object CloudClick : NotesEvent
     data object DismissCloudHub : NotesEvent
+    data class RequestDeleteSubject(val subjectName: String) : NotesEvent
+    data object CancelDeleteSubject : NotesEvent
+    data object DeleteLocalOnly : NotesEvent
+    data object DeleteLocalAndCloud : NotesEvent
+    data object DeleteFallbackLocal : NotesEvent
 }
 
