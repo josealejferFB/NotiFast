@@ -63,4 +63,12 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindGlobalBackupStore(impl: com.notifast.app.data.local.backup.LocalGlobalBackupStore): com.notifast.app.domain.repository.GlobalBackupStore
+
+    @Binds
+    @Singleton
+    abstract fun bindGoogleAuthDataSource(impl: com.notifast.app.data.remote.google.DefaultGoogleAuthDataSource): com.notifast.app.data.remote.google.GoogleAuthDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindGoogleAccountRepository(impl: com.notifast.app.data.repository.GoogleAccountRepositoryImpl): com.notifast.app.domain.repository.GoogleAccountRepository
 }
