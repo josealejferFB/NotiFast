@@ -114,6 +114,32 @@ class ContentHasher @Inject constructor() {
         return digest.joinToString("") { "%02x".format(it) }
     }
 
+    fun hashGlobal(snapshot: GlobalSnapshot): String {
+        val root = JsonObject().apply {
+            addProperty("firstName", snapshot.firstName.trim())
+            addProperty("lastName", snapshot.lastName.trim())
+            add("prefs", gson.toJsonTree(snapshot.prefs))
+            val teachersArr = JsonArray()
+            snapshot.teachers.sortedBy { it.id }.forEach { t ->
+                val obj = JsonObject().apply {
+                    addProperty("id", t.id)
+                    addProperty("firstName", t.firstName.trim().lowercase())
+                    addProperty("lastName", t.lastName.trim().lowercase())
+                    addProperty("email", t.email.trim().lowercase())
+                    addProperty("phoneNumber", t.phoneNumber.trim())
+                }
+                teachersArr.add(obj)
+            }
+            add("teachers", teachersArr)
+            val avatarHash = snapshot.avatar?.let { sha1(it) } ?: "none"
+            addProperty("avatarSha1", avatarHash)
+        }
+        val canonicalString = sortJsonKeys(root).toString()
+        val sha256 = MessageDigest.getInstance("SHA-256")
+        val digest = sha256.digest(canonicalString.toByteArray(Charsets.UTF_8))
+        return digest.joinToString("") { "%02x".format(it) }
+    }
+
     private fun resolveImageSha1(pathOrUri: String, imageFiles: Map<String, File>): String {
         val file = imageFiles[pathOrUri] ?: File(pathOrUri.removePrefix("file://"))
         return sha1(file)
