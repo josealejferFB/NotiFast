@@ -14,10 +14,14 @@ import javax.inject.Inject
 
 import kotlinx.coroutines.flow.first
 
+import com.notifast.app.domain.usecase.ResolveSubjectNameUseCase
+import com.notifast.app.domain.util.NameValidation
+
 @HiltViewModel
 class AddSubjectViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val resolveSubjectNameUseCase: ResolveSubjectNameUseCase = ResolveSubjectNameUseCase()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddSubjectUiState())
@@ -38,10 +42,6 @@ class AddSubjectViewModel @Inject constructor(
     private fun saveSubject() {
         val state = _uiState.value
         val cleanName = state.subjectName.trim()
-        if (cleanName.isBlank()) {
-            _uiState.update { it.copy(error = "El nombre de la materia no puede estar vacío") }
-            return
-        }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             val userId = authRepository.getCurrentUserId()
@@ -50,16 +50,27 @@ class AddSubjectViewModel @Inject constructor(
                 return@launch
             }
 
-            // Validar materias duplicadas (case-insensitive)
+            // Validar materia (longitud, vacía, duplicados case-insensitive)
             val existingSubjects = try {
                 noteRepository.getSubjects(userId).first()
             } catch (e: Exception) {
                 emptyList()
             }
 
-            if (existingSubjects.any { it.name.equals(cleanName, ignoreCase = true) }) {
-                _uiState.update { it.copy(isLoading = false, error = "Ya tienes una materia registrada con este nombre") }
-                return@launch
+            when (resolveSubjectNameUseCase.validate(cleanName, existingSubjects.map { it.name })) {
+                is NameValidation.Blank -> {
+                    _uiState.update { it.copy(isLoading = false, error = "El nombre de la materia no puede estar vacío") }
+                    return@launch
+                }
+                is NameValidation.TooLong -> {
+                    _uiState.update { it.copy(isLoading = false, error = "El nombre no puede superar los 50 caracteres") }
+                    return@launch
+                }
+                is NameValidation.Duplicate -> {
+                    _uiState.update { it.copy(isLoading = false, error = "Ya tienes una materia registrada con este nombre") }
+                    return@launch
+                }
+                is NameValidation.Valid -> Unit
             }
 
             noteRepository.addSubject(userId, cleanName, state.selectedIcon, state.selectedColor).fold(

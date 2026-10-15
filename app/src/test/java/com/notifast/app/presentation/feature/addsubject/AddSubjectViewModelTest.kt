@@ -78,6 +78,20 @@ class AddSubjectViewModelTest {
     }
 
     @Test
+    fun `when saving subject name exceeding 50 chars, sets too long error`() = runTest {
+        val viewModel = AddSubjectViewModel(noteRepository, authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddSubjectEvent.NameChanged("A".repeat(51)))
+        viewModel.onEvent(AddSubjectEvent.SaveClicked)
+        advanceUntilIdle()
+
+        assertEquals("El nombre no puede superar los 50 caracteres", viewModel.uiState.value.error)
+        assertFalse(viewModel.uiState.value.isSaved)
+        coVerify(exactly = 0) { noteRepository.addSubject(any(), any(), any(), any()) }
+    }
+
+    @Test
     fun `when saving duplicate subject name case insensitively, sets duplicate error`() = runTest {
         val viewModel = AddSubjectViewModel(noteRepository, authRepository)
         advanceUntilIdle()

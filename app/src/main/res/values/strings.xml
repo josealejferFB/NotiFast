@@ -202,6 +202,7 @@
     <string name="add_subject_icon_title">Icono Temático</string>
     <string name="add_subject_btn_create">Crear Materia</string>
     <string name="add_subject_name_label">Nombre de la materia</string>
+    <string name="subject_name_too_long">El nombre no puede superar los 50 caracteres</string>
     <string name="add_subject_suggestions_title">Sugerencias rápidas</string>
     <string name="add_subject_preview_stats">0 apuntes • 0 evaluaciones</string>
     <string name="add_subject_discard_title">Descartar materia</string>
