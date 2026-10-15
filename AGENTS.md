@@ -38,6 +38,9 @@ Antes de iniciar cualquier trabajo o responder sobre el roadmap, consulta siempr
 | **Kickoff Fase 3** | [`docs/prd/KICKOFF_FASE_3.md`](docs/prd/KICKOFF_FASE_3.md) | Guía de arranque para Sprint 3.1: Notificaciones Proactivas WorkManager (Completado). |
 | **Kickoff Fase 3.1** | [`docs/prd/KICKOFF_FASE_3.1.md`](docs/prd/KICKOFF_FASE_3.1.md) | Guía de arranque para Sprint 3.2: Analíticas Predictivas en Canvas (Completado). |
 | **Kickoff Fase 3.2** | [`docs/prd/KICKOFF_FASE_3.2.md`](docs/prd/KICKOFF_FASE_3.2.md) | Guía de arranque para Sprints 3.3 y 3.4 — Búsqueda Global y Pack Académico P2P (Completada). |
+| **Cloud Backup Spec** | [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md) | Especificación de arquitectura para Google Drive Cloud Backup (`appDataFolder`). |
+| **Cloud Backup Plan** | [`docs/superpowers/plans/2026-10-15-cloud-backup-google-drive.md`](docs/superpowers/plans/2026-10-15-cloud-backup-google-drive.md) | Plan de ejecución de 21 tareas (TDD, MVI, Drive REST API). |
+| **Matriz de Resultados Cloud** | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) | Verificación de los 51 escenarios de prueba y a11y. |
 | **Kickoff Fase 4** | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) | Guía de arranque y prompt de sesión para Pulido de Experiencia, a11y y Rendimiento (Siguiente sesión). |
 | **Auditoría Histórica** | [`docs/audit/2026-06-18-full-audit.md`](docs/audit/2026-06-18-full-audit.md) | Análisis base de seguridad, arquitectura y bugs iniciales. |
 | **Planes y Specs** | [`docs/superpowers/plans/`](docs/superpowers/plans/) y [`docs/superpowers/specs/`](docs/superpowers/specs/) | Diseños y planes de ejecución atómicos. |

@@ -22,10 +22,12 @@ Fase 3.7: Normalización Sheets/FAB[██████████████�
 Editor Premium (OneNote-like)     [████████████████] 100% (12/12 tareas) ✅
 Sanitización Materias & Profesores[████████████████] 100% (9/9 tareas) ✅
 Auditoría Global & Pipelines CI/CD[████████████████] 100% (6/6 pilares) ✅
+Copia en la Nube (Google Drive)   [████████████████] 100% (21/21 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  92% (126/137 tareas)
+PROGRESO TOTAL ESTIMADO:          [████████████████]  95% (147/155 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    563 tests pasando (0 fallos, 0 ignorados) ✅
 ```
 
 ---
@@ -499,6 +501,53 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
     3. `android-build`: Ensamblado de release debuggable (`./gradlew assembleDebug`) con almacenamiento de APK compilada.
   * Activación de paralelismo y cache en `gradle.properties`: `org.gradle.parallel=true`, `org.gradle.caching=true`.
   * Configuración de `signingConfigs` en `build.gradle.kts` para compilación release con keystore debug fallback.
+
+---
+
+## ☁️ Copia de Seguridad y Sincronización en Google Drive — 100% Completado (15 Oct 2026)
+
+> **Documento de Diseño:** [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](../superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md)  
+> **Plan de Ejecución Atómica:** [`docs/superpowers/plans/2026-10-15-cloud-backup-google-drive.md`](../superpowers/plans/2026-10-15-cloud-backup-google-drive.md)  
+> **Matriz de Resultados:** [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](../superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md)
+
+**Objetivo:** Implementar la copia de seguridad y restauración manual bajo demanda por materia hacia el espacio oculto `appDataFolder` de Google Drive del estudiante, garantizando privacidad total (zero-server backend), resolución interactiva de colisiones ("Sobrescribir" vs "Agregar como Materia (1)"), borrado dual selectivo (solo en teléfono vs teléfono y nube), indicador visual honesto en el TopBar (`PhoneAndroid`, `CloudDone`, `CloudSync`) y coexistencia limpia con el Pack Académico P2P (QR/texto).
+
+### Entregables Completados (21 / 21 Tareas):
+
+1. **Infraestructura de Red & REST Client:**
+   - Dependencias OkHttp 4.12.0 y Gson 2.11.0 integradas sin romper compatibilidad.
+   - `GoogleAuthDataSource`: Autenticación OAuth2 Google Identity con scope restringido `drive.appdata`, manejo de resolución vía `PendingIntent` e invalidación automática de token ante 401.
+   - `DriveRestClient`: Implementación directa contra Google Drive REST API v3 con operaciones atómicas multipart para `files.create`, `files.update`, `files.get`, `files.delete` y `files.list`.
+   - `DriveSubjectBackupStore`: Manejo de archivos en la nube con subidas multipart atómicas y fallback automático a `POST` ante errores 404 en `PATCH`.
+
+2. **Persistencia Local Room v5 & Migración Multi-Cuenta:**
+   - `SubjectCloudStateEntity` y `SubjectCloudStateDao` con clave primaria compuesta `(accountId, subjectId)`.
+   - `MIGRATION_4_5` implementada y verificada para la creación de la tabla `subject_cloud_state`.
+   - Soporte multicuenta nativo: el cambio de cuenta en el dispositivo oculta los estados de la cuenta previa y los preserva intactos para cuando vuelva a iniciar sesión.
+
+3. **Compresión Inteligente & Empaquetado Atómico:**
+   - `SubjectBackupCodec`: Empaquetado de materias con notas, imágenes, evaluaciones y horarios en ZIP con `manifest.json`.
+   - `ImageCompressor`: Redimensionamiento optimizado de fotografías adjuntas a apuntes ($\le 1600\,\text{px}$, JPEG 80) reduciendo el consumo de ancho de banda y cuota sin degradar la legibilidad.
+   - `GlobalBackupData`: Serialización y restauración de perfil de usuario, preferencias y directorio de profesores (`global.nfbak`).
+
+4. **Casos de Uso de Sincronización y Dominio:**
+   - `ResolveSubjectNameUseCase`: Generador inteligente de nombres con sufijo incremental `Materia (1)`, `Materia (2)` y validación en tiempo real (longitud $\le 50$, caracteres en blanco, colisiones case-insensitive).
+   - `UploadSubjectsUseCase` & `UploadGlobalDataUseCase`: Subida por lote con emisión de progreso reactivo `UploadProgress` y resultados atómicos por materia (`ItemOutcome`).
+   - `RestoreSubjectsUseCase` & `RestoreGlobalDataUseCase`: Restauración en transacción única Room con reprogramación proactiva de notificaciones locales y purga limpia de imágenes obsoletas tras sobreescritura.
+   - `DeleteCloudSubjectUseCase`: Borrado seguro solo en nube o coordinado teléfono + nube.
+   - `ObserveLocalSyncSummaryUseCase`: Monitor reactivo del estado de sincronización global para la cabecera.
+
+5. **Experiencia de Usuario en Compose (Límite $\le 250$ LOC):**
+   - `CloudHubSheet`: Hoja modal principal con selección individual y global, cálculo dinámico de `canUpload`/`canRestore` y banner de materias solo en nube.
+   - Subcomponentes modulares en `presentation/feature/cloud/components/`: `CloudAccountHeader`, `CloudConfirmDialog`, `CloudErrorDialog`, `CloudProgressOverlay`, `CloudStatusChip`, `CloudSubjectRow`, `CloudSummaryCard`, `GlobalSettingsRow`, `LinkAccountPrompt`, `RestoreConflictDialog`.
+   - Diálogo de borrado dual en `NotesDialogs`: cuando una materia cuenta con copia en Drive, ofrece "Solo en este teléfono" vs "En el teléfono y en la nube", con confirmación de contingencia si falla la red.
+   - Sección de cuenta Google en `SettingsScreen`: `SettingsCloudAccountSection` permite vincular, cambiar y desvincular la cuenta personal con diálogo de confirmación y preservación estricta de datos locales.
+   - Indicador honesto en `NotiFastTopBar`: muestra `PhoneAndroid` (sin cuenta), `CloudDone` (todo sincronizado) o `CloudSync` con punto Ruby (cambios pendientes).
+
+6. **Calidad y Verificación:**
+   - Cobertura de tests unitarios: **563 tests pasando al 100%** (incluyendo suites completas para `CloudViewModelTest`, `SettingsViewModelTest`, `NotesViewModelTest`, use cases y stores).
+   - Matriz completa de 51 escenarios (A1–A11, B1–B12, C1–C14, D1–D7, E1–E4, F) documentada y validada en `docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`.
+   - Verificación de compilación release y debug: `./gradlew testDebugUnitTest assembleDebug` aprobados.
 
 ---
 

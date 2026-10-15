@@ -153,6 +153,7 @@ users/
 | Auditoría completa | [`docs/audit/`](docs/audit/) |
 | Planes de implementación | [`docs/superpowers/plans/`](docs/superpowers/plans/) |
 | Specs de diseño | [`docs/superpowers/specs/`](docs/superpowers/specs/) |
+| Matriz de Escenarios Cloud | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) |
 | Guía para agentes AI | [`AGENTS.md`](AGENTS.md) |
 
 ---
