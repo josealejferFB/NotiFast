@@ -29,8 +29,9 @@ android {
         if (localPropertiesFile.exists()) {
             FileInputStream(localPropertiesFile).use { localProperties.load(it) }
         }
-        val webClientId = localProperties.getProperty("WEB_CLIENT_ID", "").replace("\"", "")
-        val googleWebClientId = localProperties.getProperty("google.webClientId", webClientId).replace("\"", "")
+        val defaultClientId = "972069019951-kpd69bj1oik7kq9r4sg47rggcvohcdi8.apps.googleusercontent.com"
+        val webClientId = localProperties.getProperty("WEB_CLIENT_ID", defaultClientId).replace("\"", "").ifBlank { defaultClientId }
+        val googleWebClientId = localProperties.getProperty("google.webClientId", webClientId).replace("\"", "").ifBlank { defaultClientId }
         buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
     }

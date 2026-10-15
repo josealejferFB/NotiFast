@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
+import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
@@ -50,6 +51,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
 ) : GoogleAuthDataSource {
 
     companion object {
+        private const val TAG = "GoogleAuthDataSource"
         const val DRIVE_APPDATA_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
     }
 
@@ -60,6 +62,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
     override suspend fun signInWithGoogle(activityContext: Context): Result<GoogleIdResult> {
         return try {
             val serverClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID
+            Log.d(TAG, "signInWithGoogle initiating with serverClientId: ${serverClientId.take(15)}...")
             val googleIdOption = GetSignInWithGoogleOption.Builder(serverClientId)
                 .build()
 
@@ -84,10 +87,13 @@ class DefaultGoogleAuthDataSource @Inject constructor(
 
             Result.success(GoogleIdResult(account, idToken))
         } catch (e: GetCredentialCancellationException) {
+            Log.d(TAG, "User cancelled Google credential picker", e)
             Result.failure(CloudAuthException(CloudAuthException.Reason.CANCELLED, e))
         } catch (e: NoCredentialException) {
+            Log.w(TAG, "No credential available for Google sign-in", e)
             Result.failure(CloudAuthException(CloudAuthException.Reason.CANCELLED, e))
         } catch (e: Exception) {
+            Log.e(TAG, "Sign in with Google failed: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -117,6 +123,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
                 }
             }
         } catch (e: ApiException) {
+            Log.e(TAG, "authorizeDrive ApiException statusCode=${e.statusCode}: ${e.message}", e)
             when (e.statusCode) {
                 CommonStatusCodes.CANCELED -> DriveAuthResult.Failure(CloudAuthException(CloudAuthException.Reason.CANCELLED, e))
                 CommonStatusCodes.SIGN_IN_REQUIRED -> DriveAuthResult.Failure(CloudAuthException(CloudAuthException.Reason.REAUTH_REQUIRED, e))
@@ -125,6 +132,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
                 else -> DriveAuthResult.Failure(e)
             }
         } catch (e: Exception) {
+            Log.e(TAG, "authorizeDrive unexpected error: ${e.message}", e)
             DriveAuthResult.Failure(e)
         }
     }

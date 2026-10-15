@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.cloud
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.data.remote.drive.DriveException
@@ -49,6 +50,10 @@ class CloudViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     @param:ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private companion object {
+        const val TAG = "CloudViewModel"
+    }
 
     private val _uiState = MutableStateFlow(CloudUiState())
     val uiState: StateFlow<CloudUiState> = _uiState.asStateFlow()
@@ -135,6 +140,7 @@ class CloudViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
+                    Log.e(TAG, "loadOverview failed: ${e.message}", e)
                     _uiState.update { it.copy(isLoading = false, error = mapError(e)) }
                 }
             )
@@ -444,6 +450,7 @@ class CloudViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
+                    Log.e(TAG, "signIn failed: ${e.message}", e)
                     _uiState.update { it.copy(isLoading = false, error = mapError(e)) }
                 }
             )
@@ -456,7 +463,10 @@ class CloudViewModel @Inject constructor(
             val res = googleAccountRepository.completeAuthorization(data)
             res.fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false) } },
-                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = mapError(e)) } }
+                onFailure = { e ->
+                    Log.e(TAG, "completeAuthorization failed: ${e.message}", e)
+                    _uiState.update { it.copy(isLoading = false, error = mapError(e)) }
+                }
             )
         }
     }
