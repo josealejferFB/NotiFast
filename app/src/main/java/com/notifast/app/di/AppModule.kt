@@ -37,4 +37,12 @@ object AppModule {
     @Singleton
     @IoDispatcher
     fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): okhttp3.OkHttpClient = okhttp3.OkHttpClient.Builder().build()
+
+    @Provides
+    @Singleton
+    fun provideGson(): com.google.gson.Gson = com.google.gson.Gson()
 }
