@@ -39,6 +39,7 @@ class LocalNoteRepositoryImplTest {
     private val evaluationDao: EvaluationDao = mockk(relaxed = true)
     private val scheduleDao: ScheduleDao = mockk(relaxed = true)
     private val teacherDao: com.notifast.app.data.local.dao.TeacherDao = mockk(relaxed = true)
+    private val subjectCloudStateDao: com.notifast.app.data.local.dao.SubjectCloudStateDao = mockk(relaxed = true)
     private val imageRepository: ImageRepository = mockk(relaxed = true)
 
     private lateinit var repository: LocalNoteRepositoryImpl
@@ -60,7 +61,8 @@ class LocalNoteRepositoryImplTest {
             imageRepository = imageRepository,
             evaluationDao = evaluationDao,
             scheduleDao = scheduleDao,
-            teacherDao = teacherDao
+            teacherDao = teacherDao,
+            subjectCloudStateDao = subjectCloudStateDao
         )
     }
 
@@ -270,6 +272,7 @@ class LocalNoteRepositoryImplTest {
         coVerify { evaluationDao.deleteEvaluationsBySubjectId("u1", "s1") }
         coVerify { scheduleDao.deleteSchedulesBySubjectId("u1", "s1") }
         coVerify { subjectDao.deleteSubjectById("u1", "s1") }
+        coVerify { subjectCloudStateDao.deleteBySubject("s1") }
     }
 
     @Test

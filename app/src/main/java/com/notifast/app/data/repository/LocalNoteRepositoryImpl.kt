@@ -37,7 +37,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
     private val imageRepository: ImageRepository,
     private val evaluationDao: EvaluationDao = db.evaluationDao(),
     private val scheduleDao: ScheduleDao = db.scheduleDao(),
-    private val teacherDao: TeacherDao = db.teacherDao()
+    private val teacherDao: TeacherDao = db.teacherDao(),
+    private val subjectCloudStateDao: com.notifast.app.data.local.dao.SubjectCloudStateDao = db.subjectCloudStateDao()
 ) : NoteRepository {
 
     override fun getNotes(userId: String): Flow<List<Note>> {
@@ -337,6 +338,7 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     evaluationDao.deleteEvaluationsBySubjectId(userId, subjectId)
                     scheduleDao.deleteSchedulesBySubjectId(userId, subjectId)
                     subjectDao.deleteSubjectById(userId, subjectId)
+                    subjectCloudStateDao.deleteBySubject(subjectId)
                 } else {
                     // Legacy rows without subjectId still cascade by name (case-safe)
                     noteDao.deleteNotesBySubject(userId, subjectName)
