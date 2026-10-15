@@ -71,4 +71,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindGoogleAccountRepository(impl: com.notifast.app.data.repository.GoogleAccountRepositoryImpl): com.notifast.app.domain.repository.GoogleAccountRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCloudBackupRepository(impl: com.notifast.app.data.repository.DriveCloudBackupRepositoryImpl): com.notifast.app.domain.repository.CloudBackupRepository
 }
