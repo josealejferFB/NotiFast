@@ -1,0 +1,15 @@
+package com.notifast.app.data.backup
+
+import com.notifast.app.data.model.Evaluation
+import com.notifast.app.data.model.Note
+import com.notifast.app.data.model.Schedule
+import com.notifast.app.data.model.SubjectData
+import java.io.File
+
+data class SubjectSnapshot(
+    val subject: SubjectData,
+    val schedules: List<Schedule> = emptyList(),
+    val evaluations: List<Evaluation> = emptyList(),
+    val notes: List<Note> = emptyList(),
+    val imageFiles: Map<String, File> = emptyMap() // key = local path / URI as stored in model
+)
