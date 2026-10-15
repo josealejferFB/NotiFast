@@ -767,4 +767,17 @@
     <string name="cloud_error_generic">Ocurrió un error inesperado al conectar con Google Drive</string>
     <string name="topbar_sync_pending_cd">Cambios pendientes por sincronizar con la nube</string>
     <string name="topbar_sync_no_account_cd">Copia de seguridad en Google Drive sin vincular</string>
+
+    <!-- Settings Google Account (Task 20) -->
+    <string name="settings_section_cloud_account">Copia de Seguridad &amp; Nube</string>
+    <string name="settings_cloud_account_linked_title">Google Drive</string>
+    <string name="settings_cloud_account_linked_subtitle">Conectado como %1$s</string>
+    <string name="settings_cloud_account_unlinked_subtitle">Sin cuenta vinculada</string>
+    <string name="settings_cloud_btn_link">Vincular cuenta de Google</string>
+    <string name="settings_cloud_btn_switch">Cambiar de cuenta</string>
+    <string name="settings_cloud_btn_unlink">Desvincular cuenta</string>
+    <string name="settings_cloud_unlink_dialog_title">¿Desvincular cuenta de Google?</string>
+    <string name="settings_cloud_unlink_dialog_message">Se eliminará la vinculación con Google Drive en este teléfono. Tus materias locales y tus copias en la nube se mantendrán intactas.</string>
+    <string name="settings_cloud_unlink_dialog_confirm">Desvincular</string>
+    <string name="settings_cloud_unlink_success">Cuenta desvinculada correctamente</string>
 </resources>

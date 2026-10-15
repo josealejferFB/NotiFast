@@ -12,12 +12,17 @@ enum class SettingsDialogType {
     ABOUT_BOTTOM_SHEET,
     PRIVACY_POLICY,
     LOGOUT,
-    EXPORT_DATA
+    EXPORT_DATA,
+    UNLINK_GOOGLE_ACCOUNT
 }
 
 data class SettingsUiState(
     val isLoading: Boolean = false,
     val userProfile: User? = null,
+    val cloudAccount: com.notifast.app.domain.model.cloud.CloudAccount? = null,
+    val pendingAuthIntent: android.app.PendingIntent? = null,
+    val isCloudLoading: Boolean = false,
+    val cloudError: String? = null,
     val lastSyncTimestampText: String = "",
     val isDarkMode: Boolean? = null,
     val themeAccent: String = "aqua",
@@ -61,4 +66,9 @@ sealed interface SettingsEvent {
     data object DismissDialog : SettingsEvent
     data object ClearSnackbar : SettingsEvent
     data object Logout : SettingsEvent
+    data class LinkAccount(val activityContext: android.content.Context) : SettingsEvent
+    data class SwitchAccount(val activityContext: android.content.Context) : SettingsEvent
+    data object UnlinkAccount : SettingsEvent
+    data class AuthResult(val data: android.content.Intent?) : SettingsEvent
+    data object ClearCloudError : SettingsEvent
 }

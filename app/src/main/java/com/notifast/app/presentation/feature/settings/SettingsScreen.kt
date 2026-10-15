@@ -1,5 +1,9 @@
 package com.notifast.app.presentation.feature.settings
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -51,6 +55,27 @@ fun SettingsScreen(
         R.string.settings_grade_scale_changed_snack,
         lastScaleLabel ?: ""
     )
+
+    val authLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onEvent(SettingsEvent.AuthResult(result.data))
+        }
+    }
+
+    LaunchedEffect(uiState.pendingAuthIntent) {
+        uiState.pendingAuthIntent?.let { pi ->
+            authLauncher.launch(IntentSenderRequest.Builder(pi.intentSender).build())
+        }
+    }
+
+    LaunchedEffect(uiState.cloudError) {
+        uiState.cloudError?.let { err ->
+            snackbarHostState.showSnackbar(err)
+            viewModel.onEvent(SettingsEvent.ClearCloudError)
+        }
+    }
 
     LaunchedEffect(uiState.isLoggedOut) {
         if (uiState.isLoggedOut) onLogout()

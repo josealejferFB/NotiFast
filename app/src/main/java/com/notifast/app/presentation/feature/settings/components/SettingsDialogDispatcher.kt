@@ -85,6 +85,20 @@ fun SettingsDialogDispatcher(
                 onDismiss = { onEvent(SettingsEvent.DismissDialog) }
             )
         }
+        SettingsDialogType.UNLINK_GOOGLE_ACCOUNT -> {
+            NotiFastDialog(
+                title = stringResource(R.string.settings_cloud_unlink_dialog_title),
+                message = stringResource(R.string.settings_cloud_unlink_dialog_message),
+                confirmText = stringResource(R.string.settings_cloud_unlink_dialog_confirm),
+                dismissText = stringResource(R.string.btn_cancel),
+                confirmColor = MaterialTheme.colorScheme.error,
+                onConfirm = {
+                    onEvent(SettingsEvent.DismissDialog)
+                    onEvent(SettingsEvent.UnlinkAccount)
+                },
+                onDismiss = { onEvent(SettingsEvent.DismissDialog) }
+            )
+        }
         SettingsDialogType.EXPORT_DATA, null -> {}
     }
 }

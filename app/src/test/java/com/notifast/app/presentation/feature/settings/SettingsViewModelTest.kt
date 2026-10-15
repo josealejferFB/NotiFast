@@ -37,6 +37,7 @@ class SettingsViewModelTest {
     private val evaluationRepository: EvaluationRepository = mockk(relaxed = true)
     private val convertGradeScaleUseCase = ConvertGradeScaleUseCase()
     private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase = mockk(relaxed = true)
+    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
     private val cacheDir: File = mockk(relaxed = true)
 
@@ -54,6 +55,7 @@ class SettingsViewModelTest {
             evaluationRepository = evaluationRepository,
             convertGradeScaleUseCase = convertGradeScaleUseCase,
             rescheduleAllAlertsUseCase = rescheduleAllAlertsUseCase,
+            googleAccountRepository = googleAccountRepository,
             context = context
         )
 
@@ -74,6 +76,10 @@ class SettingsViewModelTest {
         coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(11.0f)
         coEvery { userPrefsRepository.activeAcademicCycleFlow } returns flowOf("2026-I")
         coEvery { userPrefsRepository.firstDayOfWeekFlow } returns flowOf("MONDAY")
+        coEvery { googleAccountRepository.account } returns flowOf(null)
+        coEvery { googleAccountRepository.unlink() } returns Result.success(Unit)
+        coEvery { googleAccountRepository.signIn(any()) } returns Result.success(com.notifast.app.domain.repository.AuthStep.Linked(com.notifast.app.domain.model.cloud.CloudAccount("acc_1", "test@test.com", "Test", null)))
+        coEvery { googleAccountRepository.completeAuthorization(any()) } returns Result.success(com.notifast.app.domain.model.cloud.CloudAccount("acc_1", "test@test.com", "Test", null))
 
         coEvery { evaluationRepository.getEvaluations(any()) } returns flowOf(emptyList())
         coEvery { evaluationRepository.updateEvaluations(any(), any()) } returns Result.success(Unit)
@@ -230,5 +236,72 @@ class SettingsViewModelTest {
 
         coVerify { authRepository.logout() }
         assertTrue(viewModel.uiState.value.isLoggedOut)
+    }
+
+    @Test
+    fun `when initialized with google account, observes account into uiState`() = runTest {
+        val cloudAccount = com.notifast.app.domain.model.cloud.CloudAccount("acc_123", "user@notifast.app", "Test User", null)
+        coEvery { googleAccountRepository.account } returns flowOf(cloudAccount)
+
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        assertEquals(cloudAccount, viewModel.uiState.value.cloudAccount)
+    }
+
+    @Test
+    fun `when UnlinkAccount received, calls googleAccountRepository unlink and leaves local repos untouched`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.UnlinkAccount)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { googleAccountRepository.unlink() }
+        coVerify(exactly = 0) { authRepository.logout() }
+        coVerify(exactly = 0) { evaluationRepository.updateEvaluations(any(), any()) }
+    }
+
+    @Test
+    fun `when SwitchAccount received, unlinks and then starts signIn`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.SwitchAccount(context))
+        advanceUntilIdle()
+
+        io.mockk.coVerifyOrder {
+            googleAccountRepository.unlink()
+            googleAccountRepository.signIn(context)
+        }
+    }
+
+    @Test
+    fun `when LinkAccount received, starts signIn and sets pendingAuthIntent if needs resolution`() = runTest {
+        val mockPendingIntent: android.app.PendingIntent = mockk()
+        coEvery { googleAccountRepository.signIn(context) } returns Result.success(
+            com.notifast.app.domain.repository.AuthStep.NeedsResolution(mockPendingIntent)
+        )
+
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.LinkAccount(context))
+        advanceUntilIdle()
+
+        assertEquals(mockPendingIntent, viewModel.uiState.value.pendingAuthIntent)
+    }
+
+    @Test
+    fun `when AuthResult received, calls completeAuthorization`() = runTest {
+        val mockIntent: android.content.Intent = mockk()
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.AuthResult(mockIntent))
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { googleAccountRepository.completeAuthorization(mockIntent) }
+        assertNull(viewModel.uiState.value.pendingAuthIntent)
     }
 }

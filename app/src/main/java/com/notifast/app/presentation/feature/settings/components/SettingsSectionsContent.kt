@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Info
@@ -54,7 +53,18 @@ fun SettingsSectionsContent(
             user = uiState.userProfile,
             academicCycle = uiState.activeAcademicCycle,
             syncStatusText = uiState.lastSyncTimestampText,
-            onEditProfile = onEditProfile
+            onEditProfile = onEditProfile,
+            hasCloudAccount = uiState.cloudAccount != null
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Section 2: Cloud Backup & Google Drive
+        SettingsCloudAccountSection(
+            account = uiState.cloudAccount,
+            isLoading = uiState.isCloudLoading,
+            context = context,
+            onEvent = onEvent
         )
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -140,11 +150,7 @@ fun SettingsSectionsContent(
             icon = Icons.Default.School
         ) {
             val scale = GradeScale.fromId(uiState.defaultGradeScale)
-            val effectivePassing = if (uiState.minPassingGrade == 0f) {
-                scale.minPassingGrade.toFloat()
-            } else {
-                uiState.minPassingGrade
-            }
+            val effectivePassing = if (uiState.minPassingGrade == 0f) scale.minPassingGrade.toFloat() else uiState.minPassingGrade
             val scaleDesc = when (uiState.defaultGradeScale) {
                 "0-10" -> stringResource(R.string.settings_academic_scale_decimal)
                 "0-100" -> stringResource(R.string.settings_academic_scale_percent)
@@ -212,18 +218,7 @@ fun SettingsSectionsContent(
                 title = stringResource(R.string.settings_about_feedback_title),
                 subtitle = stringResource(R.string.settings_about_feedback_subtitle),
                 icon = Icons.Default.Feedback,
-                onClick = {
-                    val intent = Intent(Intent.ACTION_SENDTO).apply {
-                        data = Uri.parse("mailto:contacto@notifast.app")
-                        putExtra(Intent.EXTRA_SUBJECT, "NotiFast 3.0 Feedback")
-                    }
-                    try {
-                        context.startActivity(Intent.createChooser(intent, "Feedback"))
-                    } catch (e: Exception) {
-                        Log.w("SettingsSections", "Failed to launch feedback email chooser", e)
-                        Toast.makeText(context, context.getString(R.string.settings_about_feedback_error), Toast.LENGTH_SHORT).show()
-                    }
-                }
+                onClick = { sendFeedback(context) }
             )
             SettingsRowItem(
                 title = stringResource(R.string.settings_about_logout_title),
@@ -236,5 +231,17 @@ fun SettingsSectionsContent(
         }
 
         Spacer(modifier = Modifier.height(110.dp))
+    }
+}
+
+private fun sendFeedback(context: Context) {
+    val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:contacto@notifast.app")).apply {
+        putExtra(Intent.EXTRA_SUBJECT, "NotiFast 3.0 Feedback")
+    }
+    try {
+        context.startActivity(Intent.createChooser(intent, "Feedback"))
+    } catch (e: Exception) {
+        Log.w("SettingsSections", "Failed to launch feedback email", e)
+        Toast.makeText(context, context.getString(R.string.settings_about_feedback_error), Toast.LENGTH_SHORT).show()
     }
 }

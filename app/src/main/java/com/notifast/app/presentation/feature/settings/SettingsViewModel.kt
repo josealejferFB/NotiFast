@@ -1,12 +1,15 @@
 package com.notifast.app.presentation.feature.settings
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.AuthStep
 import com.notifast.app.domain.repository.EvaluationRepository
+import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.ConvertGradeScaleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +30,8 @@ class SettingsViewModel @Inject constructor(
     private val evaluationRepository: EvaluationRepository,
     private val convertGradeScaleUseCase: ConvertGradeScaleUseCase,
     private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase,
-    @ApplicationContext private val context: Context
+    private val googleAccountRepository: GoogleAccountRepository,
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private companion object {
@@ -43,6 +47,7 @@ class SettingsViewModel @Inject constructor(
         observePreferences()
         calculateCacheSize()
         loadConvertibleEvaluationCount()
+        observeGoogleAccount()
     }
 
     private fun loadProfile() {
@@ -243,6 +248,82 @@ class SettingsViewModel @Inject constructor(
                 it.copy(snackbarMessage = null, error = null, lastScaleLabel = null)
             }
             is SettingsEvent.Logout -> logout()
+            is SettingsEvent.LinkAccount -> linkAccount(event.activityContext)
+            is SettingsEvent.SwitchAccount -> switchAccount(event.activityContext)
+            is SettingsEvent.UnlinkAccount -> unlinkAccount()
+            is SettingsEvent.AuthResult -> handleAuthResult(event.data)
+            is SettingsEvent.ClearCloudError -> _uiState.update { it.copy(cloudError = null) }
+        }
+    }
+
+    private fun observeGoogleAccount() {
+        viewModelScope.launch {
+            googleAccountRepository.account.collect { account ->
+                _uiState.update { it.copy(cloudAccount = account) }
+            }
+        }
+    }
+
+    private fun linkAccount(activityContext: Context) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isCloudLoading = true, cloudError = null) }
+            googleAccountRepository.signIn(activityContext).fold(
+                onSuccess = { step ->
+                    when (step) {
+                        is AuthStep.NeedsResolution -> _uiState.update {
+                            it.copy(pendingAuthIntent = step.pendingIntent, isCloudLoading = false)
+                        }
+                        is AuthStep.Linked -> _uiState.update { it.copy(isCloudLoading = false) }
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error al vincular cuenta") }
+                }
+            )
+        }
+    }
+
+    private fun switchAccount(activityContext: Context) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isCloudLoading = true, cloudError = null) }
+            googleAccountRepository.unlink()
+            googleAccountRepository.signIn(activityContext).fold(
+                onSuccess = { step ->
+                    when (step) {
+                        is AuthStep.NeedsResolution -> _uiState.update {
+                            it.copy(pendingAuthIntent = step.pendingIntent, isCloudLoading = false)
+                        }
+                        is AuthStep.Linked -> _uiState.update { it.copy(isCloudLoading = false) }
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error al cambiar de cuenta") }
+                }
+            )
+        }
+    }
+
+    private fun unlinkAccount() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isCloudLoading = true, cloudError = null) }
+            googleAccountRepository.unlink().fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isCloudLoading = false, snackbarMessage = "Cuenta desvinculada correctamente") }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error al desvincular cuenta") }
+                }
+            )
+        }
+    }
+
+    private fun handleAuthResult(data: Intent?) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(pendingAuthIntent = null, isCloudLoading = true, cloudError = null) }
+            googleAccountRepository.completeAuthorization(data).fold(
+                onSuccess = { _uiState.update { it.copy(isCloudLoading = false) } },
+                onFailure = { e -> _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error en autorización") } }
+            )
         }
     }
 
