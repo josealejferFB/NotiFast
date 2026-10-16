@@ -183,6 +183,16 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { it.copy(firstDayOfWeek = day) }
             }
         }
+        viewModelScope.launch {
+            userPrefsRepository.themePresetIdFlow.collect { presetId ->
+                _uiState.update { it.copy(themePresetId = presetId) }
+            }
+        }
+        viewModelScope.launch {
+            userPrefsRepository.customPrimaryHexFlow.collect { hex ->
+                _uiState.update { it.copy(customPrimaryHex = hex) }
+            }
+        }
     }
 
     private fun loadConvertibleEvaluationCount() {
@@ -310,6 +320,47 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.UnlinkAccount -> unlinkAccount()
             is SettingsEvent.AuthResult -> handleAuthResult(event.data)
             is SettingsEvent.ClearCloudError -> _uiState.update { it.copy(cloudError = null) }
+            is SettingsEvent.SelectThemePreset -> selectThemePreset(event.presetId)
+            is SettingsEvent.SetCustomPrimaryHex -> setCustomPrimaryHex(event.hex)
+            is SettingsEvent.OpenCustomThemeSheet -> openCustomThemeSheet()
+            is SettingsEvent.CloseCustomThemeSheet -> _uiState.update { it.copy(isCustomThemeSheetOpen = false) }
+            is SettingsEvent.UpdateCustomDraftColor -> _uiState.update { it.copy(customDraftColorHex = event.hex) }
+            is SettingsEvent.ApplyCustomTheme -> applyCustomTheme()
+        }
+    }
+
+    private fun selectThemePreset(presetId: String) {
+        viewModelScope.launch {
+            userPrefsRepository.setThemePresetId(presetId).onFailure { e ->
+                Log.e(TAG, "Failed to persist theme preset id", e)
+            }
+        }
+    }
+
+    private fun setCustomPrimaryHex(hex: String) {
+        viewModelScope.launch {
+            userPrefsRepository.setCustomPrimaryHex(hex).onFailure { e ->
+                Log.e(TAG, "Failed to persist custom primary hex", e)
+            }
+        }
+    }
+
+    private fun openCustomThemeSheet() {
+        val initialDraft = _uiState.value.customPrimaryHex ?: "#9E1B32"
+        _uiState.update {
+            it.copy(
+                isCustomThemeSheetOpen = true,
+                customDraftColorHex = initialDraft
+            )
+        }
+    }
+
+    private fun applyCustomTheme() {
+        viewModelScope.launch {
+            val draft = _uiState.value.customDraftColorHex
+            userPrefsRepository.setThemePresetId("custom")
+            userPrefsRepository.setCustomPrimaryHex(draft)
+            _uiState.update { it.copy(isCustomThemeSheetOpen = false) }
         }
     }
 

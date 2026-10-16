@@ -52,7 +52,11 @@ data class SettingsUiState(
     val cacheSizeFormatted: String = "0.0 MB",
     val activeDialog: SettingsDialogType? = null,
     val snackbarMessage: String? = null,
-    val isLoggedOut: Boolean = false
+    val isLoggedOut: Boolean = false,
+    val themePresetId: String = "classic",
+    val customPrimaryHex: String? = null,
+    val isCustomThemeSheetOpen: Boolean = false,
+    val customDraftColorHex: String = "#9E1B32"
 )
 
 sealed interface SettingsEvent {
@@ -80,5 +84,11 @@ sealed interface SettingsEvent {
     data object UnlinkAccount : SettingsEvent
     data class AuthResult(val data: Intent?) : SettingsEvent
     data object ClearCloudError : SettingsEvent
+    data class SelectThemePreset(val presetId: String) : SettingsEvent
+    data class SetCustomPrimaryHex(val hex: String) : SettingsEvent
+    data object OpenCustomThemeSheet : SettingsEvent
+    data object CloseCustomThemeSheet : SettingsEvent
+    data class UpdateCustomDraftColor(val hex: String) : SettingsEvent
+    data object ApplyCustomTheme : SettingsEvent
 }
 

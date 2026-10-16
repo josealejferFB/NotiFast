@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -84,6 +85,8 @@ class SettingsViewModelTest {
         coEvery { userPrefsRepository.minPassingGradeFlow } returns flowOf(11.0f)
         coEvery { userPrefsRepository.activeAcademicCycleFlow } returns flowOf("2026-I")
         coEvery { userPrefsRepository.firstDayOfWeekFlow } returns flowOf("MONDAY")
+        coEvery { userPrefsRepository.themePresetIdFlow } returns flowOf("classic")
+        coEvery { userPrefsRepository.customPrimaryHexFlow } returns flowOf(null)
         coEvery { googleAccountRepository.account } returns flowOf(null)
         coEvery { googleAccountRepository.unlink() } returns Result.success(Unit)
         coEvery { googleAccountRepository.signIn(any()) } returns Result.success(
@@ -424,5 +427,55 @@ class SettingsViewModelTest {
         assertFalse(viewModel.uiState.value.isCloudLoading)
         coVerify(exactly = 0) { googleAccountRepository.completeAuthorization(any()) }
     }
+
+    @Test
+    fun `when SelectThemePreset event, calls repository setThemePresetId`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.SelectThemePreset("forest_sage"))
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { userPrefsRepository.setThemePresetId("forest_sage") }
+    }
+
+    @Test
+    fun `when OpenCustomThemeSheet event, opens sheet and initializes draft color`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.OpenCustomThemeSheet)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isCustomThemeSheetOpen)
+        assertNotNull(viewModel.uiState.value.customDraftColorHex)
+    }
+
+    @Test
+    fun `when UpdateCustomDraftColor event, updates customDraftColorHex in state`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.UpdateCustomDraftColor("#15803D"))
+        advanceUntilIdle()
+
+        assertEquals("#15803D", viewModel.uiState.value.customDraftColorHex)
+    }
+
+    @Test
+    fun `when ApplyCustomTheme event, persists custom preset and custom hex and closes sheet`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.OpenCustomThemeSheet)
+        viewModel.onEvent(SettingsEvent.UpdateCustomDraftColor("#4F46E5"))
+        viewModel.onEvent(SettingsEvent.ApplyCustomTheme)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { userPrefsRepository.setThemePresetId("custom") }
+        coVerify(exactly = 1) { userPrefsRepository.setCustomPrimaryHex("#4F46E5") }
+        assertFalse(viewModel.uiState.value.isCustomThemeSheetOpen)
+    }
 }
+
 
