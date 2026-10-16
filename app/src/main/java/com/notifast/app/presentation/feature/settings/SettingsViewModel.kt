@@ -189,6 +189,11 @@ class SettingsViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
+            userPrefsRepository.backgroundPresetIdFlow.collect { presetId ->
+                _uiState.update { it.copy(backgroundPresetId = presetId) }
+            }
+        }
+        viewModelScope.launch {
             userPrefsRepository.customPrimaryHexFlow.collect { hex ->
                 _uiState.update { it.copy(customPrimaryHex = hex) }
             }
@@ -321,6 +326,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.AuthResult -> handleAuthResult(event.data)
             is SettingsEvent.ClearCloudError -> _uiState.update { it.copy(cloudError = null) }
             is SettingsEvent.SelectThemePreset -> selectThemePreset(event.presetId)
+            is SettingsEvent.SelectBackgroundPreset -> selectBackgroundPreset(event.presetId)
             is SettingsEvent.SetCustomPrimaryHex -> setCustomPrimaryHex(event.hex)
             is SettingsEvent.OpenCustomThemeSheet -> openCustomThemeSheet()
             is SettingsEvent.CloseCustomThemeSheet -> _uiState.update { it.copy(isCustomThemeSheetOpen = false) }
@@ -333,6 +339,14 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userPrefsRepository.setThemePresetId(presetId).onFailure { e ->
                 Log.e(TAG, "Failed to persist theme preset id", e)
+            }
+        }
+    }
+
+    private fun selectBackgroundPreset(presetId: String) {
+        viewModelScope.launch {
+            userPrefsRepository.setBackgroundPresetId(presetId).onFailure { e ->
+                Log.e(TAG, "Failed to persist background preset id", e)
             }
         }
     }

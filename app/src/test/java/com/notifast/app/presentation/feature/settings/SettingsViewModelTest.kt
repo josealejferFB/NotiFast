@@ -86,6 +86,7 @@ class SettingsViewModelTest {
         coEvery { userPrefsRepository.activeAcademicCycleFlow } returns flowOf("2026-I")
         coEvery { userPrefsRepository.firstDayOfWeekFlow } returns flowOf("MONDAY")
         coEvery { userPrefsRepository.themePresetIdFlow } returns flowOf("classic")
+        coEvery { userPrefsRepository.backgroundPresetIdFlow } returns flowOf("classic")
         coEvery { userPrefsRepository.customPrimaryHexFlow } returns flowOf(null)
         coEvery { googleAccountRepository.account } returns flowOf(null)
         coEvery { googleAccountRepository.unlink() } returns Result.success(Unit)
@@ -475,6 +476,17 @@ class SettingsViewModelTest {
         coVerify(exactly = 1) { userPrefsRepository.setThemePresetId("custom") }
         coVerify(exactly = 1) { userPrefsRepository.setCustomPrimaryHex("#4F46E5") }
         assertFalse(viewModel.uiState.value.isCustomThemeSheetOpen)
+    }
+
+    @Test
+    fun `when SelectBackgroundPreset event, calls repository setBackgroundPresetId`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.SelectBackgroundPreset("warm_mocha"))
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { userPrefsRepository.setBackgroundPresetId("warm_mocha") }
     }
 }
 

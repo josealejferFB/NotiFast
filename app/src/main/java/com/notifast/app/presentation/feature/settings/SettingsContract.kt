@@ -54,6 +54,7 @@ data class SettingsUiState(
     val snackbarMessage: String? = null,
     val isLoggedOut: Boolean = false,
     val themePresetId: String = "classic",
+    val backgroundPresetId: String = "classic",
     val customPrimaryHex: String? = null,
     val isCustomThemeSheetOpen: Boolean = false,
     val customDraftColorHex: String = "#9E1B32"
@@ -85,6 +86,7 @@ sealed interface SettingsEvent {
     data class AuthResult(val data: Intent?) : SettingsEvent
     data object ClearCloudError : SettingsEvent
     data class SelectThemePreset(val presetId: String) : SettingsEvent
+    data class SelectBackgroundPreset(val presetId: String) : SettingsEvent
     data class SetCustomPrimaryHex(val hex: String) : SettingsEvent
     data object OpenCustomThemeSheet : SettingsEvent
     data object CloseCustomThemeSheet : SettingsEvent
