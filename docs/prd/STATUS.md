@@ -26,11 +26,12 @@ Copia en la Nube (Google Drive)   [███████████████
 Cloud Hub AAA & Rediseño Táctil   [████████████████] 100% (4/4 objetivos) ✅
 Onboarding & Acceso Cloud Sync    [████████████████] 100% (4/4 pilares) ✅
 Grades Hub & Analíticas AAA       [████████████████] 100% (5/5 pilares) ✅
+Sistema de Temas Dinámicos AAA    [████████████████] 100% (8/8 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  98% (162/168 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    614 tests pasando (0 fallos, 0 ignorados) ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████]  98% (170/176 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    634 tests pasando (0 fallos, 0 ignorados) ✅
 ```
 
 ---
@@ -699,6 +700,46 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
    - **614 tests unitarios automatizados pasando al 100%** (0 fallos, 0 errores, 0 ignorados).
    - Compilación exitosa (`./gradlew assembleDebug`).
    - Instalación y validación táctil y visual en dispositivo físico `TK6TVCRSMB7DPVAQ`.
+
+---
+
+## 🎨 Sistema de Temas Personalizados y Paletas Académicas Dinámicas (Theme Customizer Engine AAA) — 100% Completado (16 Oct 2026)
+
+**Objetivo:** Diseñar e integrar el motor de personalización de temas y paletas dinámicas desde la pantalla de Ajustes (`SettingsScreen`), permitiendo a cada estudiante personalizar su entorno visual con máxima comodidad, serenidad e identidad académica, garantizando contraste WCAG AAA tanto en Modo Claro como en Modo Oscuro, preservando el lenguaje táctil papercraft y manteniendo sincronización bidireccional y resiliente con la nube (`Google Drive appDataFolder`).
+
+### Entregables Implementados:
+1. **Biblioteca de Colección de Estudio (6 Temas Académicos Predefinidos):**
+   - **NotiFast Classic:** Ruby Crimson (`#9E1B32` / `#E05A6E`) + Aqua Studio (`#2A7B7B` / `#38B2AC`).
+   - **Forest Sage (Campus Verde):** Verde Esmeralda Profundo (`#15803D` / `#34D399`) + Cálido Trigo/Tierra (`#854D0E` / `#FBBF24`). Ideal para estudiantes de ciencias, lectura prolongada y reducción de fatiga ocular.
+   - **Midnight Indigo (Cyber Nocturno):** Azul Índigo Eléctrico (`#4338CA` / `#818CF8`) + Turquesa Suave (`#0891B2` / `#22D3EE`). Diseñado para sesiones de estudio nocturnas y alta concentración.
+   - **Warm Mocha (Café Nórdico):** Terracota & Caramelo Cálido (`#C2410C` / `#FB923C`) + Vainilla / Papiro (`#B45309` / `#FCD34D`). Enfoque acogedor tipo biblioteca clásica.
+   - **Sakura Zen (Lavanda & Pastel):** Lavanda Suave (`#6D28D9` / `#A78BFA`) + Rosa Cuarzo (`#BE185D` / `#F472B6`). Entorno visual sereno para reducir la ansiedad académica.
+   - **Ocean Cyan (Minimalista Nórdico):** Azul Océano Profundo (`#0284C7` / `#38BDF8`) + Aqua Suave (`#0F766E` / `#2DD4BF`). Estilo limpio, moderno y estructurado.
+2. **Motor Algorítmico Puro de Esquemas Material 3 (`ThemePaletteGenerator`):**
+   - Función algorítmica pura que, a partir de cualquier color primario base (predefinido o personalizado por el estudiante), calcula dinámicamente los roles Material 3 (`primary`, `onPrimary`, `primaryContainer`, `onPrimaryContainer`, `secondary`, `tertiary`).
+   - **Calibración Dinámica de Luminancia y Contraste WCAG AAA:** En Modo Claro, si la luminancia sRGB relativa del color es elevada, ajusta iterativamente la luminosidad (`pLight -= 0.02f`) garantizando ratio de contraste $\ge 4.5:1$ con respecto a `onPrimary` (Blanco) y preservando legibilidad sobre superficies claras. En Modo Oscuro, ajusta la luminosidad (`pLight += 0.02f`) para garantizar ratio $\ge 4.5:1$ con respecto a fondos oscuros.
+   - **Preservación Estricta de Superficies NotiFast 3.0 Papercraft:** Para el tema `CLASSIC` y cualquier tema derivado o custom, se preservan los tokens táctiles papercraft de superficie y bordes (`BackgroundLight`, `SurfaceLight`, `SurfaceContainerLight`, `OutlineVariantLight`, etc.).
+3. **Estudio de Personalización Libre del Estudiante (`CustomThemePaletteSheet` & `ThemePreviewMiniCard`):**
+   - Modal bottom sheet con cuadrícula táctil de 10 colores base académicos cuidadosamente balanceados.
+   - **Previsualizador Táctil en Vivo (`ThemePreviewMiniCard`):** Micro-maqueta interactiva que renderiza en tiempo real cómo lucirá el tema (tarjeta `NotiFastCard`, botón `NotiFastButton`, insignia de evaluación y título de asignatura) antes de confirmar y aplicar los cambios.
+4. **Persistencia Local y Resiliencia Cloud (Google Drive `appDataFolder`):**
+   - Persistencia inmediata y reactiva en Jetpack DataStore mediante `UserPrefsRepository` (`theme_preset_id`, `custom_theme_primary_hex`).
+   - Integración nativa en `GlobalSnapshot.prefs` para copias de seguridad en Google Drive. Serialización y deserialización con fallback seguro: si se restaura un backup antiguo sin claves de tema, asigna de forma transparente `CLASSIC / SYSTEM` sin arrojar `NullPointerException` ni alterar notas u horarios existentes.
+5. **UI/UX en Pantalla de Ajustes (`SettingsScreen`):**
+   - Tarjeta principal `ThemeSelectorCard` integrada en la sección "Apariencia" de Ajustes:
+     - Selector de modo de luminancia por segmentos (`Sistema`, `Claro`, `Oscuro`).
+     - Fila horizontal con desplazamiento de muestras circulares (swatches) con gradientes de color primario/secundario y animación de resorte táctil (`spring`).
+     - Micro-insignia de check animada sobre el tema activo.
+     - Botón de acceso al Estudio de Personalización con icono y gradiente de color.
+     - Banner descriptivo contextual del tema activo.
+     - Respuesta háptica (`LocalHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)`).
+6. **Higiene de Código, Clean Architecture y Modularidad:**
+   - **Límite Estricto $\le 250$ LOC Cumplido:** `ThemePreviewMiniCard.kt` (133 LOC), `CustomThemePaletteSheet.kt` (198 LOC), `ThemeSwatchItems.kt` (209 LOC), `ThemeSelectorCard.kt` (187 LOC), `SettingsSectionsContent.kt` (226 LOC), `SettingsScreen.kt` (181 LOC).
+   - **Cero Strings Quemados:** 100% de títulos, nombres de temas, descripciones y etiquetas accesibles centralizados en `res/values/strings.xml` en español.
+   - **Cero Lógica en UI:** Estado MVI centralizado en un único StateFlow (`SettingsUiState`), interacción mediante eventos sellados (`SettingsEvent`), y lógica cromática pura en dominio/presentación.
+7. **Verificación Basada en Evidencia:**
+   - **634 pruebas unitarias automatizadas ejecutadas y aprobadas al 100%** (0 fallos, 0 errores, 0 ignorados), incluyendo tests de dominio (`ThemePresetTest`), generador de color (`ThemePaletteGeneratorTest`), repositorio (`UserPrefsRepositoryTest`), casos de uso cloud (`BuildCloudOverviewUseCaseTest`) y ViewModel (`SettingsViewModelTest`).
+   - Compilación exitosa de build debug (`./gradlew assembleDebug`).
 
 ---
 
