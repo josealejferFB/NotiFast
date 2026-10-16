@@ -24,6 +24,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,8 @@ import com.notifast.app.presentation.feature.notes.components.SubjectsSubTabSegm
 @Composable
 fun NotesScreen(
     viewModel: NotesViewModel = hiltViewModel(),
+    initialOpenCloudHub: Boolean = false,
+    onResetAutoOpenCloudHub: () -> Unit = {},
     onAddNoteClick: (String?) -> Unit = {},
     onAddSubjectClick: () -> Unit,
     onSubjectClick: (String) -> Unit,
@@ -65,6 +68,13 @@ fun NotesScreen(
     onSearchClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialOpenCloudHub) {
+        if (initialOpenCloudHub) {
+            viewModel.onEvent(NotesEvent.CloudClick)
+            onResetAutoOpenCloudHub()
+        }
+    }
     var subjectToDelete by remember { mutableStateOf<String?>(null) }
     var subjectToEdit by remember { mutableStateOf<SubjectInfo?>(null) }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
@@ -106,6 +116,14 @@ fun NotesScreen(
         ) { padding ->
             Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    uiState.error?.let { err ->
+                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                            com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                                message = err,
+                                onDismiss = { viewModel.onEvent(NotesEvent.ClearError) }
+                            )
+                        }
+                    }
                     TabRow(
                         selectedTabIndex = selectedTabIndex,
                         containerColor = Color.Transparent,

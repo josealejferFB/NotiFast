@@ -58,13 +58,6 @@ fun SubjectDetailScreen(
     var showEditDialog by remember { mutableStateOf(false) }
     var selectedTeacher by remember { mutableStateOf<com.notifast.app.data.model.Teacher?>(null) }
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(SubjectDetailEvent.ClearError)
-        }
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
         Scaffold(
@@ -87,6 +80,14 @@ fun SubjectDetailScreen(
             }
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                uiState.error?.let { err ->
+                    Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                        com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                            message = err,
+                            onDismiss = { viewModel.onEvent(SubjectDetailEvent.ClearError) }
+                        )
+                    }
+                }
                 SubjectSegmentedTabs(
                     selectedQuadrant = uiState.selectedQuadrant,
                     onQuadrantSelected = { viewModel.onEvent(SubjectDetailEvent.SelectQuadrant(it)) }

@@ -23,6 +23,7 @@ class CloudAuthException(val reason: Reason, cause: Throwable? = null) : Excepti
 interface GoogleAccountRepository {
     val account: Flow<CloudAccount?>
     suspend fun signIn(activityContext: Context): Result<AuthStep>
+    suspend fun switchAccount(activityContext: Context): Result<AuthStep> = signIn(activityContext)
     suspend fun completeAuthorization(data: Intent?): Result<CloudAccount>
     suspend fun accessToken(forceRefresh: Boolean = false): Result<String>
     suspend fun unlink(): Result<Unit>

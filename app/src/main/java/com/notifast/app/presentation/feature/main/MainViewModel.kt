@@ -22,4 +22,10 @@ class MainViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
     )
+
+    val hapticsEnabled: StateFlow<Boolean> = userPrefsRepository.hapticsEnabledFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = true
+    )
 }

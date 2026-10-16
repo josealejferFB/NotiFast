@@ -85,6 +85,15 @@ fun GradesScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(top = 16.dp, bottom = 88.dp)
                 ) {
+                    if (!uiState.error.isNullOrBlank()) {
+                        item {
+                            com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                                message = uiState.error ?: "",
+                                onDismiss = { viewModel.onEvent(GradesEvent.ClearError) }
+                            )
+                        }
+                    }
+
                     item {
                         GradesTabSelector(
                             selectedTab = uiState.selectedTab,

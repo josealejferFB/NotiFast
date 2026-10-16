@@ -1,6 +1,11 @@
 package com.notifast.app.presentation.feature.settings
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import com.notifast.app.data.model.User
+import com.notifast.app.domain.model.cloud.CloudAccount
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
 
 enum class SettingsDialogType {
     THEME,
@@ -12,20 +17,23 @@ enum class SettingsDialogType {
     ABOUT_BOTTOM_SHEET,
     PRIVACY_POLICY,
     LOGOUT,
-    EXPORT_DATA,
     UNLINK_GOOGLE_ACCOUNT
 }
 
 data class SettingsUiState(
     val isLoading: Boolean = false,
     val userProfile: User? = null,
-    val cloudAccount: com.notifast.app.domain.model.cloud.CloudAccount? = null,
-    val pendingAuthIntent: android.app.PendingIntent? = null,
+    val displayFirstName: String = "",
+    val displayLastName: String = "",
+    val displayEmail: String = "",
+    val displayPhotoUrl: String? = null,
+    val cloudAccount: CloudAccount? = null,
+    val syncSummary: LocalSyncSummary = LocalSyncSummary.NO_ACCOUNT,
+    val isCloudHubOpen: Boolean = false,
+    val pendingAuthIntent: PendingIntent? = null,
     val isCloudLoading: Boolean = false,
     val cloudError: String? = null,
-    val lastSyncTimestampText: String = "",
     val isDarkMode: Boolean? = null,
-    val themeAccent: String = "aqua",
     val hapticsEnabled: Boolean = true,
     val classAlertsEnabled: Boolean = true,
     val classAlertMinutes: Int = 15,
@@ -51,7 +59,6 @@ sealed interface SettingsEvent {
     data object LoadProfile : SettingsEvent
     data object RefreshCacheSize : SettingsEvent
     data class SetDarkMode(val enabled: Boolean?) : SettingsEvent
-    data class SetThemeAccent(val accent: String) : SettingsEvent
     data class SetHapticsEnabled(val enabled: Boolean) : SettingsEvent
     data class SetClassAlertsEnabled(val enabled: Boolean) : SettingsEvent
     data class SetClassAlertMinutes(val minutes: Int) : SettingsEvent
@@ -64,11 +71,14 @@ sealed interface SettingsEvent {
     data object ClearCache : SettingsEvent
     data class OpenDialog(val dialog: SettingsDialogType) : SettingsEvent
     data object DismissDialog : SettingsEvent
+    data object OpenCloudHub : SettingsEvent
+    data object CloseCloudHub : SettingsEvent
     data object ClearSnackbar : SettingsEvent
     data object Logout : SettingsEvent
-    data class LinkAccount(val activityContext: android.content.Context) : SettingsEvent
-    data class SwitchAccount(val activityContext: android.content.Context) : SettingsEvent
+    data class LinkAccount(val activityContext: Context) : SettingsEvent
+    data class SwitchAccount(val activityContext: Context) : SettingsEvent
     data object UnlinkAccount : SettingsEvent
-    data class AuthResult(val data: android.content.Intent?) : SettingsEvent
+    data class AuthResult(val data: Intent?) : SettingsEvent
     data object ClearCloudError : SettingsEvent
 }
+

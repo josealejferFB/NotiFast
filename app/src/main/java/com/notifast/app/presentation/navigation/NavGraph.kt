@@ -7,7 +7,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -26,7 +28,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.notifast.app.presentation.atoms.LocalNotiFastSnackbarHostState
 import com.notifast.app.presentation.atoms.NotiFastBottomNav
+import com.notifast.app.presentation.atoms.NotiFastSnackbarHost
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.feature.addevaluation.EvaluationEditorBottomSheet
 import com.notifast.app.presentation.feature.addschedule.ScheduleEditorBottomSheet
@@ -66,6 +70,7 @@ fun MainContent() {
     var activeScheduleEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
     var activeEvaluationEditorArgs by remember { mutableStateOf<Pair<String?, String?>?>(null) }
     var showAddSubjectSheetFromEditor by remember { mutableStateOf(false) }
+    var autoOpenCloudHubOnNotes by remember { mutableStateOf(false) }
 
     val startDestination = if (authState == true) Screen.Notes.route else Screen.Onboarding.route
 
@@ -87,9 +92,13 @@ fun MainContent() {
         currentRoute == tabRoute || currentRoute?.startsWith("$tabRoute/") == true
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        bottomBar = {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    CompositionLocalProvider(LocalNotiFastSnackbarHostState provides snackbarHostState) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            snackbarHost = { NotiFastSnackbarHost(snackbarHostState) },
+            bottomBar = {
             if (showBottomBar) {
                 NotiFastBottomNav(
                     items = Screen.bottomNavItems,
@@ -107,12 +116,15 @@ fun MainContent() {
     ) { _ ->
         NavHost(navController = navController, startDestination = startDestination) {
             composable(Screen.Onboarding.route) {
-                OnboardingScreen(onOnboardingComplete = {
+                OnboardingScreen(onOnboardingComplete = { autoOpenCloud ->
+                    autoOpenCloudHubOnNotes = autoOpenCloud
                     navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
                 })
             }
             composable(Screen.Notes.route) {
                 NotesScreen(
+                    initialOpenCloudHub = autoOpenCloudHubOnNotes,
+                    onResetAutoOpenCloudHub = { autoOpenCloudHubOnNotes = false },
                     onAddNoteClick = { subject -> activeNoteEditorArgs = Pair(null, subject) },
                     onAddSubjectClick = { navController.navigate(Screen.AddSubject.route) },
                     onSubjectClick = { subject -> navController.navigate(Screen.SubjectDetail.createRoute(subject)) },
@@ -164,7 +176,8 @@ fun MainContent() {
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
-                    onLogout = { navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } } }
+                    onLogout = { navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } } },
+                    onSearchClick = { showGlobalSearchSheet = true }
                 )
             }
             composable(Screen.EditProfile.route) {
@@ -251,4 +264,5 @@ fun MainContent() {
             )
         }
     }
+}
 }

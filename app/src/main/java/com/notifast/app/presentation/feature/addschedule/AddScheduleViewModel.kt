@@ -11,6 +11,7 @@ import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.domain.repository.TeacherRepository
 import com.notifast.app.domain.usecase.ScheduleOverlapResult
 import com.notifast.app.domain.usecase.ValidateScheduleOverlapUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,7 @@ class AddScheduleViewModel @Inject constructor(
     val uiState: StateFlow<AddScheduleUiState> = _uiState.asStateFlow()
 
     private var teachersJob: kotlinx.coroutines.Job? = null
+    private var allTeachersJob: kotlinx.coroutines.Job? = null
 
     init {
         loadData()
@@ -48,6 +50,26 @@ class AddScheduleViewModel @Inject constructor(
             val subjects = noteRepository.getSubjects(userId).first()
             val schedules = scheduleRepository.getSchedules(userId).first()
             _uiState.update { it.copy(subjects = subjects, existingSchedules = schedules) }
+        }
+        observeAllTeachers()
+    }
+
+    private fun observeAllTeachers() {
+        allTeachersJob?.cancel()
+        allTeachersJob = viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            teacherRepository.getTeachers(userId).collect { teachers ->
+                _uiState.update { state ->
+                    val filtered = if (state.subjectName.isNotBlank()) {
+                        teachers.filter { t -> t.subjectNames.any { it.equals(state.subjectName.trim(), ignoreCase = true) } }
+                    } else teachers
+                    state.copy(
+                        allTeachers = teachers,
+                        availableTeachers = filtered,
+                        hasConfiguredTeacher = filtered.isNotEmpty()
+                    )
+                }
+            }
         }
     }
 
@@ -92,6 +114,9 @@ class AddScheduleViewModel @Inject constructor(
             is AddScheduleEvent.UpdateTeacher -> _uiState.update { it.copy(teacher = event.teacher) }
             is AddScheduleEvent.UpdateMeetingUrl -> _uiState.update { it.copy(meetingUrl = event.url) }
             is AddScheduleEvent.RefreshSubjectsAndSelect -> refreshSubjectsAndSelect(event.subjectName)
+            is AddScheduleEvent.OpenAddTeacherSheet -> _uiState.update { it.copy(showAddTeacherSheet = true) }
+            is AddScheduleEvent.CloseAddTeacherSheet -> _uiState.update { it.copy(showAddTeacherSheet = false) }
+            is AddScheduleEvent.SaveTeacher -> saveTeacher(event.teacher)
             is AddScheduleEvent.ClearError -> _uiState.update { it.copy(error = null) }
             is AddScheduleEvent.SaveSchedule -> saveSchedule()
             is AddScheduleEvent.ResetState -> {
@@ -108,10 +133,32 @@ class AddScheduleViewModel @Inject constructor(
                         isSaving = false,
                         error = null,
                         isSaved = false,
-                        conflictingSchedules = emptyList()
+                        conflictingSchedules = emptyList(),
+                        showAddTeacherSheet = false
                     )
                 }
             }
+        }
+    }
+
+    private fun saveTeacher(teacher: Teacher) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val toSave = if (teacher.userId.isBlank()) teacher.copy(userId = userId) else teacher
+            teacherRepository.saveTeacher(toSave).fold(
+                onSuccess = {
+                    _uiState.update { current ->
+                        current.copy(
+                            teacher = toSave.fullName,
+                            showAddTeacherSheet = false,
+                            error = null
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al guardar profesor")) }
+                }
+            )
         }
     }
 
@@ -188,11 +235,11 @@ class AddScheduleViewModel @Inject constructor(
     private fun saveSchedule() {
         val state = _uiState.value
         if (state.subjectName.isBlank()) {
-            _uiState.update { it.copy(error = "El nombre de la materia es requerido") }
+            _uiState.update { it.copy(error = "El nombre de la materia es requerido.") }
             return
         }
         if (state.startTime.isBlank() || state.endTime.isBlank()) {
-            _uiState.update { it.copy(error = "Las horas de inicio y fin son requeridas") }
+            _uiState.update { it.copy(error = "Las horas de inicio y fin son obligatorias.") }
             return
         }
 
@@ -200,7 +247,8 @@ class AddScheduleViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             _uiState.update { it.copy(isSaving = true, error = null) }
 
-            val subjectColorHex = state.subjects.find { it.name == state.subjectName }?.colorHex
+            val matchedSubject = state.subjects.find { it.name.equals(state.subjectName, ignoreCase = true) }
+            val subjectColorHex = matchedSubject?.colorHex
             val subjectColor = if (!subjectColorHex.isNullOrBlank()) {
                 try {
                     android.graphics.Color.parseColor(subjectColorHex).toLong()
@@ -209,6 +257,7 @@ class AddScheduleViewModel @Inject constructor(
 
             val schedule = Schedule(
                 userId = userId,
+                subjectId = matchedSubject?.id.orEmpty(),
                 subjectName = state.subjectName,
                 modality = state.modality,
                 dayOfWeek = state.dayOfWeek,
@@ -254,7 +303,7 @@ class AddScheduleViewModel @Inject constructor(
                     _uiState.update { it.copy(isSaved = true, isSaving = false) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(error = e.message ?: "Error al guardar horario", isSaving = false) }
+                    _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al guardar horario"), isSaving = false) }
                 }
             )
         }

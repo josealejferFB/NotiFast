@@ -19,8 +19,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import com.notifast.app.presentation.atoms.NotiFastChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -131,7 +130,8 @@ fun AddEditTeacherBottomSheet(
                     ) {
                         availableSubjects.forEach { subject ->
                             val isSelected = selectedSubjects.contains(subject)
-                            FilterChip(
+                            NotiFastChip(
+                                label = subject,
                                 selected = isSelected,
                                 onClick = {
                                     selectedSubjects = if (isSelected) {
@@ -139,13 +139,7 @@ fun AddEditTeacherBottomSheet(
                                     } else {
                                         selectedSubjects + subject
                                     }
-                                },
-                                label = { Text(subject) },
-                                shape = RoundedCornerShape(10.dp),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
+                                }
                             )
                         }
                     }

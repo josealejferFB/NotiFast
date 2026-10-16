@@ -434,4 +434,74 @@ class CloudViewModelTest {
         coVerify { deleteCloudSubjectUseCase.cloudOnly("df_cloud") }
         coVerify(atLeast = 2) { buildCloudOverviewUseCase("user_123") }
     }
+
+    @Test
+    fun `failed upload populates failedSubjectIds and Refresh or Toggle clears them`() = runTest {
+        accountFlow.value = testAccount
+        coEvery { uploadSubjectsUseCase(any(), any(), any()) } returns flowOf(
+            UploadProgress.Done(
+                BatchResult(
+                    listOf(
+                        ItemOutcome("sub_local", "Local Solo", null),
+                        ItemOutcome("sub_changes", "Local Changes", Exception("Transient error"))
+                    )
+                )
+            )
+        )
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.onEvent(CloudEvent.Toggle("sub_local"))
+        vm.onEvent(CloudEvent.Toggle("sub_changes"))
+        vm.onEvent(CloudEvent.Upload)
+        advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.failedSubjectIds.contains("sub_changes"))
+        assertNotNull(vm.uiState.value.summary)
+
+        // Toggling sub_changes should clear its failure state
+        vm.onEvent(CloudEvent.Toggle("sub_changes"))
+        assertFalse(vm.uiState.value.failedSubjectIds.contains("sub_changes"))
+        assertNull(vm.uiState.value.summary)
+
+        // Re-inject error state manually to test Refresh
+        vm.onEvent(CloudEvent.Upload)
+        advanceUntilIdle()
+        assertTrue(vm.uiState.value.failedSubjectIds.contains("sub_changes"))
+
+        // Refresh clears failedSubjectIds and summary
+        vm.onEvent(CloudEvent.Refresh)
+        advanceUntilIdle()
+        assertTrue(vm.uiState.value.failedSubjectIds.isEmpty())
+        assertNull(vm.uiState.value.summary)
+    }
+
+    @Test
+    fun `DismissSummary clears summary and failedSubjectIds`() = runTest {
+        accountFlow.value = testAccount
+        coEvery { uploadSubjectsUseCase(any(), any(), any()) } returns flowOf(
+            UploadProgress.Done(
+                BatchResult(
+                    listOf(
+                        ItemOutcome("sub_changes", "Local Changes", Exception("Network glitch"))
+                    )
+                )
+            )
+        )
+
+        val vm = createViewModel()
+        advanceUntilIdle()
+
+        vm.onEvent(CloudEvent.Toggle("sub_changes"))
+        vm.onEvent(CloudEvent.Upload)
+        advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.failedSubjectIds.contains("sub_changes"))
+        assertNotNull(vm.uiState.value.summary)
+
+        vm.onEvent(CloudEvent.DismissSummary)
+        assertNull(vm.uiState.value.summary)
+        assertTrue(vm.uiState.value.failedSubjectIds.isEmpty())
+    }
 }

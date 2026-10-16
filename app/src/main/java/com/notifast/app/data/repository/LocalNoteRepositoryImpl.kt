@@ -78,6 +78,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
                 }
                 imageUrl = uploadResult.getOrNull()
             }
+            val parsedBlocks = MarkdownToBlocksParser.parse(content, imageUrl)
+            val blocksJson = NoteBlockCodec.toJson(parsedBlocks)
             val noteId = UUID.randomUUID().toString()
             val now = Date()
             noteDao.insertNote(
@@ -91,7 +93,9 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     imageUrl = imageUrl,
                     tags = tags,
                     timestamp = now,
-                    updatedAt = now
+                    updatedAt = now,
+                    blocksJson = blocksJson,
+                    schemaVersion = 2
                 )
             )
             Result.success(noteId)
@@ -285,6 +289,20 @@ class LocalNoteRepositoryImpl @Inject constructor(
             } else {
                 ""
             }
+            val blocksToSave = if (hasBlocks) {
+                note.blocks
+            } else if (contentToSave.isNotBlank()) {
+                MarkdownToBlocksParser.parse(contentToSave, imageUrl)
+            } else {
+                emptyList()
+            }
+            val blocksJsonToSave = if (blocksToSave.isNotEmpty()) {
+                NoteBlockCodec.toJson(blocksToSave)
+            } else {
+                existing?.blocksJson ?: "[]"
+            }
+            val schemaVersionToSave = if (blocksToSave.isNotEmpty()) 2 else (existing?.schemaVersion ?: 1)
+
             noteDao.updateNote(
                 NoteEntity(
                     id = note.id,
@@ -297,8 +315,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     tags = note.tags,
                     timestamp = note.timestamp ?: existing?.timestamp ?: Date(),
                     updatedAt = Date(),
-                    blocksJson = if (hasBlocks) NoteBlockCodec.toJson(note.blocks) else (existing?.blocksJson ?: "[]"),
-                    schemaVersion = if (hasBlocks) 2 else (existing?.schemaVersion ?: 1)
+                    blocksJson = blocksJsonToSave,
+                    schemaVersion = schemaVersionToSave
                 )
             )
             Result.success(Unit)

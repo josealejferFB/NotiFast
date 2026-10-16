@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,194 +48,172 @@ fun SettingsSectionsContent(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Section 1: Hero Card 3.0
         SettingsProfileHeroCard(
-            user = uiState.userProfile,
+            firstName = uiState.displayFirstName,
+            lastName = uiState.displayLastName,
+            email = uiState.displayEmail,
+            photoUrl = uiState.displayPhotoUrl,
             academicCycle = uiState.activeAcademicCycle,
-            syncStatusText = uiState.lastSyncTimestampText,
-            onEditProfile = onEditProfile,
-            hasCloudAccount = uiState.cloudAccount != null
+            syncSummary = uiState.syncSummary,
+            onEditProfile = onEditProfile
         )
-
         Spacer(modifier = Modifier.height(14.dp))
-
-        // Section 2: Cloud Backup & Google Drive
         SettingsCloudAccountSection(
             account = uiState.cloudAccount,
+            syncSummary = uiState.syncSummary,
             isLoading = uiState.isCloudLoading,
             context = context,
             onEvent = onEvent
         )
-
         Spacer(modifier = Modifier.height(14.dp))
-
-        // Section 2: Appearance & Design
-        SettingsSectionContainer(
-            title = stringResource(R.string.settings_section_appearance),
-            icon = Icons.Default.Palette
-        ) {
-            val themeSubtitle = when (uiState.isDarkMode) {
-                null -> stringResource(R.string.settings_appearance_theme_system)
-                true -> stringResource(R.string.settings_appearance_theme_dark)
-                false -> stringResource(R.string.settings_appearance_theme_light)
-            }
-            SettingsRowItem(
-                title = stringResource(R.string.settings_appearance_theme_title),
-                subtitle = themeSubtitle,
-                icon = Icons.Default.Palette,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.THEME)) }
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_appearance_haptics_title),
-                subtitle = stringResource(R.string.settings_appearance_haptics_subtitle),
-                icon = Icons.Default.Vibration,
-                trailing = SettingsTrailingContent.SwitchToggle(
-                    checked = uiState.hapticsEnabled,
-                    onCheckedChange = { onEvent(SettingsEvent.SetHapticsEnabled(it)) }
-                )
-            )
-        }
-
-        // Section 3: Proactive Notifications
-        SettingsSectionContainer(
-            title = stringResource(R.string.settings_section_notifications),
-            icon = Icons.Default.Notifications
-        ) {
-            val classSub = if (uiState.classAlertsEnabled) {
-                stringResource(R.string.settings_notifications_classes_subtitle, uiState.classAlertMinutes)
-            } else stringResource(R.string.settings_notifications_classes_disabled)
-
-            val evalSub = if (uiState.evalAlertsEnabled) {
-                stringResource(R.string.settings_notifications_evaluations_subtitle, uiState.evalAlertDays)
-            } else stringResource(R.string.settings_notifications_evaluations_disabled)
-
-            SettingsRowItem(
-                title = stringResource(R.string.settings_notifications_classes_title),
-                subtitle = classSub,
-                icon = Icons.Default.NotificationsActive,
-                trailing = SettingsTrailingContent.SwitchToggle(
-                    checked = uiState.classAlertsEnabled,
-                    onCheckedChange = { onEvent(SettingsEvent.SetClassAlertsEnabled(it)) }
-                ),
-                onClick = if (uiState.classAlertsEnabled) {
-                    { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.CLASS_ALERT_TIMING)) }
-                } else null
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_notifications_evaluations_title),
-                subtitle = evalSub,
-                icon = Icons.Default.CalendarMonth,
-                trailing = SettingsTrailingContent.SwitchToggle(
-                    checked = uiState.evalAlertsEnabled,
-                    onCheckedChange = { onEvent(SettingsEvent.SetEvalAlertsEnabled(it)) }
-                ),
-                onClick = if (uiState.evalAlertsEnabled) {
-                    { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.EVAL_ALERT_TIMING)) }
-                } else null
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_notifications_daily_summary_title),
-                subtitle = stringResource(R.string.settings_notifications_daily_summary_subtitle),
-                icon = Icons.Default.WbSunny,
-                trailing = SettingsTrailingContent.SwitchToggle(
-                    checked = uiState.dailySummaryEnabled,
-                    onCheckedChange = { onEvent(SettingsEvent.SetDailySummaryEnabled(it)) }
-                )
-            )
-        }
-
-        // Section 4: Academic Settings
-        SettingsSectionContainer(
-            title = stringResource(R.string.settings_section_academic),
-            icon = Icons.Default.School
-        ) {
-            val scale = GradeScale.fromId(uiState.defaultGradeScale)
-            val effectivePassing = if (uiState.minPassingGrade == 0f) scale.minPassingGrade.toFloat() else uiState.minPassingGrade
-            val scaleDesc = when (uiState.defaultGradeScale) {
-                "0-10" -> stringResource(R.string.settings_academic_scale_decimal)
-                "0-100" -> stringResource(R.string.settings_academic_scale_percent)
-                "A-F" -> stringResource(R.string.settings_academic_scale_letters)
-                else -> stringResource(R.string.settings_academic_scale_vigesimal)
-            }
-            val passingText = GradeFormatters.passing(effectivePassing.toDouble(), scale)
-
-            SettingsRowItem(
-                title = stringResource(R.string.settings_academic_scale_title),
-                subtitle = "$scaleDesc • Mín: $passingText",
-                icon = Icons.Default.Grade,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.GRADE_SCALE)) }
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_academic_cycle_title),
-                subtitle = "${uiState.activeAcademicCycle} • ${stringResource(R.string.settings_academic_cycle_desc)}",
-                icon = Icons.Default.Today,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.ACADEMIC_CYCLE)) }
-            )
-            val firstDayLabel = if (uiState.firstDayOfWeek == "SUNDAY") {
-                stringResource(R.string.settings_first_day_sunday)
-            } else stringResource(R.string.settings_first_day_monday)
-
-            SettingsRowItem(
-                title = stringResource(R.string.settings_academic_first_day_title),
-                subtitle = firstDayLabel,
-                icon = Icons.Default.CalendarMonth,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.FIRST_DAY_OF_WEEK)) }
-            )
-        }
-
-        // Section 5: Data & Storage
-        SettingsSectionContainer(
-            title = stringResource(R.string.settings_section_storage),
-            icon = Icons.Default.Storage
-        ) {
-            SettingsRowItem(
-                title = stringResource(R.string.settings_storage_cache_title),
-                subtitle = stringResource(R.string.settings_storage_cache_clear_btn),
-                icon = Icons.Default.CleaningServices,
-                trailing = SettingsTrailingContent.ValueBadge(uiState.cacheSizeFormatted),
-                onClick = { onEvent(SettingsEvent.ClearCache) }
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_storage_privacy_title),
-                subtitle = stringResource(R.string.settings_storage_privacy_subtitle),
-                icon = Icons.Default.Shield,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.PRIVACY_POLICY)) }
-            )
-        }
-
-        // Section 6: About & Support
-        SettingsSectionContainer(
-            title = stringResource(R.string.settings_section_about),
-            icon = Icons.Default.Info
-        ) {
-            SettingsRowItem(
-                title = stringResource(R.string.settings_about_thesis_title),
-                subtitle = stringResource(R.string.settings_about_version_value),
-                icon = Icons.Default.Info,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.ABOUT_BOTTOM_SHEET)) }
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_about_feedback_title),
-                subtitle = stringResource(R.string.settings_about_feedback_subtitle),
-                icon = Icons.Default.Feedback,
-                onClick = { sendFeedback(context) }
-            )
-            SettingsRowItem(
-                title = stringResource(R.string.settings_about_logout_title),
-                subtitle = stringResource(R.string.settings_about_logout_subtitle),
-                icon = Icons.AutoMirrored.Filled.Logout,
-                iconTint = MaterialTheme.colorScheme.error,
-                titleColor = MaterialTheme.colorScheme.error,
-                onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.LOGOUT)) }
-            )
-        }
-
+        SettingsAcademicSection(uiState = uiState, onEvent = onEvent)
+        SettingsNotificationsSection(uiState = uiState, onEvent = onEvent)
+        SettingsAppearanceSection(uiState = uiState, onEvent = onEvent)
+        SettingsStorageAboutSection(uiState = uiState, context = context, onEvent = onEvent)
         Spacer(modifier = Modifier.height(110.dp))
     }
 }
 
-private fun sendFeedback(context: Context) {
+@Composable
+private fun SettingsAcademicSection(uiState: SettingsUiState, onEvent: (SettingsEvent) -> Unit) {
+    SettingsSectionContainer(title = stringResource(R.string.settings_section_academic), icon = Icons.Default.School) {
+        val scale = GradeScale.fromId(uiState.defaultGradeScale)
+        val effectivePassing = if (uiState.minPassingGrade == 0f) scale.minPassingGrade.toFloat() else uiState.minPassingGrade
+        val scaleDesc = when (uiState.defaultGradeScale) {
+            "0-10" -> stringResource(R.string.settings_academic_scale_decimal)
+            "0-100" -> stringResource(R.string.settings_academic_scale_percent)
+            "A-F" -> stringResource(R.string.settings_academic_scale_letters)
+            else -> stringResource(R.string.settings_academic_scale_vigesimal)
+        }
+        val passingText = GradeFormatters.passing(effectivePassing.toDouble(), scale)
+        SettingsRowItem(
+            title = stringResource(R.string.settings_academic_scale_title),
+            subtitle = stringResource(R.string.settings_academic_scale_subtitle_format, scaleDesc, passingText),
+            icon = Icons.Default.Grade,
+            trailing = SettingsTrailingContent.ValueBadge(text = "${uiState.defaultGradeScale} • $passingText", isMono = true),
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.GRADE_SCALE)) }
+        )
+        val firstDayLabel = if (uiState.firstDayOfWeek == "SUNDAY") stringResource(R.string.settings_first_day_sunday) else stringResource(R.string.settings_first_day_monday)
+        SettingsRowItem(
+            title = stringResource(R.string.settings_academic_first_day_title),
+            subtitle = stringResource(R.string.settings_academic_first_day_subtitle, firstDayLabel),
+            icon = Icons.Default.CalendarMonth,
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.FIRST_DAY_OF_WEEK)) }
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_academic_cycle_title),
+            subtitle = stringResource(R.string.settings_academic_cycle_desc),
+            icon = Icons.Default.Today,
+            trailing = SettingsTrailingContent.ValueBadge(text = uiState.activeAcademicCycle, isMono = true),
+            showDivider = false,
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.ACADEMIC_CYCLE)) }
+        )
+    }
+}
+
+@Composable
+private fun SettingsNotificationsSection(uiState: SettingsUiState, onEvent: (SettingsEvent) -> Unit) {
+    SettingsSectionContainer(title = stringResource(R.string.settings_section_notifications), icon = Icons.Default.Notifications) {
+        val classSub = if (uiState.classAlertsEnabled) stringResource(R.string.settings_notifications_classes_subtitle, uiState.classAlertMinutes) else stringResource(R.string.settings_notifications_classes_disabled)
+        val evalSub = if (uiState.evalAlertsEnabled) stringResource(R.string.settings_notifications_evaluations_subtitle, uiState.evalAlertDays) else stringResource(R.string.settings_notifications_evaluations_disabled)
+        SettingsRowItem(
+            title = stringResource(R.string.settings_notifications_classes_title),
+            subtitle = classSub,
+            icon = Icons.Default.NotificationsActive,
+            trailing = SettingsTrailingContent.SwitchToggle(
+                checked = uiState.classAlertsEnabled,
+                onCheckedChange = { onEvent(SettingsEvent.SetClassAlertsEnabled(it)) },
+                badgeText = stringResource(R.string.settings_notifications_badge_min, uiState.classAlertMinutes)
+            ),
+            onClick = if (uiState.classAlertsEnabled) ({ onEvent(SettingsEvent.OpenDialog(SettingsDialogType.CLASS_ALERT_TIMING)) }) else null
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_notifications_evaluations_title),
+            subtitle = evalSub,
+            icon = Icons.Default.CalendarMonth,
+            trailing = SettingsTrailingContent.SwitchToggle(
+                checked = uiState.evalAlertsEnabled,
+                onCheckedChange = { onEvent(SettingsEvent.SetEvalAlertsEnabled(it)) },
+                badgeText = stringResource(R.string.settings_notifications_badge_days, uiState.evalAlertDays)
+            ),
+            onClick = if (uiState.evalAlertsEnabled) ({ onEvent(SettingsEvent.OpenDialog(SettingsDialogType.EVAL_ALERT_TIMING)) }) else null
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_notifications_daily_summary_title),
+            subtitle = stringResource(R.string.settings_notifications_daily_summary_subtitle),
+            icon = Icons.Default.WbSunny,
+            trailing = SettingsTrailingContent.SwitchToggle(checked = uiState.dailySummaryEnabled, onCheckedChange = { onEvent(SettingsEvent.SetDailySummaryEnabled(it)) }),
+            showDivider = false
+        )
+    }
+}
+
+@Composable
+private fun SettingsAppearanceSection(uiState: SettingsUiState, onEvent: (SettingsEvent) -> Unit) {
+    SettingsSectionContainer(title = stringResource(R.string.settings_section_appearance), icon = Icons.Default.Palette) {
+        val themeSubtitle = when (uiState.isDarkMode) {
+            null -> stringResource(R.string.settings_appearance_theme_system)
+            true -> stringResource(R.string.settings_appearance_theme_dark)
+            false -> stringResource(R.string.settings_appearance_theme_light)
+        }
+        SettingsRowItem(
+            title = stringResource(R.string.settings_appearance_theme_title),
+            subtitle = themeSubtitle,
+            icon = Icons.Default.Palette,
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.THEME)) }
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_appearance_haptics_title),
+            subtitle = stringResource(R.string.settings_appearance_haptics_subtitle),
+            icon = Icons.Default.Vibration,
+            trailing = SettingsTrailingContent.SwitchToggle(checked = uiState.hapticsEnabled, onCheckedChange = { onEvent(SettingsEvent.SetHapticsEnabled(it)) }),
+            showDivider = false
+        )
+    }
+}
+
+@Composable
+private fun SettingsStorageAboutSection(uiState: SettingsUiState, context: Context, onEvent: (SettingsEvent) -> Unit) {
+    SettingsSectionContainer(title = stringResource(R.string.settings_section_storage), icon = Icons.Default.Storage) {
+        SettingsRowItem(
+            title = stringResource(R.string.settings_storage_cache_title),
+            subtitle = stringResource(R.string.settings_storage_cache_subtitle),
+            icon = Icons.Default.CleaningServices,
+            trailing = SettingsTrailingContent.ValueBadge(text = uiState.cacheSizeFormatted, isMono = true),
+            onClick = { onEvent(SettingsEvent.ClearCache) }
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_storage_privacy_title),
+            subtitle = stringResource(R.string.settings_storage_privacy_subtitle),
+            icon = Icons.Default.Shield,
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.PRIVACY_POLICY)) }
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_about_thesis_title),
+            subtitle = stringResource(R.string.settings_about_version_value),
+            icon = Icons.Default.Info,
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.ABOUT_BOTTOM_SHEET)) }
+        )
+        val showAlert = rememberNotiFastAlert()
+        SettingsRowItem(
+            title = stringResource(R.string.settings_about_feedback_title),
+            subtitle = stringResource(R.string.settings_about_feedback_subtitle),
+            icon = Icons.Default.Feedback,
+            onClick = { sendFeedback(context, showAlert) }
+        )
+        SettingsRowItem(
+            title = stringResource(R.string.settings_about_logout_title),
+            subtitle = stringResource(R.string.settings_about_logout_subtitle),
+            icon = Icons.AutoMirrored.Filled.Logout,
+            iconTint = MaterialTheme.colorScheme.error,
+            titleColor = MaterialTheme.colorScheme.error,
+            showDivider = false,
+            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.LOGOUT)) }
+        )
+    }
+}
+
+private fun sendFeedback(context: Context, showAlert: (String, AlertSeverity) -> Unit) {
     val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:contacto@notifast.app")).apply {
         putExtra(Intent.EXTRA_SUBJECT, "NotiFast 3.0 Feedback")
     }
@@ -242,6 +221,8 @@ private fun sendFeedback(context: Context) {
         context.startActivity(Intent.createChooser(intent, "Feedback"))
     } catch (e: Exception) {
         Log.w("SettingsSections", "Failed to launch feedback email", e)
-        Toast.makeText(context, context.getString(R.string.settings_about_feedback_error), Toast.LENGTH_SHORT).show()
+        showAlert(context.getString(R.string.settings_about_feedback_error), AlertSeverity.ERROR)
     }
 }
+
+

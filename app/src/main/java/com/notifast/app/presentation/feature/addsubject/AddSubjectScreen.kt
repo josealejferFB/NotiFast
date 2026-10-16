@@ -101,10 +101,9 @@ fun AddSubjectScreen(
                 }
 
                 uiState.error?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                    com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                        message = it,
+                        onDismiss = { viewModel.onEvent(AddSubjectEvent.ClearError) }
                     )
                 }
 

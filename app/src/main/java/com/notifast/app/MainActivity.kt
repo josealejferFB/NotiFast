@@ -8,8 +8,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.presentation.feature.main.MainViewModel
@@ -25,14 +30,27 @@ class MainActivity : ComponentActivity() {
         setContent {
             val mainViewModel: MainViewModel = hiltViewModel()
             val isDarkMode by mainViewModel.isDarkMode.collectAsStateWithLifecycle()
+            val hapticsEnabled by mainViewModel.hapticsEnabled.collectAsStateWithLifecycle()
             val darkTheme = isDarkMode ?: isSystemInDarkTheme()
+            val systemHaptics = LocalHapticFeedback.current
+            val effectiveHaptics = remember(hapticsEnabled, systemHaptics) {
+                if (hapticsEnabled) {
+                    systemHaptics
+                } else {
+                    object : HapticFeedback {
+                        override fun performHapticFeedback(hapticFeedbackType: HapticFeedbackType) = Unit
+                    }
+                }
+            }
 
             NotiFastTheme(darkTheme = darkTheme) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainContent()
+                CompositionLocalProvider(LocalHapticFeedback provides effectiveHaptics) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MainContent()
+                    }
                 }
             }
         }

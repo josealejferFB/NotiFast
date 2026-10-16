@@ -28,7 +28,8 @@ data class CloudUiState(
     val pendingConfirm: CloudConfirm? = null,
     val pendingAuthIntent: PendingIntent? = null,
     val error: CloudError? = null,
-    val conflictNameError: String? = null
+    val conflictNameError: String? = null,
+    val failedSubjectIds: Set<String> = emptySet()
 )
 
 sealed interface CloudConfirm {

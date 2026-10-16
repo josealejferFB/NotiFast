@@ -15,10 +15,12 @@ import com.notifast.app.domain.repository.ImageRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
@@ -194,6 +196,20 @@ class LocalAuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Error getting user profile for $uid", e)
             Result.failure(e)
+        }
+    }
+
+    override fun observeUserProfile(uid: String): Flow<User?> {
+        return userDao.observeUser(uid).map { entity ->
+            entity?.let {
+                User(
+                    uid = it.uid,
+                    email = it.email,
+                    firstName = it.firstName,
+                    lastName = it.lastName,
+                    profilePictureUrl = it.profilePictureUrl
+                )
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import com.notifast.app.domain.repository.CloudAuthException
 import com.notifast.app.domain.repository.CloudBackupRepository
 import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.repository.SubjectBackupStore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -49,6 +50,24 @@ class UploadSubjectsUseCase @Inject constructor(
                     val snapshot = snapshotResult.getOrThrow()
                     val hash = hasher.hash(snapshot)
 
+                    val cloudHash = item.cloudFile?.contentHash
+                    val targetDriveId = item.driveFileId ?: item.cloudFile?.driveFileId
+
+                    // Detección inteligente de contenido idéntico: No-Op sin red
+                    if (cloudHash != null && cloudHash == hash && targetDriveId != null) {
+                        stateDao.upsert(
+                            SubjectCloudStateEntity(
+                                accountId = account.accountId,
+                                subjectId = item.subjectId,
+                                driveFileId = targetDriveId,
+                                lastUploadedHash = hash,
+                                lastSyncedAt = System.currentTimeMillis()
+                            )
+                        )
+                        outcomes.add(ItemOutcome(id = item.subjectId, name = item.name, error = null, isNoOp = true))
+                        return@forEachIndexed
+                    }
+
                     val zipFile = File(itemDir, "subject_${item.subjectId}.nfbak")
                     archiveCodec.writeSubject(snapshot, zipFile, itemDir).getOrThrow()
 
@@ -67,7 +86,7 @@ class UploadSubjectsUseCase @Inject constructor(
                     )
 
                     val driveFileId = cloud.upload(
-                        existingFileId = item.driveFileId,
+                        existingFileId = targetDriveId,
                         fileName = "subject_${item.subjectId}.nfbak",
                         props = props,
                         file = zipFile
@@ -84,6 +103,8 @@ class UploadSubjectsUseCase @Inject constructor(
                     )
 
                     outcomes.add(ItemOutcome(id = item.subjectId, name = item.name, error = null))
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     outcomes.add(ItemOutcome(id = item.subjectId, name = item.name, error = e))
                 } finally {

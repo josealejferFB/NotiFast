@@ -1,57 +1,93 @@
 package com.notifast.app.presentation.feature.onboarding
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.notifast.app.R
-import com.notifast.app.presentation.atoms.NotiFastButton
-import com.notifast.app.presentation.atoms.NotiFastFormField
-import com.notifast.app.presentation.atoms.NotiFastImagePickerField
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.feature.onboarding.components.GoogleDriveBackupCard
+import com.notifast.app.presentation.feature.onboarding.components.LocalProfileSection
 import com.notifast.app.presentation.feature.onboarding.components.OnboardingHeader
+import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    onOnboardingComplete: () -> Unit
+    onOnboardingComplete: (autoOpenCloudHub: Boolean) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val authLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onEvent(OnboardingEvent.GoogleAuthResult(result.data))
+        } else {
+            viewModel.onEvent(OnboardingEvent.GoogleAuthResult(null))
+        }
+    }
+
+    LaunchedEffect(uiState.pendingAuthIntent) {
+        val pending = uiState.pendingAuthIntent
+        if (pending != null) {
+            authLauncher.launch(IntentSenderRequest.Builder(pending).build())
+        }
+    }
 
     LaunchedEffect(uiState.isCompleted) {
         if (uiState.isCompleted) {
-            onOnboardingComplete()
+            onOnboardingComplete(uiState.autoOpenCloudHub)
+        }
+    }
+
+    val contentAlpha = remember { Animatable(0f) }
+    val contentOffsetY = remember { Animatable(32f) }
+
+    LaunchedEffect(Unit) {
+        launch {
+            contentAlpha.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+            )
+        }
+        launch {
+            contentOffsetY.animateTo(
+                targetValue = 0f,
+                animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f)
+            )
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        NotiFastStudyBackground()
+        NotiFastStudyBackground(showFloatingIcons = false)
 
         Column(
             modifier = Modifier
@@ -59,88 +95,53 @@ fun OnboardingScreen(
                 .statusBarsPadding()
                 .navigationBarsPadding()
                 .imePadding()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState())
+                .graphicsLayer {
+                    alpha = contentAlpha.value
+                    translationY = contentOffsetY.value
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             OnboardingHeader()
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            NotiFastImagePickerField(
-                existingImageUrl = uiState.profileImageUri?.toString(),
-                placeholderText = stringResource(R.string.onboarding_avatar_hint),
-                onImageSelected = { uri ->
-                    viewModel.onEvent(OnboardingEvent.ImageSelected(uri))
-                }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            NotiFastFormField(
-                value = uiState.firstName,
-                onValueChange = {
+            LocalProfileSection(
+                firstName = uiState.firstName,
+                lastName = uiState.lastName,
+                profileImageUri = uiState.profileImageUri,
+                isLoading = uiState.isLoading,
+                isGoogleLoading = uiState.isGoogleLoading,
+                error = uiState.error,
+                onFirstNameChange = {
                     viewModel.onEvent(OnboardingEvent.FirstNameChanged(it))
                     if (uiState.error != null) {
                         viewModel.onEvent(OnboardingEvent.ClearError)
                     }
                 },
-                label = stringResource(R.string.onboarding_name_label),
-                leadingIcon = Icons.Default.Person,
-                isError = uiState.error != null && uiState.firstName.isBlank(),
-                supportingText = if (uiState.error != null && uiState.firstName.isBlank()) {
-                    {
-                        Text(
-                            text = stringResource(R.string.onboarding_error_name_required),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                } else null
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            NotiFastFormField(
-                value = uiState.lastName,
-                onValueChange = {
+                onLastNameChange = {
                     viewModel.onEvent(OnboardingEvent.LastNameChanged(it))
                 },
-                label = stringResource(R.string.onboarding_lastname_label),
-                leadingIcon = Icons.Default.Person
+                onImageSelected = { uri ->
+                    viewModel.onEvent(OnboardingEvent.ImageSelected(uri))
+                },
+                onStartLocal = {
+                    viewModel.onEvent(OnboardingEvent.SubmitProfile)
+                }
             )
 
-            if (uiState.error != null && uiState.firstName.isNotBlank()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = uiState.error.orEmpty(),
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.padding(12.dp),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            GoogleDriveBackupCard(
+                isGoogleLoading = uiState.isGoogleLoading,
+                isLocalLoading = uiState.isLoading,
+                onSignInWithGoogle = {
+                    viewModel.onEvent(OnboardingEvent.SignInWithGoogle(context))
                 }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            NotiFastButton(
-                text = stringResource(R.string.onboarding_start_button),
-                onClick = {
-                    viewModel.onEvent(OnboardingEvent.SubmitProfile)
-                },
-                isLoading = uiState.isLoading,
-                enabled = !uiState.isLoading
             )
 
             Spacer(modifier = Modifier.height(24.dp))

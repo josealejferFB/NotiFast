@@ -44,10 +44,15 @@ fun ScheduleDaySelector(
     viewMode: ScheduleViewMode,
     onDaySelected: (Int) -> Unit,
     onViewModeChanged: (ScheduleViewMode) -> Unit,
+    firstDayOfWeek: String = "MONDAY",
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    val daysOrder = listOf(1, 2, 3, 4, 5, 6, 0)
+    val daysOrder = if (firstDayOfWeek == "SUNDAY") {
+        listOf(0, 1, 2, 3, 4, 5, 6)
+    } else {
+        listOf(1, 2, 3, 4, 5, 6, 0)
+    }
     val today = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it }
 
     Column(modifier = modifier.fillMaxWidth()) {

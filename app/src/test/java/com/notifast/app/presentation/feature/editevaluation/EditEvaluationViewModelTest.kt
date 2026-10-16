@@ -186,6 +186,6 @@ class EditEvaluationViewModelTest {
         assertEquals("", state.description)
         assertEquals("", state.grade)
         assertEquals("", state.weight)
-        assertEquals("Evaluación no encontrada", state.error)
+        assertEquals(com.notifast.app.domain.util.ErrorSanitizer.MSG_EVALUATION_NOT_FOUND, state.error)
     }
 }

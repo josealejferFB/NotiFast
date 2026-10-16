@@ -3,7 +3,7 @@
 > **Documento de verificación técnica y operativa para NotiFast 3.0.**
 > Acompaña a [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix.md`](2026-10-15-cloud-backup-scenario-matrix.md) y [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](2026-10-15-cloud-backup-google-drive-design.md).
 > Fecha de validación: 2026-10-15.
-> Resultado general de la suite de pruebas: **563 tests ejecutados, 0 fallos, 0 ignorados (100% éxito)**.
+> Resultado general de la suite de pruebas: **570 tests ejecutados, 0 fallos, 0 ignorados (100% éxito)** tras sesión de Hardening de Casos Borde.
 > Build verificado: `./gradlew assembleDebug` y `./gradlew testDebugUnitTest` en estado verde.
 
 ---

@@ -242,4 +242,61 @@ class AddScheduleViewModelTest {
             )
         }
     }
+
+    @Test
+    fun `when OpenAddTeacherSheet and CloseAddTeacherSheet are dispatched, toggles showAddTeacherSheet`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.showAddTeacherSheet)
+
+        viewModel.onEvent(AddScheduleEvent.OpenAddTeacherSheet)
+        assertTrue(viewModel.uiState.value.showAddTeacherSheet)
+
+        viewModel.onEvent(AddScheduleEvent.CloseAddTeacherSheet)
+        assertFalse(viewModel.uiState.value.showAddTeacherSheet)
+    }
+
+    @Test
+    fun `when SaveTeacher is dispatched, saves to teacherRepository, updates teacher to fullName, and closes sheet`() = runTest {
+        coEvery { teacherRepository.saveTeacher(any()) } returns Result.success(Unit)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.OpenAddTeacherSheet)
+        assertTrue(viewModel.uiState.value.showAddTeacherSheet)
+
+        val newTeacher = Teacher(
+            firstName = "Marie",
+            lastName = "Curie",
+            email = "mcurie@univ.edu",
+            subjectNames = listOf("Química")
+        )
+
+        viewModel.onEvent(AddScheduleEvent.SaveTeacher(newTeacher))
+        advanceUntilIdle()
+
+        coVerify {
+            teacherRepository.saveTeacher(
+                match { it.firstName == "Marie" && it.lastName == "Curie" && it.userId == "user_123" }
+            )
+        }
+        assertEquals("Marie Curie", viewModel.uiState.value.teacher)
+        assertFalse(viewModel.uiState.value.showAddTeacherSheet)
+    }
+
+    @Test
+    fun `when allTeachers flow emits, uiState allTeachers is updated`() = runTest {
+        val t1 = Teacher(id = "1", firstName = "Albert", lastName = "Einstein")
+        val t2 = Teacher(id = "2", firstName = "Isaac", lastName = "Newton")
+        coEvery { teacherRepository.getTeachers("user_123") } returns flowOf(listOf(t1, t2))
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(2, viewModel.uiState.value.allTeachers.size)
+        assertEquals("Albert Einstein", viewModel.uiState.value.allTeachers[0].fullName)
+        assertEquals("Isaac Newton", viewModel.uiState.value.allTeachers[1].fullName)
+    }
 }

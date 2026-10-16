@@ -37,7 +37,9 @@ fun ScheduleEditorForm(
     teacher: String,
     onTeacherChange: (String) -> Unit,
     availableTeachers: List<Teacher> = emptyList(),
+    allTeachers: List<Teacher> = emptyList(),
     hasConfiguredTeacher: Boolean = true,
+    onAddNewTeacherClick: () -> Unit = {},
     conflictingSchedules: List<Schedule>,
     isSaving: Boolean,
     onSaveClick: () -> Unit,
@@ -85,8 +87,10 @@ fun ScheduleEditorForm(
                     subjectName = selectedSubject,
                     selectedTeacher = teacher,
                     availableTeachers = availableTeachers,
+                    allTeachers = allTeachers,
                     hasConfiguredTeacher = hasConfiguredTeacher,
-                    onTeacherSelected = onTeacherChange
+                    onTeacherSelected = onTeacherChange,
+                    onAddNewTeacherClick = onAddNewTeacherClick
                 )
             }
         }

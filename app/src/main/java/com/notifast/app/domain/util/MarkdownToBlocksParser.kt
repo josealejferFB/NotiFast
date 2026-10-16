@@ -5,7 +5,6 @@ import com.notifast.app.data.model.ListItem
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.TextSpan
 import com.notifast.app.data.model.TextStyle
-import java.util.UUID
 
 object MarkdownToBlocksParser {
 
@@ -13,6 +12,8 @@ object MarkdownToBlocksParser {
 
     fun parse(markdown: String, imageUrl: String? = null): List<NoteBlock> {
         val blocks = mutableListOf<NoteBlock>()
+        var blockIndex = 0
+        fun newId(): String = "b_${blockIndex++}"
         val lines = markdown.lines()
         var inCodeBlock = false
         val codeBuffer = StringBuilder()
@@ -133,8 +134,6 @@ object MarkdownToBlocksParser {
 
         return blocks
     }
-
-    private fun newId(): String = UUID.randomUUID().toString()
 
     internal data class InlineResult(val text: String, val spans: List<TextSpan>)
 

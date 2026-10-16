@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,11 +37,21 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.notifast.app.presentation.theme.type.MonoAcademicSmallTextStyle
 
 sealed interface SettingsTrailingContent {
     data object Chevron : SettingsTrailingContent
-    data class SwitchToggle(val checked: Boolean, val onCheckedChange: (Boolean) -> Unit) : SettingsTrailingContent
-    data class ValueBadge(val text: String) : SettingsTrailingContent
+    data class SwitchToggle(
+        val checked: Boolean,
+        val onCheckedChange: (Boolean) -> Unit,
+        val badgeText: String? = null
+    ) : SettingsTrailingContent
+    data class ValueBadge(
+        val text: String,
+        val isMono: Boolean = false,
+        val containerColor: Color? = null,
+        val contentColor: Color? = null
+    ) : SettingsTrailingContent
     data object None : SettingsTrailingContent
 }
 
@@ -58,6 +68,7 @@ fun SettingsRowItem(
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     titleColor: Color = MaterialTheme.colorScheme.onSurface,
     trailing: SettingsTrailingContent = SettingsTrailingContent.Chevron,
+    showDivider: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
     val haptic = LocalHapticFeedback.current
@@ -73,107 +84,138 @@ fun SettingsRowItem(
         label = "row_press_scale"
     )
 
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 2.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .then(
-                if (onClick != null) {
-                    Modifier.clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onClick()
-                    }
-                } else {
-                    Modifier
-                }
-            )
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            },
-        color = Color.Transparent
-    ) {
-        Row(
+    Column(modifier = modifier.fillMaxWidth()) {
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(22.dp)
-            )
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = titleColor
-                )
-                if (!subtitle.isNullOrBlank()) {
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            when (trailing) {
-                is SettingsTrailingContent.Chevron -> {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        modifier = Modifier.size(14.dp)
-                    )
-                }
-                is SettingsTrailingContent.SwitchToggle -> {
-                    Switch(
-                        checked = trailing.checked,
-                        onCheckedChange = {
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .then(
+                    if (onClick != null) {
+                        Modifier.clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            trailing.onCheckedChange(it)
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                            checkedTrackColor = MaterialTheme.colorScheme.primary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
+                            onClick()
+                        }
+                    } else {
+                        Modifier
+                    }
+                )
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                },
+            color = Color.Transparent
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(22.dp)
+                )
+
+                Spacer(modifier = Modifier.width(14.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = titleColor
                     )
-                }
-                is SettingsTrailingContent.ValueBadge -> {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
-                    ) {
+                    if (!subtitle.isNullOrBlank()) {
                         Text(
-                            text = trailing.text,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 2.dp)
                         )
                     }
                 }
-                SettingsTrailingContent.None -> {}
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                when (trailing) {
+                    is SettingsTrailingContent.Chevron -> {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                    is SettingsTrailingContent.SwitchToggle -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (!trailing.badgeText.isNullOrBlank() && trailing.checked) {
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                                ) {
+                                    Text(
+                                        text = trailing.badgeText,
+                                        style = MonoAcademicSmallTextStyle,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            Switch(
+                                checked = trailing.checked,
+                                onCheckedChange = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    trailing.onCheckedChange(it)
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            )
+                        }
+                    }
+                    is SettingsTrailingContent.ValueBadge -> {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = trailing.containerColor ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                        ) {
+                            Text(
+                                text = trailing.text,
+                                style = if (trailing.isMono) {
+                                    MonoAcademicSmallTextStyle
+                                } else {
+                                    MaterialTheme.typography.labelMedium
+                                },
+                                fontWeight = FontWeight.SemiBold,
+                                color = trailing.contentColor ?: MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                    SettingsTrailingContent.None -> {}
+                }
             }
+        }
+        if (showDivider) {
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 52.dp, end = 16.dp),
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
         }
     }
 }
+

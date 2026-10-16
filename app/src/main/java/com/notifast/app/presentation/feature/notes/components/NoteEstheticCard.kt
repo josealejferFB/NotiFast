@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.notes.components
 
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -70,6 +71,7 @@ fun NoteEstheticCard(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val showAlert = rememberNotiFastAlert()
     val isDark = isSystemInDarkTheme()
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -131,7 +133,7 @@ fun NoteEstheticCard(
                             onClick = {
                                 val md = com.notifast.app.domain.usecase.ExportNoteMarkdownUseCase()(note)
                                 clipboardManager.setText(AnnotatedString(md))
-                                Toast.makeText(context, context.getString(R.string.notes_copied_markdown_toast), Toast.LENGTH_SHORT).show()
+                                showAlert(context.getString(R.string.notes_copied_markdown_toast), AlertSeverity.SUCCESS)
                             },
                             modifier = Modifier.size(22.dp)
                         ) {

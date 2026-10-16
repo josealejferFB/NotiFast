@@ -1,7 +1,8 @@
 package com.notifast.app.presentation.feature.share.components
 
 import android.graphics.Bitmap
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -63,6 +64,7 @@ fun QrCodeShareDialog(
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
+    val showAlert = rememberNotiFastAlert()
 
     LaunchedEffect(payload) {
         withContext(Dispatchers.Default) {
@@ -176,7 +178,7 @@ fun QrCodeShareDialog(
                 OutlinedButton(
                     onClick = {
                         clipboardManager.setText(AnnotatedString(payload))
-                        Toast.makeText(context, context.getString(R.string.qr_code_copied_to_clipboard), Toast.LENGTH_SHORT).show()
+                        showAlert(context.getString(R.string.qr_code_copied_to_clipboard), AlertSeverity.SUCCESS)
                     },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()

@@ -15,6 +15,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 
 import com.notifast.app.domain.usecase.ResolveSubjectNameUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import com.notifast.app.domain.util.NameValidation
 
 @HiltViewModel
@@ -75,7 +76,7 @@ class AddSubjectViewModel @Inject constructor(
 
             noteRepository.addSubject(userId, cleanName, state.selectedIcon, state.selectedColor).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true, createdSubjectName = cleanName, subjectName = cleanName) } },
-                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al guardar la materia") } }
+                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = ErrorSanitizer.sanitize(e, "Error al guardar la materia")) } }
             )
         }
     }

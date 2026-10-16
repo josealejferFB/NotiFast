@@ -316,14 +316,13 @@
     <!-- Settings 3.0 AAA Bento Strings -->
     <!-- Profile & Hero -->
     <string name="settings_profile_active_student">Estudiante Activo</string>
-    <string name="settings_profile_edit_hint">Toca para editar tu perfil institucional</string>
-    <string name="settings_profile_synced_just_now">Sincronizado ahora con Firebase</string>
-    <string name="settings_profile_syncing">Sincronizando con la nube…</string>
-    <string name="settings_profile_synced_minutes">Sincronizado hace %1$d min</string>
-    <string name="settings_profile_offline">Modo sin conexión</string>
+    <string name="settings_profile_edit_hint">Toca para editar tu perfil y foto</string>
+    <string name="settings_profile_local_only">Almacenamiento local seguro</string>
+    <string name="settings_profile_cloud_synced">Respaldado en Google Drive</string>
+    <string name="settings_profile_cloud_pending">Cambios pendientes de respaldo</string>
 
     <!-- Appearance -->
-    <string name="settings_section_appearance">Apariencia &amp; Sistema de Diseño</string>
+    <string name="settings_section_appearance">Apariencia &amp; Experiencia Táctil</string>
     <string name="settings_appearance_theme_title">Tema de la Aplicación</string>
     <string name="settings_appearance_theme_system">Automático (Sistema)</string>
     <string name="settings_appearance_theme_system_desc">Sigue el modo claro/oscuro de tu dispositivo</string>
@@ -331,25 +330,21 @@
     <string name="settings_appearance_theme_light_desc">Fondo cálido y luminoso de lectura diurna</string>
     <string name="settings_appearance_theme_dark">Slate Desk (Oscuro)</string>
     <string name="settings_appearance_theme_dark_desc">Superficie oscura de alta concentración</string>
-    <string name="settings_appearance_accent_title">Acento de Estudio</string>
-    <string name="settings_appearance_accent_aqua">Aqua Green</string>
-    <string name="settings_appearance_accent_ruby">Ruby Crimson</string>
-    <string name="settings_appearance_accent_indigo">Studio Indigo</string>
-    <string name="settings_appearance_accent_terracotta">Terracotta Warm</string>
-    <string name="settings_appearance_accent_sage">Sage Forest</string>
     <string name="settings_appearance_haptics_title">Respuesta Háptica</string>
-    <string name="settings_appearance_haptics_subtitle">Vibración táctil sutil en toques y gestos</string>
+    <string name="settings_appearance_haptics_subtitle">Vibración táctil sutil en botones, selectores y gestos</string>
 
     <!-- Notifications -->
     <string name="settings_section_notifications">Notificaciones &amp; Recordatorios</string>
     <string name="settings_notifications_classes_title">Alertas de Clases</string>
-    <string name="settings_notifications_classes_subtitle">%1$d min antes de iniciar cada bloque</string>
+    <string name="settings_notifications_classes_subtitle">%1$d min antes de iniciar • Toca para ajustar</string>
     <string name="settings_notifications_classes_disabled">Recordatorios de clase desactivados</string>
     <string name="settings_notifications_evaluations_title">Alertas de Evaluaciones</string>
-    <string name="settings_notifications_evaluations_subtitle">%1$d día(s) de anticipación</string>
+    <string name="settings_notifications_evaluations_subtitle">%1$d día(s) antes de la entrega • Toca para ajustar</string>
     <string name="settings_notifications_evaluations_disabled">Recordatorios de exámenes desactivados</string>
     <string name="settings_notifications_daily_summary_title">Resumen Matutino Diario</string>
-    <string name="settings_notifications_daily_summary_subtitle">Notificación con tu plan del día a las 07:00 AM</string>
+    <string name="settings_notifications_daily_summary_subtitle">Notificación con tu agenda del día a las 07:00 AM</string>
+    <string name="settings_notifications_badge_min">%1$d min</string>
+    <string name="settings_notifications_badge_days">%1$d d</string>
     <string name="settings_dialog_timing_class_title">Anticipación de Alerta de Clase</string>
     <string name="settings_dialog_timing_eval_title">Anticipación de Alerta de Evaluación</string>
     <string name="settings_timing_10m">10 minutos antes</string>
@@ -360,8 +355,9 @@
     <string name="settings_timing_3d">3 días antes</string>
 
     <!-- Academic -->
-    <string name="settings_section_academic">Configuración Académica &amp; Cuaderno</string>
+    <string name="settings_section_academic">Configuración Académica &amp; Agenda</string>
     <string name="settings_academic_scale_title">Escala de Calificación</string>
+    <string name="settings_academic_scale_subtitle_format">%1$s • Mínimo aprobatorio: %2$s</string>
     <string name="settings_academic_scale_vigesimal">Vigesimal (0 a 20 pts)</string>
     <string name="settings_academic_scale_vigesimal_desc">Estándar oficial Perú / Latinoamérica</string>
     <string name="settings_academic_scale_decimal">Decimal (0 a 10 pts)</string>
@@ -369,39 +365,39 @@
     <string name="settings_academic_scale_percent">Porcentual (0 a 100%)</string>
     <string name="settings_academic_scale_percent_desc">Estándar USA / Internacional</string>
     <string name="settings_academic_passing_grade_title">Nota Mínima Aprobatoria</string>
-    <string name="settings_academic_cycle_title">Ciclo Académico Activo</string>
-    <string name="settings_academic_cycle_desc">Filtra la carga horaria y apuntes por periodo</string>
+    <string name="settings_academic_cycle_title">Periodo / Semestre en Curso</string>
+    <string name="settings_academic_cycle_desc">Etiqueta de tu ciclo académico actual en el perfil</string>
+    <string name="settings_academic_cycle_custom_label">Periodo personalizado (ej. 2026-II)</string>
     <string name="settings_academic_first_day_title">Primer Día de la Semana</string>
+    <string name="settings_academic_first_day_subtitle">%1$s • Ordena tu horario y calendario mensual</string>
     <string name="settings_first_day_monday">Lunes (Semana Académica)</string>
     <string name="settings_first_day_sunday">Domingo (Tradicional)</string>
-    <string name="settings_dialog_select_cycle_title">Seleccionar Ciclo Activo</string>
+    <string name="settings_dialog_select_cycle_title">Periodo Académico en Curso</string>
     <string name="settings_dialog_passing_grade_title">Configurar Nota Mínima</string>
     <string name="settings_dialog_first_day_title">Primer Día de la Semana</string>
 
     <!-- Storage & Privacy -->
-    <string name="settings_section_storage">Datos, Almacenamiento &amp; Privacidad</string>
-    <string name="settings_storage_cache_title">Caché de Apuntes e Imágenes</string>
+    <string name="settings_section_storage">Almacenamiento, Privacidad &amp; Acerca de</string>
+    <string name="settings_storage_cache_title">Caché Temporal de Imágenes</string>
+    <string name="settings_storage_cache_subtitle">Archivos temporales de previsualización y miniaturas</string>
     <string name="settings_storage_cache_clear_btn">Limpiar Caché</string>
     <string name="settings_storage_cache_cleared_toast">Caché liberada correctamente</string>
-    <string name="settings_storage_export_title">Exportar Cuaderno Completo</string>
-    <string name="settings_storage_export_subtitle">Copia de seguridad en formato Markdown / JSON</string>
-    <string name="settings_storage_export_ready_toast">¡Cuaderno preparado para exportar!</string>
-    <string name="settings_storage_privacy_title">Políticas de Privacidad &amp; Términos</string>
-    <string name="settings_storage_privacy_subtitle">Tus datos residen encriptados en Firebase Cloud</string>
-    <string name="settings_privacy_dialog_title">Privacidad &amp; Protección de Datos</string>
-    <string name="settings_privacy_dialog_content">NotiFast protege tu privacidad académica. Todos tus apuntes, calificaciones y horarios se sincronizan de forma segura mediante encriptación SSL/TLS y reglas estrictas de seguridad en Firebase Cloud Firestore. Tus datos nunca son compartidos con terceros con fines publicitarios.</string>
+    <string name="settings_storage_privacy_title">Privacidad &amp; Arquitectura Offline-First</string>
+    <string name="settings_storage_privacy_subtitle">100% local en tu dispositivo • Respaldo privado en Drive</string>
+    <string name="settings_privacy_dialog_title">Privacidad &amp; Arquitectura Offline-First</string>
+    <string name="settings_privacy_dialog_content">NotiFast opera bajo una arquitectura 100% Offline-First. Tus apuntes, calificaciones, horarios y directorio docente se almacenan localmente en tu dispositivo mediante Room SQLite sin depender de servidores externos.\n\nSi vinculas tu cuenta de Google, tus respaldos se guardan exclusivamente en la carpeta privada oculta (appDataFolder) de tu propio Google Drive, accesible únicamente por NotiFast. Tus datos jamás son leídos, analizados ni compartidos con terceros.</string>
 
     <!-- About & Support -->
-    <string name="settings_section_about">Acerca de NotiFast &amp; Cuenta</string>
+    <string name="settings_section_about">Soporte &amp; Sesión</string>
     <string name="settings_about_thesis_title">Ficha Institucional &amp; Tesis</string>
     <string name="settings_about_thesis_subtitle">Proyecto de Tesis de Grado en Ingeniería de Software</string>
-    <string name="settings_about_feedback_title">Reportar Problema o Feedback</string>
-    <string name="settings_about_feedback_subtitle">Envía tus comentarios directamente al desarrollador</string>
-    <string name="settings_about_logout_title">Cerrar Sesión</string>
-    <string name="settings_about_logout_subtitle">Finalizar sesión en este dispositivo</string>
-    <string name="settings_dialog_logout_title">¿Cerrar Sesión?</string>
-    <string name="settings_dialog_logout_message">¿Estás seguro de que deseas salir de tu cuenta de NotiFast? Tus datos permanecerán guardados en este dispositivo.</string>
-    <string name="settings_dialog_logout_confirm">Cerrar Sesión</string>
+    <string name="settings_about_feedback_title">Reportar Problema o Sugerencia</string>
+    <string name="settings_about_feedback_subtitle">Envía tus comentarios directamente al autor</string>
+    <string name="settings_about_logout_title">Reiniciar Sesión Local</string>
+    <string name="settings_about_logout_subtitle">Volver a la pantalla de bienvenida (conserva tus datos)</string>
+    <string name="settings_dialog_logout_title">¿Volver a la pantalla de bienvenida?</string>
+    <string name="settings_dialog_logout_message">Se cerrará tu sesión actual en NotiFast. Tus materias, apuntes y horarios guardados en este dispositivo se conservarán intactos.</string>
+    <string name="settings_dialog_logout_confirm">Salir a Bienvenida</string>
     <string name="settings_about_author_label">Desarrollador / Autor:</string>
     <string name="settings_about_author_name">José Alejandro Fernández</string>
     <string name="settings_about_university_label">Propósito Académico:</string>
@@ -409,7 +405,12 @@
     <string name="settings_about_version_label">Versión de la App:</string>
     <string name="settings_about_version_value">NotiFast 3.0.0 (Build 300 - Release AAA)</string>
     <string name="settings_about_tech_label">Stack Tecnológico:</string>
-    <string name="settings_about_tech_desc">Kotlin 2.0.21 • Jetpack Compose • Material 3 • Firebase Firestore &amp; Auth • Hilt 2.59 • DataStore Preferences • WorkManager</string>
+    <string name="settings_about_tech_desc">Kotlin 2.0.21 • Jetpack Compose M3 • Room SQLite (Offline-First) • Google Drive REST API (appDataFolder) • Hilt 2.59 • DataStore • WorkManager</string>
+    <string name="settings_cloud_open_hub_title">Centro de Respaldo en la Nube</string>
+    <string name="settings_cloud_open_hub_subtitle_synced">Todo al día • Gestionar copias y restauraciones</string>
+    <string name="settings_cloud_open_hub_subtitle_pending">Hay cambios sin subir • Toca para sincronizar ahora</string>
+    <string name="settings_cloud_open_hub_subtitle_unlinked">Sube o restaura tus materias en Google Drive</string>
+    <string name="settings_cloud_unlinked_banner_desc">Protege tu semestre guardando tus materias, apuntes y notas en tu Google Drive privado.</string>
     <!-- Subject Detail 3.0: Academic Subject Command Center -->
     <string name="subject_detail_tab_panorama">Panorama</string>
     <string name="subject_detail_tab_evaluations">Evaluaciones</string>
@@ -578,21 +579,53 @@
     <string name="import_scan_or_paste">O pega el código de texto</string>
     <string name="import_scanner_error">No se pudo abrir el escáner. Puedes pegar el código de texto manualmente.</string>
 
-    <!-- Local Onboarding (Fase 3.5 Offline-First) -->
+    <!-- Local Onboarding (Fase 3.5 Offline-First & Google Cloud Backup) -->
+    <string name="onboarding_badge_engine_active">MOTOR ACADÉMICO ACTIVO • 100% OFFLINE</string>
     <string name="onboarding_welcome_title">Bienvenido a NotiFast</string>
     <string name="onboarding_welcome_subtitle">Tu cuaderno académico inteligente, 100% privado y en tu dispositivo.</string>
-    <string name="onboarding_name_label">¿Cómo te llamas?</string>
+    <string name="onboarding_name_label">Nombre *</string>
     <string name="onboarding_lastname_label">Apellido (opcional)</string>
-    <string name="onboarding_start_button">Comenzar mi Cuaderno</string>
-    <string name="onboarding_avatar_hint">Toca para añadir una foto a tu perfil</string>
+    <string name="onboarding_start_button">Comenzar en Modo Local</string>
+    <string name="onboarding_avatar_hint">Añadir foto</string>
+    <string name="onboarding_avatar_change">Cambiar foto</string>
+    <string name="onboarding_avatar_remove">Quitar</string>
+    <string name="onboarding_avatar_cd">Foto de perfil</string>
     <string name="onboarding_error_name_required">Por favor escribe tu nombre para continuar</string>
+    <string name="onboarding_offline_badge_title">100% Offline y Privado</string>
+    <string name="onboarding_offline_badge_desc">Todos tus apuntes, horarios y notas se guardan únicamente en tu teléfono. Sin cuentas obligatorias ni internet.</string>
+    <string name="onboarding_local_section_title">Personaliza tu Cuaderno</string>
+    <string name="onboarding_local_section_subtitle">Solo necesitamos tu nombre para comenzar</string>
+    <string name="onboarding_divider_or">O CONECTA TU RESPALDO</string>
+    <string name="onboarding_google_card_title">Copia en Google Drive</string>
+    <string name="onboarding_google_card_badge">Opcional</string>
+    <string name="onboarding_google_card_desc">Restaura tus asignaturas o activa el respaldo en tu Google Drive personal.</string>
+    <string name="onboarding_btn_google_backup">Vincular Google Drive para respaldo</string>
+    <string name="onboarding_google_error_generic">Error al conectar con Google. Puedes continuar en Modo Local.</string>
 
-    <!-- Sanitización: strings de errores y diálogos de notas -->
-    <string name="error_generic">Ocurrió un error</string>
-    <string name="error_user_not_authenticated">Usuario no autenticado</string>
-    <string name="error_load_data">Error al cargar datos</string>
-    <string name="error_save">Error al guardar</string>
-    <string name="error_delete">Error al eliminar</string>
+    <!-- Sanitización y Normalización AAA: strings de errores y alertas -->
+    <string name="error_generic">Ocurrió un error inesperado. Intenta nuevamente.</string>
+    <string name="error_network_offline">Sin conexión a internet. Revisa tu red e intenta de nuevo.</string>
+    <string name="error_network_timeout">El servidor tardó demasiado en responder. Intenta nuevamente.</string>
+    <string name="error_user_not_authenticated">Debes iniciar sesión para continuar.</string>
+    <string name="error_permission_denied">No tienes permisos suficientes para realizar esta acción.</string>
+    <string name="error_not_found">El elemento solicitado no fue encontrado.</string>
+    <string name="error_evaluation_not_found">La evaluación solicitada no fue encontrada.</string>
+    <string name="error_schedule_not_found">El horario solicitado no fue encontrado.</string>
+    <string name="error_subject_not_found">La materia solicitada no fue encontrada.</string>
+    <string name="error_duplicate_entry">Ya existe un registro con esos datos.</string>
+    <string name="error_load_data">Error al cargar datos. Intenta de nuevo.</string>
+    <string name="error_save">Error al guardar los cambios.</string>
+    <string name="error_delete">Error al eliminar el elemento.</string>
+    <string name="error_subject_name_required">El nombre de la materia es requerido.</string>
+    <string name="error_subject_and_title_required">La materia y el título son requeridos.</string>
+    <string name="error_schedule_times_required">Las horas de inicio y fin son requeridas.</string>
+    <string name="error_rate_limit">Demasiadas solicitudes. Por favor, espera un momento.</string>
+    <string name="error_google_auth">No se pudo autenticar con Google. Intenta conectar tu cuenta de nuevo.</string>
+    <string name="alert_dismiss_cd">Cerrar alerta</string>
+    <string name="alert_severity_error_prefix">Error: %1$s</string>
+    <string name="alert_severity_warning_prefix">Advertencia: %1$s</string>
+    <string name="alert_severity_info_prefix">Información: %1$s</string>
+    <string name="alert_severity_success_prefix">Éxito: %1$s</string>
     <string name="sync_saving">Guardando…</string>
     <string name="sync_saved">Guardado</string>
     <string name="sync_error">Error</string>
@@ -680,9 +713,16 @@
 
     <!-- Contextual Schedule Teacher Sync -->
     <string name="schedule_no_teacher_warning">Esta materia aún no tiene un profesor asignado</string>
-    <string name="schedule_no_teacher_subtitle">Escribe el nombre del docente para vincularlo automáticamente</string>
+    <string name="schedule_no_teacher_subtitle">Selecciona o registra un profesor para vincularlo</string>
     <string name="schedule_select_teacher_label">Profesor asignado</string>
+    <string name="schedule_select_teacher_hint">Seleccionar profesor...</string>
+    <string name="schedule_select_teacher_none">Sin profesor</string>
     <string name="schedule_add_new_teacher_option">➕ Nuevo Profesor</string>
+    <string name="schedule_subject_teachers_header">Docentes de esta materia</string>
+    <string name="schedule_all_teachers_header">Otros profesores guardados</string>
+    <string name="schedule_no_teachers_saved">No tienes profesores registrados</string>
+    <string name="schedule_no_teachers_card_subtitle">Registra a tus profesores para vincularlos a tus clases</string>
+    <string name="schedule_register_teacher_btn">Registrar Profesor</string>
 
     <!-- Subject Detail Faculty Section -->
     <string name="subject_faculty_title">Cuerpo Docente</string>
@@ -731,6 +771,7 @@
     <string name="cloud_status_both_unlinked">Conflicto</string>
     <string name="cloud_status_local_only">Solo en el teléfono</string>
     <string name="cloud_status_cloud_only">Solo en la nube</string>
+    <string name="cloud_status_error">Error de sincronización</string>
     <string name="cloud_action_select_all">Seleccionar todas</string>
     <string name="cloud_action_deselect_all">Deseleccionar</string>
     <string name="cloud_selected_count">%1$d seleccionadas</string>
@@ -755,6 +796,7 @@
     <string name="cloud_conflict_new_name_label">Nuevo nombre</string>
     <string name="cloud_summary_title">Resumen de sincronización</string>
     <string name="cloud_summary_success_count">%1$d materias procesadas con éxito</string>
+    <string name="cloud_summary_noop_count">%1$d materias sin cambios (ya sincronizadas)</string>
     <string name="cloud_summary_failure_count">%1$d materias con error</string>
     <string name="cloud_summary_btn_retry">Reintentar fallidas</string>
     <string name="cloud_progress_title">Sincronizando con Google Drive…</string>

@@ -1,7 +1,6 @@
 package com.notifast.app.presentation.feature.addevaluation
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,6 +11,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import com.notifast.app.presentation.feature.addevaluation.components.EvaluationEditorAddForm
 import com.notifast.app.presentation.feature.addevaluation.components.EvaluationEditorEditForm
 import com.notifast.app.presentation.feature.addevaluation.components.EvaluationEditorSheetLayout
@@ -71,19 +72,13 @@ private fun AddEvaluationEditorSheet(
         }
     }
 
+    val showAlert = rememberNotiFastAlert()
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
-            Toast.makeText(context, R.string.evaluation_saved_success, Toast.LENGTH_SHORT).show()
+            showAlert(context.getString(R.string.evaluation_saved_success), AlertSeverity.SUCCESS)
             selectedDate = Date()
             selectedImageUri = null
             viewModel.onEvent(AddEvaluationEvent.ResetState)
-        }
-    }
-
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { err ->
-            Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(AddEvaluationEvent.ClearError)
         }
     }
 
@@ -97,6 +92,8 @@ private fun AddEvaluationEditorSheet(
         isEditing = false,
         isSaved = uiState.isSaved,
         hasUnsavedChanges = hasChanges,
+        errorMessage = uiState.error,
+        onErrorDismiss = { viewModel.onEvent(AddEvaluationEvent.ClearError) },
         onDismiss = onDismiss,
         onSaved = onSaved,
         onCreateSubject = onCreateSubject
@@ -135,16 +132,10 @@ private fun EditEvaluationEditorSheet(
         uiState.date?.let { selectedDate = it }
     }
 
+    val showAlert = rememberNotiFastAlert()
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
-            Toast.makeText(context, R.string.evaluation_saved_success, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { err ->
-            Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(EditEvaluationEvent.ClearError)
+            showAlert(context.getString(R.string.evaluation_saved_success), AlertSeverity.SUCCESS)
         }
     }
 
@@ -188,6 +179,8 @@ private fun EditEvaluationEditorSheet(
         isEditing = true,
         isSaved = uiState.isSaved,
         hasUnsavedChanges = hasChanges,
+        errorMessage = uiState.error,
+        onErrorDismiss = { viewModel.onEvent(EditEvaluationEvent.ClearError) },
         onDismiss = onDismiss,
         onSaved = onSaved,
         onCreateSubject = onCreateSubject

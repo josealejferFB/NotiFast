@@ -21,7 +21,9 @@ data class EditScheduleUiState(
     val existingSchedules: List<Schedule> = emptyList(),
     val conflictingSchedules: List<Schedule> = emptyList(),
     val availableTeachers: List<Teacher> = emptyList(),
-    val hasConfiguredTeacher: Boolean = true
+    val allTeachers: List<Teacher> = emptyList(),
+    val hasConfiguredTeacher: Boolean = true,
+    val showAddTeacherSheet: Boolean = false
 )
 
 sealed interface EditScheduleEvent {
@@ -35,6 +37,9 @@ sealed interface EditScheduleEvent {
     data class UpdateClassroom(val classroom: String) : EditScheduleEvent
     data class UpdateTeacher(val teacher: String) : EditScheduleEvent
     data class UpdateMeetingUrl(val url: String) : EditScheduleEvent
+    data object OpenAddTeacherSheet : EditScheduleEvent
+    data object CloseAddTeacherSheet : EditScheduleEvent
+    data class SaveTeacher(val teacher: Teacher) : EditScheduleEvent
     data object SaveSchedule : EditScheduleEvent
     data object ClearError : EditScheduleEvent
 }

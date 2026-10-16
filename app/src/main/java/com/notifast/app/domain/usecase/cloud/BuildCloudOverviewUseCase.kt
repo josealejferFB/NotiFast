@@ -116,15 +116,10 @@ class BuildCloudOverviewUseCase @Inject constructor(
 
             return when {
                 localMatchesSaved && cloudMatchesSaved -> CloudSubjectStatus.SYNCED
+                localHash == cloud.contentHash -> CloudSubjectStatus.SYNCED
                 !localMatchesSaved && cloudMatchesSaved -> CloudSubjectStatus.LOCAL_CHANGES
                 localMatchesSaved && !cloudMatchesSaved -> CloudSubjectStatus.CLOUD_NEWER
-                else -> {
-                    if (localHash == cloud.contentHash) {
-                        CloudSubjectStatus.SYNCED
-                    } else {
-                        CloudSubjectStatus.BOTH_UNLINKED
-                    }
-                }
+                else -> CloudSubjectStatus.BOTH_UNLINKED
             }
         } else {
             return if (localHash == cloud!!.contentHash) {

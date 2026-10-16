@@ -88,7 +88,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
             Result.success(GoogleIdResult(account, idToken))
         } catch (e: GetCredentialCancellationException) {
             val msg = e.message.orEmpty()
-            if (msg.contains("Account reauth failed", ignoreCase = true) || msg.contains("[16]")) {
+            if (msg.contains("Account reauth failed", ignoreCase = true) || msg.contains("UNREGISTERED_ON_API_CONSOLE", ignoreCase = true)) {
                 Log.e(TAG, "Google Sign-In reauth failed (likely UNREGISTERED_ON_API_CONSOLE or missing SHA-1): $msg", e)
                 Result.failure(CloudAuthException(CloudAuthException.Reason.PERMISSION_DENIED, e))
             } else {
@@ -99,8 +99,19 @@ class DefaultGoogleAuthDataSource @Inject constructor(
             Log.w(TAG, "No credential available for Google sign-in", e)
             Result.failure(CloudAuthException(CloudAuthException.Reason.CANCELLED, e))
         } catch (e: Exception) {
-            Log.e(TAG, "Sign in with Google failed: ${e.message}", e)
-            Result.failure(e)
+            val msg = e.message.orEmpty()
+            val cls = e.javaClass.simpleName
+            if (cls.contains("Cancel", ignoreCase = true) ||
+                msg.contains("cancel", ignoreCase = true) ||
+                msg.contains("[16]") ||
+                msg.contains("16:")
+            ) {
+                Log.d(TAG, "User cancelled Google sign-in: $msg", e)
+                Result.failure(CloudAuthException(CloudAuthException.Reason.CANCELLED, e))
+            } else {
+                Log.e(TAG, "Sign in with Google failed: ${e.message}", e)
+                Result.failure(e)
+            }
         }
     }
 

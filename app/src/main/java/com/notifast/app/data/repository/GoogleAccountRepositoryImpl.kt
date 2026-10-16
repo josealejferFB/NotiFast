@@ -24,12 +24,19 @@ import javax.inject.Singleton
 val Context.googleAccountDataStore: DataStore<Preferences> by preferencesDataStore(name = "linked_google_account")
 
 @Singleton
-class GoogleAccountRepositoryImpl @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+class GoogleAccountRepositoryImpl(
+    private val context: Context,
     private val dataSource: GoogleAuthDataSource,
     private val subjectCloudStateDao: SubjectCloudStateDao,
     private val dataStoreOverride: DataStore<Preferences>? = null
 ) : GoogleAccountRepository {
+
+    @Inject
+    constructor(
+        @ApplicationContext context: Context,
+        dataSource: GoogleAuthDataSource,
+        subjectCloudStateDao: SubjectCloudStateDao
+    ) : this(context, dataSource, subjectCloudStateDao, null)
 
     private object AccountKeys {
         val ACCOUNT_ID = stringPreferencesKey("account_id")
@@ -71,7 +78,7 @@ class GoogleAccountRepositoryImpl @Inject constructor(
                 }
                 is DriveAuthResult.Success -> {
                     pendingAccount = null
-                    persistAccount(idResult.account)
+                    replaceAndPersistAccount(idResult.account)
                     Result.success(AuthStep.Linked(idResult.account))
                 }
                 is DriveAuthResult.Failure -> {
@@ -79,6 +86,17 @@ class GoogleAccountRepositoryImpl @Inject constructor(
                     Result.failure(driveResult.throwable)
                 }
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun switchAccount(activityContext: Context): Result<AuthStep> {
+        return try {
+            // Clear Credential Manager session state so the picker lets the user choose another account,
+            // WITHOUT wiping the currently linked account or DataStore until the new sign-in succeeds.
+            dataSource.clearCredentialState()
+            signIn(activityContext)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -93,7 +111,7 @@ class GoogleAccountRepositoryImpl @Inject constructor(
             is DriveAuthResult.Success -> {
                 val acct = pendingAccount
                     ?: return Result.failure(IllegalStateException("No pending Google account found for resolution"))
-                persistAccount(acct)
+                replaceAndPersistAccount(acct)
                 pendingAccount = null
                 Result.success(acct)
             }
@@ -125,7 +143,12 @@ class GoogleAccountRepositoryImpl @Inject constructor(
         return try {
             val current = account.first()
             dataSource.clearCredentialState()
-            dataStore.edit { it.clear() }
+            dataStore.edit { prefs ->
+                prefs.remove(AccountKeys.ACCOUNT_ID)
+                prefs.remove(AccountKeys.EMAIL)
+                prefs.remove(AccountKeys.DISPLAY_NAME)
+                prefs.remove(AccountKeys.PHOTO_URL)
+            }
             if (current != null) {
                 subjectCloudStateDao.deleteByAccount(current.accountId)
             }
@@ -133,6 +156,14 @@ class GoogleAccountRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    private suspend fun replaceAndPersistAccount(acct: CloudAccount) {
+        val previous = account.first()
+        if (previous != null && previous.accountId != acct.accountId) {
+            subjectCloudStateDao.deleteByAccount(previous.accountId)
+        }
+        persistAccount(acct)
     }
 
     private suspend fun persistAccount(acct: CloudAccount) {

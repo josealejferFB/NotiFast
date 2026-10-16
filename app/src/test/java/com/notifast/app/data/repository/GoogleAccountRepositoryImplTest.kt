@@ -144,4 +144,52 @@ class GoogleAccountRepositoryImplTest {
         coVerify { subjectCloudStateDao.deleteByAccount("sub-123") }
         assertNull(repository.account.first())
     }
+
+    @Test
+    fun switchAccount_when_user_cancels_picker_preserves_existing_linked_account() = runTest {
+        coEvery { dataSource.signInWithGoogle(any()) } returns Result.success(
+            GoogleIdResult(testAccount, "fake-id-token")
+        )
+        coEvery { dataSource.authorizeDrive(testAccount.email) } returns DriveAuthResult.Success("access-token-1")
+        repository.signIn(context)
+        assertEquals(testAccount, repository.account.first())
+
+        // Now user taps Switch Account and cancels the picker
+        coEvery { dataSource.signInWithGoogle(any()) } returns Result.failure(
+            CloudAuthException(CloudAuthException.Reason.CANCELLED)
+        )
+
+        val switchResult = repository.switchAccount(context)
+        assertTrue(switchResult.isFailure)
+
+        // Existing account MUST still be linked and its cloud state must NOT be deleted
+        assertEquals(testAccount, repository.account.first())
+        coVerify(exactly = 0) { subjectCloudStateDao.deleteByAccount("sub-123") }
+    }
+
+    @Test
+    fun switchAccount_when_new_account_linked_replaces_account_and_clears_old_cloud_states() = runTest {
+        coEvery { dataSource.signInWithGoogle(any()) } returns Result.success(
+            GoogleIdResult(testAccount, "fake-id-token")
+        )
+        coEvery { dataSource.authorizeDrive(testAccount.email) } returns DriveAuthResult.Success("access-token-1")
+        repository.signIn(context)
+        assertEquals(testAccount, repository.account.first())
+
+        val secondAccount = CloudAccount(
+            accountId = "sub-456",
+            email = "other@gmail.com",
+            displayName = "Other Student",
+            photoUrl = null
+        )
+        coEvery { dataSource.signInWithGoogle(any()) } returns Result.success(
+            GoogleIdResult(secondAccount, "fake-id-token-2")
+        )
+        coEvery { dataSource.authorizeDrive(secondAccount.email) } returns DriveAuthResult.Success("access-token-2")
+
+        val switchResult = repository.switchAccount(context)
+        assertTrue(switchResult.isSuccess)
+        assertEquals(secondAccount, repository.account.first())
+        coVerify(exactly = 1) { subjectCloudStateDao.deleteByAccount("sub-123") }
+    }
 }

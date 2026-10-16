@@ -14,6 +14,7 @@ import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -69,13 +70,25 @@ class NotesViewModel @Inject constructor(
     private fun loadUserProfile() {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUserId() ?: return@launch
-            authRepository.getUserProfile(uid).onSuccess { user ->
+            combine(
+                authRepository.observeUserProfile(uid),
+                googleAccountRepository.account
+            ) { user, account ->
+                user to account
+            }.collect { (user, account) ->
+                val firstName = user?.firstName?.takeIf { it.isNotBlank() }
+                    ?: account?.displayName?.split(" ")?.firstOrNull().orEmpty()
+                val lastName = user?.lastName.orEmpty()
+                val email = user?.email?.takeIf { !it.endsWith("@local.notifast") && it.isNotBlank() }
+                    ?: account?.email.orEmpty()
+                val photo = user?.profilePictureUrl?.takeIf { it.isNotBlank() } ?: account?.photoUrl
+
                 _uiState.update { it.copy(
                     userId = uid,
-                    userFirstName = user.firstName,
-                    userLastName = user.lastName,
-                    userEmail = user.email,
-                    userProfilePictureUrl = user.profilePictureUrl
+                    userFirstName = firstName,
+                    userLastName = lastName,
+                    userEmail = email,
+                    userProfilePictureUrl = photo
                 ) }
             }
         }
@@ -169,7 +182,7 @@ class NotesViewModel @Inject constructor(
                     )
                 }
             }.catch { e ->
-                _uiState.update { it.copy(error = e.message ?: "Error al cargar notas", isLoading = false) }
+                _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al cargar notas"), isLoading = false) }
             }.collect { }
         }
     }
@@ -301,6 +314,7 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.DeleteLocalOnly -> onDeleteLocalOnly()
             is NotesEvent.DeleteLocalAndCloud -> onDeleteLocalAndCloud()
             is NotesEvent.DeleteFallbackLocal -> onDeleteFallbackLocal()
+            is NotesEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
@@ -398,7 +412,7 @@ class NotesViewModel @Inject constructor(
                     _uiState.update { it.copy(teacherBeingEdited = null, error = null) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(error = e.message ?: "Error al guardar profesor") }
+                    _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al guardar profesor")) }
                 }
             )
         }
@@ -412,7 +426,7 @@ class NotesViewModel @Inject constructor(
                     _uiState.update { it.copy(selectedTeacherForDetail = null, error = null) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(error = e.message ?: "Error al eliminar profesor") }
+                    _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar profesor")) }
                 }
             )
         }
@@ -428,7 +442,7 @@ class NotesViewModel @Inject constructor(
             )
             noteRepository.updateSubject(userId, oldName, updatedSubject).fold(
                 onSuccess = { _uiState.update { it.copy(error = null) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al actualizar materia") } }
+                onFailure = { e -> _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al actualizar materia")) } }
             )
         }
     }
@@ -453,7 +467,7 @@ class NotesViewModel @Inject constructor(
             noteRepository.updateNote(userId, updatedNote, null).fold(
                 onSuccess = { _uiState.update { it.copy(error = null) } },
                 onFailure = { e ->
-                    _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") }
+                    _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al actualizar nota")) }
                     loadNotes()
                 }
             )
@@ -465,7 +479,7 @@ class NotesViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             noteRepository.deleteNote(userId, note).fold(
                 onSuccess = { _uiState.update { it.copy(error = null) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar") } }
+                onFailure = { e -> _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar apunte")) } }
             )
         }
     }
@@ -475,7 +489,7 @@ class NotesViewModel @Inject constructor(
             val userId = authRepository.getCurrentUserId() ?: return@launch
             noteRepository.deleteSubject(userId, subjectName).fold(
                 onSuccess = { _uiState.update { it.copy(error = null) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar materia") } }
+                onFailure = { e -> _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar materia")) } }
             )
         }
     }

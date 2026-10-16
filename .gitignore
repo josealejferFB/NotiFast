@@ -19,6 +19,7 @@ app/google-services.json
 .worktrees/
 .codegraph/
 .superpowers/
+.impeccable/
 
 
 # Python cache & testing

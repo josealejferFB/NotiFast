@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import com.notifast.app.domain.repository.NoteRepository
+import com.notifast.app.domain.util.ErrorSanitizer
 
 @HiltViewModel
 class EditEvaluationViewModel @Inject constructor(
@@ -58,12 +59,12 @@ class EditEvaluationViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val userId = authRepository.getCurrentUserId()
             if (userId == null) {
-                _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }
+                _uiState.update { it.copy(isLoading = false, error = ErrorSanitizer.MSG_AUTH_REQUIRED) }
                 return@launch
             }
             val eval = evaluationRepository.getEvaluation(userId, currentEvalId).first()
             if (eval == null) {
-                _uiState.update { it.copy(isLoading = false, error = "Evaluación no encontrada") }
+                _uiState.update { it.copy(isLoading = false, error = ErrorSanitizer.MSG_EVALUATION_NOT_FOUND) }
                 return@launch
             }
             val activeScaleId = userPrefsRepository.defaultGradeScaleFlow.first()
@@ -149,9 +150,11 @@ class EditEvaluationViewModel @Inject constructor(
                 return@launch
             }
             val scale = com.notifast.app.domain.model.GradeScale.fromId(state.gradeScaleId)
+            val matchedSubject = state.subjects.find { it.name.equals(state.subjectName.trim(), ignoreCase = true) }
             val updatedEval = com.notifast.app.data.model.Evaluation(
                 id = currentEvalId,
                 userId = userId,
+                subjectId = matchedSubject?.id.orEmpty(),
                 subjectName = state.subjectName.trim(),
                 title = cleanTitle,
                 description = state.description.trim(),
@@ -172,7 +175,7 @@ class EditEvaluationViewModel @Inject constructor(
                 }
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure { e ->
-                _uiState.update { it.copy(isSaving = false, error = e.message ?: "Error al guardar") }
+                _uiState.update { it.copy(isSaving = false, error = ErrorSanitizer.sanitize(e, "Error al guardar la evaluación")) }
             }
         }
     }

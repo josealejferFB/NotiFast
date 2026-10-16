@@ -19,6 +19,7 @@ import com.notifast.app.domain.usecase.CancelAlertUseCase
 import com.notifast.app.domain.usecase.CalculateRequiredGradeUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
 import com.notifast.app.domain.usecase.ExportSubjectPackageUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -169,7 +170,7 @@ class SubjectDetailViewModel @Inject constructor(
                     )
                 }
             }.catch { e ->
-                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al cargar") }
+                _uiState.update { it.copy(isLoading = false, error = ErrorSanitizer.sanitize(e, "Error al cargar la materia")) }
             }.collect { }
         }
     }
@@ -220,7 +221,7 @@ class SubjectDetailViewModel @Inject constructor(
                     loadData()
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(isRenaming = false, error = e.message ?: "Error al actualizar materia") }
+                    _uiState.update { it.copy(isRenaming = false, error = ErrorSanitizer.sanitize(e, "Error al actualizar materia")) }
                 }
         }
     }
@@ -241,7 +242,7 @@ class SubjectDetailViewModel @Inject constructor(
                         cancelAlertUseCase?.cancelEvaluationAlert(evalId)
                     }
                 }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") } }
+                .onFailure { e -> _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al actualizar nota")) } }
         }
     }
 
@@ -253,7 +254,7 @@ class SubjectDetailViewModel @Inject constructor(
                 .onSuccess {
                     cancelAlertUseCase?.cancelEvaluationAlert(evalId)
                 }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar evaluación") } }
+                .onFailure { e -> _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar evaluación")) } }
         }
     }
 
@@ -264,7 +265,7 @@ class SubjectDetailViewModel @Inject constructor(
                 .onSuccess {
                     cancelAlertUseCase?.cancelClassAlert(schedule.id)
                 }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Error al eliminar horario") } }
+                .onFailure { e -> _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar horario")) } }
         }
     }
 

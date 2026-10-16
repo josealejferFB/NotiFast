@@ -46,8 +46,10 @@ import androidx.compose.ui.unit.dp
  * Renders a warm parchment or slate desk gradient with subtle floating educational watermarks.
  */
 @Composable
-fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "floating_bg_icons")
+fun NotiFastStudyBackground(
+    modifier: Modifier = Modifier,
+    showFloatingIcons: Boolean = true
+) {
     val isDark = isSystemInDarkTheme()
 
     val studyIcons = listOf(
@@ -80,8 +82,10 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(Brush.verticalGradient(listOf(bgColor1, bgColor2)))
     ) {
-        studyIcons.forEachIndexed { index, icon ->
-            val duration = 4500 + (index * 500)
+        if (showFloatingIcons) {
+            val infiniteTransition = rememberInfiniteTransition(label = "floating_bg_icons")
+            studyIcons.forEachIndexed { index, icon ->
+                val duration = 4500 + (index * 500)
 
             val yOffset by infiniteTransition.animateFloat(
                 initialValue = 0f,
@@ -118,4 +122,5 @@ fun NotiFastStudyBackground(modifier: Modifier = Modifier) {
             )
         }
     }
+}
 }

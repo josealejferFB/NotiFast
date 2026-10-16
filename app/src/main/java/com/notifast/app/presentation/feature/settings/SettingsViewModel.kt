@@ -5,23 +5,32 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notifast.app.data.model.User
 import com.notifast.app.domain.model.GradeScale
+import com.notifast.app.domain.model.cloud.CloudAccount
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.AuthStep
+import com.notifast.app.domain.repository.CloudAuthException
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.ConvertGradeScaleUseCase
+import com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase
+import com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -29,18 +38,22 @@ class SettingsViewModel @Inject constructor(
     private val userPrefsRepository: UserPrefsRepository,
     private val evaluationRepository: EvaluationRepository,
     private val convertGradeScaleUseCase: ConvertGradeScaleUseCase,
-    private val rescheduleAllAlertsUseCase: com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase,
+    private val rescheduleAllAlertsUseCase: RescheduleAllAlertsUseCase,
     private val googleAccountRepository: GoogleAccountRepository,
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val observeLocalSyncSummaryUseCase: ObserveLocalSyncSummaryUseCase? = null
 ) : ViewModel() {
 
     private companion object {
         const val TAG = "SettingsViewModel"
         const val ERROR_GRADE_SCALE = "No se pudo actualizar la escala de calificación"
+        const val EPSILON = 0.01f
     }
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+
+    private var profileJob: Job? = null
 
     init {
         loadProfile()
@@ -48,26 +61,68 @@ class SettingsViewModel @Inject constructor(
         calculateCacheSize()
         loadConvertibleEvaluationCount()
         observeGoogleAccount()
+        observeSyncSummary()
     }
 
     private fun loadProfile() {
-        viewModelScope.launch {
+        profileJob?.cancel()
+        profileJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val userId = authRepository.getCurrentUserId()
             if (userId == null) {
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
-            authRepository.getUserProfile(userId).onSuccess { user ->
-                _uiState.update {
-                    it.copy(
-                        userProfile = user,
-                        lastSyncTimestampText = "Sincronizado ahora",
-                        isLoading = false
-                    )
-                }
-            }.onFailure {
+            val initialUser = authRepository.getUserProfile(userId).getOrNull()
+            if (initialUser != null) {
+                applyProfileAndAccount(initialUser, _uiState.value.cloudAccount)
+            } else {
                 _uiState.update { it.copy(isLoading = false) }
+            }
+            runCatching {
+                combine(
+                    authRepository.observeUserProfile(userId),
+                    googleAccountRepository.account
+                ) { user, account ->
+                    user to account
+                }.collect { (user, account) ->
+                    applyProfileAndAccount(user ?: initialUser, account)
+                }
+            }
+        }
+    }
+
+    private fun applyProfileAndAccount(user: User?, account: CloudAccount?) {
+        val nameParts = account?.displayName?.trim()?.split(" ").orEmpty()
+        val firstName = user?.firstName?.takeIf { it.isNotBlank() }
+            ?: nameParts.firstOrNull().orEmpty()
+        val lastName = user?.lastName?.takeIf { it.isNotBlank() }
+            ?: nameParts.drop(1).joinToString(" ")
+        val email = user?.email?.takeIf { !it.endsWith("@local.notifast") && it.isNotBlank() }
+            ?: account?.email.orEmpty()
+        val photo = user?.profilePictureUrl?.takeIf { it.isNotBlank() } ?: account?.photoUrl
+
+        _uiState.update {
+            it.copy(
+                userProfile = user ?: it.userProfile,
+                displayFirstName = firstName,
+                displayLastName = lastName,
+                displayEmail = email,
+                displayPhotoUrl = photo,
+                cloudAccount = account,
+                isLoading = false
+            )
+        }
+    }
+
+    private fun observeSyncSummary() {
+        val useCase = observeLocalSyncSummaryUseCase ?: return
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            runCatching {
+                useCase(userId).collect { summary ->
+                    _uiState.update { it.copy(syncSummary = summary) }
+                }
             }
         }
     }
@@ -76,11 +131,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userPrefsRepository.isDarkModeFlow.collect { isDark ->
                 _uiState.update { it.copy(isDarkMode = isDark) }
-            }
-        }
-        viewModelScope.launch {
-            userPrefsRepository.themeAccentFlow.collect { accent ->
-                _uiState.update { it.copy(themeAccent = accent) }
             }
         }
         viewModelScope.launch {
@@ -139,9 +189,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             runCatching {
-                evaluationRepository.getEvaluations(userId).first().count { it.grade != null }
-            }.onSuccess { count ->
-                _uiState.update { it.copy(evaluationsWithGradeCount = count) }
+                evaluationRepository.getEvaluations(userId).collect { evals ->
+                    val count = evals.count { it.grade != null }
+                    _uiState.update { it.copy(evaluationsWithGradeCount = count) }
+                }
             }.onFailure { e ->
                 Log.e(TAG, "Failed to load evaluations for grade-scale preview", e)
             }
@@ -182,21 +233,26 @@ class SettingsViewModel @Inject constructor(
             val result = convertGradeScaleUseCase(evals, target, currentScale, custom)
             evaluationRepository.updateEvaluations(userId, result.convertedEvaluations).onFailure { e ->
                 Log.e(TAG, "Failed to rewrite evaluations on grade scale change", e)
-                _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
+                _uiState.update { s -> s.copy(error = ErrorSanitizer.sanitize(e, ERROR_GRADE_SCALE)) }
                 return@launch
             }
-            // D16: 0f sentinel means "use scale default"; only persist a concrete
-            // value when the user actually had a custom min passing (converted).
-            val persistedMinPassing =
-                if (result.hasCustomMinPassing) result.minPassingGrade.toFloat() else 0f
+            val defaultTargetPassing = target.minPassingGrade.toFloat()
+            val userOverrodeSlider = newPassing > 0f &&
+                abs(newPassing - defaultTargetPassing) > EPSILON &&
+                abs(newPassing - result.minPassingGrade.toFloat()) > EPSILON
+            val persistedMinPassing = when {
+                userOverrodeSlider -> newPassing
+                result.hasCustomMinPassing -> result.minPassingGrade.toFloat()
+                else -> 0f
+            }
             userPrefsRepository.setDefaultGradeScale(target.id).onFailure { e ->
                 Log.e(TAG, "Failed to persist default grade scale", e)
-                _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
+                _uiState.update { s -> s.copy(error = ErrorSanitizer.sanitize(e, ERROR_GRADE_SCALE)) }
                 return@launch
             }
             userPrefsRepository.setMinPassingGrade(persistedMinPassing).onFailure { e ->
                 Log.e(TAG, "Failed to persist min passing grade", e)
-                _uiState.update { s -> s.copy(error = e.message ?: ERROR_GRADE_SCALE) }
+                _uiState.update { s -> s.copy(error = ErrorSanitizer.sanitize(e, ERROR_GRADE_SCALE)) }
                 return@launch
             }
             _uiState.update {
@@ -216,7 +272,6 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.LoadProfile -> loadProfile()
             is SettingsEvent.RefreshCacheSize -> calculateCacheSize()
             is SettingsEvent.SetDarkMode -> viewModelScope.launch { userPrefsRepository.setDarkMode(event.enabled) }
-            is SettingsEvent.SetThemeAccent -> viewModelScope.launch { userPrefsRepository.setThemeAccent(event.accent) }
             is SettingsEvent.SetHapticsEnabled -> viewModelScope.launch { userPrefsRepository.setHapticsEnabled(event.enabled) }
             is SettingsEvent.SetClassAlertsEnabled -> viewModelScope.launch {
                 userPrefsRepository.setClassAlertsEnabled(event.enabled)
@@ -244,6 +299,8 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ClearCache -> clearCache()
             is SettingsEvent.OpenDialog -> _uiState.update { it.copy(activeDialog = event.dialog) }
             is SettingsEvent.DismissDialog -> _uiState.update { it.copy(activeDialog = null) }
+            is SettingsEvent.OpenCloudHub -> _uiState.update { it.copy(isCloudHubOpen = true) }
+            is SettingsEvent.CloseCloudHub -> _uiState.update { it.copy(isCloudHubOpen = false) }
             is SettingsEvent.ClearSnackbar -> _uiState.update {
                 it.copy(snackbarMessage = null, error = null, lastScaleLabel = null)
             }
@@ -259,7 +316,7 @@ class SettingsViewModel @Inject constructor(
     private fun observeGoogleAccount() {
         viewModelScope.launch {
             googleAccountRepository.account.collect { account ->
-                _uiState.update { it.copy(cloudAccount = account) }
+                applyProfileAndAccount(_uiState.value.userProfile, account)
             }
         }
     }
@@ -277,7 +334,13 @@ class SettingsViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error al vincular cuenta") }
+                    val isCancelled = ErrorSanitizer.isCancellation(e)
+                    _uiState.update {
+                        it.copy(
+                            isCloudLoading = false,
+                            cloudError = if (isCancelled) null else ErrorSanitizer.sanitize(e, "Error al vincular cuenta con Google")
+                        )
+                    }
                 }
             )
         }
@@ -286,8 +349,7 @@ class SettingsViewModel @Inject constructor(
     private fun switchAccount(activityContext: Context) {
         viewModelScope.launch {
             _uiState.update { it.copy(isCloudLoading = true, cloudError = null) }
-            googleAccountRepository.unlink()
-            googleAccountRepository.signIn(activityContext).fold(
+            googleAccountRepository.switchAccount(activityContext).fold(
                 onSuccess = { step ->
                     when (step) {
                         is AuthStep.NeedsResolution -> _uiState.update {
@@ -297,7 +359,13 @@ class SettingsViewModel @Inject constructor(
                     }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error al cambiar de cuenta") }
+                    val isCancelled = ErrorSanitizer.isCancellation(e)
+                    _uiState.update {
+                        it.copy(
+                            isCloudLoading = false,
+                            cloudError = if (isCancelled) null else ErrorSanitizer.sanitize(e, "Error al cambiar de cuenta con Google")
+                        )
+                    }
                 }
             )
         }
@@ -311,18 +379,30 @@ class SettingsViewModel @Inject constructor(
                     _uiState.update { it.copy(isCloudLoading = false, snackbarMessage = "Cuenta desvinculada correctamente") }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error al desvincular cuenta") }
+                    _uiState.update { it.copy(isCloudLoading = false, cloudError = ErrorSanitizer.sanitize(e, "Error al desvincular cuenta")) }
                 }
             )
         }
     }
 
     private fun handleAuthResult(data: Intent?) {
+        if (data == null) {
+            _uiState.update { it.copy(pendingAuthIntent = null, isCloudLoading = false) }
+            return
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(pendingAuthIntent = null, isCloudLoading = true, cloudError = null) }
             googleAccountRepository.completeAuthorization(data).fold(
                 onSuccess = { _uiState.update { it.copy(isCloudLoading = false) } },
-                onFailure = { e -> _uiState.update { it.copy(isCloudLoading = false, cloudError = e.message ?: "Error en autorización") } }
+                onFailure = { e ->
+                    val isCancelled = ErrorSanitizer.isCancellation(e)
+                    _uiState.update {
+                        it.copy(
+                            isCloudLoading = false,
+                            cloudError = if (isCancelled) null else ErrorSanitizer.sanitize(e, "Error en autorización con Google")
+                        )
+                    }
+                }
             )
         }
     }
@@ -334,3 +414,4 @@ class SettingsViewModel @Inject constructor(
         }
     }
 }
+

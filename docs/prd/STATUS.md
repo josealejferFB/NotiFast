@@ -23,11 +23,12 @@ Editor Premium (OneNote-like)     [███████████████
 Sanitización Materias & Profesores[████████████████] 100% (9/9 tareas) ✅
 Auditoría Global & Pipelines CI/CD[████████████████] 100% (6/6 pilares) ✅
 Copia en la Nube (Google Drive)   [████████████████] 100% (21/21 tareas) ✅
+Onboarding & Acceso Cloud Sync    [████████████████] 100% (4/4 pilares) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  95% (147/155 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    563 tests pasando (0 fallos, 0 ignorados) ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████]  97% (153/159 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    614 tests pasando (0 fallos, 0 ignorados) ✅
 ```
 
 ---
@@ -128,6 +129,12 @@ SUITE DE PRUEBAS AUTOMATIZADA:    563 tests pasando (0 fallos, 0 ignorados) ✅
 - `AddScheduleViewModelTest` & `EditScheduleViewModelTest` (selector contextual y auto-guardado).
 - `NotesViewModelTest` (búsqueda de docentes, selección y borrado).
 - `SubjectDetailViewModelTest` (reactividad de docentes por asignatura).
+
+#### Integración de Selección y Creación Oficial de Docentes en Horarios (Octubre 2026):
+- **Eliminación de input de texto libre:** Se removió el campo de texto manual de profesor en `ScheduleTeacherSelector`, reemplazándolo por un selector conectado al sistema de profesores guardados (`TeacherRepository`).
+- **Integración con `AddEditTeacherBottomSheet`:** La opción "+ Nuevo Profesor" o el estado vacío abren directamente la hoja oficial de creación de docentes, preseleccionando la materia actual.
+- **Persistencia y Compatibilidad Cloud:** Los docentes creados se guardan en Room (`TeacherEntity`) y se sincronizan automáticamente con Google Drive dentro de `GlobalSnapshot.teachers`.
+- **Modularización y SRP:** `ScheduleTeacherSelector` subdividido en `EmptyTeacherCard` y `TeacherDropdownMenuItem` para garantizar archivos $\le 250$ LOC.
 
 ---
 
@@ -545,9 +552,77 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
    - Indicador honesto en `NotiFastTopBar`: muestra `PhoneAndroid` (sin cuenta), `CloudDone` (todo sincronizado) o `CloudSync` con punto Ruby (cambios pendientes).
 
 6. **Calidad y Verificación:**
-   - Cobertura de tests unitarios: **563 tests pasando al 100%** (incluyendo suites completas para `CloudViewModelTest`, `SettingsViewModelTest`, `NotesViewModelTest`, use cases y stores).
+   - Cobertura de tests unitarios: **570 tests pasando al 100%** (incluyendo suites completas para `CloudViewModelTest`, `SettingsViewModelTest`, `NotesViewModelTest`, use cases y stores).
    - Matriz completa de 51 escenarios (A1–A11, B1–B12, C1–C14, D1–D7, E1–E4, F) documentada y validada en `docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`.
    - Verificación de compilación release y debug: `./gradlew testDebugUnitTest assembleDebug` aprobados.
+
+7. **Hardening de Casos Borde y Sincronización Inteligente (Oct 2026):**
+   - **No-Op en Contenido Idéntico:** `UploadSubjectsUseCase` y `RestoreSubjectsUseCase` detectan concordancia de hash SHA-256 (`ContentHasher`) entre el snapshot local y los metadatos de Drive; actualizan el estado a `SYNCED` de inmediato sin descargar archivos, sin sobreescribir Room DB y sin disparar diálogos de conflicto innecesarios.
+   - **Gestión de Errores por Materia:** Aislamiento de fallos transitorios en `failedSubjectIds` con chip de estado contextual (`cloud_status_error` en Ruby) y reseteo inmediato al refrescar (`Refresh`), reintentar (`RetryFailed`) o interactuar (`Toggle`).
+   - **Ciclo de Vida de `CloudSummaryCard`:** Descarte automático con `delay(5000L)` para lotes exitosos, descarte al interactuar o salir de la hoja, y animación suave con `AnimatedVisibility(fadeIn() + expandVertically(), fadeOut() + shrinkVertically())`.
+   - **Blindaje de Concurrencia:** Propagación estricta de `CancellationException` en todos los flujos de subida y descarga para garantizar rollbacks Room atómicos y prevenir estados inconsistentes en SQLite.
+   - **Modularización Estricta:** Extracción de `CloudDialogsHost` para mantener `CloudHubSheet` en 234 líneas ($\le 250$ LOC).
+   - **Refresco Automático de Materias:** Inclusión de `LaunchedEffect(Unit)` en `CloudHubSheet` para disparar `CloudEvent.Refresh` cada vez que se abre la hoja, listando materias recién creadas sin reiniciar la app.
+   - **Sincronización Total de Horarios y Evaluaciones:** En `RoomSubjectBackupStore`, inclusión de fallback a `subjectName` cuando `subjectId` es blanco, y resolución automática de `subjectId` en `LocalScheduleRepositoryImpl` y `LocalEvaluationRepositoryImpl` al persistir, garantizando que los horarios y evaluaciones se respalden en el snapshot y se restauren integralmente.
+   - **Foto de Perfil en Tiempo Real:** Exposición de `observeUserProfile(uid)` en `AuthRepository` y combinación reactiva con `googleAccountRepository.account` en `NotesViewModel`, `SchedulesViewModel` y `GradesViewModel`, permitiendo que la foto de Google se muestre inmediatamente al sincronizar por primera vez o al restaurar el perfil sin cerrar la app.
+   - **Estabilidad de Hash ante Creación de Apuntes:** Se eliminó la divergencia de hash que causaba que una materia subida continuara mostrando "Cambios sin subir" (`CloudSubjectStatus.LOCAL_CHANGES`). Se normalizaron los identificadores de bloques en `ContentHasher` (`normId = "b_$index"`), se hizo determinista la generación de IDs en `MarkdownToBlocksParser`, se persistieron `blocksJson` y `schemaVersion = 2` en `LocalNoteRepositoryImpl.addNote` y `updateNote`, y se garantizó la actualización del `targetDriveId` en `UploadSubjectsUseCase`.
+   - **Integración con Directorio de Profesores en Horarios:** Se reemplazó el campo de texto libre de profesor en `ScheduleEditorForm` por el selector táctil `ScheduleTeacherSelector`, conectándolo con `TeacherRepository`, incluyendo opción de crear un nuevo profesor directamente (`AddEditTeacherBottomSheet`) con preselección contextual de materia, y modularizando en `EmptyTeacherCard` y `TeacherDropdownMenuItem` ($\le 250$ LOC).
+
+---
+
+## 🚀 Rediseño y Reingeniería del Flujo de Acceso (Welcome & Onboarding UX) — 100% Completado (16 Oct 2026)
+
+**Objetivo:** Transformar la pantalla de bienvenida/onboarding en una experiencia de acceso premium, honesta y sin fricciones, estableciendo el Modo Local (offline-first) como camino primario por defecto con transparencia total de privacidad, y ofreciendo Google Drive Cloud Backup como opción transparente con auto-despliegue de `CloudHubSheet` al completar la vinculación.
+
+### Entregables Implementados:
+1. **Acceso Primario Offline-First por Defecto:**
+   - Sección de perfil local `LocalProfileSection` (selector de foto opcional, nombre requerido y apellido opcional) con botón de inicio local de alta prominencia táctil, sin barreras ni cuentas obligatorias.
+   - Diagrama de red de conocimiento (`AcademicNodesMotion`): isotipo central NotiFast sobre superficie neutra, conectado mediante filamentos táctiles a nodos perimetrales de asignaturas (Matemáticas, Ciencias, Tecnología, Historia, Psicología, Artes) con pulsos sutiles de paquetes de datos y respiración armónica sin gradientes ruidosos ni sobrecarga cognitiva.
+2. **Acceso Opcional y Honesto con Google Drive:**
+   - Componente `GoogleDriveBackupCard` con tarjeta papercraft, icono `CloudSync` en contenedor secundario Aqua y badge "Opcional".
+   - Mensaje honesto de valor: *"Inicia con Google solo si deseas activar la copia de seguridad automática de tus materias en tu Google Drive personal (carpeta privada appDataFolder)."*
+   - Botón táctil secundario estilizado *"Vincular Google Drive para respaldo"* con gestión de estado de carga independiente (`isGoogleLoading`).
+3. **Flujo de Integración Google OAuth2 y Auto-Despliegue de CloudHub:**
+   - Ejecución nativa de Google Identity / Drive OAuth2 (`GoogleAccountRepository.signIn` y `completeAuthorization`).
+   - Creación y prellenado automático del perfil local en Room utilizando el nombre y foto de Google (`parseGoogleName`), priorizando cualquier nombre ya tipeado por el estudiante.
+   - Al completar la vinculación con Google, la navegación transiciona al dashboard y **despliega automáticamente `CloudHubSheet`** (`initialOpenCloudHub = true`), permitiendo al estudiante respaldar o restaurar materias inmediatamente.
+4. **Higiene Arquitectónica y Suite de Pruebas:**
+   - MVI Contract estricto con único StateFlow consolidado en `OnboardingContract.kt`.
+   - Respeto del límite $\le 250$ LOC por archivo composable (OnboardingScreen en 150 LOC, AcademicNodesMotion en 200 LOC, CompactAvatarPicker en 167 LOC, LocalProfileSection en 156 LOC, GoogleDriveBackupCard en 148 LOC, OnboardingHeader en 49 LOC).
+   - Avatar circular táctil de 76dp con badge flotante para cámara/edición y acción de descarte, eliminando el uploader rectangular de 160dp.
+   - Entradas de nombre y apellido unificadas en fila ergonómica con acciones de teclado IME inmediatas.
+   - Eliminación de tarjetas redundantes y chips con sobrecarga ("100% offline motor" y card offline) a favor de un layout sobrio, focalizado y de alta legibilidad.
+   - Cero strings quemados: 100% de textos y badges en `res/values/strings.xml`.
+   - Suite completa de 16 pruebas unitarias en `OnboardingViewModelTest` cubriendo el ciclo TDD completo (estados de carga, nombres compuestos Google, cancelación limpia de intent y autoOpenCloudHub). Suite global en 587 tests pasando al 100%.
+
+---
+
+## 🛡️ Normalización Global de Chips de Alertas & Sanitización de Errores AAA — 100% Completado (16 Oct 2026)
+
+**Objetivo:** Erradicar todas las chips por defecto de Android, textos rojos desalineados y `Toast.makeText` huérfanos que exponían excepciones técnicas del sistema. Crear un motor de sanitización de errores en dominio puro (`ErrorSanitizer`), estandarizar componentes atómicos táctiles AAA (`NotiFastAlertChip`, `NotiFastAlertBanner`, `NotiFastChip`), y garantizar soporte completo de accesibilidad TalkBack, feedback háptico y estética papercraft en toda la aplicación.
+
+### Entregables Implementados:
+1. **Motor de Sanitización en Dominio Puro (`ErrorSanitizer`):**
+   - Módulo Kotlin puro en `domain/util/ErrorSanitizer.kt` probado con 12 tests unitarios TDD (`ErrorSanitizerTest`).
+   - Mapeo de errores de red (offline, timeout), autenticación (expiración de sesión, Google Auth 12500/10), entidades inexistentes, colisiones de claves SQLite y cuotas de almacenamiento a mensajes empáticos, claros y en español estandarizado.
+   - Eliminación estricta de prefijos y trazas técnicas (`java.lang.*`, `Firebase*`, `ApiException:`, `SQLiteConstraintException`).
+   - Normalización tipográfica (mayúscula inicial y puntuación de oración obligatoria).
+2. **Sistema de Diseño Atómico de Alertas y Chips AAA (`presentation/atoms/`):**
+   - **`AlertSeverity` & `AlertColors`:** 4 niveles de severidad (`ERROR`, `WARNING`, `SUCCESS`, `INFO`) con esquemas de color adaptativos para temas Claro y Oscuro, garantizando contraste WCAG AAA/AA sobre tokens corporativos Ruby y Aqua.
+   - **`NotiFastAlertChip`:** Chip/píldora táctil con animación de escala con resorte (`0.96f`), feedback háptico, micro-botón de descarte opcional y semántica TalkBack con `liveRegion = LiveRegionMode.Polite`.
+   - **`NotiFastAlertBanner`:** Tarjeta de advertencia/error de ancho completo con revelación animada (`expandVertically + fadeIn`), insignia circular para icono, título, mensaje descriptivo, botón de acción y botón de descarte.
+   - **`NotiFastChip` Mejorado:** Actualizado con soporte para `leadingIcon`, `trailingIcon`, `contentPadding` personalizable y alineación centrada para reemplazar completamente las `FilterChip` e `InputChip` por defecto de Android.
+3. **Refactorización Integral de Pantallas y Formularios:**
+   - **Erradicación de Toasts y Snackbars por Defecto:** Creación de `NotiFastSnackbarHost` y `rememberNotiFastAlert()`. Integración en el `Scaffold` raíz de `NavGraph.kt` vía `CompositionLocalProvider(LocalNotiFastSnackbarHostState provides snackbarHostState)` para que todas las alertas floten armoniosamente **por encima** de `NotiFastBottomNav` y de la barra de navegación del sistema, erradicando que aparezcan detrás de la barra.
+   - **Mapeo y Cancelación Silenciosa:** Detección de cancelaciones voluntarias en `ErrorSanitizer.isCancellation` (código 16 de Google Play Services, excepciones de descarte de Credential Manager), impidiendo que se muestren alertas espurias al cancelar cambios de cuenta o inicio de sesión.
+   - **Reemplazo Completo de `Toast.makeText`:** 100% de los `Toast.makeText` de Android en `ScheduleEditorBottomSheet`, `EvaluationEditorBottomSheet`, `TeacherContactSection`, `NoteEstheticCard`, `SubjectSchedulesTab`, `SettingsSectionsContent`, `SchedulesScreen`, `QrCodeShareDialog`, `ShareSubjectBottomSheet` e `ImportSubjectBottomSheet` reemplazados por alertas papercraft AAA con `rememberNotiFastAlert()`.
+   - **Formularios con Chips de Validación:** Reemplazo de textos rojos crudos por `NotiFastAlertChip` en `EvaluationEditorAddForm`, `EvaluationEditorEditForm` y `EditSubjectDialog`.
+   - **Normalización de Chips de Selección:** Reemplazo de componentes Android genéricos por `NotiFastChip` en `NotiFastGradePresetChips`, `NotesFilterBar`, `SubjectNotesTab`, `AddEditTeacherBottomSheet` y `NoteTagsEditor`.
+   - **Arquitectura Limpia y Modularidad:** Extracción de componentes y cumplimiento estricto del límite $\le 250$ LOC en todos los composables.
+   - **Recursos de Cero Strings Hardcodeados:** Centralización de identificadores de error, prefijos de accesibilidad (`alert_severity_*_prefix`, `alert_dismiss_cd`) y etiquetas en `res/values/strings.xml`.
+4. **Verificación y Cobertura:**
+   - **614 pruebas unitarias ejecutadas y aprobadas al 100%** (0 fallos, 0 ignorados).
+   - Compilación exitosa de build debug e instalación directa en dispositivo físico conectado (`TK6TVCRSMB7DPVAQ`).
 
 ---
 

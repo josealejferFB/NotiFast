@@ -117,46 +117,21 @@ fun NotesFilterBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val isAllSelected = selectedTag == null
-                TagFilterChip(
+                com.notifast.app.presentation.atoms.NotiFastChip(
                     label = stringResource(R.string.notes_filter_all_tag_chip),
-                    isSelected = isAllSelected,
+                    selected = isAllSelected,
                     onClick = { onTagSelect(null) }
                 )
                 availableTags.forEach { tag ->
                     val isSelected = tag.equals(selectedTag, ignoreCase = true)
                     val displayTag = if (tag.startsWith("#")) tag else "#$tag"
-                    TagFilterChip(
+                    com.notifast.app.presentation.atoms.NotiFastChip(
                         label = displayTag,
-                        isSelected = isSelected,
+                        selected = isSelected,
                         onClick = { onTagSelect(if (isSelected) null else tag) }
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun TagFilterChip(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = CircleShape,
-        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer,
-        border = BorderStroke(
-            1.dp,
-            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
-        ),
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Text(
-            text = label,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

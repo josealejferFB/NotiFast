@@ -2,6 +2,7 @@ package com.notifast.app.domain.repository
 
 import android.net.Uri
 import com.notifast.app.data.model.User
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface AuthRepository {
@@ -10,6 +11,7 @@ interface AuthRepository {
     suspend fun logout()
     suspend fun getCurrentUserId(): String?
     suspend fun getUserProfile(uid: String): Result<User>
+    fun observeUserProfile(uid: String): Flow<User?>
     suspend fun updateProfile(
         uid: String,
         firstName: String,

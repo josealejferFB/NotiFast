@@ -148,4 +148,57 @@ class ContentHasherTest {
         org.junit.Assert.assertNotNull(hash)
         assertEquals(64, hash.length) // SHA-256 hex length
     }
+
+    @Test
+    fun notes_with_different_block_ids_but_same_content_produce_equal_hash() {
+        val note1 = Note(
+            id = "n1",
+            subject = "Cálculo",
+            title = "Apunte 1",
+            content = "Texto",
+            blocks = listOf(
+                NoteBlock.Paragraph(id = "uuid-1", text = "Texto"),
+                NoteBlock.Heading(id = "uuid-2", text = "Subtítulo", level = 2),
+                NoteBlock.BulletList(id = "uuid-3", items = listOf(com.notifast.app.data.model.ListItem("Item 1"))),
+                NoteBlock.Checklist(id = "uuid-4", items = listOf(com.notifast.app.data.model.CheckItem("Tarea 1", isChecked = false))),
+                NoteBlock.Quote(id = "uuid-5", text = "Cita"),
+                NoteBlock.Image(id = "uuid-6", path = "/tmp/fake.png"),
+                NoteBlock.MathBlock(id = "uuid-7", source = "x^2 + y^2 = z^2"),
+                NoteBlock.Divider(id = "uuid-8")
+            )
+        )
+        val note2 = Note(
+            id = "n1",
+            subject = "Cálculo",
+            title = "Apunte 1",
+            content = "Texto",
+            blocks = listOf(
+                NoteBlock.Paragraph(id = "other-uuid-1", text = "Texto"),
+                NoteBlock.Heading(id = "other-uuid-2", text = "Subtítulo", level = 2),
+                NoteBlock.BulletList(id = "other-uuid-3", items = listOf(com.notifast.app.data.model.ListItem("Item 1"))),
+                NoteBlock.Checklist(id = "other-uuid-4", items = listOf(com.notifast.app.data.model.CheckItem("Tarea 1", isChecked = false))),
+                NoteBlock.Quote(id = "other-uuid-5", text = "Cita"),
+                NoteBlock.Image(id = "other-uuid-6", path = "/tmp/fake.png"),
+                NoteBlock.MathBlock(id = "other-uuid-7", source = "x^2 + y^2 = z^2"),
+                NoteBlock.Divider(id = "other-uuid-8")
+            )
+        )
+
+        val snapA = SubjectSnapshot(
+            subject = SubjectData(id = "sub-1", name = "Cálculo"),
+            schedules = emptyList(),
+            evaluations = emptyList(),
+            notes = listOf(note1),
+            imageFiles = emptyMap()
+        )
+        val snapB = SubjectSnapshot(
+            subject = SubjectData(id = "sub-1", name = "Cálculo"),
+            schedules = emptyList(),
+            evaluations = emptyList(),
+            notes = listOf(note2),
+            imageFiles = emptyMap()
+        )
+
+        assertEquals(hasher.hash(snapA), hasher.hash(snapB))
+    }
 }

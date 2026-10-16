@@ -12,6 +12,7 @@ import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CancelAlertUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import com.notifast.app.domain.util.ScheduleCalculations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,8 @@ class SchedulesViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository? = null,
     private val cancelAlertUseCase: CancelAlertUseCase? = null,
-    private val noteRepository: NoteRepository? = null
+    private val noteRepository: NoteRepository? = null,
+    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SchedulesUiState())
@@ -55,7 +57,7 @@ class SchedulesViewModel @Inject constructor(
         evaluationRepository: EvaluationRepository,
         authRepository: AuthRepository,
         timeProvider: () -> Pair<Int, String>
-    ) : this(scheduleRepository, evaluationRepository, authRepository, null, null, null) {
+    ) : this(scheduleRepository, evaluationRepository, authRepository, null, null, null, null) {
         this.currentTimeProvider = timeProvider
         if (_uiState.value.schedules.isNotEmpty() || _uiState.value.evaluations.isNotEmpty()) {
             updateState(
@@ -73,11 +75,23 @@ class SchedulesViewModel @Inject constructor(
     private fun loadUserProfile() {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUserId() ?: return@launch
-            authRepository.getUserProfile(uid).onSuccess { user ->
+            val accountFlow = googleAccountRepository?.account ?: kotlinx.coroutines.flow.flowOf(null)
+            combine(
+                authRepository.observeUserProfile(uid),
+                accountFlow
+            ) { user, account ->
+                user to account
+            }.collect { (user, account) ->
+                val firstName = user?.firstName?.takeIf { it.isNotBlank() }
+                    ?: account?.displayName?.split(" ")?.firstOrNull().orEmpty()
+                val email = user?.email?.takeIf { !it.endsWith("@local.notifast") && it.isNotBlank() }
+                    ?: account?.email.orEmpty()
+                val photo = user?.profilePictureUrl?.takeIf { it.isNotBlank() } ?: account?.photoUrl
+
                 _uiState.update { it.copy(
-                    userFirstName = user.firstName,
-                    userEmail = user.email,
-                    userProfilePictureUrl = user.profilePictureUrl
+                    userFirstName = firstName,
+                    userEmail = email,
+                    userProfilePictureUrl = photo
                 ) }
             }
         }
@@ -262,7 +276,7 @@ class SchedulesViewModel @Inject constructor(
             scheduleRepository.deleteSchedule(userId, schedule).onSuccess {
                 cancelAlertUseCase?.cancelClassAlert(schedule.id)
             }.onFailure { e ->
-                _uiState.update { it.copy(error = e.message ?: "Error al eliminar horario") }
+                _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar horario")) }
             }
         }
     }
@@ -273,7 +287,7 @@ class SchedulesViewModel @Inject constructor(
             evaluationRepository.deleteEvaluation(userId, evaluation).onSuccess {
                 cancelAlertUseCase?.cancelEvaluationAlert(evaluation.id)
             }.onFailure { e ->
-                _uiState.update { it.copy(error = e.message ?: "Error al eliminar evaluación") }
+                _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al eliminar evaluación")) }
             }
         }
     }

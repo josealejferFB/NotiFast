@@ -97,5 +97,6 @@ sealed interface NotesEvent {
     data object DeleteLocalOnly : NotesEvent
     data object DeleteLocalAndCloud : NotesEvent
     data object DeleteFallbackLocal : NotesEvent
+    data object ClearError : NotesEvent
 }
 

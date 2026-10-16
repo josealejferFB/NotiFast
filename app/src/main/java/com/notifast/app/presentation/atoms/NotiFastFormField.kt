@@ -3,6 +3,7 @@ package com.notifast.app.presentation.atoms
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +36,7 @@ fun NotiFastFormField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     height: Dp? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None
@@ -55,9 +57,12 @@ fun NotiFastFormField(
         maxLines = maxLines,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         isError = isError,
         supportingText = supportingText,
         colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -65,6 +70,7 @@ fun NotiFastFormField(
             cursorColor = cursorColor,
             focusedLabelColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            errorTextColor = MaterialTheme.colorScheme.onSurface,
             errorContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
             errorBorderColor = MaterialTheme.colorScheme.error
         )
@@ -84,6 +90,7 @@ fun NotiFastFormField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     height: Dp? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None
@@ -104,9 +111,12 @@ fun NotiFastFormField(
         maxLines = maxLines,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         isError = isError,
         supportingText = supportingText,
         colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -114,6 +124,7 @@ fun NotiFastFormField(
             cursorColor = cursorColor,
             focusedLabelColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            errorTextColor = MaterialTheme.colorScheme.onSurface,
             errorContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
             errorBorderColor = MaterialTheme.colorScheme.error
         )

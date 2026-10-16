@@ -1,7 +1,8 @@
 package com.notifast.app.presentation.feature.share
 
 import android.content.Intent
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -70,6 +71,7 @@ fun ShareSubjectBottomSheet(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val showAlert = rememberNotiFastAlert()
 
     var includeNotes by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -216,15 +218,13 @@ fun ShareSubjectBottomSheet(
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.share_via_text), fontWeight = FontWeight.SemiBold)
                 }
-
                 Spacer(Modifier.height(10.dp))
-
                 // Action: Copy to clipboard
                 OutlinedButton(
                     onClick = {
                         val payload = generatedPayload ?: return@OutlinedButton
                         clipboardManager.setText(AnnotatedString(payload))
-                        Toast.makeText(context, context.getString(R.string.share_copied_toast), Toast.LENGTH_SHORT).show()
+                        showAlert(context.getString(R.string.share_copied_toast), AlertSeverity.SUCCESS)
                     },
                     enabled = generatedPayload != null,
                     shape = RoundedCornerShape(14.dp),

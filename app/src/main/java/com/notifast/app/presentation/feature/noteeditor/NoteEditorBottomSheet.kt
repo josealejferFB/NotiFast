@@ -188,6 +188,14 @@ fun NoteEditorBottomSheet(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp, vertical = 6.dp)
             ) {
+                if (!uiState.error.isNullOrBlank()) {
+                    com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                        message = uiState.error ?: "",
+                        onDismiss = { viewModel.onEvent(NoteEditorEvent.ClearError) },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
                 NoteEditorContent(
                     uiState = uiState,
                     contentFieldValue = contentFieldValue,

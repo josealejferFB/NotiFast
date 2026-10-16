@@ -77,7 +77,7 @@ fun ScheduleTimeRangePicker(
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "Horario de Clase",
+            text = stringResource(R.string.agenda_create_schedule_option),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface

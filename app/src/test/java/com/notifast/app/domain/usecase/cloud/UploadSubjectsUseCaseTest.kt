@@ -201,4 +201,123 @@ class UploadSubjectsUseCaseTest {
         val remainingFiles = cacheDir.listFiles()?.filter { it.name.startsWith("upload_global_") } ?: emptyList()
         assertTrue(remainingFiles.isEmpty())
     }
+
+    @Test
+    fun invoke_whenCloudHasIdenticalHash_isNoOpWithoutUploading() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+
+        val cloudFile = CloudFile(
+            driveFileId = "drive_sub1",
+            kind = "subject",
+            subjectId = "sub1",
+            subjectName = "Matemáticas",
+            icon = "📚",
+            colorHex = "#BF092F",
+            contentHash = "identicalHash456",
+            uploadedAt = 1000L,
+            deviceModel = "Pixel",
+            noteCount = 0,
+            evaluationCount = 0,
+            sizeBytes = 100L,
+            schemaVersion = 1
+        )
+        val item = mockSubjectItem("sub1", "Matemáticas", driveFileId = "drive_sub1").copy(
+            cloudFile = cloudFile
+        )
+        val snap = mockSnapshot("sub1", "Matemáticas")
+
+        coEvery { store.readSnapshot("u1", "sub1") } returns Result.success(snap)
+        every { hasher.hash(snap) } returns "identicalHash456"
+
+        val cacheDir = tempFolder.newFolder("cacheNoOp")
+
+        uploadSubjectsUseCase("u1", listOf(item), cacheDir).test {
+            awaitItem() // Progress
+            val done = awaitItem() as UploadProgress.Done
+            assertEquals(1, done.result.outcomes.size)
+            val outcome = done.result.outcomes[0]
+            assertNull(outcome.error)
+            assertTrue("Outcome should be marked as isNoOp", outcome.isNoOp)
+            awaitComplete()
+        }
+
+        // Verify cloud.upload was never called
+        coVerify(exactly = 0) { cloud.upload(any(), any(), any(), any()) }
+
+        // State DAO should be upserted to SYNCED
+        coVerify(exactly = 1) {
+            stateDao.upsert(match {
+                it.subjectId == "sub1" &&
+                    it.driveFileId == "drive_sub1" &&
+                    it.lastUploadedHash == "identicalHash456"
+            })
+        }
+    }
+
+    @Test
+    fun invoke_whenCancelled_rethrowsCancellationException() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+
+        val item = mockSubjectItem("sub1", "Matemáticas")
+        val snap = mockSnapshot("sub1", "Matemáticas")
+
+        coEvery { store.readSnapshot("u1", "sub1") } throws kotlinx.coroutines.CancellationException("Upload cancelled")
+
+        val cacheDir = tempFolder.newFolder("cacheCancel")
+
+        var caughtCancellation = false
+        try {
+            uploadSubjectsUseCase("u1", listOf(item), cacheDir).collect { }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            caughtCancellation = true
+        }
+
+        assertTrue("CancellationException must be rethrown and not swallowed as ItemOutcome error", caughtCancellation)
+    }
+
+    @Test
+    fun invoke_whenDriveFileIdIsNull_usesCloudFileDriveFileIdAsExistingFileId() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+
+        val cloudFile = CloudFile(
+            driveFileId = "existing_drive_id_123",
+            kind = "subject",
+            subjectId = "sub1",
+            subjectName = "Matemáticas",
+            icon = "📚",
+            colorHex = "#BF092F",
+            contentHash = "oldHash",
+            uploadedAt = 1000L,
+            deviceModel = "Pixel",
+            noteCount = 0,
+            evaluationCount = 0,
+            sizeBytes = 100L,
+            schemaVersion = 1
+        )
+        val item = mockSubjectItem("sub1", "Matemáticas", driveFileId = null).copy(
+            cloudFile = cloudFile
+        )
+        val snap = mockSnapshot("sub1", "Matemáticas")
+
+        coEvery { store.readSnapshot("u1", "sub1") } returns Result.success(snap)
+        every { hasher.hash(snap) } returns "newHash"
+        every { archiveCodec.writeSubject(snap, any(), any()) } returns Result.success(Unit)
+        coEvery { cloud.upload("existing_drive_id_123", any(), any(), any()) } returns Result.success("existing_drive_id_123")
+
+        val cacheDir = tempFolder.newFolder("cacheTargetId")
+
+        uploadSubjectsUseCase("u1", listOf(item), cacheDir).test {
+            awaitItem()
+            val done = awaitItem() as UploadProgress.Done
+            assertNull(done.result.outcomes[0].error)
+            awaitComplete()
+        }
+
+        coVerify(exactly = 1) {
+            cloud.upload("existing_drive_id_123", any(), any(), any())
+        }
+    }
 }

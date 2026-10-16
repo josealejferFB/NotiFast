@@ -280,7 +280,7 @@ class SchedulesViewModelTest {
         advanceUntilIdle()
 
         coVerify { evaluationRepository.deleteEvaluation("user_123", eval) }
-        assertEquals("Error eliminando evaluación", viewModel.uiState.value.error)
+        assertEquals("Error eliminando evaluación.", viewModel.uiState.value.error)
 
         viewModel.onEvent(SchedulesEvent.ClearError)
         assertNull(viewModel.uiState.value.error)

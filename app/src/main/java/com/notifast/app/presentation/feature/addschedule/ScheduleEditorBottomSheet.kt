@@ -1,6 +1,5 @@
 package com.notifast.app.presentation.feature.addschedule
 
-import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,10 +10,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
+import com.notifast.app.data.model.Teacher
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import com.notifast.app.presentation.feature.addschedule.components.ScheduleEditorForm
 import com.notifast.app.presentation.feature.addschedule.components.ScheduleEditorSheetLayout
 import com.notifast.app.presentation.feature.editschedule.EditScheduleEvent
 import com.notifast.app.presentation.feature.editschedule.EditScheduleViewModel
+import com.notifast.app.presentation.feature.notes.components.AddEditTeacherBottomSheet
 
 @Composable
 fun ScheduleEditorBottomSheet(
@@ -65,17 +68,11 @@ private fun AddScheduleEditorSheet(
         }
     }
 
+    val showAlert = rememberNotiFastAlert()
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
-            Toast.makeText(context, R.string.schedules_saved_success, Toast.LENGTH_SHORT).show()
+            showAlert(context.getString(R.string.schedules_saved_success), AlertSeverity.SUCCESS)
             viewModel.onEvent(AddScheduleEvent.ResetState)
-        }
-    }
-
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { err ->
-            Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(AddScheduleEvent.ClearError)
         }
     }
 
@@ -89,6 +86,8 @@ private fun AddScheduleEditorSheet(
         isEditing = false,
         isSaved = uiState.isSaved,
         hasUnsavedChanges = hasChanges,
+        errorMessage = uiState.error,
+        onErrorDismiss = { viewModel.onEvent(AddScheduleEvent.ClearError) },
         onDismiss = onDismiss,
         onSaved = onSaved,
         onCreateSubject = onCreateSubject
@@ -108,10 +107,23 @@ private fun AddScheduleEditorSheet(
             teacher = uiState.teacher,
             onTeacherChange = { viewModel.onEvent(AddScheduleEvent.UpdateTeacher(it)) },
             availableTeachers = uiState.availableTeachers,
+            allTeachers = uiState.allTeachers,
             hasConfiguredTeacher = uiState.hasConfiguredTeacher,
+            onAddNewTeacherClick = { viewModel.onEvent(AddScheduleEvent.OpenAddTeacherSheet) },
             conflictingSchedules = uiState.conflictingSchedules,
             isSaving = uiState.isSaving,
             onSaveClick = { viewModel.onEvent(AddScheduleEvent.SaveSchedule) }
+        )
+    }
+
+    if (uiState.showAddTeacherSheet) {
+        AddEditTeacherBottomSheet(
+            teacher = Teacher(
+                subjectNames = if (uiState.subjectName.isNotBlank()) listOf(uiState.subjectName) else emptyList()
+            ),
+            availableSubjects = uiState.subjects.map { it.name },
+            onDismiss = { viewModel.onEvent(AddScheduleEvent.CloseAddTeacherSheet) },
+            onSave = { viewModel.onEvent(AddScheduleEvent.SaveTeacher(it)) }
         )
     }
 }
@@ -131,16 +143,10 @@ private fun EditScheduleEditorSheet(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    val showAlert = rememberNotiFastAlert()
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
-            Toast.makeText(context, R.string.schedules_saved_success, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { err ->
-            Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(EditScheduleEvent.ClearError)
+            showAlert(context.getString(R.string.schedules_saved_success), AlertSeverity.SUCCESS)
         }
     }
 
@@ -177,6 +183,8 @@ private fun EditScheduleEditorSheet(
         isEditing = true,
         isSaved = uiState.isSaved,
         hasUnsavedChanges = hasChanges,
+        errorMessage = uiState.error,
+        onErrorDismiss = { viewModel.onEvent(EditScheduleEvent.ClearError) },
         onDismiss = onDismiss,
         onSaved = onSaved,
         onCreateSubject = onCreateSubject
@@ -196,10 +204,23 @@ private fun EditScheduleEditorSheet(
             teacher = uiState.teacher,
             onTeacherChange = { viewModel.onEvent(EditScheduleEvent.UpdateTeacher(it)) },
             availableTeachers = uiState.availableTeachers,
+            allTeachers = uiState.allTeachers,
             hasConfiguredTeacher = uiState.hasConfiguredTeacher,
+            onAddNewTeacherClick = { viewModel.onEvent(EditScheduleEvent.OpenAddTeacherSheet) },
             conflictingSchedules = uiState.conflictingSchedules,
             isSaving = uiState.isSaving,
             onSaveClick = { viewModel.onEvent(EditScheduleEvent.SaveSchedule) }
+        )
+    }
+
+    if (uiState.showAddTeacherSheet) {
+        AddEditTeacherBottomSheet(
+            teacher = Teacher(
+                subjectNames = if (uiState.subjectName.isNotBlank()) listOf(uiState.subjectName) else emptyList()
+            ),
+            availableSubjects = uiState.subjects.map { it.name },
+            onDismiss = { viewModel.onEvent(EditScheduleEvent.CloseAddTeacherSheet) },
+            onSave = { viewModel.onEvent(EditScheduleEvent.SaveTeacher(it)) }
         )
     }
 }

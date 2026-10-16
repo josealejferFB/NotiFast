@@ -45,9 +45,15 @@ class RoomSubjectBackupStore @Inject constructor(
             val subject = subjectDao.getSubjectById(userId, subjectId)
                 ?: return Result.failure(NoSuchElementException("Subject $subjectId not found for user $userId"))
 
-            val schedules = scheduleDao.getSchedulesBySubjectId(userId, subjectId).first().map { it.toDomain() }
-            val evaluations = evaluationDao.getEvaluationsBySubjectId(userId, subjectId).first().map { it.toDomain() }
-            val notes = noteDao.getNotesBySubjectId(userId, subjectId).first().map { it.toDomain() }
+            val schedules = scheduleDao.getSchedules(userId).first()
+                .filter { it.subjectId == subjectId || (it.subjectId.isBlank() && it.subjectName.equals(subject.name, ignoreCase = true)) }
+                .map { it.toDomain() }
+            val evaluations = evaluationDao.getEvaluations(userId).first()
+                .filter { it.subjectId == subjectId || (it.subjectId.isBlank() && it.subjectName.equals(subject.name, ignoreCase = true)) }
+                .map { it.toDomain() }
+            val notes = noteDao.getNotes(userId).first()
+                .filter { it.subjectId == subjectId || (it.subjectId.isBlank() && it.subject.equals(subject.name, ignoreCase = true)) }
+                .map { it.toDomain() }
 
             val imageFiles = mutableMapOf<String, File>()
 
@@ -277,6 +283,12 @@ class RoomSubjectBackupStore @Inject constructor(
 
             db.withTransaction {
                 // Delete old records
+                val oldSubject = subjectDao.getSubjectById(userId, oldSubjectId)
+                if (oldSubject != null) {
+                    scheduleDao.deleteSchedulesBySubject(userId, oldSubject.name)
+                    evaluationDao.deleteEvaluationsBySubject(userId, oldSubject.name)
+                    noteDao.deleteNotesBySubject(userId, oldSubject.name)
+                }
                 noteDao.deleteNotesBySubjectId(userId, oldSubjectId)
                 evaluationDao.deleteEvaluationsBySubjectId(userId, oldSubjectId)
                 scheduleDao.deleteSchedulesBySubjectId(userId, oldSubjectId)

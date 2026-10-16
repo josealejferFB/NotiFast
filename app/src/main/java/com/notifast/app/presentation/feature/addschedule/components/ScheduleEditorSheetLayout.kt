@@ -52,6 +52,8 @@ fun ScheduleEditorSheetLayout(
     onDismiss: () -> Unit,
     onSaved: () -> Unit,
     onCreateSubject: () -> Unit,
+    errorMessage: String? = null,
+    onErrorDismiss: (() -> Unit)? = null,
     content: @Composable (onCreateSubjectClick: () -> Unit) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -154,6 +156,14 @@ fun ScheduleEditorSheetLayout(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp, vertical = 6.dp)
             ) {
+                if (!errorMessage.isNullOrBlank()) {
+                    com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                        message = errorMessage,
+                        onDismiss = onErrorDismiss,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+
                 content(handleCreateSubject)
 
                 Spacer(

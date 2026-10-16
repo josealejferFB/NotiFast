@@ -99,6 +99,6 @@ fun SettingsDialogDispatcher(
                 onDismiss = { onEvent(SettingsEvent.DismissDialog) }
             )
         }
-        SettingsDialogType.EXPORT_DATA, null -> {}
+        null -> {}
     }
 }

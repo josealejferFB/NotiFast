@@ -90,8 +90,11 @@ class CloudViewModel @Inject constructor(
             is CloudEvent.ResolveConflict -> resolveConflict(event.decision, event.applyToRest)
             is CloudEvent.DeleteFromCloud -> deleteFromCloud(event.id)
             is CloudEvent.RetryFailed -> retryFailed()
-            is CloudEvent.Refresh -> loadOverview()
-            is CloudEvent.DismissSummary -> _uiState.update { it.copy(summary = null) }
+            is CloudEvent.Refresh -> {
+                _uiState.update { it.copy(summary = null, failedSubjectIds = emptySet(), error = null) }
+                loadOverview()
+            }
+            is CloudEvent.DismissSummary -> _uiState.update { it.copy(summary = null, failedSubjectIds = emptySet()) }
             is CloudEvent.ClearError -> _uiState.update { it.copy(error = null) }
             is CloudEvent.ValidateConflictName -> validateConflictName(event.candidate)
         }
@@ -169,6 +172,8 @@ class CloudViewModel @Inject constructor(
             val newSelected = if (id in current.selected) current.selected - id else current.selected + id
             current.copy(
                 selected = newSelected,
+                failedSubjectIds = current.failedSubjectIds - id,
+                summary = null,
                 canUpload = computeCanUpload(newSelected, current.globalSelected, current.items),
                 canRestore = computeCanRestore(newSelected, current.globalSelected, current.global, current.items)
             )
@@ -180,6 +185,7 @@ class CloudViewModel @Inject constructor(
             val newGlobal = !current.globalSelected
             current.copy(
                 globalSelected = newGlobal,
+                summary = null,
                 canUpload = computeCanUpload(current.selected, newGlobal, current.items),
                 canRestore = computeCanRestore(current.selected, newGlobal, current.global, current.items)
             )
@@ -195,6 +201,7 @@ class CloudViewModel @Inject constructor(
             }
             current.copy(
                 selected = newSelected,
+                summary = null,
                 canUpload = computeCanUpload(newSelected, current.globalSelected, current.items),
                 canRestore = computeCanRestore(newSelected, current.globalSelected, current.global, current.items)
             )
@@ -260,7 +267,15 @@ class CloudViewModel @Inject constructor(
                         outcomes.add(ItemOutcome(id = "global", name = "Perfil y ajustes", error = globalResult.exceptionOrNull()))
                     }
                 }
-                _uiState.update { it.copy(isLoading = false, progress = null, summary = BatchResult(outcomes)) }
+                val failedIds = outcomes.filter { it.error != null }.map { it.id }.toSet()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        progress = null,
+                        summary = BatchResult(outcomes),
+                        failedSubjectIds = failedIds
+                    )
+                }
                 loadOverview()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, progress = null, error = mapError(e)) }
@@ -385,7 +400,15 @@ class CloudViewModel @Inject constructor(
                         outcomes.add(ItemOutcome(id = "global", name = "Perfil y ajustes", error = globalResult.exceptionOrNull()))
                     }
                 }
-                _uiState.update { it.copy(isLoading = false, progress = null, summary = BatchResult(outcomes)) }
+                val failedIds = outcomes.filter { it.error != null }.map { it.id }.toSet()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        progress = null,
+                        summary = BatchResult(outcomes),
+                        failedSubjectIds = failedIds
+                    )
+                }
                 loadOverview()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, progress = null, error = mapError(e)) }
@@ -415,6 +438,7 @@ class CloudViewModel @Inject constructor(
     private fun retryFailed() {
         val failed = _uiState.value.summary?.failed ?: return
         val failedIds = failed.map { it.id }.toSet()
+        _uiState.update { it.copy(failedSubjectIds = it.failedSubjectIds - failedIds, summary = null) }
         if (lastOperation == Operation.UPLOAD) {
             val toUpload = _uiState.value.items.filter { it.subjectId in failedIds }
             executeUpload(toUpload, uploadGlobal = failedIds.contains("global"))

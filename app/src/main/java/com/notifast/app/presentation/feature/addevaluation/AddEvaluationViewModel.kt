@@ -8,6 +8,7 @@ import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.EvaluationRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.util.ErrorSanitizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -92,14 +93,16 @@ class AddEvaluationViewModel @Inject constructor(
             val state = _uiState.value
             val cleanTitle = state.title.trim()
             if (cleanTitle.isBlank() || state.selectedSubject.isBlank()) {
-                _uiState.update { it.copy(isSaving = false, error = "Materia y título son requeridos") }
+                _uiState.update { it.copy(isSaving = false, error = "La materia y el título son obligatorios.") }
                 return@launch
             }
             val evalId = java.util.UUID.randomUUID().toString()
             val scaleId = userPrefsRepository.defaultGradeScaleFlow.first()
+            val matchedSubject = state.subjects.find { it.name.equals(state.selectedSubject.trim(), ignoreCase = true) }
             val evaluation = Evaluation(
                 id = evalId,
                 userId = userId,
+                subjectId = matchedSubject?.id.orEmpty(),
                 subjectName = state.selectedSubject.trim(),
                 title = cleanTitle,
                 description = state.description.trim(),
@@ -113,7 +116,7 @@ class AddEvaluationViewModel @Inject constructor(
                 scheduleEvaluationAlertUseCase(evaluation.copy(id = savedId))
                 _uiState.update { it.copy(isSaved = true, isSaving = false) }
             }.onFailure { e ->
-                _uiState.update { it.copy(isSaving = false, error = e.message ?: "Error al guardar la evaluación") }
+                _uiState.update { it.copy(isSaving = false, error = ErrorSanitizer.sanitize(e, "Error al guardar la evaluación")) }
             }
         }
     }

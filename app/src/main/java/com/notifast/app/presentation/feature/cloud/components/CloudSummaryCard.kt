@@ -30,7 +30,8 @@ fun CloudSummaryCard(
 ) {
     val total = summary.outcomes.size
     val failed = summary.failed.size
-    val succeeded = total - failed
+    val noOp = summary.noOpCount
+    val succeeded = summary.actualSuccessCount
 
     NotiFastCard(
         modifier = modifier.fillMaxWidth(),
@@ -54,6 +55,14 @@ fun CloudSummaryCard(
                     text = stringResource(R.string.cloud_summary_success_count, succeeded),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+
+            if (noOp > 0) {
+                Text(
+                    text = stringResource(R.string.cloud_summary_noop_count, noOp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 

@@ -16,7 +16,8 @@ private const val TAG = "LocalScheduleRepo"
 
 @Singleton
 class LocalScheduleRepositoryImpl @Inject constructor(
-    private val scheduleDao: ScheduleDao
+    private val scheduleDao: ScheduleDao,
+    private val subjectDao: com.notifast.app.data.local.dao.SubjectDao? = null
 ) : ScheduleRepository {
 
     override fun getSchedules(userId: String): Flow<List<Schedule>> {
@@ -28,11 +29,16 @@ class LocalScheduleRepositoryImpl @Inject constructor(
             validate(schedule)?.let { return Result.failure(it) }
             val id = if (schedule.id.isBlank()) UUID.randomUUID().toString() else schedule.id
             val now = Date()
+            val resolvedSubjectId = if (schedule.subjectId.isNotBlank()) {
+                schedule.subjectId
+            } else {
+                subjectDao?.getSubjectByName(userId, schedule.subjectName)?.id.orEmpty()
+            }
             scheduleDao.insertSchedule(
                 ScheduleEntity(
                     id = id,
                     userId = userId,
-                    subjectId = schedule.subjectId,
+                    subjectId = resolvedSubjectId,
                     subjectName = schedule.subjectName,
                     modality = schedule.modality,
                     dayOfWeek = schedule.dayOfWeek,
@@ -57,11 +63,17 @@ class LocalScheduleRepositoryImpl @Inject constructor(
         return try {
             validate(schedule)?.let { return Result.failure(it) }
             val existing = scheduleDao.getScheduleById(userId, schedule.id)
+            val resolvedSubjectId = if (schedule.subjectId.isNotBlank()) {
+                schedule.subjectId
+            } else {
+                existing?.subjectId?.takeIf { it.isNotBlank() }
+                    ?: subjectDao?.getSubjectByName(userId, schedule.subjectName)?.id.orEmpty()
+            }
             scheduleDao.updateSchedule(
                 ScheduleEntity(
                     id = schedule.id,
                     userId = userId,
-                    subjectId = schedule.subjectId.ifBlank { existing?.subjectId ?: "" },
+                    subjectId = resolvedSubjectId,
                     subjectName = schedule.subjectName,
                     modality = schedule.modality,
                     dayOfWeek = schedule.dayOfWeek,

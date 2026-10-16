@@ -43,7 +43,8 @@ fun CloudSubjectRow(
     isSelected: Boolean,
     onToggle: (String) -> Unit,
     onDeleteCloud: ((String) -> Unit)?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasError: Boolean = false
 ) {
     val isDark = isSystemInDarkTheme()
     val subjectColor = ThemeUtils.getAccessibleColor(item.colorHex, isDark)
@@ -96,7 +97,7 @@ fun CloudSubjectRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            CloudStatusChip(status = item.status)
+            CloudStatusChip(status = item.status, isError = hasError)
         }
 
         if (item.status == CloudSubjectStatus.CLOUD_ONLY && onDeleteCloud != null) {

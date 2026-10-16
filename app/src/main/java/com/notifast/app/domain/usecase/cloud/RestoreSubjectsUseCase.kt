@@ -7,6 +7,7 @@ import com.notifast.app.data.local.entity.SubjectCloudStateEntity
 import com.notifast.app.data.model.package_data.SubjectPackage
 import com.notifast.app.domain.model.cloud.BatchResult
 import com.notifast.app.domain.model.cloud.CloudSubjectItem
+import com.notifast.app.domain.model.cloud.CloudSubjectStatus
 import com.notifast.app.domain.model.cloud.ItemOutcome
 import com.notifast.app.domain.model.cloud.RestoreConflict
 import com.notifast.app.domain.model.cloud.RestoreDecision
@@ -19,6 +20,7 @@ import com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase
 import com.notifast.app.domain.usecase.ResolveSubjectNameUseCase
 import com.notifast.app.domain.usecase.validatePackage
 import com.notifast.app.domain.util.NameValidation
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -63,9 +65,19 @@ class RestoreSubjectsUseCase @Inject constructor(
                 val localName = localMatch?.second ?: seenBatchOriginalNames[trimmedName] ?: item.name
 
                 val state = stateMap[localSubjectId]
+                val localSnap = if (localMatch != null) store.readSnapshot(userId, localSubjectId).getOrNull() else null
+                val currentHash = localSnap?.let { hasher.hash(it) }
+                val cloudHash = item.cloudFile?.contentHash
+
+                // Detección inteligente de contenido idéntico: no es conflicto real
+                if (localMatch != null && currentHash != null && cloudHash != null && currentHash == cloudHash) {
+                    seenBatchNames.add(trimmedName)
+                    seenBatchOriginalNames[trimmedName] = localName
+                    existingNames.add(localName)
+                    continue
+                }
+
                 val hasLocalChanges = if (localMatch != null) {
-                    val localSnap = store.readSnapshot(userId, localSubjectId).getOrNull()
-                    val currentHash = localSnap?.let { hasher.hash(it) }
                     state == null || currentHash != state.lastUploadedHash
                 } else {
                     false
@@ -120,6 +132,33 @@ class RestoreSubjectsUseCase @Inject constructor(
                 try {
                     val driveFileId = item.driveFileId
                         ?: throw IllegalArgumentException("Falta identificador en la nube para ${item.name}")
+
+                    // Detección inteligente de contenido idéntico: No-Op sin descargar ni sobrescribir
+                    val cloudHash = item.cloudFile?.contentHash
+                    if (item.status != CloudSubjectStatus.CLOUD_ONLY || item.localHash != null) {
+                        val locals = store.listSubjectIds(userId)
+                        val matchingLocalId = locals.firstOrNull { it.first == item.subjectId }?.first
+                            ?: locals.firstOrNull { it.second.trim().equals(item.name.trim(), ignoreCase = true) }?.first
+
+                        if (matchingLocalId != null) {
+                            val localSnap = store.readSnapshot(userId, matchingLocalId).getOrNull()
+                            val localHash = localSnap?.let { hasher.hash(it) } ?: item.localHash
+
+                            if (localHash != null && cloudHash != null && localHash == cloudHash) {
+                                stateDao.upsert(
+                                    SubjectCloudStateEntity(
+                                        accountId = account.accountId,
+                                        subjectId = matchingLocalId,
+                                        driveFileId = driveFileId,
+                                        lastUploadedHash = localHash,
+                                        lastSyncedAt = System.currentTimeMillis()
+                                    )
+                                )
+                                outcomes.add(ItemOutcome(id = item.subjectId, name = item.name, error = null, isNoOp = true))
+                                return@forEachIndexed
+                            }
+                        }
+                    }
 
                     cloud.download(driveFileId, targetZip).getOrThrow()
 
@@ -194,6 +233,8 @@ class RestoreSubjectsUseCase @Inject constructor(
                     }
 
                     outcomes.add(ItemOutcome(id = item.subjectId, name = item.name, error = null))
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     outcomes.add(ItemOutcome(id = item.subjectId, name = item.name, error = e))
                 } finally {

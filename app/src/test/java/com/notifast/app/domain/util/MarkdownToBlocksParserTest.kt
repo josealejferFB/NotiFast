@@ -156,4 +156,12 @@ class MarkdownToBlocksParserTest {
         assertTrue(blocks[1] is NoteBlock.Paragraph)
         assertTrue(blocks[2] is NoteBlock.Image)
     }
+
+    @Test
+    fun `parsing same markdown multiple times produces identical block ids`() {
+        val md = "# Header\nParagraph 1\n- item 1\n- item 2"
+        val run1 = MarkdownToBlocksParser.parse(md, "file:///test.jpg")
+        val run2 = MarkdownToBlocksParser.parse(md, "file:///test.jpg")
+        assertEquals(run1.map { it.id }, run2.map { it.id })
+    }
 }

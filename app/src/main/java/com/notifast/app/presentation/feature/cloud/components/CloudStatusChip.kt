@@ -36,15 +36,24 @@ import com.notifast.app.domain.model.cloud.CloudSubjectStatus
 @Composable
 fun CloudStatusChip(
     status: CloudSubjectStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isError: Boolean = false
 ) {
-    val (labelRes, icon, contentColor, containerColor) = when (status) {
-        CloudSubjectStatus.SYNCED -> Quad(
-            R.string.cloud_status_synced,
-            Icons.Default.CloudDone,
-            MaterialTheme.colorScheme.tertiary,
-            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.35f)
+    val (labelRes, icon, contentColor, containerColor) = if (isError) {
+        Quad(
+            R.string.cloud_status_error,
+            Icons.Default.SyncProblem,
+            MaterialTheme.colorScheme.error,
+            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
         )
+    } else {
+        when (status) {
+            CloudSubjectStatus.SYNCED -> Quad(
+                R.string.cloud_status_synced,
+                Icons.Default.CloudDone,
+                MaterialTheme.colorScheme.tertiary,
+                MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.35f)
+            )
         CloudSubjectStatus.LOCAL_CHANGES -> Quad(
             R.string.cloud_status_local_changes,
             Icons.Default.Edit,
@@ -69,12 +78,13 @@ fun CloudStatusChip(
             MaterialTheme.colorScheme.onSurfaceVariant,
             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         )
-        CloudSubjectStatus.CLOUD_ONLY -> Quad(
-            R.string.cloud_status_cloud_only,
-            Icons.Default.CloudQueue,
-            MaterialTheme.colorScheme.onSurfaceVariant,
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-        )
+            CloudSubjectStatus.CLOUD_ONLY -> Quad(
+                R.string.cloud_status_cloud_only,
+                Icons.Default.CloudQueue,
+                MaterialTheme.colorScheme.onSurfaceVariant,
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            )
+        }
     }
 
     val labelText = stringResource(labelRes)

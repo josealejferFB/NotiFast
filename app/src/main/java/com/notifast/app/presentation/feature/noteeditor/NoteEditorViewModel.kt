@@ -11,6 +11,7 @@ import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.ImageRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.usecase.ExportNoteMarkdownUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import com.notifast.app.domain.util.MarkdownToBlocksParser
 import com.notifast.app.presentation.atoms.MarkdownParser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -276,7 +277,7 @@ class NoteEditorViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 syncStatus = null,
-                                error = e.message ?: context.getString(R.string.note_error_save_failed)
+                                error = ErrorSanitizer.sanitize(e, context.getString(R.string.note_error_save_failed))
                             )
                         }
                     }
@@ -318,7 +319,7 @@ class NoteEditorViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 syncStatus = null,
-                                error = e.message ?: context.getString(R.string.note_error_save_failed)
+                                error = ErrorSanitizer.sanitize(e, context.getString(R.string.note_error_save_failed))
                             )
                         }
                     }

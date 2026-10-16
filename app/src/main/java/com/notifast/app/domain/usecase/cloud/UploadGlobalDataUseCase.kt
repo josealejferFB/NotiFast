@@ -38,6 +38,10 @@ class UploadGlobalDataUseCase @Inject constructor(
         val zipFile = File(tempDir, "global.nfbak")
 
         return try {
+            if (existing?.contentHash != null && existing.contentHash == hash) {
+                return Result.success(Unit)
+            }
+
             archiveCodec.writeGlobal(snapshot, zipFile, tempDir).getOrThrow()
 
             val props = mapOf(
@@ -54,6 +58,8 @@ class UploadGlobalDataUseCase @Inject constructor(
                 props = props,
                 file = zipFile
             ).map { }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             Result.failure(e)
         } finally {

@@ -12,6 +12,7 @@ import com.notifast.app.domain.repository.ScheduleRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.CalculateAcademicStatsUseCase
 import com.notifast.app.domain.usecase.CalculateWeightedAverageUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,8 @@ class GradesViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userPrefsRepository: UserPrefsRepository,
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
-    private val calculateAcademicStatsUseCase: CalculateAcademicStatsUseCase
+    private val calculateAcademicStatsUseCase: CalculateAcademicStatsUseCase,
+    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GradesUiState())
@@ -46,11 +48,23 @@ class GradesViewModel @Inject constructor(
     private fun loadUserProfile() {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUserId() ?: return@launch
-            authRepository.getUserProfile(uid).onSuccess { user ->
+            val accountFlow = googleAccountRepository?.account ?: kotlinx.coroutines.flow.flowOf(null)
+            combine(
+                authRepository.observeUserProfile(uid),
+                accountFlow
+            ) { user, account ->
+                user to account
+            }.collect { (user, account) ->
+                val firstName = user?.firstName?.takeIf { it.isNotBlank() }
+                    ?: account?.displayName?.split(" ")?.firstOrNull().orEmpty()
+                val email = user?.email?.takeIf { !it.endsWith("@local.notifast") && it.isNotBlank() }
+                    ?: account?.email.orEmpty()
+                val photo = user?.profilePictureUrl?.takeIf { it.isNotBlank() } ?: account?.photoUrl
+
                 _uiState.update { it.copy(
-                    userFirstName = user.firstName,
-                    userEmail = user.email,
-                    userProfilePictureUrl = user.profilePictureUrl
+                    userFirstName = firstName,
+                    userEmail = email,
+                    userProfilePictureUrl = photo
                 ) }
             }
         }
@@ -112,7 +126,7 @@ class GradesViewModel @Inject constructor(
                     )
                 }
             }.catch { e ->
-                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error al cargar datos") }
+                _uiState.update { it.copy(isLoading = false, error = ErrorSanitizer.sanitize(e, "Error al cargar calificaciones")) }
             }.collect { }
         }
     }
@@ -138,7 +152,7 @@ class GradesViewModel @Inject constructor(
                 gradeScaleId = activeScale.id
             )
             evaluationRepository.updateEvaluation(userId, updated, null).onFailure { e ->
-                _uiState.update { it.copy(error = e.message ?: "Error al actualizar nota") }
+                _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al actualizar nota")) }
             }
         }
     }

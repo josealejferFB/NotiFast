@@ -3,7 +3,8 @@ package com.notifast.app.presentation.feature.notes.components
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,8 @@ fun TeacherContactSection(
     context: Context,
     modifier: Modifier = Modifier
 ) {
+    val showAlert = rememberNotiFastAlert()
+
     if (!teacher.hasPhoneNumber) {
         Surface(
             shape = RoundedCornerShape(12.dp),
@@ -86,7 +89,7 @@ fun TeacherContactSection(
                         subjectName = teacher.subjectNames.firstOrNull().orEmpty()
                     )
                     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
-                        .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_whatsapp_unavailable), Toast.LENGTH_SHORT).show() }
+                        .onFailure { showAlert(context.getString(R.string.teacher_contact_whatsapp_unavailable), AlertSeverity.WARNING) }
                 }
             )
             TeacherActionButton(
@@ -95,7 +98,7 @@ fun TeacherContactSection(
                 tint = MaterialTheme.colorScheme.primary,
                 onClick = {
                     runCatching { context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${teacher.formattedPhoneNumber}"))) }
-                        .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_call_unavailable), Toast.LENGTH_SHORT).show() }
+                        .onFailure { showAlert(context.getString(R.string.teacher_contact_call_unavailable), AlertSeverity.WARNING) }
                 }
             )
             TeacherActionButton(
@@ -104,7 +107,7 @@ fun TeacherContactSection(
                 tint = MaterialTheme.colorScheme.tertiary,
                 onClick = {
                     runCatching { context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${teacher.formattedPhoneNumber}"))) }
-                        .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_sms_unavailable), Toast.LENGTH_SHORT).show() }
+                        .onFailure { showAlert(context.getString(R.string.teacher_contact_sms_unavailable), AlertSeverity.WARNING) }
                 }
             )
             if (teacher.email.isNotBlank()) {
@@ -114,7 +117,7 @@ fun TeacherContactSection(
                     tint = MaterialTheme.colorScheme.secondary,
                     onClick = {
                         runCatching { context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${teacher.email}"))) }
-                            .onFailure { Toast.makeText(context, context.getString(R.string.teacher_contact_email_unavailable), Toast.LENGTH_SHORT).show() }
+                            .onFailure { showAlert(context.getString(R.string.teacher_contact_email_unavailable), AlertSeverity.WARNING) }
                     }
                 )
             }

@@ -284,4 +284,91 @@ class RestoreSubjectsUseCaseTest {
         assertTrue(result.isSuccess)
         coVerify(exactly = 1) { globalStore.apply("u1", globalSnap) }
     }
+
+    @Test
+    fun findConflicts_whenLocalContentIdenticalToCloudContent_doesNotTriggerConflict() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+        coEvery { stateDao.getAll("acc1") } returns emptyList()
+
+        val item = mockSubjectItem("sub1", "Química").copy(
+            cloudFile = mockSubjectItem("sub1", "Química").cloudFile?.copy(contentHash = "identicalHash123")
+        )
+        val snap = mockSnapshot("sub1", "Química")
+
+        coEvery { store.listSubjectIds("u1") } returns listOf("sub1" to "Química")
+        coEvery { store.readSnapshot("u1", "sub1") } returns Result.success(snap)
+        every { hasher.hash(snap) } returns "identicalHash123"
+
+        val conflicts = restoreSubjectsUseCase.findConflicts("u1", listOf(item))
+
+        assertTrue("Should not trigger conflict when local content is identical to cloud content", conflicts.isEmpty())
+    }
+
+    @Test
+    fun restore_whenLocalContentIdenticalToCloudContent_isNoOpWithoutDbOverwrite() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+
+        val item = mockSubjectItem("sub1", "Química").copy(
+            status = CloudSubjectStatus.SYNCED,
+            localHash = "identicalHash123",
+            cloudFile = mockSubjectItem("sub1", "Química").cloudFile?.copy(contentHash = "identicalHash123")
+        )
+        val snap = mockSnapshot("sub1", "Química")
+
+        coEvery { store.listSubjectIds("u1") } returns listOf("sub1" to "Química")
+        coEvery { store.readSnapshot("u1", "sub1") } returns Result.success(snap)
+        every { hasher.hash(snap) } returns "identicalHash123"
+
+        val cacheDir = tempFolder.newFolder("restoreNoOpCache")
+
+        restoreSubjectsUseCase("u1", listOf(item), emptyMap(), cacheDir).test {
+            awaitItem() // Progress
+            val done = awaitItem() as UploadProgress.Done
+            assertEquals(1, done.result.outcomes.size)
+            val outcome = done.result.outcomes[0]
+            assertNull(outcome.error)
+            assertTrue("Outcome should be marked as isNoOp", outcome.isNoOp)
+            awaitComplete()
+        }
+
+        // Verify neither download nor db replacement/insertion was performed
+        coVerify(exactly = 0) { cloud.download(any(), any()) }
+        coVerify(exactly = 0) { store.insertSnapshot(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { store.replaceSnapshot(any(), any(), any()) }
+
+        // State DAO should be updated to SYNCED
+        coVerify(exactly = 1) {
+            stateDao.upsert(match {
+                it.subjectId == "sub1" &&
+                    it.driveFileId == "drive_sub1" &&
+                    it.lastUploadedHash == "identicalHash123"
+            })
+        }
+    }
+
+    @Test
+    fun restore_whenCancelled_rethrowsCancellationException() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+
+        val item = mockSubjectItem("sub1", "Química").copy(
+            cloudFile = mockSubjectItem("sub1", "Química").cloudFile?.copy(contentHash = "hash1")
+        )
+
+        coEvery { store.listSubjectIds("u1") } returns emptyList()
+        coEvery { cloud.download(any(), any()) } throws kotlinx.coroutines.CancellationException("Job cancelled")
+
+        val cacheDir = tempFolder.newFolder("restoreCancelCache")
+
+        var caughtCancellation = false
+        try {
+            restoreSubjectsUseCase("u1", listOf(item), emptyMap(), cacheDir).collect { }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            caughtCancellation = true
+        }
+
+        assertTrue("CancellationException must be rethrown and not swallowed as ItemOutcome error", caughtCancellation)
+    }
 }

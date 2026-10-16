@@ -22,6 +22,8 @@ class RestoreGlobalDataUseCase @Inject constructor(
             val snapshot = archiveCodec.readGlobal(targetZip, tempDir).getOrThrow()
             globalStore.apply(userId, snapshot).getOrThrow()
             Result.success(Unit)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             Result.failure(e)
         } finally {

@@ -16,9 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
+import com.notifast.app.presentation.atoms.NotiFastChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -87,15 +86,15 @@ fun NoteTagsEditor(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 selectedTags.forEach { tag ->
-                    InputChip(
+                    NotiFastChip(
+                        label = "#$tag",
                         selected = true,
                         onClick = { onCustomTagRemoved(tag) },
-                        label = { Text("#$tag") },
                         trailingIcon = {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = stringResource(R.string.notes_remove_tag_cd),
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                     )
@@ -146,10 +145,10 @@ fun NoteTagsEditor(
             }
 
             unselected.forEach { tag ->
-                FilterChip(
+                NotiFastChip(
+                    label = if (tag.startsWith("#")) tag else "#$tag",
                     selected = false,
-                    onClick = { onTagToggled(tag) },
-                    label = { Text(if (tag.startsWith("#")) tag else "#$tag") }
+                    onClick = { onTagToggled(tag) }
                 )
             }
         }

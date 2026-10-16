@@ -19,7 +19,8 @@ private const val TAG = "LocalEvaluationRepo"
 @Singleton
 class LocalEvaluationRepositoryImpl @Inject constructor(
     private val evaluationDao: EvaluationDao,
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
+    private val subjectDao: com.notifast.app.data.local.dao.SubjectDao? = null
 ) : EvaluationRepository {
 
     override fun getEvaluations(userId: String): Flow<List<Evaluation>> {
@@ -46,11 +47,16 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
             }
             val evalId = if (evaluation.id.isBlank()) UUID.randomUUID().toString() else evaluation.id
             val now = Date()
+            val resolvedSubjectId = if (evaluation.subjectId.isNotBlank()) {
+                evaluation.subjectId
+            } else {
+                subjectDao?.getSubjectByName(userId, evaluation.subjectName)?.id.orEmpty()
+            }
             evaluationDao.insertEvaluation(
                 EvaluationEntity(
                     id = evalId,
                     userId = userId,
-                    subjectId = evaluation.subjectId,
+                    subjectId = resolvedSubjectId,
                     subjectName = evaluation.subjectName,
                     title = evaluation.title,
                     description = evaluation.description,
@@ -104,9 +110,16 @@ class LocalEvaluationRepositoryImpl @Inject constructor(
                 }
             }
 
+            val resolvedSubjectId = if (evaluation.subjectId.isNotBlank()) {
+                evaluation.subjectId
+            } else {
+                existing?.subjectId?.takeIf { it.isNotBlank() }
+                    ?: subjectDao?.getSubjectByName(userId, evaluation.subjectName)?.id.orEmpty()
+            }
+
             evaluationDao.updateEvaluation(
                 evaluation.toEntity(userId).copy(
-                    subjectId = evaluation.subjectId.ifBlank { existing?.subjectId ?: "" },
+                    subjectId = resolvedSubjectId,
                     imageUrl = imageUrl,
                     createdAt = evaluation.createdAt ?: existing?.createdAt ?: Date(),
                     updatedAt = Date()

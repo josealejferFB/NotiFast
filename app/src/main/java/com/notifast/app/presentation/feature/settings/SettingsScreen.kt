@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,24 +23,29 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.LocalNotiFastSnackbarHostState
+import com.notifast.app.presentation.atoms.NotiFastSnackbarVisuals
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
+import com.notifast.app.presentation.feature.cloud.CloudHubSheet
 import com.notifast.app.presentation.feature.settings.components.SettingsDialogDispatcher
 import com.notifast.app.presentation.feature.settings.components.SettingsSectionsContent
 
 /**
  * NotiFast 3.0 Settings Orchestrator Screen (AAA Control Hub).
- * Ultra-lightweight composable (< 90 LOC) conforming to strict Clean Architecture and SRP.
+ * Ultra-lightweight composable conforming to strict Clean Architecture and SRP.
  */
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onEditProfile: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onSearchClick: (() -> Unit)? = null,
+    snackbarHostState: SnackbarHostState = LocalNotiFastSnackbarHostState.current
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
     val lastScaleLabel = uiState.lastScaleLabel
@@ -61,6 +65,8 @@ fun SettingsScreen(
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             viewModel.onEvent(SettingsEvent.AuthResult(result.data))
+        } else {
+            viewModel.onEvent(SettingsEvent.AuthResult(null))
         }
     }
 
@@ -72,7 +78,12 @@ fun SettingsScreen(
 
     LaunchedEffect(uiState.cloudError) {
         uiState.cloudError?.let { err ->
-            snackbarHostState.showSnackbar(err)
+            snackbarHostState.showSnackbar(
+                NotiFastSnackbarVisuals(
+                    message = err,
+                    severity = AlertSeverity.ERROR
+                )
+            )
             viewModel.onEvent(SettingsEvent.ClearCloudError)
         }
     }
@@ -84,15 +95,30 @@ fun SettingsScreen(
     LaunchedEffect(uiState.snackbarMessage, uiState.error, lastScaleLabel, lastConvertedCount) {
         if (lastScaleLabel != null) {
             val message = if (lastConvertedCount > 0) gradeScaleConvertedSnack else gradeScaleChangedSnack
-            snackbarHostState.showSnackbar(message)
+            snackbarHostState.showSnackbar(
+                NotiFastSnackbarVisuals(
+                    message = message,
+                    severity = AlertSeverity.INFO
+                )
+            )
             viewModel.onEvent(SettingsEvent.ClearSnackbar)
         }
         uiState.error?.let { message ->
-            snackbarHostState.showSnackbar(message)
+            snackbarHostState.showSnackbar(
+                NotiFastSnackbarVisuals(
+                    message = message,
+                    severity = AlertSeverity.ERROR
+                )
+            )
             viewModel.onEvent(SettingsEvent.ClearSnackbar)
         }
         uiState.snackbarMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
+            snackbarHostState.showSnackbar(
+                NotiFastSnackbarVisuals(
+                    message = message,
+                    severity = AlertSeverity.SUCCESS
+                )
+            )
             viewModel.onEvent(SettingsEvent.ClearSnackbar)
         }
     }
@@ -101,15 +127,17 @@ fun SettingsScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 NotiFastTopBar(
                     type = TopBarType.Home(
-                        firstName = uiState.userProfile?.firstName ?: "",
-                        email = uiState.userProfile?.email ?: "",
-                        profilePictureUrl = uiState.userProfile?.profilePictureUrl,
+                        firstName = uiState.displayFirstName,
+                        email = uiState.displayEmail,
+                        profilePictureUrl = uiState.displayPhotoUrl,
                         contextText = stringResource(R.string.settings_title),
-                        onProfileClick = onEditProfile
+                        onProfileClick = onEditProfile,
+                        onSearchClick = onSearchClick,
+                        onCloudClick = { viewModel.onEvent(SettingsEvent.OpenCloudHub) },
+                        syncSummary = uiState.syncSummary
                     )
                 )
             }
@@ -132,4 +160,11 @@ fun SettingsScreen(
         uiState = uiState,
         onEvent = viewModel::onEvent
     )
+
+    if (uiState.isCloudHubOpen) {
+        CloudHubSheet(
+            onDismiss = { viewModel.onEvent(SettingsEvent.CloseCloudHub) }
+        )
+    }
 }
+

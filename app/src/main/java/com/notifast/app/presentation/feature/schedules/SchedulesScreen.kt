@@ -2,7 +2,8 @@ package com.notifast.app.presentation.feature.schedules
 
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -71,19 +72,16 @@ fun SchedulesScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    LaunchedEffect(uiState.error) {
-        if (uiState.error != null) {
-            Toast.makeText(context, uiState.error, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(SchedulesEvent.ClearError)
-        }
-    }
+
+
+    val showAlert = rememberNotiFastAlert()
 
     val openMeeting: (String) -> Unit = { url ->
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: Exception) {
             android.util.Log.w("SchedulesScreen", "Could not open meeting link: $url", e)
-            Toast.makeText(context, context.getString(R.string.error_open_link), Toast.LENGTH_SHORT).show()
+            showAlert(context.getString(R.string.error_open_link), AlertSeverity.ERROR)
         }
     }
 
@@ -135,6 +133,15 @@ fun SchedulesScreen(
             }
 
             Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                uiState.error?.let { err ->
+                    Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                        com.notifast.app.presentation.atoms.NotiFastAlertBanner(
+                            message = err,
+                            onDismiss = { viewModel.onEvent(SchedulesEvent.ClearError) }
+                        )
+                    }
+                }
+
                 if (uiState.schedules.isNotEmpty()) {
                     Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                         ScheduleLiveStatusCard(status = uiState.liveClassStatus, onTakeNote = onTakeNoteClick, onJoinMeeting = openMeeting)
@@ -147,7 +154,8 @@ fun SchedulesScreen(
                     evaluationCountsByDay = evalCounts,
                     viewMode = uiState.viewMode,
                     onDaySelected = { viewModel.onEvent(SchedulesEvent.SelectDay(it)) },
-                    onViewModeChanged = { viewModel.onEvent(SchedulesEvent.SetViewMode(it)) }
+                    onViewModeChanged = { viewModel.onEvent(SchedulesEvent.SetViewMode(it)) },
+                    firstDayOfWeek = uiState.firstDayOfWeek
                 )
 
                 AnimatedContent(

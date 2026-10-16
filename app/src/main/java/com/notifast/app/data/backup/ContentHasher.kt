@@ -87,12 +87,20 @@ class ContentHasher @Inject constructor() {
         val notesArray = JsonArray()
         snapshot.notes.sortedBy { it.id }.forEach { n ->
             val noteImgHash = n.imageUrl?.let { resolveImageSha1(it, snapshot.imageFiles) }
-            val normalizedBlocks = n.blocks.map { block ->
-                if (block is NoteBlock.Image) {
-                    val blockImgHash = resolveImageSha1(block.path, snapshot.imageFiles)
-                    block.copy(path = blockImgHash)
-                } else {
-                    block
+            val normalizedBlocks = n.blocks.mapIndexed { index, block ->
+                val normId = "b_$index"
+                when (block) {
+                    is NoteBlock.Heading -> block.copy(id = normId)
+                    is NoteBlock.Paragraph -> block.copy(id = normId)
+                    is NoteBlock.BulletList -> block.copy(id = normId)
+                    is NoteBlock.Checklist -> block.copy(id = normId)
+                    is NoteBlock.Quote -> block.copy(id = normId)
+                    is NoteBlock.Image -> {
+                        val blockImgHash = resolveImageSha1(block.path, snapshot.imageFiles)
+                        block.copy(id = normId, path = blockImgHash)
+                    }
+                    is NoteBlock.MathBlock -> block.copy(id = normId)
+                    is NoteBlock.Divider -> block.copy(id = normId)
                 }
             }
             val obj = JsonObject().apply {

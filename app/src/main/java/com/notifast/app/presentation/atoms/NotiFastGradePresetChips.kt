@@ -1,12 +1,9 @@
 package com.notifast.app.presentation.atoms
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -54,14 +51,11 @@ fun NotiFastGradePresetChips(
     ) {
         presetChips.forEach { preset ->
             val text = presetText(preset.value)
-            FilterChip(
+            NotiFastChip(
+                label = preset.label,
                 selected = selectedText == text,
                 onClick = { onPresetClick(preset.value) },
-                label = { Text(preset.label) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
                 modifier = Modifier.weight(1f)
             )
         }

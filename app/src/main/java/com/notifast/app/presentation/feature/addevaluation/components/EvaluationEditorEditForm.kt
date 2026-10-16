@@ -110,13 +110,16 @@ fun EvaluationEditorEditForm(
         }
 
         uiState.error?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
+            androidx.compose.foundation.layout.Box(
                 modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodyMedium
-            )
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                com.notifast.app.presentation.atoms.NotiFastAlertChip(
+                    text = it,
+                    severity = com.notifast.app.presentation.atoms.AlertSeverity.ERROR,
+                    onDismiss = { onEvent(EditEvaluationEvent.ClearError) }
+                )
+            }
         }
 
         NotiFastButton(

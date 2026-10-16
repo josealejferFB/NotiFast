@@ -4,6 +4,11 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,14 +40,12 @@ import com.notifast.app.R
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.feature.cloud.components.CloudActionBar
 import com.notifast.app.presentation.feature.cloud.components.CloudAccountHeader
-import com.notifast.app.presentation.feature.cloud.components.CloudConfirmDialog
-import com.notifast.app.presentation.feature.cloud.components.CloudErrorDialog
+import com.notifast.app.presentation.feature.cloud.components.CloudDialogsHost
 import com.notifast.app.presentation.feature.cloud.components.CloudProgressOverlay
 import com.notifast.app.presentation.feature.cloud.components.CloudSubjectRow
 import com.notifast.app.presentation.feature.cloud.components.CloudSummaryCard
 import com.notifast.app.presentation.feature.cloud.components.GlobalSettingsRow
 import com.notifast.app.presentation.feature.cloud.components.LinkAccountPrompt
-import com.notifast.app.presentation.feature.cloud.components.RestoreConflictDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +68,10 @@ fun CloudHubSheet(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(CloudEvent.Refresh)
+    }
+
     LaunchedEffect(uiState.pendingAuthIntent) {
         val pending = uiState.pendingAuthIntent
         if (pending != null) {
@@ -72,8 +79,20 @@ fun CloudHubSheet(
         }
     }
 
+    LaunchedEffect(uiState.summary) {
+        if (uiState.summary != null && uiState.summary!!.failed.isEmpty()) {
+            kotlinx.coroutines.delay(5000L)
+            viewModel.onEvent(CloudEvent.DismissSummary)
+        }
+    }
+
+    val handleDismiss = {
+        viewModel.onEvent(CloudEvent.DismissSummary)
+        onDismiss()
+    }
+
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = handleDismiss,
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -103,7 +122,7 @@ fun CloudHubSheet(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = handleDismiss) {
                     Text(stringResource(R.string.btn_close))
                 }
             }
@@ -149,13 +168,21 @@ fun CloudHubSheet(
                     CloudProgressOverlay(progress = uiState.progress!!)
                 }
 
-                if (uiState.summary != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CloudSummaryCard(
-                        summary = uiState.summary!!,
-                        onRetry = { viewModel.onEvent(CloudEvent.RetryFailed) },
-                        onDismiss = { viewModel.onEvent(CloudEvent.DismissSummary) }
-                    )
+                AnimatedVisibility(
+                    visible = uiState.summary != null,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    if (uiState.summary != null) {
+                        Column {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            CloudSummaryCard(
+                                summary = uiState.summary!!,
+                                onRetry = { viewModel.onEvent(CloudEvent.RetryFailed) },
+                                onDismiss = { viewModel.onEvent(CloudEvent.DismissSummary) }
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -177,6 +204,7 @@ fun CloudHubSheet(
                         CloudSubjectRow(
                             item = item,
                             isSelected = item.subjectId in uiState.selected,
+                            hasError = item.subjectId in uiState.failedSubjectIds,
                             onToggle = { viewModel.onEvent(CloudEvent.Toggle(it)) },
                             onDeleteCloud = { viewModel.onEvent(CloudEvent.DeleteFromCloud(it)) }
                         )
@@ -203,29 +231,8 @@ fun CloudHubSheet(
         }
     }
 
-    if (uiState.pendingConflicts.isNotEmpty()) {
-        RestoreConflictDialog(
-            conflict = uiState.pendingConflicts.first(),
-            errorText = uiState.conflictNameError,
-            onValidateName = { viewModel.onEvent(CloudEvent.ValidateConflictName(it)) },
-            onDecision = { decision, applyToRest ->
-                viewModel.onEvent(CloudEvent.ResolveConflict(decision, applyToRest))
-            },
-            onDismiss = { viewModel.onEvent(CloudEvent.Confirm(false)) }
-        )
-    }
-
-    if (uiState.pendingConfirm != null) {
-        CloudConfirmDialog(
-            confirm = uiState.pendingConfirm!!,
-            onConfirm = { accepted -> viewModel.onEvent(CloudEvent.Confirm(accepted)) }
-        )
-    }
-
-    if (uiState.error != null) {
-        CloudErrorDialog(
-            error = uiState.error!!,
-            onDismiss = { viewModel.onEvent(CloudEvent.ClearError) }
-        )
-    }
+    CloudDialogsHost(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
+    )
 }

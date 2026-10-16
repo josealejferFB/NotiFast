@@ -100,10 +100,9 @@ fun EditSubjectDialog(
                 )
 
                 if (errorMessage != null) {
-                    Text(
+                    com.notifast.app.presentation.atoms.NotiFastAlertChip(
                         text = errorMessage,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
+                        severity = com.notifast.app.presentation.atoms.AlertSeverity.ERROR
                     )
                 }
 

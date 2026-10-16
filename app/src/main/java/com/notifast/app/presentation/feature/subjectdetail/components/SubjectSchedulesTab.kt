@@ -2,7 +2,8 @@ package com.notifast.app.presentation.feature.subjectdetail.components
 
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,7 @@ fun SubjectSchedulesTab(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val showAlert = rememberNotiFastAlert()
 
     Column(
         modifier = modifier
@@ -130,7 +132,7 @@ fun SubjectSchedulesTab(
                                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(schedule.meetingUrl)))
                                     } catch (e: Exception) {
                                         android.util.Log.w("SubjectSchedulesTab", "Could not open meeting link: ${schedule.meetingUrl}", e)
-                                        Toast.makeText(context, context.getString(R.string.error_open_link), Toast.LENGTH_SHORT).show()
+                                        showAlert(context.getString(R.string.error_open_link), AlertSeverity.ERROR)
                                     }
                                 },
                                 shape = RoundedCornerShape(10.dp),

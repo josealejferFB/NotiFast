@@ -5,9 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,8 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,29 +37,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.notifast.app.R
-import com.notifast.app.data.model.User
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
 
 /**
  * NotiFast 3.0 Hero Card for Settings Profile.
- * Displays user avatar/monogram, academic status pill, sync timestamp, and edit trigger.
+ * Displays user avatar/monogram, academic status pill, real cloud/local status badge, and edit trigger.
  */
 @Composable
 fun SettingsProfileHeroCard(
-    user: User?,
+    firstName: String,
+    lastName: String,
+    email: String,
+    photoUrl: String?,
     academicCycle: String,
-    syncStatusText: String,
+    syncSummary: LocalSyncSummary,
     onEditProfile: () -> Unit,
-    modifier: Modifier = Modifier,
-    hasCloudAccount: Boolean = false
+    modifier: Modifier = Modifier
 ) {
+    val haptics = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -70,38 +79,51 @@ fun SettingsProfileHeroCard(
         label = "hero_press_scale"
     )
 
-    val displayName = if (user != null && (user.firstName.isNotBlank() || user.lastName.isNotBlank())) {
-        "${user.firstName} ${user.lastName}".trim()
-    } else {
-        stringResource(R.string.topbar_default_student)
-    }
+    val displayName = listOf(firstName.trim(), lastName.trim())
+        .filter { it.isNotBlank() }
+        .joinToString(" ")
+        .ifBlank { stringResource(R.string.topbar_default_student) }
 
-    val initials = if (user != null && user.firstName.isNotBlank()) {
-        "${user.firstName.first()}${user.lastName.firstOrNull() ?: ""}".uppercase()
+    val initials = if (firstName.isNotBlank()) {
+        "${firstName.first()}${lastName.firstOrNull() ?: ""}".uppercase()
     } else "N"
 
+    val syncBadge = when (syncSummary) {
+        LocalSyncSummary.ALL_SYNCED -> HeroSyncBadge(
+            label = stringResource(R.string.settings_profile_cloud_synced),
+            icon = Icons.Default.CloudDone,
+            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.14f),
+            contentColor = MaterialTheme.colorScheme.secondary
+        )
+        LocalSyncSummary.PENDING -> HeroSyncBadge(
+            label = stringResource(R.string.settings_profile_cloud_pending),
+            icon = Icons.Default.CloudSync,
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+            contentColor = MaterialTheme.colorScheme.primary
+        )
+        LocalSyncSummary.NO_ACCOUNT -> HeroSyncBadge(
+            label = stringResource(R.string.settings_profile_local_only),
+            icon = Icons.Default.Shield,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
     Surface(
-        onClick = onEditProfile,
+        onClick = {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            onEditProfile()
+        },
         modifier = modifier
             .fillMaxWidth()
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            },
+            .graphicsLayer { scaleX = scale; scaleY = scale },
         shape = RoundedCornerShape(24.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         interactionSource = interactionSource
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
                         .size(62.dp)
@@ -109,14 +131,14 @@ fun SettingsProfileHeroCard(
                         .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (!user?.profilePictureUrl.isNullOrBlank()) {
+                    if (!photoUrl.isNullOrBlank()) {
                         SubcomposeAsyncImage(
-                            model = user?.profilePictureUrl,
-                            contentDescription = null,
+                            model = photoUrl,
+                            contentDescription = displayName,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
-                    } else if (user != null && user.firstName.isNotBlank()) {
+                    } else if (firstName.isNotBlank()) {
                         Text(
                             text = initials,
                             style = MaterialTheme.typography.titleMedium,
@@ -140,20 +162,23 @@ fun SettingsProfileHeroCard(
                         text = displayName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = user?.email?.ifBlank { stringResource(R.string.settings_profile_edit_hint) }
-                            ?: stringResource(R.string.settings_profile_edit_hint),
+                        text = email.ifBlank { stringResource(R.string.settings_profile_edit_hint) },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.settings_profile_edit_hint),
                     modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
@@ -161,55 +186,61 @@ fun SettingsProfileHeroCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Badges row: Academic Cycle & Cloud Sync
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "${stringResource(R.string.settings_profile_active_student)} • $academicCycle",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                if (hasCloudAccount) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.CloudDone,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = syncStatusText.ifBlank { stringResource(R.string.settings_profile_synced_just_now) },
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp
-                        )
-                    }
-                }
+                HeroPillBadge(
+                    label = "${stringResource(R.string.settings_profile_active_student)} • $academicCycle",
+                    icon = Icons.Default.School,
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+                HeroPillBadge(
+                    label = syncBadge.label,
+                    icon = syncBadge.icon,
+                    containerColor = syncBadge.containerColor,
+                    contentColor = syncBadge.contentColor
+                )
             }
         }
     }
 }
+
+@Composable
+private fun HeroPillBadge(
+    label: String,
+    icon: ImageVector,
+    containerColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(10.dp), color = containerColor) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(imageVector = icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(14.dp))
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+private data class HeroSyncBadge(
+    val label: String,
+    val icon: ImageVector,
+    val containerColor: Color,
+    val contentColor: Color
+)
+
+

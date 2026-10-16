@@ -14,8 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import com.notifast.app.presentation.atoms.NotiFastChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -73,18 +72,16 @@ fun SubjectNotesTab(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                FilterChip(
+                NotiFastChip(
+                    label = stringResource(R.string.notes_filter_all_tags),
                     selected = selectedTag == null,
-                    onClick = { onTagSelect(null) },
-                    label = { Text(stringResource(R.string.notes_filter_all_tags)) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer, selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                    onClick = { onTagSelect(null) }
                 )
                 availableTags.forEach { tag ->
-                    FilterChip(
+                    NotiFastChip(
+                        label = "#$tag",
                         selected = selectedTag == tag,
-                        onClick = { onTagSelect(if (selectedTag == tag) null else tag) },
-                        label = { Text("#$tag") },
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer, selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                        onClick = { onTagSelect(if (selectedTag == tag) null else tag) }
                     )
                 }
             }

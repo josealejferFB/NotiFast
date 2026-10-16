@@ -310,4 +310,54 @@ class RoomSubjectBackupStoreTest {
         assertEquals(1, blocks.size)
         assertTrue(blocks.first() is NoteBlock.Paragraph)
     }
+
+    @Test
+    fun readSnapshot_includes_schedules_and_evaluations_with_blank_subjectId_matching_subject_name() = runTest {
+        val subject = SubjectEntity(
+            userId = "user1",
+            id = "sub-1",
+            name = "Álgebra Lineal",
+            icon = "math",
+            colorHex = "#3B9797",
+            cycle = "2026-1",
+            createdAt = Date()
+        )
+        db.subjectDao().insertSubject(subject)
+
+        val schedule = ScheduleEntity(
+            id = "sch-blank",
+            userId = "user1",
+            subjectId = "",
+            subjectName = "Álgebra Lineal",
+            dayOfWeek = 1,
+            startTime = "08:00",
+            endTime = "10:00",
+            classroom = "A-101",
+            teacher = "Prof. Gauss",
+            createdAt = Date()
+        )
+        db.scheduleDao().insertSchedule(schedule)
+
+        val evaluation = EvaluationEntity(
+            id = "eval-blank",
+            userId = "user1",
+            subjectId = "",
+            subjectName = "Álgebra Lineal",
+            title = "Examen Parcial",
+            description = "Temas 1 al 4",
+            date = Date(),
+            createdAt = Date()
+        )
+        db.evaluationDao().insertEvaluation(evaluation)
+
+        val result = store.readSnapshot("user1", "sub-1")
+        assertTrue(result.isSuccess)
+        val snapshot = result.getOrThrow()
+
+        assertEquals("Should include schedule matching by subjectName", 1, snapshot.schedules.size)
+        assertEquals("sch-blank", snapshot.schedules.first().id)
+        assertEquals("Should include evaluation matching by subjectName", 1, snapshot.evaluations.size)
+        assertEquals("eval-blank", snapshot.evaluations.first().id)
+    }
 }
+

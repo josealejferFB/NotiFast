@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.share
 
-import android.widget.Toast
+import com.notifast.app.presentation.atoms.AlertSeverity
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +45,8 @@ import com.notifast.app.data.model.package_data.SubjectPackage
 import com.notifast.app.data.model.package_data.SubjectPackageCodec
 import com.notifast.app.domain.model.package_data.ConflictStrategy
 import com.notifast.app.domain.usecase.ImportSubjectPackageUseCase
+import com.notifast.app.domain.util.ErrorSanitizer
+import com.notifast.app.presentation.atoms.NotiFastAlertBanner
 import com.notifast.app.presentation.feature.share.components.ImportCameraScanButton
 import com.notifast.app.presentation.feature.share.components.ImportPayloadPreview
 import com.notifast.app.presentation.feature.share.components.SubjectConflictDialog
@@ -61,6 +64,7 @@ fun ImportSubjectBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val showAlert = rememberNotiFastAlert()
 
     var payloadInput by remember { mutableStateOf("") }
     var parsedPackage by remember { mutableStateOf<SubjectPackage?>(null) }
@@ -106,7 +110,7 @@ fun ImportSubjectBottomSheet(
                 val isCancelled = e is com.google.mlkit.common.MlKitException &&
                         e.errorCode == com.google.mlkit.common.MlKitException.CODE_SCANNER_CANCELLED
                 if (!isCancelled) {
-                    Toast.makeText(context, context.getString(R.string.import_scanner_error), Toast.LENGTH_SHORT).show()
+                    errorText = ErrorSanitizer.sanitize(e, context.getString(R.string.import_scanner_error))
                 }
             }
     }
@@ -119,14 +123,14 @@ fun ImportSubjectBottomSheet(
             val result = importUseCase(userId, payloadInput.trim(), strategy)
             isImporting = false
             result.onSuccess { importedName ->
-                Toast.makeText(context, context.getString(R.string.import_success_toast, importedName), Toast.LENGTH_SHORT).show()
+                showAlert(context.getString(R.string.import_success_toast, importedName), AlertSeverity.SUCCESS)
                 onSubjectImported(importedName)
                 onDismiss()
             }.onFailure { err ->
                 if (err is IllegalStateException && err.message?.contains("ya existe") == true) {
                     showConflictDialog = true
                 } else {
-                    errorText = err.message ?: context.getString(R.string.import_invalid_code)
+                    errorText = ErrorSanitizer.sanitize(err, context.getString(R.string.import_invalid_code))
                 }
             }
         }
@@ -144,32 +148,17 @@ fun ImportSubjectBottomSheet(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 36.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.QrCode2,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
-                Column {
-                    Text(
-                        text = stringResource(R.string.import_subject_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = stringResource(R.string.import_subject_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+            com.notifast.app.presentation.feature.share.components.ImportSubjectHeader()
 
             Spacer(Modifier.height(18.dp))
+
+            if (!errorText.isNullOrBlank()) {
+                NotiFastAlertBanner(
+                    message = errorText!!,
+                    onDismiss = { errorText = null },
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
 
             // Primary Action: Camera QR Scan Button
             ImportCameraScanButton(onClick = { launchCameraScanner() })
@@ -201,7 +190,6 @@ fun ImportSubjectBottomSheet(
                 maxLines = 4,
                 shape = RoundedCornerShape(14.dp),
                 isError = errorText != null,
-                supportingText = errorText?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
                 modifier = Modifier.fillMaxWidth()
             )
 

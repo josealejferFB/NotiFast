@@ -3,6 +3,7 @@ package com.notifast.app.presentation.feature.editschedule
 import androidx.lifecycle.SavedStateHandle
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.repository.AuthRepository
 import com.notifast.app.domain.repository.NoteRepository
 import com.notifast.app.domain.repository.ScheduleRepository
@@ -159,5 +160,48 @@ class EditScheduleViewModelTest {
         assertFalse(viewModel.uiState.value.isLoading)
         assertEquals("Física", viewModel.uiState.value.subjectName)
         assertEquals("", viewModel.uiState.value.classroom)
+    }
+
+    @Test
+    fun `when OpenAddTeacherSheet and CloseAddTeacherSheet are dispatched, toggles showAddTeacherSheet`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.showAddTeacherSheet)
+
+        viewModel.onEvent(EditScheduleEvent.OpenAddTeacherSheet)
+        assertTrue(viewModel.uiState.value.showAddTeacherSheet)
+
+        viewModel.onEvent(EditScheduleEvent.CloseAddTeacherSheet)
+        assertFalse(viewModel.uiState.value.showAddTeacherSheet)
+    }
+
+    @Test
+    fun `when SaveTeacher is dispatched, saves to teacherRepository, updates teacher to fullName, and closes sheet`() = runTest {
+        coEvery { teacherRepository.saveTeacher(any()) } returns Result.success(Unit)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(EditScheduleEvent.OpenAddTeacherSheet)
+        assertTrue(viewModel.uiState.value.showAddTeacherSheet)
+
+        val newTeacher = Teacher(
+            firstName = "Richard",
+            lastName = "Feynman",
+            email = "feynman@caltech.edu",
+            subjectNames = listOf("Física")
+        )
+
+        viewModel.onEvent(EditScheduleEvent.SaveTeacher(newTeacher))
+        advanceUntilIdle()
+
+        coVerify {
+            teacherRepository.saveTeacher(
+                match { it.firstName == "Richard" && it.lastName == "Feynman" && it.userId == "user_123" }
+            )
+        }
+        assertEquals("Richard Feynman", viewModel.uiState.value.teacher)
+        assertFalse(viewModel.uiState.value.showAddTeacherSheet)
     }
 }
