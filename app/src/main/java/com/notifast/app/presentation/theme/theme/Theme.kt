@@ -124,6 +124,8 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun NotiFastTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    themePreset: com.notifast.app.domain.model.theme.ThemePreset = com.notifast.app.domain.model.theme.ThemePreset.CLASSIC,
+    customPrimaryHex: String? = null,
     dynamicColor: Boolean = false, // Forced false to maintain NotiFast 3.0 tactile branding
     content: @Composable () -> Unit
 ) {
@@ -132,8 +134,16 @@ fun NotiFastTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        themePreset == com.notifast.app.domain.model.theme.ThemePreset.CLASSIC && customPrimaryHex.isNullOrBlank() -> {
+            if (darkTheme) DarkColorScheme else LightColorScheme
+        }
+        else -> {
+            com.notifast.app.presentation.theme.ThemePaletteGenerator.generateColorScheme(
+                preset = themePreset,
+                isDark = darkTheme,
+                customPrimaryHex = customPrimaryHex
+            )
+        }
     }
 
     MaterialTheme(

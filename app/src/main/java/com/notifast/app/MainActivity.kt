@@ -31,6 +31,11 @@ class MainActivity : ComponentActivity() {
             val mainViewModel: MainViewModel = hiltViewModel()
             val isDarkMode by mainViewModel.isDarkMode.collectAsStateWithLifecycle()
             val hapticsEnabled by mainViewModel.hapticsEnabled.collectAsStateWithLifecycle()
+            val themePresetId by mainViewModel.themePresetId.collectAsStateWithLifecycle()
+            val customPrimaryHex by mainViewModel.customPrimaryHex.collectAsStateWithLifecycle()
+            val themePreset = remember(themePresetId) {
+                com.notifast.app.domain.model.theme.ThemePreset.fromId(themePresetId)
+            }
             val darkTheme = isDarkMode ?: isSystemInDarkTheme()
             val systemHaptics = LocalHapticFeedback.current
             val effectiveHaptics = remember(hapticsEnabled, systemHaptics) {
@@ -43,7 +48,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            NotiFastTheme(darkTheme = darkTheme) {
+            NotiFastTheme(
+                darkTheme = darkTheme,
+                themePreset = themePreset,
+                customPrimaryHex = customPrimaryHex
+            ) {
                 CompositionLocalProvider(LocalHapticFeedback provides effectiveHaptics) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),

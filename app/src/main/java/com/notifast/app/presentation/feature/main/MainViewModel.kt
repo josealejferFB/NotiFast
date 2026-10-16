@@ -28,4 +28,16 @@ class MainViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = true
     )
+
+    val themePresetId: StateFlow<String> = userPrefsRepository.themePresetIdFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = "classic"
+    )
+
+    val customPrimaryHex: StateFlow<String?> = userPrefsRepository.customPrimaryHexFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 }
