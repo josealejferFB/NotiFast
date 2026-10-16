@@ -366,6 +366,22 @@
     <string name="settings_theme_mode_unselected_cd">Modo %1$s</string>
     <string name="theme_swatch_selected_cd">%1$s, seleccionado</string>
     <string name="theme_swatch_unselected_cd">%1$s</string>
+    <string name="bg_preset_classic_name">Pergamino</string>
+    <string name="bg_preset_classic_desc">Lienzo neutro tradicional de lectura y alta claridad</string>
+    <string name="bg_preset_forest_sage_name">Menta</string>
+    <string name="bg_preset_forest_sage_desc">Tonalidad botánica suave para relajar la vista</string>
+    <string name="bg_preset_midnight_indigo_name">Polar</string>
+    <string name="bg_preset_midnight_indigo_desc">Fondo frío y despejado para sesiones de cálculo</string>
+    <string name="bg_preset_warm_mocha_name">Papiro</string>
+    <string name="bg_preset_warm_mocha_desc">Calidez de biblioteca antigua y confort nocturno</string>
+    <string name="bg_preset_sakura_zen_name">Lavanda</string>
+    <string name="bg_preset_sakura_zen_desc">Atmósfera relajante y serena para reducir el estrés</string>
+    <string name="bg_preset_ocean_cyan_name">Glaciar</string>
+    <string name="bg_preset_ocean_cyan_desc">Tono fresco y estructurado para máxima concentración</string>
+    <string name="settings_theme_accent_title">Color de Énfasis</string>
+    <string name="settings_theme_background_title">Tonalidad de Fondo</string>
+    <string name="bg_swatch_selected_cd">Fondo %1$s, seleccionado</string>
+    <string name="bg_swatch_unselected_cd">Fondo %1$s</string>
 
     <!-- Notifications -->
     <string name="settings_section_notifications">Notificaciones &amp; Recordatorios</string>
