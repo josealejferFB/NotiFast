@@ -155,9 +155,11 @@ private fun SettingsAppearanceSection(uiState: SettingsUiState, onEvent: (Settin
     SettingsSectionContainer(title = stringResource(R.string.settings_section_appearance), icon = Icons.Default.Palette) {
         ThemeSelectorCard(
             currentPresetId = uiState.themePresetId,
+            currentBackgroundPresetId = uiState.backgroundPresetId,
             customPrimaryHex = uiState.customPrimaryHex,
             isDarkMode = uiState.isDarkMode,
             onSelectPreset = { onEvent(SettingsEvent.SelectThemePreset(it)) },
+            onSelectBackgroundPreset = { onEvent(SettingsEvent.SelectBackgroundPreset(it)) },
             onSetDarkMode = { onEvent(SettingsEvent.SetDarkMode(it)) },
             onOpenCustomStudio = { onEvent(SettingsEvent.OpenCustomThemeSheet) }
         )

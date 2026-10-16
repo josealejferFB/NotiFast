@@ -41,15 +41,20 @@ import com.notifast.app.presentation.theme.isDark
 @Composable
 fun ThemeSelectorCard(
     currentPresetId: String,
+    currentBackgroundPresetId: String,
     customPrimaryHex: String?,
     isDarkMode: Boolean?,
     onSelectPreset: (String) -> Unit,
+    onSelectBackgroundPreset: (String) -> Unit,
     onSetDarkMode: (Boolean?) -> Unit,
     onOpenCustomStudio: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
     val activePreset = remember(currentPresetId) { ThemePreset.fromId(currentPresetId) }
+    val activeBackgroundPreset = remember(currentBackgroundPresetId) {
+        com.notifast.app.domain.model.theme.BackgroundPreset.fromId(currentBackgroundPresetId)
+    }
     val isSystemDark = MaterialTheme.colorScheme.isDark
     val defaultPrimaryFallback = MaterialTheme.colorScheme.primary
     val defaultSecondaryFallback = MaterialTheme.colorScheme.secondary
@@ -101,9 +106,20 @@ fun ThemeSelectorCard(
             )
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Horizontal Swatches Selection Row (Edge-to-edge with contentPadding)
+        // Accent Palette Subtitle
+        Text(
+            text = stringResource(R.string.settings_theme_accent_title),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 14.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Horizontal Accent Swatches Selection Row
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 14.dp),
@@ -150,9 +166,44 @@ fun ThemeSelectorCard(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Active theme contextual description banner (subtle tonal background, zero border clutter)
+        // Background / Canvas Palette Subtitle
+        Text(
+            text = stringResource(R.string.settings_theme_background_title),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 14.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Horizontal Background Swatches Selection Row
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(
+                com.notifast.app.domain.model.theme.BackgroundPreset.availablePresets,
+                key = { it.id }
+            ) { bgPreset ->
+                BackgroundSwatchItem(
+                    preset = bgPreset,
+                    isSelected = activeBackgroundPreset == bgPreset,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onSelectBackgroundPreset(bgPreset.id)
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Active theme contextual description banner
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -162,7 +213,7 @@ fun ThemeSelectorCard(
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             Text(
-                text = "${stringResource(activePreset.nameRes)} • ${stringResource(activePreset.descriptionRes)}",
+                text = "${stringResource(activePreset.nameRes)} • ${stringResource(activeBackgroundPreset.nameRes)}: ${stringResource(activeBackgroundPreset.descriptionRes)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
