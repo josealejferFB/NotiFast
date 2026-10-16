@@ -113,4 +113,67 @@ class UserPrefsRepositoryTest {
         val result = repository.setShowCompletedEvaluations(false)
         assertTrue(result.isSuccess)
     }
+
+    @Test
+    fun `themePresetIdFlow returns classic by default`() = runTest {
+        every { dataStore.data } returns flowOf(emptyPreferences())
+
+        repository.themePresetIdFlow.test {
+            val value = awaitItem()
+            assertEquals("classic", value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `themePresetIdFlow returns configured preset`() = runTest {
+        val themePresetKey = stringPreferencesKey("theme_preset_id")
+        val prefs = mockk<Preferences>()
+        every { prefs[themePresetKey] } returns "forest_sage"
+        every { dataStore.data } returns flowOf(prefs)
+
+        repository.themePresetIdFlow.test {
+            val value = awaitItem()
+            assertEquals("forest_sage", value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `customPrimaryHexFlow returns null by default`() = runTest {
+        every { dataStore.data } returns flowOf(emptyPreferences())
+
+        repository.customPrimaryHexFlow.test {
+            val value = awaitItem()
+            assertNull(value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `customPrimaryHexFlow returns configured hex`() = runTest {
+        val customHexKey = stringPreferencesKey("custom_theme_primary_hex")
+        val prefs = mockk<Preferences>()
+        every { prefs[customHexKey] } returns "#15803D"
+        every { dataStore.data } returns flowOf(prefs)
+
+        repository.customPrimaryHexFlow.test {
+            val value = awaitItem()
+            assertEquals("#15803D", value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setThemePresetId returns success`() = runTest {
+        val result = repository.setThemePresetId("midnight_indigo")
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `setCustomPrimaryHex returns success`() = runTest {
+        val result = repository.setCustomPrimaryHex("#4F46E5")
+        assertTrue(result.isSuccess)
+    }
 }
+

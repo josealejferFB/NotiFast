@@ -27,6 +27,26 @@ interface UserPrefsRepository {
     suspend fun setThemeAccent(accent: String): Result<Unit>
 
     /**
+     * Flow emitting current active theme preset ID (e.g. "classic", "forest_sage", "custom").
+     */
+    val themePresetIdFlow: Flow<String>
+
+    /**
+     * Sets active theme preset ID preference.
+     */
+    suspend fun setThemePresetId(presetId: String): Result<Unit>
+
+    /**
+     * Flow emitting custom primary color hex code (e.g. "#4F46E5"), or null if using presets.
+     */
+    val customPrimaryHexFlow: Flow<String?>
+
+    /**
+     * Sets custom primary color hex preference. Pass null to clear.
+     */
+    suspend fun setCustomPrimaryHex(hex: String?): Result<Unit>
+
+    /**
      * Flow emitting whether tactile haptic feedback is enabled.
      */
     val hapticsEnabledFlow: Flow<Boolean>
