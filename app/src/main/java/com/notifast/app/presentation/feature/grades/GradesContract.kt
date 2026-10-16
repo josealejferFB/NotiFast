@@ -13,7 +13,7 @@ enum class GradesTab {
 data class SubjectGradeInfo(
     val subject: String,
     val evaluations: List<Evaluation>,
-    val average: Double,
+    val average: Double? = null,
     val icon: String = "📚",
     val colorHex: String = ""
 )
@@ -23,7 +23,7 @@ data class GradesUiState(
     val selectedTab: GradesTab = GradesTab.SUBJECTS,
     val evaluationsBySubject: Map<String, List<Evaluation>> = emptyMap(),
     val subjects: List<SubjectData> = emptyList(),
-    val globalAverage: Double = 0.0,
+    val globalAverage: Double? = null,
     val gradeScale: GradeScale = GradeScale.SCALE_0_10,
     val minPassingGrade: Double = 6.0,
     val subjectGrades: List<SubjectGradeInfo> = emptyList(),

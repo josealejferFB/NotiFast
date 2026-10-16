@@ -47,6 +47,7 @@ fun RestoreConflictDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     var choice by remember(conflict) { mutableStateOf(ConflictChoice.OVERWRITE) }
     var candidateName by remember(conflict) { mutableStateOf(conflict.suggestedName) }
     var applyToRest by remember(conflict) { mutableStateOf(false) }
@@ -88,13 +89,19 @@ fun RestoreConflictDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { choice = ConflictChoice.OVERWRITE }
+                        .clickable {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            choice = ConflictChoice.OVERWRITE
+                        }
                         .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
                         selected = choice == ConflictChoice.OVERWRITE,
-                        onClick = { choice = ConflictChoice.OVERWRITE },
+                        onClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            choice = ConflictChoice.OVERWRITE
+                        },
                         colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -108,13 +115,19 @@ fun RestoreConflictDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { choice = ConflictChoice.ADD_AS }
+                        .clickable {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            choice = ConflictChoice.ADD_AS
+                        }
                         .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
                         selected = choice == ConflictChoice.ADD_AS,
-                        onClick = { choice = ConflictChoice.ADD_AS },
+                        onClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            choice = ConflictChoice.ADD_AS
+                        },
                         colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -143,13 +156,19 @@ fun RestoreConflictDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { choice = ConflictChoice.SKIP }
+                        .clickable {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            choice = ConflictChoice.SKIP
+                        }
                         .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
                         selected = choice == ConflictChoice.SKIP,
-                        onClick = { choice = ConflictChoice.SKIP },
+                        onClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            choice = ConflictChoice.SKIP
+                        },
                         colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -165,13 +184,19 @@ fun RestoreConflictDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { applyToRest = !applyToRest }
+                            .clickable {
+                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                applyToRest = !applyToRest
+                            }
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
                             checked = applyToRest,
-                            onCheckedChange = { applyToRest = it },
+                            onCheckedChange = {
+                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                applyToRest = it
+                            },
                             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -187,6 +212,7 @@ fun RestoreConflictDialog(
         confirmButton = {
             TextButton(
                 onClick = {
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     val decision = when (choice) {
                         ConflictChoice.OVERWRITE -> RestoreDecision.Overwrite
                         ConflictChoice.ADD_AS -> RestoreDecision.AddAs(candidateName.trim())

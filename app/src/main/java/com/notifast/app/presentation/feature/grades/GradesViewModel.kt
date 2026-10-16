@@ -93,17 +93,19 @@ class GradesViewModel @Inject constructor(
                 val customMin = minPassing.toDouble().takeIf {
                     it > scale.minGrade && it <= scale.maxGrade
                 }
-                val globalAverage = calculateWeightedAverageUseCase(evaluations, scale) ?: 0.0
-                val subjectGrades = evalsBySubject.map { (subject, evals) ->
+                val allSubjectNames = (subjects.map { it.name } + evaluations.map { it.subjectName }).distinct().sorted()
+                val globalAverage = calculateWeightedAverageUseCase(evaluations, scale)
+                val subjectGrades = allSubjectNames.map { subject ->
+                    val evals = evalsBySubject[subject].orEmpty()
                     val subjData = subjects.find { it.name.equals(subject, ignoreCase = true) }
                     SubjectGradeInfo(
                         subject = subject,
                         evaluations = evals,
-                        average = calculateWeightedAverageUseCase(evals, scale) ?: 0.0,
+                        average = calculateWeightedAverageUseCase(evals, scale),
                         icon = subjData?.icon ?: "📚",
                         colorHex = subjData?.colorHex.orEmpty()
                     )
-                }.sortedBy { it.subject }
+                }
 
                 val academicStats = calculateAcademicStatsUseCase(
                     evaluations = evaluations,

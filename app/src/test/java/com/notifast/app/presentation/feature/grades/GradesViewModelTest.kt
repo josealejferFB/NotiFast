@@ -74,7 +74,7 @@ class GradesViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertEquals(14.0, state.globalAverage, 0.01)
+        assertEquals(14.0, state.globalAverage ?: 0.0, 0.01)
         assertEquals(GradeScale.SCALE_0_20, state.gradeScale)
         assertEquals(1, state.subjectGrades.size)
         assertEquals("Calculate", state.subjectGrades[0].icon)
@@ -82,6 +82,28 @@ class GradesViewModelTest {
         assertEquals(1, state.academicStats.totalSubjectsCount)
         assertEquals(1, state.academicStats.approvedSubjectsCount)
         assertEquals(2.0, state.academicStats.totalWeeklyClassHours, 0.01)
+    }
+
+    @Test
+    fun `when initialized with subjects without evaluations, subjects are included and globalAverage is null`() = runTest {
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(emptyList())
+        val viewModel = GradesViewModel(
+            evaluationRepository,
+            noteRepository,
+            scheduleRepository,
+            authRepository,
+            userPrefsRepository,
+            calculateWeightedAverageUseCase,
+            calculateAcademicStatsUseCase
+        )
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        org.junit.Assert.assertNull(state.globalAverage)
+        assertEquals(1, state.subjectGrades.size)
+        assertEquals("Matemáticas", state.subjectGrades[0].subject)
+        org.junit.Assert.assertNull(state.subjectGrades[0].average)
+        assertEquals(0, state.subjectGrades[0].evaluations.size)
     }
 
     @Test

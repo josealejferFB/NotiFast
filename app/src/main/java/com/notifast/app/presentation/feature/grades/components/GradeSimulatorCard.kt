@@ -41,6 +41,8 @@ import com.notifast.app.domain.usecase.SimulatorStatus
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
+import com.notifast.app.presentation.theme.type.monoAcademicBold
+import com.notifast.app.presentation.theme.type.monoAcademicLarge
 
 @Composable
 fun GradeSimulatorCard(
@@ -97,7 +99,7 @@ fun GradeSimulatorCard(
                     SimulatorStatus.ACHIEVABLE -> Triple(Aqua, Icons.Default.CheckCircle, stringResource(R.string.simulator_status_achievable))
                     SimulatorStatus.AT_RISK -> Triple(MaterialTheme.colorScheme.tertiary, Icons.Default.Warning, stringResource(R.string.simulator_status_at_risk))
                     SimulatorStatus.IMPOSSIBLE -> Triple(Ruby, Icons.Default.Warning, stringResource(R.string.simulator_status_impossible))
-                    SimulatorStatus.NO_PENDING_EVALUATIONS -> Triple(MaterialTheme.colorScheme.outline, Icons.Default.Info, stringResource(R.string.simulator_no_pending_weight))
+                    SimulatorStatus.NO_PENDING_EVALUATIONS -> Triple(MaterialTheme.colorScheme.onSurfaceVariant, Icons.Default.Info, stringResource(R.string.simulator_no_pending_weight))
                 }
 
                 Surface(
@@ -128,14 +130,13 @@ fun GradeSimulatorCard(
                 ) {
                     Column {
                         Text(
-                            text = "Acumulado",
+                            text = stringResource(R.string.simulator_accumulated_label),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = scale.formatGrade(simulationResult.currentAccumulated),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.monoAcademicLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -146,10 +147,10 @@ fun GradeSimulatorCard(
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        val dashText = stringResource(R.string.grades_average_dash)
                         Text(
-                            text = if (simulationResult.requiredGrade != null) scale.formatGrade(simulationResult.requiredGrade) else "-",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.ExtraBold,
+                            text = if (simulationResult.requiredGrade != null) scale.formatGrade(simulationResult.requiredGrade) else dashText,
+                            style = MaterialTheme.typography.monoAcademicLarge,
                             color = statusColor
                         )
                     }
@@ -179,7 +180,7 @@ fun GradeSimulatorCard(
                         ) {
                             Text(
                                 text = scale.formatGrade(targetGrade),
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.monoAcademicBold,
                                 color = Ruby,
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)

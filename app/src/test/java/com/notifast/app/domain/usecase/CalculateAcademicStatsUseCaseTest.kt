@@ -242,4 +242,24 @@ class CalculateAcademicStatsUseCaseTest {
         assertEquals(1, customStats.gradeDistribution.regularCount)
         assertEquals(1, customStats.gradeDistribution.atRiskCount)
     }
+
+    @Test
+    fun `subjects without evaluations are ON_TRACK and projectedPassingRate is 100 percent`() {
+        val subjects = listOf(
+            SubjectData(name = "Química")
+        )
+        val stats = useCase(
+            evaluations = emptyList(),
+            subjects = subjects,
+            schedules = emptyList(),
+            gradeScale = GradeScale.SCALE_0_20
+        )
+
+        assertEquals(1, stats.subjectHealthList.size)
+        val quimica = stats.subjectHealthList.first()
+        assertEquals(SubjectHealthStatus.ON_TRACK, quimica.status)
+        assertEquals(100.0, stats.projectedPassingRate, 0.01)
+        assertTrue(stats.atRiskSubjects.isEmpty())
+        assertTrue(stats.studyRecommendations.isEmpty())
+    }
 }

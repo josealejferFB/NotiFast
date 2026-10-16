@@ -1,17 +1,11 @@
 package com.notifast.app.presentation.feature.grades.components
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,30 +19,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.domain.model.GradeScale
+import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.theme.type.JetBrainsMonoFamily
 import com.notifast.app.presentation.util.GradeFormatters
 
 /**
  * NotiFast 3.0 Studio Notebook Global Average Hero Block.
- * Features JetBrains Mono tabular digits and hairline borders.
+ * Features JetBrains Mono tabular digits, tactile papercraft card,
+ * and semantic status color indicators (Tertiary/ForestSage for passing, Error/Ruby for at risk).
  */
 @Composable
 fun MainAverageDashboard(
-    generalAverage: Double,
+    generalAverage: Double?,
     gradeScale: GradeScale = GradeScale.SCALE_0_10,
     minPassingGrade: Double = gradeScale.minPassingGrade
 ) {
-    Card(
+    val hasGrades = generalAverage != null
+    val isPassing = (generalAverage ?: 0.0) >= minPassingGrade
+    val statusColor = when {
+        !hasGrades -> MaterialTheme.colorScheme.primary
+        isPassing -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.error
+    }
+
+    NotiFastCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        shape = RoundedCornerShape(20.dp),
+        backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+        borderColor = MaterialTheme.colorScheme.outlineVariant,
+        contentPadding = 16.dp
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -59,10 +61,16 @@ fun MainAverageDashboard(
                 fontSize = 12.sp
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val averageText = if (hasGrades) {
+                GradeFormatters.average(generalAverage ?: 0.0, gradeScale)
+            } else {
+                stringResource(R.string.grades_average_dash)
+            }
 
             Text(
-                text = GradeFormatters.average(generalAverage, gradeScale),
+                text = averageText,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 54.sp,
                 fontWeight = FontWeight.Bold,
@@ -70,10 +78,14 @@ fun MainAverageDashboard(
                 letterSpacing = (-1).sp
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             val maxScale = gradeScale.maxGrade.toFloat()
-            val progress = (generalAverage.toFloat() / maxScale).coerceIn(0f, 1f)
+            val progress = if (hasGrades) {
+                ((generalAverage ?: 0.0).toFloat() / maxScale).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
 
             LinearProgressIndicator(
                 progress = { progress },
@@ -81,18 +93,21 @@ fun MainAverageDashboard(
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(CircleShape),
-                color = MaterialTheme.colorScheme.primary,
+                color = statusColor,
                 trackColor = MaterialTheme.colorScheme.surfaceContainerHigh
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            val isPassing = generalAverage >= minPassingGrade
+            val messageText = when {
+                !hasGrades -> stringResource(R.string.grades_average_no_evaluations)
+                isPassing -> stringResource(R.string.grades_average_excellent)
+                else -> stringResource(R.string.grades_average_keep_going)
+            }
+
             Text(
-                text = stringResource(
-                    if (isPassing) R.string.grades_average_excellent else R.string.grades_average_keep_going
-                ),
-                color = if (isPassing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
+                text = messageText,
+                color = if (hasGrades) statusColor else MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
@@ -64,7 +63,6 @@ fun GradesScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .safeDrawingPadding()
             ) {
                 if (uiState.isLoading) {
                     Column(
@@ -133,7 +131,8 @@ fun GradesScreen(
                                 AcademicAnalyticsContent(
                                     stats = uiState.academicStats,
                                     gradeScale = uiState.gradeScale,
-                                    minPassingGrade = uiState.minPassingGrade
+                                    minPassingGrade = uiState.minPassingGrade,
+                                    subjectGrades = uiState.subjectGrades
                                 )
                             }
                         }

@@ -4,13 +4,13 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +33,7 @@ import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.theme.ThemeUtils
-import com.notifast.app.presentation.theme.color.AquaGreen
+import com.notifast.app.presentation.theme.isDark
 import java.util.Locale
 
 @Composable
@@ -43,7 +43,7 @@ fun AcademicProgressChart(
     minPassingGrade: Double = gradeScale.minPassingGrade,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.isDark
     val animProgress = remember { Animatable(0f) }
 
     LaunchedEffect(subjects) {
@@ -51,7 +51,8 @@ fun AcademicProgressChart(
         animProgress.animateTo(1f, animationSpec = tween(750, easing = FastOutSlowInEasing))
     }
 
-    val outlineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
+    val outlineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+    val trackColor = MaterialTheme.colorScheme.surfaceContainerHigh
     val textMutedColor = MaterialTheme.colorScheme.onSurfaceVariant
     val passingLineColor = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
     val passingGrade = minPassingGrade
@@ -59,13 +60,11 @@ fun AcademicProgressChart(
 
     NotiFastCard(
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = 16.dp,
         onClick = null
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -107,7 +106,7 @@ fun AcademicProgressChart(
                         progress = animProgress.value,
                         isDark = isDark,
                         outlineColor = outlineColor,
-                        textMutedColor = textMutedColor,
+                        trackColor = trackColor,
                         passingLineColor = passingLineColor
                     )
                 }
@@ -123,7 +122,7 @@ private fun DrawScope.drawChartContent(
     progress: Float,
     isDark: Boolean,
     outlineColor: Color,
-    textMutedColor: Color,
+    trackColor: Color,
     passingLineColor: Color
 ) {
     val paddingBottom = 28.dp.toPx()
@@ -162,10 +161,10 @@ private fun DrawScope.drawChartContent(
         val centerX = paddingLeft + (index * slotWidth) + (slotWidth / 2f)
         val subjectColor = ThemeUtils.getAccessibleColor(subject.colorHex ?: "", isDark)
 
-        // Bar background (total max height track)
+        // Bar background (total max height track using surfaceContainerHigh for WCAG AAA)
         val barLeft = centerX - (barWidth / 2f)
         drawRoundRect(
-            color = outlineColor.copy(alpha = 0.15f),
+            color = trackColor,
             topLeft = Offset(barLeft, paddingTop),
             size = Size(barWidth, chartHeight),
             cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
@@ -183,7 +182,7 @@ private fun DrawScope.drawChartContent(
             cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
         )
 
-        // Subject Monogram Label
+        // Subject Monogram Label with tabular monospace
         val monogram = subject.subjectName.take(3).uppercase(Locale.ROOT)
         drawContext.canvas.nativeCanvas.apply {
             val paint = android.graphics.Paint().apply {
@@ -191,7 +190,7 @@ private fun DrawScope.drawChartContent(
                 textSize = 10.dp.toPx()
                 textAlign = android.graphics.Paint.Align.CENTER
                 isAntiAlias = true
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                typeface = android.graphics.Typeface.create(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD)
             }
             drawText(monogram, centerX, size.height - 6.dp.toPx(), paint)
         }

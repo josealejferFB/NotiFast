@@ -166,6 +166,7 @@
     <string name="simulator_status_impossible">Matemáticamente Imposible</string>
     <string name="simulator_remaining_weight">Ponderación restante: %1$.0f%%</string>
     <string name="simulator_no_pending_weight">No hay evaluaciones pendientes con ponderación</string>
+    <string name="simulator_accumulated_label">Acumulado</string>
     <string name="grade_scale_label">Escala de Calificación</string>
     <string name="grade_scale_min_passing">Nota Mínima Aprobatoria: %1$.1f</string>
     
@@ -509,6 +510,26 @@
     <string name="analytics_recommendations_title">Recomendaciones Tácticas</string>
     <string name="analytics_no_data_title">Sin datos analíticos suficientes</string>
     <string name="analytics_no_data_desc">Registra tus materias y calificaciones para visualizar diagnósticos predictivos.</string>
+    <string name="analytics_recommendation_item">💡 %1$s</string>
+    <string name="analytics_histogram_band_format">%1$d (%2$d%%)</string>
+    <string name="analytics_pulse_title">Pulso Académico</string>
+    <string name="analytics_pulse_all_good">¡Excelente ritmo!</string>
+    <string name="analytics_pulse_all_good_desc">Todas tus materias tienen proyección aprobatoria.</string>
+    <string name="analytics_pulse_attention_desc">%1$d materias requieren atención adicional.</string>
+    <string name="analytics_pulse_no_evals_desc">Semestre en curso. Registra notas para proyectar tu fin de ciclo.</string>
+    <string name="analytics_subjects_status_title">Estado por Materia</string>
+    <string name="analytics_subjects_status_subtitle">Puntos acumulados hacia la meta de aprobación</string>
+    <string name="analytics_status_approved">Aprobada</string>
+    <string name="analytics_status_on_track">Al día</string>
+    <string name="analytics_status_no_evals">Sin notas</string>
+    <string name="analytics_status_at_risk">En riesgo</string>
+    <string name="analytics_status_critical">Crítico</string>
+    <string name="analytics_pts_accumulated">%1$s pts</string>
+    <string name="analytics_pts_and_weight">%1$s pts • Falta %2$.0f%%</string>
+    <string name="analytics_pts_no_weight">%1$s pts acumulados</string>
+    <string name="analytics_simulator_section_title">Simulador de Nota</string>
+    <string name="analytics_simulator_section_subtitle">Calcula cuánto necesitas en tus próximas pruebas</string>
+    <string name="analytics_simulator_select_subject">Selecciona una materia:</string>
 
     <!-- Global Search (Sprint 3.3) -->
     <string name="search_global_title">Búsqueda Global</string>
@@ -639,6 +660,11 @@
     <string name="grades_average_keep_going">¡Sigue esforzándote!</string>
     <string name="grades_status_evaluated">Evaluada</string>
     <string name="grades_status_pending">Pendiente</string>
+    <string name="grades_evaluations_count">%1$d evaluaciones</string>
+    <string name="grades_evaluations_count_single">1 evaluación</string>
+    <string name="grades_average_dash">—</string>
+    <string name="grades_average_no_evaluations">Registra notas en tus evaluaciones para calcular tu promedio</string>
+    <string name="grades_empty_no_evaluations_subject">No hay evaluaciones registradas en esta materia</string>
     <string name="edit_eval_grade_range_label">Calificación obtenida (%1$s - %2$s)</string>
     <string name="btn_delete_image">Eliminar imagen</string>
     <string name="eval_grade_obtained_label">Nota Obtenida</string>
@@ -810,6 +836,22 @@
     <string name="cloud_error_generic">Ocurrió un error inesperado al conectar con Google Drive</string>
     <string name="topbar_sync_pending_cd">Cambios pendientes por sincronizar con la nube</string>
     <string name="topbar_sync_no_account_cd">Copia de seguridad en Google Drive sin vincular</string>
+
+    <!-- Cloud Hub AAA Enhancements -->
+    <string name="cloud_filter_all">Todas (%1$d)</string>
+    <string name="cloud_filter_pending">Pendientes (%1$d)</string>
+    <string name="cloud_filter_synced">Al día (%1$d)</string>
+    <string name="cloud_filter_conflicts">Conflictos (%1$d)</string>
+    <string name="cloud_badge_notes">%1$d ap.</string>
+    <string name="cloud_badge_schedules">%1$d hor.</string>
+    <string name="cloud_badge_evaluations">%1$d eval.</string>
+    <string name="cloud_sync_just_now">Hace un momento</string>
+    <string name="cloud_last_synced">Sincronizado %1$s</string>
+    <string name="cloud_scanning_metadata">Escaneando cambios en Google Drive…</string>
+    <string name="cloud_scanning_metadata_desc">Verificando firmas SHA-256 e integridad de datos</string>
+    <string name="cloud_empty_filter_title">Sin materias en esta categoría</string>
+    <string name="cloud_empty_filter_msg">No se encontraron materias que coincidan con el filtro seleccionado.</string>
+    <string name="cloud_subject_empty_local">Sin contenido aún</string>
 
     <!-- Settings Google Account (Task 20) -->
     <string name="settings_section_cloud_account">Copia de Seguridad &amp; Nube</string>

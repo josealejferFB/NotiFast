@@ -69,6 +69,12 @@ class BuildCloudOverviewUseCase @Inject constructor(
                 val colorHex = localSnapshot?.subject?.colorHex ?: cloudFile?.colorHex ?: "#BF092F"
                 val driveFileId = cloudFile?.driveFileId ?: state?.driveFileId
 
+                val noteCount = localSnapshot?.notes?.size ?: cloudFile?.noteCount ?: 0
+                val evaluationCount = localSnapshot?.evaluations?.size ?: cloudFile?.evaluationCount ?: 0
+                val scheduleCount = localSnapshot?.schedules?.size ?: 0
+                val sizeBytes = cloudFile?.sizeBytes ?: 0L
+                val lastSyncedAt = cloudFile?.uploadedAt
+
                 items.add(
                     CloudSubjectItem(
                         subjectId = subjectId,
@@ -78,7 +84,12 @@ class BuildCloudOverviewUseCase @Inject constructor(
                         status = status,
                         driveFileId = driveFileId,
                         localHash = localHash,
-                        cloudFile = cloudFile
+                        cloudFile = cloudFile,
+                        noteCount = noteCount,
+                        evaluationCount = evaluationCount,
+                        scheduleCount = scheduleCount,
+                        sizeBytes = sizeBytes,
+                        lastSyncedAt = lastSyncedAt
                     )
                 )
             }

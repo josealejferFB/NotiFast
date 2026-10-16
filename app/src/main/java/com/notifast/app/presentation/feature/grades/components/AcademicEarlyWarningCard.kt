@@ -22,9 +22,8 @@ import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.domain.model.SubjectHealthStatus
 import com.notifast.app.presentation.atoms.NotiFastCard
-import com.notifast.app.presentation.theme.color.AquaGreen
-import com.notifast.app.presentation.theme.color.Ruby
 import com.notifast.app.presentation.theme.color.TerracottaWarm
+import com.notifast.app.presentation.theme.type.monoAcademicBold
 import com.notifast.app.presentation.util.GradeFormatters
 import java.util.Locale
 
@@ -36,12 +35,12 @@ fun AcademicEarlyWarningCard(
 ) {
     NotiFastCard(
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = 16.dp,
         onClick = null
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
@@ -56,7 +55,11 @@ fun AcademicEarlyWarningCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
-                val badgeColor = if (atRiskSubjects.isEmpty()) AquaGreen else Ruby
+                val badgeColor = if (atRiskSubjects.isEmpty()) {
+                    MaterialTheme.colorScheme.tertiary
+                } else {
+                    MaterialTheme.colorScheme.error
+                }
                 val badgeText = if (atRiskSubjects.isEmpty()) "0" else "${atRiskSubjects.size}"
                 Box(
                     modifier = Modifier
@@ -66,8 +69,7 @@ fun AcademicEarlyWarningCard(
                 ) {
                     Text(
                         text = badgeText,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.monoAcademicBold,
                         color = badgeColor
                     )
                 }
@@ -97,8 +99,8 @@ private fun EarlyWarningSubjectRow(
     displayScale: GradeScale
 ) {
     val isCritical = subject.status == SubjectHealthStatus.CRITICAL_FAIL
-    val tagBg = if (isCritical) Ruby.copy(alpha = 0.12f) else TerracottaWarm.copy(alpha = 0.12f)
-    val tagColor = if (isCritical) Ruby else TerracottaWarm
+    val tagColor = if (isCritical) MaterialTheme.colorScheme.error else TerracottaWarm
+    val tagBg = tagColor.copy(alpha = 0.12f)
     val tagLabel = if (isCritical) {
         stringResource(R.string.analytics_early_warning_critical)
     } else {

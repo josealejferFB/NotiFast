@@ -1,10 +1,32 @@
 package com.notifast.app.presentation.theme
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import com.notifast.app.presentation.theme.color.AquaGreen
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import kotlin.math.max
 import kotlin.math.min
+
+/**
+ * Extension property to check if the current ColorScheme is in dark mode
+ * based on the actual background luminance of the active app theme,
+ * NOT the system-wide OS setting.
+ */
+val ColorScheme.isDark: Boolean
+    get() = background.luminance() < 0.5f
+
+/**
+ * Composable property to determine if the active theme of the app is dark.
+ * Adheres strictly to the app's selected theme rather than OS isSystemInDarkTheme().
+ */
+val isAppInDarkTheme: Boolean
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.colorScheme.isDark
 
 object ThemeUtils {
     /**

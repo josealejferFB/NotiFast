@@ -21,8 +21,7 @@ import com.notifast.app.R
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.domain.model.SubjectAcademicHealth
 import com.notifast.app.presentation.atoms.NotiFastCard
-import com.notifast.app.presentation.theme.color.AquaGreen
-import com.notifast.app.presentation.theme.color.Ruby
+import com.notifast.app.presentation.theme.type.monoAcademicBold
 import com.notifast.app.presentation.util.GradeFormatters
 
 @Composable
@@ -35,12 +34,12 @@ fun AcademicWorkloadCard(
 ) {
     NotiFastCard(
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = 16.dp,
         onClick = null
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
@@ -70,8 +69,7 @@ fun AcademicWorkloadCard(
                 ) {
                     Text(
                         text = stringResource(R.string.analytics_workload_total_hours, totalWeeklyHours),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.monoAcademicBold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -88,7 +86,7 @@ fun AcademicWorkloadCard(
                             subjectName = best.subjectName,
                             average = best.currentAverage,
                             displayScale = displayScale,
-                            color = AquaGreen,
+                            color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -98,7 +96,7 @@ fun AcademicWorkloadCard(
                             subjectName = lowest.subjectName,
                             average = lowest.currentAverage,
                             displayScale = displayScale,
-                            color = Ruby,
+                            color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -140,8 +138,7 @@ private fun WorkloadPill(
                 R.string.analytics_workload_prom_avg,
                 GradeFormatters.average(average, displayScale)
             ),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.monoAcademicBold,
             color = color
         )
     }

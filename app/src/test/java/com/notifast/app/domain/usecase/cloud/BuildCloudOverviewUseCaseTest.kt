@@ -183,4 +183,31 @@ class BuildCloudOverviewUseCaseTest {
 
         assertEquals("globalDrive", overview.global?.driveFileId)
     }
+
+    @Test
+    fun invoke_populatesMetadataBreakdownCountsFromLocalSnapshot() = runTest {
+        val account = CloudAccount("acc1", "user@test.com", "User", null)
+        every { accountRepository.account } returns flowOf(account)
+
+        val localSnapshot = SubjectSnapshot(
+            subject = SubjectData(id = "sub1", name = "Física", colorHex = "#3B9797", icon = "atom"),
+            schedules = listOf(mockk(), mockk()),
+            evaluations = listOf(mockk(), mockk(), mockk()),
+            notes = listOf(mockk()),
+            imageFiles = emptyMap()
+        )
+        coEvery { store.listSubjectIds("u1") } returns listOf("sub1" to "Física")
+        coEvery { store.readSnapshot("u1", "sub1") } returns Result.success(localSnapshot)
+        every { hasher.hash(localSnapshot) } returns "hashF"
+        coEvery { cloud.listFiles() } returns Result.success(emptyList())
+        coEvery { stateDao.getAll("acc1") } returns emptyList()
+
+        val result = useCase("u1")
+        assertTrue(result.isSuccess)
+        val item = result.getOrThrow().subjects.first()
+        assertEquals(1, item.noteCount)
+        assertEquals(3, item.evaluationCount)
+        assertEquals(2, item.scheduleCount)
+        assertEquals(0L, item.sizeBytes)
+    }
 }

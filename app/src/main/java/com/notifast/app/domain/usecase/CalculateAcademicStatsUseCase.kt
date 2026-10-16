@@ -100,19 +100,23 @@ class CalculateAcademicStatsUseCase @Inject constructor() {
         val accumulatedPoints = GradePolicy.accumulatedPoints(subjectEvals, gradeScale)
         val currentAverage = GradePolicy.weightedAverage(subjectEvals, gradeScale) ?: 0.0
 
+        val hasEvaluated = evaluatedWeight > 0.0
         val pointsNeeded = (minPassingGrade - accumulatedPoints).coerceAtLeast(0.0)
         val minGradeNeeded = if (accumulatedPoints >= minPassingGrade) {
             0.0
         } else if (remainingWeight > 0.0) {
             (pointsNeeded / remainingWeight) * 100.0
+        } else if (!hasEvaluated) {
+            minPassingGrade
         } else {
             Double.POSITIVE_INFINITY
         }
 
         val status = when {
             accumulatedPoints >= minPassingGrade -> SubjectHealthStatus.APPROVED
+            !hasEvaluated && remainingWeight <= 0.0 -> SubjectHealthStatus.ON_TRACK
             minGradeNeeded > maxGrade -> SubjectHealthStatus.CRITICAL_FAIL
-            evaluatedWeight > 0.0 && currentAverage < minPassingGrade -> SubjectHealthStatus.AT_RISK
+            hasEvaluated && currentAverage < minPassingGrade -> SubjectHealthStatus.AT_RISK
             else -> SubjectHealthStatus.ON_TRACK
         }
 

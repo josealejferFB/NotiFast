@@ -24,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.notifast.app.presentation.theme.type.monoAcademicSmall
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.notifast.app.R
@@ -117,8 +119,11 @@ fun CloudAccountHeader(
             }
             Text(
                 text = backupText,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.monoAcademicSmall.copy(
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

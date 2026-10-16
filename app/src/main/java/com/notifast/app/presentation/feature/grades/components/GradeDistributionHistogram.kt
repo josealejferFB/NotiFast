@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +30,8 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.domain.model.GradeBandDistribution
 import com.notifast.app.presentation.atoms.NotiFastCard
-import com.notifast.app.presentation.theme.color.AquaGreen
-import com.notifast.app.presentation.theme.color.Ruby
 import com.notifast.app.presentation.theme.color.TerracottaWarm
+import com.notifast.app.presentation.theme.type.monoAcademicBold
 
 @Composable
 fun GradeDistributionHistogram(
@@ -52,13 +52,13 @@ fun GradeDistributionHistogram(
             label = stringResource(R.string.analytics_band_excellent),
             count = distribution.excellentCount,
             fraction = distribution.excellentCount.toFloat() / total,
-            color = AquaGreen
+            color = MaterialTheme.colorScheme.tertiary
         ),
         HistogramBandItem(
             label = stringResource(R.string.analytics_band_good),
             count = distribution.goodCount,
             fraction = distribution.goodCount.toFloat() / total,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.secondary
         ),
         HistogramBandItem(
             label = stringResource(R.string.analytics_band_regular),
@@ -70,18 +70,18 @@ fun GradeDistributionHistogram(
             label = stringResource(R.string.analytics_band_at_risk),
             count = distribution.atRiskCount,
             fraction = distribution.atRiskCount.toFloat() / total,
-            color = Ruby
+            color = MaterialTheme.colorScheme.error
         )
     )
 
     NotiFastCard(
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = 16.dp,
         onClick = null
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Column {
@@ -116,7 +116,7 @@ private data class HistogramBandItem(
 
 @Composable
 private fun BandRow(band: HistogramBandItem, progress: Float) {
-    val trackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+    val trackColor = MaterialTheme.colorScheme.surfaceContainerHigh
     val percentage = (band.fraction * 100).toInt()
 
     Row(
@@ -137,7 +137,7 @@ private fun BandRow(band: HistogramBandItem, progress: Float) {
                 .height(10.dp)
                 .padding(horizontal = 8.dp)
         ) {
-            // Background track
+            // Background track using surfaceContainerHigh
             drawRoundRect(
                 color = trackColor,
                 topLeft = Offset.Zero,
@@ -158,11 +158,10 @@ private fun BandRow(band: HistogramBandItem, progress: Float) {
         }
 
         Text(
-            text = "${band.count} ($percentage%)",
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
+            text = stringResource(R.string.analytics_histogram_band_format, band.count, percentage),
+            style = MaterialTheme.typography.monoAcademicBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.width(54.dp)
+            modifier = Modifier.width(64.dp)
         )
     }
 }

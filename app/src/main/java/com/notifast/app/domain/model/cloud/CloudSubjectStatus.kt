@@ -17,7 +17,12 @@ data class CloudSubjectItem(
     val status: CloudSubjectStatus,
     val driveFileId: String?,
     val localHash: String?,
-    val cloudFile: CloudFile?
+    val cloudFile: CloudFile?,
+    val noteCount: Int = cloudFile?.noteCount ?: 0,
+    val evaluationCount: Int = cloudFile?.evaluationCount ?: 0,
+    val scheduleCount: Int = 0,
+    val sizeBytes: Long = cloudFile?.sizeBytes ?: 0L,
+    val lastSyncedAt: Long? = cloudFile?.uploadedAt
 )
 
 data class CloudOverview(

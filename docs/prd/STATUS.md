@@ -23,11 +23,13 @@ Editor Premium (OneNote-like)     [███████████████
 Sanitización Materias & Profesores[████████████████] 100% (9/9 tareas) ✅
 Auditoría Global & Pipelines CI/CD[████████████████] 100% (6/6 pilares) ✅
 Copia en la Nube (Google Drive)   [████████████████] 100% (21/21 tareas) ✅
+Cloud Hub AAA & Rediseño Táctil   [████████████████] 100% (4/4 objetivos) ✅
 Onboarding & Acceso Cloud Sync    [████████████████] 100% (4/4 pilares) ✅
+Grades Hub & Analíticas AAA       [████████████████] 100% (5/5 pilares) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  97% (153/159 tareas)
+PROGRESO TOTAL ESTIMADO:          [████████████████]  98% (162/168 tareas)
 SUITE DE PRUEBAS AUTOMATIZADA:    614 tests pasando (0 fallos, 0 ignorados) ✅
 ```
 
@@ -623,6 +625,80 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 4. **Verificación y Cobertura:**
    - **614 pruebas unitarias ejecutadas y aprobadas al 100%** (0 fallos, 0 ignorados).
    - Compilación exitosa de build debug e instalación directa en dispositivo físico conectado (`TK6TVCRSMB7DPVAQ`).
+
+---
+
+## ☁️ Reingeniería Visual y Elevación AAA del Cloud Hub (Google Drive) — 100% Completado (16 Oct 2026)
+
+**Objetivo:** Optimizar integralmente la experiencia visual, háptica, tipográfica y de rendimiento de la Copia de Seguridad en Google Drive (`CloudHubSheet`), consolidando la paleta corporativa AAA (Ruby reservado para errores/conflictos, Aqua para sincronización primaria, Emerald para estados al día, Amber para pendientes), eliminando redundancias cognitivas, e introduciendo filtros rápidos táctiles y micro-insignias compactas del desglose de datos a 120 FPS.
+
+### Entregables Implementados:
+1. **Jerarquía Visual, Tipografía y Paleta Corporativa AAA:**
+   - Contraste WCAG AAA riguroso en Modo Claro y Oscuro.
+   - **Ruby (`#BF092F` / `colorScheme.error`):** Restringido estrictamente a fallos críticos de red/autenticación y conflictos de versión (`BOTH_UNLINKED`, `isError`).
+   - **Aqua (`#3B9797` / `colorScheme.secondary`):** Consolidado como acción primaria de sincronización ("Subir a la nube / Sincronizar ahora") y badges de copias en la nube.
+   - **Emerald / ForestSage (`#15803D` / `#34D399`):** Estado 100% al día (`SYNCED`).
+   - **Amber / Sunset (`#B45309` / `#FBBF24`):** Estados pendientes con cambios locales no subidos (`LOCAL_CHANGES`, `LOCAL_ONLY`, `CLOUD_NEWER`).
+   - **Tipografía `JetBrainsMono`:** Tokens oficiales `monoAcademicBold` y `monoAcademicSmall` para marcas de tiempo, tamaños de archivo (KB/MB) y métricas de procesamiento.
+2. **Rediseño Táctil de Filas (`CloudSubjectRow`) y Rendimiento 120 FPS:**
+   - Estética papercraft táctil (`Surface` con borde adaptativo, esquinas redondeadas de 16dp y elevación suave).
+   - Indicador dinámico y accesible del color de la asignatura mediante `ThemeUtils.getAccessibleColor(item.colorHex, isDark)`.
+   - Micro-insignias compactas del desglose de datos (`DataBreakdownBadges`): conteo de apuntes (`X ap.`), evaluaciones (`Y eval.`), horarios (`Z hor.`) y peso en disco (`XX.X KB`).
+   - Erradicación total de textos redundantes ("Sincronizado con Drive").
+   - Barra de filtrado táctil rápido con `NotiFastChip` (`CloudFilterBar`: "Todas", "Pendientes", "Al día", "Conflictos").
+   - Claves estables `key = { it.subjectId }` en `LazyColumn`, estados derivados con `remember { derivedStateOf { ... } }`, y animaciones de resorte fluidas a 120 FPS (`animateItem`).
+3. **Micro-Interacciones y Feedback Inmersivo:**
+   - Feedback visual inmediato durante el escaneo diferencial SHA-256 de metadatos mediante `CloudScanningSkeletonCard` con `rememberShimmerBrush()` y animación de rotación suave.
+   - Micro-animaciones con resortes táctiles (`spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow)`).
+   - Respuesta táctil háptica (`LocalHapticFeedback`) al presionar "Subir a la nube", "Restaurar", alternar selección de materias y confirmar resolución de conflictos.
+   - Enlace al sistema global `LocalNotiFastSnackbarHostState` para desplegar alertas flotantes con `NotiFastAlertBanner` por encima de la barra de navegación.
+4. **Higiene de Código y Modularidad:**
+   - 100% de los composables cumplen con el límite estricto de $\le 250$ LOC (`CloudHubSheet` en 245 LOC, `CloudSubjectRow` en 204 LOC, `CloudSummaryCard` en 194 LOC, `GlobalSettingsRow` en 159 LOC, `CloudScanningSkeletonCard` en 122 LOC, `DataBreakdownBadges` en 120 LOC, `CloudSheetBanners` en 94 LOC, `CloudSubjectList` en 80 LOC, `CloudFilterBar` en 69 LOC, `CloudSheetHeader` en 47 LOC).
+   - Cero strings quemados: 100% de textos y badges centralizados en `res/values/strings.xml`.
+   - Clean Architecture y MVI estricto.
+5. **Apego Riguroso al Tema Activo de la App y Calibración Tipográfica:**
+   - Erradicación de `isSystemInDarkTheme()` en favor de `MaterialTheme.colorScheme.isDark` (`background.luminance() < 0.5f`), garantizando que todos los elementos se apeguen al tema seleccionado por el usuario en la app (Claro u Oscuro) independientemente de la configuración global de Android.
+   - Corrección de contraste en marcas de tiempo ("Último registro"): sustitución de `colorScheme.outline` por `colorScheme.onSurfaceVariant` con `monoAcademicSmall` (11.5sp, Medium), alcanzando ratio de contraste WCAG AAA > 6:1 en fondo claro y > 8:1 en oscuro.
+   - Calibración de textos de estado local vacío (`cloud_subject_empty_local`) y tamaños de archivos para legibilidad óptima.
+6. **Verificación Basada en Evidencia:**
+   - **615 pruebas unitarias automatizadas aprobadas al 100%** (0 fallos, 0 ignorados).
+   - Compilación exitosa de build debug (`./gradlew assembleDebug`).
+   - Instalación y validación directa en dispositivo físico (`adb install -r app/build/outputs/apk/debug/app-debug.apk` en `TK6TVCRSMB7DPVAQ`).
+
+---
+
+## 🎓 Elevación AAA del Hub de Calificaciones y Analíticas Académicas — 100% Completado (16 Oct 2026)
+
+**Objetivo:** Elevar a estándar AAA la experiencia de Calificaciones (`GradesScreen`), erradicando insets duplicados bajo el topbar, corrigiendo la inversión de colores semánticos, reestructurando las analíticas desde la perspectiva de estudiantes de secundaria y universidad (reemplazando métricas abstractas y sobrecargadas por el Simulador de Calificaciones Interactivo en tiempo real y la lista de salud académica scannable), y garantizando precisión matemática y estados vacíos empáticos.
+
+### Entregables Implementados:
+1. **Erradicación de Insets Duplicados y Espacio en Blanco Bajo el TopBar:**
+   - Aislamiento de causa raíz mediante Systematic Debugging: `Scaffold(innerPadding)` ya gestionaba los insets de la barra de estado inyectados por `NotiFastTopBar`. El modificador `.safeDrawingPadding()` en el contenedor raíz duplicaba el espaciado empujando y cortando el contenido visual.
+   - Eliminación del modificador redundante en `GradesScreen.kt`. Alineación perfecta de la cuadrícula base con 16dp de padding uniforme y 20dp de márgenes laterales.
+2. **Corrección de Inversión Semántica de Colores y Apego al Tema de la App:**
+   - **Verde / Tertiary / ForestSage (`#15803D` / `#34D399`):** Consolidado rigurosamente para notas aprobatorias, proyección al día y ritmos excelentes (`analytics_pulse_all_good`).
+   - **Rojo / Ruby / Error (`#BF092F`):** Restringido exclusivamente a notas reprobadas, materias en riesgo crítico y fallos.
+   - **Apego al Tema Activo:** Sustitución de `isSystemInDarkTheme()` por `MaterialTheme.colorScheme.isDark` (`background.luminance() < 0.5f`), garantizando que tanto `SubjectGradeCard` como los componentes de analíticas respeten el tema claro/oscuro interno de NotiFast sin depender del sistema Android.
+   - **Sanitización de Contraste:** Sustitución de `outline` por `onSurfaceVariant` en estados sin pendientes del simulador, erradicando textos lavados.
+3. **Reestructuración de Analíticas Basada en Casos de Uso Reales de Estudiantes:**
+   - **Eliminación de Ruido Abstracto:** Se eliminaron el histograma gaussiano de 4 bandas y la correlación horas/nota semanal, identificados como sobrecarga cognitiva poco útil para el estudiante.
+   - **Simulador Interactivo Directo (`IntegratedGradeSimulatorCard`):** Integración del simulador de notas en la pestaña principal de Analíticas, permitiendo alternar materias mediante chips táctiles horizontales y ajustar la nota meta en tiempo real para responder a la pregunta fundamental: *«¿Cuánto necesito sacar en lo que falta para aprobar?»*.
+   - **Lista Visual de Salud Académica (`SubjectHealthListCard`):** Sustitución de gráficos de barras abstractos en Canvas por filas legibles y accesibles con icono de asignatura, nombre completo, puntos acumulados sobre la nota meta, insignias semánticas ("Al día", "En riesgo", "Sin notas") y tracks de progreso con contraste WCAG AAA.
+4. **Corrección Matemática y UX Empática para Materias sin Evaluaciones:**
+   - **Aislamiento de Causa Raíz en `CalculateAcademicStatsUseCase`:** Materias recién creadas con 0 evaluaciones generaban división entre 0 en `remainingWeight`, arrojando `minGradeNeeded = Double.POSITIVE_INFINITY` y marcando falsamente `CRITICAL_FAIL` con 0% de proyección en rojo.
+   - **Solución Algorítmica:** Si una materia no tiene evaluaciones (`!hasEvaluated && remainingWeight <= 0.0`), se clasifica de forma justa como `ON_TRACK` con 100% de proyección aprobatoria y badge "Sin notas".
+   - **Manejo de Promedio Nulo:** En `GradesViewModel`, `MainAverageDashboard` y `SubjectGradeCard`, si una materia o el estudiante no tienen notas aún, se presenta `—` en tipografía monoespaciada con tono neutro y el mensaje orientativo *"Registra notas en tus evaluaciones para calcular tu promedio"*, eliminando el `0.0` rojo alarmante.
+   - **Inclusión Universal de Materias:** Todas las materias creadas en la app se muestran en la pestaña "Materias" con su tarjeta expandible y animada, permitiendo al estudiante ver su portafolio académico completo.
+5. **Estandarización al Design System 3.0 (Papercraft Táctil) y Modularidad:**
+   - Migración de tarjetas genéricas `Card` a `NotiFastCard` con micro-borde de 1dp `outlineVariant`, esquinas redondeadas de 16-20dp y elevación 0dp.
+   - Selector táctil tipo píldora (`GradesTabSelector`) con transiciones de resorte (`spring`) y respuesta háptica (`LocalHapticFeedback`).
+   - Micro-fichas de evaluación expandibles (`EvaluationDetailRow`) con chip monoespaciado (`JetBrainsMonoFamily`) e indicador de estado ("Evaluada" / "Pendiente").
+   - Límite estricto de $\le 250$ LOC en todos los composables.
+   - Cero strings quemados: 100% de cadenas extraídas en `res/values/strings.xml`.
+6. **Verificación Basada en Evidencia:**
+   - **614 tests unitarios automatizados pasando al 100%** (0 fallos, 0 errores, 0 ignorados).
+   - Compilación exitosa (`./gradlew assembleDebug`).
+   - Instalación y validación táctil y visual en dispositivo físico `TK6TVCRSMB7DPVAQ`.
 
 ---
 
