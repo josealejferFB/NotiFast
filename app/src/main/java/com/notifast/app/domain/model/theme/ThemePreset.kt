@@ -8,8 +8,8 @@ import com.notifast.app.R
  */
 enum class ThemePreset(
     val id: String,
-    @property:StringRes val nameRes: Int,
-    @property:StringRes val descriptionRes: Int,
+    @get:StringRes val nameRes: Int,
+    @get:StringRes val descriptionRes: Int,
     val primaryLightHex: String,
     val secondaryLightHex: String,
     val primaryDarkHex: String,
