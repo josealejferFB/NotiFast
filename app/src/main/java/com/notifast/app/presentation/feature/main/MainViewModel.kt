@@ -35,6 +35,12 @@ class MainViewModel @Inject constructor(
         initialValue = "classic"
     )
 
+    val backgroundPresetId: StateFlow<String> = userPrefsRepository.backgroundPresetIdFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = "classic"
+    )
+
     val customPrimaryHex: StateFlow<String?> = userPrefsRepository.customPrimaryHexFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),

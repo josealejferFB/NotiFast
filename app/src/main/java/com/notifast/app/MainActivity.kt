@@ -32,9 +32,13 @@ class MainActivity : ComponentActivity() {
             val isDarkMode by mainViewModel.isDarkMode.collectAsStateWithLifecycle()
             val hapticsEnabled by mainViewModel.hapticsEnabled.collectAsStateWithLifecycle()
             val themePresetId by mainViewModel.themePresetId.collectAsStateWithLifecycle()
+            val backgroundPresetId by mainViewModel.backgroundPresetId.collectAsStateWithLifecycle()
             val customPrimaryHex by mainViewModel.customPrimaryHex.collectAsStateWithLifecycle()
             val themePreset = remember(themePresetId) {
                 com.notifast.app.domain.model.theme.ThemePreset.fromId(themePresetId)
+            }
+            val backgroundPreset = remember(backgroundPresetId) {
+                com.notifast.app.domain.model.theme.BackgroundPreset.fromId(backgroundPresetId)
             }
             val darkTheme = isDarkMode ?: isSystemInDarkTheme()
             val systemHaptics = LocalHapticFeedback.current
@@ -51,6 +55,7 @@ class MainActivity : ComponentActivity() {
             NotiFastTheme(
                 darkTheme = darkTheme,
                 themePreset = themePreset,
+                backgroundPreset = backgroundPreset,
                 customPrimaryHex = customPrimaryHex
             ) {
                 CompositionLocalProvider(LocalHapticFeedback provides effectiveHaptics) {
