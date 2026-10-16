@@ -45,6 +45,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
         val FIRST_DAY_OF_WEEK = stringPreferencesKey("first_day_of_week")
         val SHOW_COMPLETED_EVALUATIONS = booleanPreferencesKey("show_completed_evaluations")
         val THEME_PRESET_ID = stringPreferencesKey("theme_preset_id")
+        val BACKGROUND_PRESET_ID = stringPreferencesKey("background_preset_id")
         val CUSTOM_THEME_PRIMARY_HEX = stringPreferencesKey("custom_theme_primary_hex")
     }
 
@@ -118,6 +119,23 @@ class UserPrefsRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save theme preset id preference", e)
+            Result.failure(e)
+        }
+    }
+
+    override val backgroundPresetIdFlow: Flow<String>
+        get() = safeDataFlow { preferences ->
+            preferences[PreferencesKeys.BACKGROUND_PRESET_ID] ?: "classic"
+        }
+
+    override suspend fun setBackgroundPresetId(presetId: String): Result<Unit> {
+        return try {
+            dataStore.edit { preferences ->
+                preferences[PreferencesKeys.BACKGROUND_PRESET_ID] = presetId
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save background preset id preference", e)
             Result.failure(e)
         }
     }
@@ -350,6 +368,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
             prefs[PreferencesKeys.FIRST_DAY_OF_WEEK]?.let { map["first_day_of_week"] = it }
             prefs[PreferencesKeys.SHOW_COMPLETED_EVALUATIONS]?.let { map["show_completed_evaluations"] = it.toString() }
             prefs[PreferencesKeys.THEME_PRESET_ID]?.let { map["theme_preset_id"] = it }
+            prefs[PreferencesKeys.BACKGROUND_PRESET_ID]?.let { map["background_preset_id"] = it }
             prefs[PreferencesKeys.CUSTOM_THEME_PRIMARY_HEX]?.let { map["custom_theme_primary_hex"] = it }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to export preferences", e)
@@ -375,6 +394,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
                 values["first_day_of_week"]?.let { prefs[PreferencesKeys.FIRST_DAY_OF_WEEK] = it }
                 values["show_completed_evaluations"]?.toBooleanStrictOrNull()?.let { prefs[PreferencesKeys.SHOW_COMPLETED_EVALUATIONS] = it }
                 values["theme_preset_id"]?.let { prefs[PreferencesKeys.THEME_PRESET_ID] = it }
+                values["background_preset_id"]?.let { prefs[PreferencesKeys.BACKGROUND_PRESET_ID] = it }
                 values["custom_theme_primary_hex"]?.let { prefs[PreferencesKeys.CUSTOM_THEME_PRIMARY_HEX] = it }
             }
             Result.success(Unit)

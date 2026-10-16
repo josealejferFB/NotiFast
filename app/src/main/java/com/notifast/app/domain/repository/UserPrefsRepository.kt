@@ -37,6 +37,16 @@ interface UserPrefsRepository {
     suspend fun setThemePresetId(presetId: String): Result<Unit>
 
     /**
+     * Flow emitting current active background preset ID (e.g. "classic", "forest_sage", "warm_mocha").
+     */
+    val backgroundPresetIdFlow: Flow<String>
+
+    /**
+     * Sets active background preset ID preference.
+     */
+    suspend fun setBackgroundPresetId(presetId: String): Result<Unit>
+
+    /**
      * Flow emitting custom primary color hex code (e.g. "#4F46E5"), or null if using presets.
      */
     val customPrimaryHexFlow: Flow<String?>

@@ -175,5 +175,36 @@ class UserPrefsRepositoryTest {
         val result = repository.setCustomPrimaryHex("#4F46E5")
         assertTrue(result.isSuccess)
     }
+
+    @Test
+    fun `backgroundPresetIdFlow returns classic by default`() = runTest {
+        every { dataStore.data } returns flowOf(emptyPreferences())
+
+        repository.backgroundPresetIdFlow.test {
+            val value = awaitItem()
+            assertEquals("classic", value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `backgroundPresetIdFlow returns configured preset`() = runTest {
+        val backgroundPresetKey = stringPreferencesKey("background_preset_id")
+        val prefs = mockk<Preferences>()
+        every { prefs[backgroundPresetKey] } returns "warm_mocha"
+        every { dataStore.data } returns flowOf(prefs)
+
+        repository.backgroundPresetIdFlow.test {
+            val value = awaitItem()
+            assertEquals("warm_mocha", value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setBackgroundPresetId returns success`() = runTest {
+        val result = repository.setBackgroundPresetId("sakura_zen")
+        assertTrue(result.isSuccess)
+    }
 }
 
