@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import com.notifast.app.presentation.theme.isDark
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -166,5 +168,14 @@ fun SettingsScreen(
             onDismiss = { viewModel.onEvent(SettingsEvent.CloseCloudHub) }
         )
     }
+
+    com.notifast.app.presentation.feature.settings.components.CustomThemePaletteSheet(
+        isOpen = uiState.isCustomThemeSheetOpen,
+        draftHex = uiState.customDraftColorHex,
+        isDark = MaterialTheme.colorScheme.isDark,
+        onColorSelected = { viewModel.onEvent(SettingsEvent.UpdateCustomDraftColor(it)) },
+        onApply = { viewModel.onEvent(SettingsEvent.ApplyCustomTheme) },
+        onDismiss = { viewModel.onEvent(SettingsEvent.CloseCustomThemeSheet) }
+    )
 }
 

@@ -151,17 +151,15 @@ private fun SettingsNotificationsSection(uiState: SettingsUiState, onEvent: (Set
 @Composable
 private fun SettingsAppearanceSection(uiState: SettingsUiState, onEvent: (SettingsEvent) -> Unit) {
     SettingsSectionContainer(title = stringResource(R.string.settings_section_appearance), icon = Icons.Default.Palette) {
-        val themeSubtitle = when (uiState.isDarkMode) {
-            null -> stringResource(R.string.settings_appearance_theme_system)
-            true -> stringResource(R.string.settings_appearance_theme_dark)
-            false -> stringResource(R.string.settings_appearance_theme_light)
-        }
-        SettingsRowItem(
-            title = stringResource(R.string.settings_appearance_theme_title),
-            subtitle = themeSubtitle,
-            icon = Icons.Default.Palette,
-            onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.THEME)) }
+        ThemeSelectorCard(
+            currentPresetId = uiState.themePresetId,
+            customPrimaryHex = uiState.customPrimaryHex,
+            isDarkMode = uiState.isDarkMode,
+            onSelectPreset = { onEvent(SettingsEvent.SelectThemePreset(it)) },
+            onSetDarkMode = { onEvent(SettingsEvent.SetDarkMode(it)) },
+            onOpenCustomStudio = { onEvent(SettingsEvent.OpenCustomThemeSheet) }
         )
+        Spacer(modifier = Modifier.height(10.dp))
         SettingsRowItem(
             title = stringResource(R.string.settings_appearance_haptics_title),
             subtitle = stringResource(R.string.settings_appearance_haptics_subtitle),

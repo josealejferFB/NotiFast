@@ -146,7 +146,7 @@ fun CustomThemePaletteSheet(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        AnimatedVisibility(visible = isSelected) {
+                        if (isSelected) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
