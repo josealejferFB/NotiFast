@@ -4,6 +4,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
+import com.notifast.app.domain.model.theme.BackgroundPreset
 import com.notifast.app.domain.model.theme.ThemePreset
 import com.notifast.app.presentation.theme.color.BackgroundDark
 import com.notifast.app.presentation.theme.color.BackgroundLight
@@ -79,32 +80,45 @@ object ThemePaletteGenerator {
     }
 
     /**
-     * Generates a Material 3 ColorScheme from a preset or custom hex value.
+     * Generates a Material 3 ColorScheme from a preset or custom hex value,
+     * harmonized with an independent background/canvas preset.
      */
     fun generateColorScheme(
         preset: ThemePreset,
         isDark: Boolean,
-        customPrimaryHex: String? = null
+        customPrimaryHex: String? = null,
+        backgroundPreset: BackgroundPreset = BackgroundPreset.CLASSIC
     ): ColorScheme {
         return if (preset == ThemePreset.CUSTOM) {
             val baseColor = customPrimaryHex?.toSafeComposeColor(PrimaryLight) ?: PrimaryLight
-            createCustomScheme(primaryColor = baseColor, isDark = isDark)
+            createCustomScheme(
+                primaryColor = baseColor,
+                isDark = isDark,
+                backgroundPreset = backgroundPreset
+            )
         } else {
             val primaryHex = if (isDark) preset.primaryDarkHex else preset.primaryLightHex
             val secondaryHex = if (isDark) preset.secondaryDarkHex else preset.secondaryLightHex
             val primaryColor = primaryHex.toSafeComposeColor(PrimaryLight)
             val secondaryColor = secondaryHex.toSafeComposeColor(SecondaryLight)
-            createCustomScheme(primaryColor = primaryColor, isDark = isDark, secondaryColor = secondaryColor)
+            createCustomScheme(
+                primaryColor = primaryColor,
+                isDark = isDark,
+                secondaryColor = secondaryColor,
+                backgroundPreset = backgroundPreset
+            )
         }
     }
 
     /**
-     * Dynamically creates a compliant ColorScheme from primary and optional secondary colors.
+     * Dynamically creates a compliant ColorScheme from primary and optional secondary colors
+     * combined with the chosen background canvas preset.
      */
     fun createCustomScheme(
         primaryColor: Color,
         isDark: Boolean,
-        secondaryColor: Color? = null
+        secondaryColor: Color? = null,
+        backgroundPreset: BackgroundPreset = BackgroundPreset.CLASSIC
     ): ColorScheme {
         val primaryHsl = ThemeUtils.rgbToHsl(primaryColor.red, primaryColor.green, primaryColor.blue)
         val secColor = secondaryColor ?: run {
@@ -114,13 +128,17 @@ object ThemePaletteGenerator {
         val secondaryHsl = ThemeUtils.rgbToHsl(secColor.red, secColor.green, secColor.blue)
 
         return if (isDark) {
-            createDarkScheme(primaryHsl, secondaryHsl)
+            createDarkScheme(primaryHsl, secondaryHsl, backgroundPreset)
         } else {
-            createLightScheme(primaryHsl, secondaryHsl)
+            createLightScheme(primaryHsl, secondaryHsl, backgroundPreset)
         }
     }
 
-    private fun createLightScheme(primaryHsl: FloatArray, secondaryHsl: FloatArray): ColorScheme {
+    private fun createLightScheme(
+        primaryHsl: FloatArray,
+        secondaryHsl: FloatArray,
+        backgroundPreset: BackgroundPreset
+    ): ColorScheme {
         val pHue = primaryHsl[0]
         val pSat = primaryHsl[1].coerceIn(0.65f, 0.85f)
         var pLight = primaryHsl[2].coerceIn(0.24f, 0.36f)
@@ -145,6 +163,14 @@ object ThemePaletteGenerator {
         val secondaryContainer = ThemeUtils.hslToColor(sHue, 0.30f, 0.95f)
         val onSecondaryContainer = ThemeUtils.hslToColor(sHue, 0.85f, 0.16f)
 
+        val bg = backgroundPreset.backgroundLightHex.toSafeComposeColor(BackgroundLight)
+        val surface = backgroundPreset.surfaceLightHex.toSafeComposeColor(SurfaceLight)
+        val surfaceContainer = backgroundPreset.surfaceContainerLightHex.toSafeComposeColor(SurfaceContainerLight)
+        val surfaceVariant = backgroundPreset.surfaceVariantLightHex.toSafeComposeColor(SurfaceVariantLight)
+        val onBackground = backgroundPreset.onBackgroundLightHex.toSafeComposeColor(OnBackgroundLight)
+        val onSurface = backgroundPreset.onSurfaceLightHex.toSafeComposeColor(OnSurfaceLight)
+        val outlineVariant = backgroundPreset.outlineVariantLightHex.toSafeComposeColor(OutlineVariantLight)
+
         return lightColorScheme(
             primary = primary,
             onPrimary = onPrimary,
@@ -158,16 +184,16 @@ object ThemePaletteGenerator {
             onTertiary = OnTertiaryLight,
             tertiaryContainer = TertiaryContainerLight,
             onTertiaryContainer = OnTertiaryContainerLight,
-            background = BackgroundLight,
-            onBackground = OnBackgroundLight,
-            surface = SurfaceLight,
-            onSurface = OnSurfaceLight,
-            surfaceVariant = SurfaceVariantLight,
+            background = bg,
+            onBackground = onBackground,
+            surface = surface,
+            onSurface = onSurface,
+            surfaceVariant = surfaceVariant,
             onSurfaceVariant = OnSurfaceVariantLight,
-            surfaceContainer = SurfaceContainerLight,
+            surfaceContainer = surfaceContainer,
             surfaceContainerHigh = SurfaceContainerHighLight,
             outline = OutlineLight,
-            outlineVariant = OutlineVariantLight,
+            outlineVariant = outlineVariant,
             error = ErrorLight,
             onError = OnErrorLight,
             errorContainer = ErrorContainerLight,
@@ -175,7 +201,11 @@ object ThemePaletteGenerator {
         )
     }
 
-    private fun createDarkScheme(primaryHsl: FloatArray, secondaryHsl: FloatArray): ColorScheme {
+    private fun createDarkScheme(
+        primaryHsl: FloatArray,
+        secondaryHsl: FloatArray,
+        backgroundPreset: BackgroundPreset
+    ): ColorScheme {
         val pHue = primaryHsl[0]
         val pSat = primaryHsl[1].coerceIn(0.65f, 0.80f)
         var pLight = primaryHsl[2].coerceIn(0.68f, 0.78f)
@@ -200,6 +230,14 @@ object ThemePaletteGenerator {
         val secondaryContainer = ThemeUtils.hslToColor(sHue, 0.50f, 0.22f)
         val onSecondaryContainer = ThemeUtils.hslToColor(sHue, 0.30f, 0.92f)
 
+        val bg = backgroundPreset.backgroundDarkHex.toSafeComposeColor(BackgroundDark)
+        val surface = backgroundPreset.surfaceDarkHex.toSafeComposeColor(SurfaceDark)
+        val surfaceContainer = backgroundPreset.surfaceContainerDarkHex.toSafeComposeColor(SurfaceContainerDark)
+        val surfaceVariant = backgroundPreset.surfaceVariantDarkHex.toSafeComposeColor(SurfaceVariantDark)
+        val onBackground = backgroundPreset.onBackgroundDarkHex.toSafeComposeColor(OnBackgroundDark)
+        val onSurface = backgroundPreset.onSurfaceDarkHex.toSafeComposeColor(OnSurfaceDark)
+        val outlineVariant = backgroundPreset.outlineVariantDarkHex.toSafeComposeColor(OutlineVariantDark)
+
         return darkColorScheme(
             primary = primary,
             onPrimary = onPrimary,
@@ -213,16 +251,16 @@ object ThemePaletteGenerator {
             onTertiary = OnTertiaryDark,
             tertiaryContainer = TertiaryContainerDark,
             onTertiaryContainer = OnTertiaryContainerDark,
-            background = BackgroundDark,
-            onBackground = OnBackgroundDark,
-            surface = SurfaceDark,
-            onSurface = OnSurfaceDark,
-            surfaceVariant = SurfaceVariantDark,
+            background = bg,
+            onBackground = onBackground,
+            surface = surface,
+            onSurface = onSurface,
+            surfaceVariant = surfaceVariant,
             onSurfaceVariant = OnSurfaceVariantDark,
-            surfaceContainer = SurfaceContainerDark,
+            surfaceContainer = surfaceContainer,
             surfaceContainerHigh = SurfaceContainerHighDark,
             outline = OutlineDark,
-            outlineVariant = OutlineVariantDark,
+            outlineVariant = outlineVariant,
             error = ErrorDark,
             onError = OnErrorDark,
             errorContainer = ErrorContainerDark,

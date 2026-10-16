@@ -13,6 +13,9 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+import com.notifast.app.domain.model.theme.BackgroundPreset
+import com.notifast.app.presentation.theme.color.toSafeComposeColor
+
 class ThemePaletteGeneratorTest {
 
     @Test
@@ -75,6 +78,70 @@ class ThemePaletteGeneratorTest {
             assertEquals(BackgroundDark, scheme.background)
             assertEquals(SurfaceContainerDark, scheme.surfaceContainer)
             assertEquals(OutlineVariantDark, scheme.outlineVariant)
+        }
+    }
+
+    @Test
+    fun `independent background presets apply custom canvas tokens in light and dark mode`() {
+        for (bgPreset in BackgroundPreset.availablePresets) {
+            val lightScheme = ThemePaletteGenerator.generateColorScheme(
+                preset = ThemePreset.CLASSIC,
+                isDark = false,
+                backgroundPreset = bgPreset
+            )
+            assertEquals(bgPreset.backgroundLightHex.toSafeComposeColor(), lightScheme.background)
+            assertEquals(bgPreset.surfaceLightHex.toSafeComposeColor(), lightScheme.surface)
+            assertEquals(bgPreset.surfaceContainerLightHex.toSafeComposeColor(), lightScheme.surfaceContainer)
+            assertEquals(bgPreset.outlineVariantLightHex.toSafeComposeColor(), lightScheme.outlineVariant)
+
+            val lightTextContrast = ThemePaletteGenerator.calculateContrastRatio(lightScheme.onBackground, lightScheme.background)
+            assertTrue(
+                "Light onBackground contrast for ${bgPreset.name} should be >= 4.5:1 (got $lightTextContrast)",
+                lightTextContrast >= 4.5f
+            )
+
+            val darkScheme = ThemePaletteGenerator.generateColorScheme(
+                preset = ThemePreset.CLASSIC,
+                isDark = true,
+                backgroundPreset = bgPreset
+            )
+            assertEquals(bgPreset.backgroundDarkHex.toSafeComposeColor(), darkScheme.background)
+            assertEquals(bgPreset.surfaceDarkHex.toSafeComposeColor(), darkScheme.surface)
+            assertEquals(bgPreset.surfaceContainerDarkHex.toSafeComposeColor(), darkScheme.surfaceContainer)
+            assertEquals(bgPreset.outlineVariantDarkHex.toSafeComposeColor(), darkScheme.outlineVariant)
+
+            val darkTextContrast = ThemePaletteGenerator.calculateContrastRatio(darkScheme.onBackground, darkScheme.background)
+            assertTrue(
+                "Dark onBackground contrast for ${bgPreset.name} should be >= 4.5:1 (got $darkTextContrast)",
+                darkTextContrast >= 4.5f
+            )
+        }
+    }
+
+    @Test
+    fun `cross matrix of all accent presets with all background presets maintains WCAG AAA`() {
+        for (accent in ThemePreset.availablePresets) {
+            for (bg in BackgroundPreset.availablePresets) {
+                val light = ThemePaletteGenerator.generateColorScheme(accent, isDark = false, backgroundPreset = bg)
+                val dark = ThemePaletteGenerator.generateColorScheme(accent, isDark = true, backgroundPreset = bg)
+
+                assertTrue(
+                    "Light onPrimary contrast for ${accent.name} + ${bg.name} should be >= 4.5:1",
+                    ThemePaletteGenerator.calculateContrastRatio(light.onPrimary, light.primary) >= 4.5f
+                )
+                assertTrue(
+                    "Dark onPrimary contrast for ${accent.name} + ${bg.name} should be >= 4.5:1",
+                    ThemePaletteGenerator.calculateContrastRatio(dark.onPrimary, dark.primary) >= 4.5f
+                )
+                assertTrue(
+                    "Light onSurface contrast for ${accent.name} + ${bg.name} should be >= 4.5:1",
+                    ThemePaletteGenerator.calculateContrastRatio(light.onSurface, light.surface) >= 4.5f
+                )
+                assertTrue(
+                    "Dark onSurface contrast for ${accent.name} + ${bg.name} should be >= 4.5:1",
+                    ThemePaletteGenerator.calculateContrastRatio(dark.onSurface, dark.surface) >= 4.5f
+                )
+            }
         }
     }
 
