@@ -334,6 +334,35 @@
     <string name="settings_appearance_haptics_title">Respuesta Háptica</string>
     <string name="settings_appearance_haptics_subtitle">Vibración táctil sutil en botones, selectores y gestos</string>
 
+    <!-- Theme Customizer Engine AAA -->
+    <string name="theme_preset_classic_name">NotiFast Classic</string>
+    <string name="theme_preset_classic_desc">Ruby Crimson &amp; Aqua Studio • Identidad oficial</string>
+    <string name="theme_preset_forest_sage_name">Campus Verde</string>
+    <string name="theme_preset_forest_sage_desc">Verde Esmeralda &amp; Trigo Cálido • Lectura relajada</string>
+    <string name="theme_preset_midnight_indigo_name">Cyber Nocturno</string>
+    <string name="theme_preset_midnight_indigo_desc">Azul Índigo &amp; Turquesa • Sesiones nocturnas</string>
+    <string name="theme_preset_warm_mocha_name">Café Nórdico</string>
+    <string name="theme_preset_warm_mocha_desc">Terracota Cálido &amp; Vainilla • Biblioteca clásica</string>
+    <string name="theme_preset_sakura_zen_name">Sakura Zen</string>
+    <string name="theme_preset_sakura_zen_desc">Lavanda Suave &amp; Rosa Cuarzo • Confort antiestrés</string>
+    <string name="theme_preset_ocean_cyan_name">Minimalista Nórdico</string>
+    <string name="theme_preset_ocean_cyan_desc">Azul Océano &amp; Aqua Suave • Claridad analítica</string>
+    <string name="theme_preset_custom_name">Estudio Personalizado</string>
+    <string name="theme_preset_custom_desc">Paleta armónica calibrada a tu propio color de estudio</string>
+    <string name="settings_theme_card_title">Paleta y Tema Académico</string>
+    <string name="settings_theme_card_subtitle">Entorno visual de estudio para confort y concentración</string>
+    <string name="settings_theme_mode_system">Sistema</string>
+    <string name="settings_theme_mode_light">Claro</string>
+    <string name="settings_theme_mode_dark">Oscuro</string>
+    <string name="settings_theme_custom_studio_btn">Personalizar Color</string>
+    <string name="settings_theme_custom_sheet_title">Estudio de Color Académico</string>
+    <string name="settings_theme_custom_sheet_subtitle">Selecciona tu color de estudio. Calibramos automáticamente un esquema Material 3 con contraste WCAG AAA garantizado.</string>
+    <string name="settings_theme_custom_apply_btn">Aplicar Paleta</string>
+    <string name="settings_theme_preview_label">Previsualización en Vivo</string>
+    <string name="settings_theme_preview_sample_subject">Matemática Discreta</string>
+    <string name="settings_theme_preview_sample_eval">Parcial I • Pendiente</string>
+    <string name="settings_theme_preview_sample_action">Repasar Apuntes</string>
+
     <!-- Notifications -->
     <string name="settings_section_notifications">Notificaciones &amp; Recordatorios</string>
     <string name="settings_notifications_classes_title">Alertas de Clases</string>
