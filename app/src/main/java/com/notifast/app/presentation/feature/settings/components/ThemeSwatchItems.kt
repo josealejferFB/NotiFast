@@ -6,16 +6,17 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,16 +34,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 
 /**
  * Segment button for luminance selection (System, Light, Dark).
+ * Meets WCAG 2.5.5 touch target size and includes full TalkBack radio semantics.
  */
 @Composable
 fun ModeSegmentButton(
@@ -52,15 +58,22 @@ fun ModeSegmentButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val a11yDesc = stringResource(
+        if (isSelected) R.string.settings_theme_mode_selected_cd else R.string.settings_theme_mode_unselected_cd,
+        text
+    )
+
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(10.dp),
         color = if (isSelected) MaterialTheme.colorScheme.surface else Color.Transparent,
         border = if (isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
         modifier = modifier
+            .defaultMinSize(minHeight = 44.dp)
+            .semantics { contentDescription = a11yDesc }
     ) {
         Row(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -70,10 +83,10 @@ fun ModeSegmentButton(
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -92,34 +105,12 @@ fun PresetSwatchItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.12f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        ),
-        label = "preset_swatch_scale"
-    )
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(58.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(46.dp)
-                .scale(scale)
-                .clip(CircleShape)
-                .background(Brush.linearGradient(listOf(primaryColor, secondaryColor)))
-                .border(
-                    width = if (isSelected) 3.dp else 1.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
+    ThemeSwatchBase(
+        name = name,
+        backgroundBrush = Brush.linearGradient(listOf(primaryColor, secondaryColor)),
+        isSelected = isSelected,
+        onClick = onClick,
+        overlayIcon = {
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -129,17 +120,7 @@ fun PresetSwatchItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = name,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            fontSize = 11.sp
-        )
-    }
+    )
 }
 
 /**
@@ -151,34 +132,12 @@ fun CustomSwatchItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.12f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        ),
-        label = "custom_swatch_scale"
-    )
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(58.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(46.dp)
-                .scale(scale)
-                .clip(CircleShape)
-                .background(color)
-                .border(
-                    width = if (isSelected) 3.dp else 1.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
+    ThemeSwatchBase(
+        name = stringResource(R.string.theme_preset_custom_name),
+        backgroundBrush = SolidColor(color),
+        isSelected = isSelected,
+        onClick = onClick,
+        overlayIcon = {
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -191,19 +150,71 @@ fun CustomSwatchItem(
                     imageVector = Icons.Default.ColorLens,
                     contentDescription = null,
                     tint = Color.White.copy(alpha = 0.85f),
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
+    )
+}
+
+@Composable
+private fun ThemeSwatchBase(
+    name: String,
+    backgroundBrush: Brush,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    overlayIcon: @Composable () -> Unit
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.12f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "swatch_scale"
+    )
+
+    val a11yDesc = stringResource(
+        if (isSelected) R.string.theme_swatch_selected_cd else R.string.theme_swatch_unselected_cd,
+        name
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(66.dp)
+            .padding(vertical = 4.dp)
+            .selectable(
+                selected = isSelected,
+                role = Role.RadioButton,
+                onClick = onClick
+            )
+            .semantics { contentDescription = a11yDesc }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .scale(scale)
+                .clip(CircleShape)
+                .background(backgroundBrush)
+                .border(
+                    width = if (isSelected) 3.dp else 1.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            overlayIcon()
+        }
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = stringResource(R.string.theme_preset_custom_name),
+            text = name,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            fontSize = 11.sp
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

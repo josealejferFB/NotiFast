@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -159,7 +161,11 @@ private fun SettingsAppearanceSection(uiState: SettingsUiState, onEvent: (Settin
             onSetDarkMode = { onEvent(SettingsEvent.SetDarkMode(it)) },
             onOpenCustomStudio = { onEvent(SettingsEvent.OpenCustomThemeSheet) }
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+            thickness = 0.5.dp
+        )
         SettingsRowItem(
             title = stringResource(R.string.settings_appearance_haptics_title),
             subtitle = stringResource(R.string.settings_appearance_haptics_subtitle),

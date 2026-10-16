@@ -362,6 +362,10 @@
     <string name="settings_theme_preview_sample_subject">Matemática Discreta</string>
     <string name="settings_theme_preview_sample_eval">Parcial I • Pendiente</string>
     <string name="settings_theme_preview_sample_action">Repasar Apuntes</string>
+    <string name="settings_theme_mode_selected_cd">Modo %1$s, seleccionado</string>
+    <string name="settings_theme_mode_unselected_cd">Modo %1$s</string>
+    <string name="theme_swatch_selected_cd">%1$s, seleccionado</string>
+    <string name="theme_swatch_unselected_cd">%1$s</string>
 
     <!-- Notifications -->
     <string name="settings_section_notifications">Notificaciones &amp; Recordatorios</string>
