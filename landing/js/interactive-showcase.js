@@ -569,7 +569,7 @@
       return `
         <div class="agenda-eval-card" data-eval-id="${ev.id}" role="button" tabindex="0">
           <div class="eval-icon-circle" style="background: ${ev.tintBg}; color: ${ev.iconTint};">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="${ev.icon}"></use></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="${ev.icon}"></use></svg>
           </div>
           <div class="eval-body">
             <div class="eval-top-row">
@@ -613,7 +613,7 @@
           if (panelHint) panelHint.textContent = 'Sin exámenes ni entregas';
           cardsList.innerHTML = `
             <div class="eval-empty-card">
-              <svg class="eval-empty-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+              <svg class="eval-empty-icon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
               <span class="eval-empty-title">Sin evaluaciones este día</span>
               <span class="eval-empty-desc">Día libre de exámenes y entregas. ¡Buen momento para repasar apuntes!</span>
             </div>
@@ -1367,7 +1367,7 @@
       if (bannerBody) bannerBody.textContent = data.body;
       if (primaryAction) primaryAction.textContent = data.action;
       if (typeIcon) {
-        typeIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><use href="${data.icon}"></use></svg>`;
+        typeIcon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="${data.icon}"></use></svg>`;
       }
 
       if (pulse) {

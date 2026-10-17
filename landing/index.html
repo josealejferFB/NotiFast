@@ -24,15 +24,15 @@
 
   <link rel="canonical" href="https://notifast.pages.dev/">
   <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/dynamic-showcase.css">
+  <link rel="stylesheet" href="css/tokens.css?v=3.2.1">
+  <link rel="stylesheet" href="css/styles.css?v=3.2.1">
+  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.2.1">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
   <!-- Zero-CORS SVG Material Definitions (NotiFastStudyBackground & SubjectIconMapper) -->
-  <svg style="display: none;" aria-hidden="true" focusable="false">
+  <svg hidden style="display: none; position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true" focusable="false">
     <defs>
       <!-- MenuBook (NotiFastStudyBackground) -->
       <symbol id="icon-menubook" viewBox="0 0 24 24">
@@ -252,8 +252,8 @@
         </button>
         <a href="https://github.com/P0X-D/NotiFast/releases/latest" class="btn btn-primary btn-sm nav-desktop-cta" target="_blank" rel="noopener noreferrer">Descargar APK</a>
         <button type="button" class="mobile-menu-toggle" id="btn-mobile-menu" aria-expanded="false" aria-controls="mobile-nav-drawer" aria-label="Abrir menú de navegación">
-          <svg class="menu-icon-open" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menu"></use></svg>
-          <svg class="menu-icon-close" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-close"></use></svg>
+          <svg class="menu-icon-open" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menu"></use></svg>
+          <svg class="menu-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-close"></use></svg>
         </button>
       </div>
     </div>
@@ -262,35 +262,35 @@
     <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Navegación móvil" hidden>
       <div class="mobile-nav-grid">
         <a href="#agenda" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
           <span>Agenda Activa</span>
         </a>
         <a href="#apuntes" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
           <span>Apuntes &amp; LaTeX</span>
         </a>
         <a href="#calificaciones" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
           <span>Calificaciones</span>
         </a>
         <a href="#evaluaciones" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-event"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-event"></use></svg>
           <span>Calendario</span>
         </a>
         <a href="#temas" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
           <span>Temas AAA</span>
         </a>
         <a href="#notificaciones" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-notifications"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-notifications"></use></svg>
           <span>Notificaciones</span>
         </a>
         <a href="#analiticas" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-analytics"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-analytics"></use></svg>
           <span>Analíticas</span>
         </a>
         <a href="#compartir" class="mobile-nav-item">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-qr"></use></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-qr"></use></svg>
           <span>Pack P2P &amp; Drive</span>
         </a>
       </div>
@@ -357,7 +357,7 @@
           <!-- Toast Flotante de Notificación Proactiva en el Teléfono -->
           <div class="hero-floating-headsup" id="hero-phone-headsup" role="status" aria-live="polite">
             <div class="headsup-icon-circle">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
             </div>
             <div class="headsup-copy">
               <div class="headsup-title-row">
@@ -388,10 +388,10 @@
               </div>
               <div class="phone-topbar-actions">
                 <button type="button" class="phone-icon-btn" id="btn-phone-trigger-notif" title="Probar alerta proactiva en el teléfono" aria-label="Disparar notificación de prueba en el teléfono">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
                 </button>
                 <a href="#temas" class="phone-icon-btn" title="Personalizar tema de la app" aria-label="Ir al estudio de temas">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
                 </a>
               </div>
             </div>
@@ -440,19 +440,19 @@
             <!-- Barra de Navegación Inferior Material 3 (4 Pestañas Reales de la App) -->
             <div class="phone-bottom-nav" role="tablist" aria-label="Navegación del teléfono interactivo">
               <button type="button" class="phone-nav-tab active" data-phone-tab="apuntes" role="tab" aria-selected="true">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
                 <span>Apuntes</span>
               </button>
               <button type="button" class="phone-nav-tab" data-phone-tab="agenda" role="tab" aria-selected="false">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
                 <span>Agenda</span>
               </button>
               <button type="button" class="phone-nav-tab" data-phone-tab="notas" role="tab" aria-selected="false">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
                 <span>Notas</span>
               </button>
               <button type="button" class="phone-nav-tab" data-phone-tab="ajustes" role="tab" aria-selected="false">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-settings"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-settings"></use></svg>
                 <span>Ajustes</span>
               </button>
             </div>
@@ -710,7 +710,7 @@
           <div class="subject-grade-breakdown">
             <div class="subject-grade-row">
               <div class="s-icon" style="background: #EFF6FF; color: #2563EB;">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
               </div>
               <div class="s-info">
                 <span class="s-name">Cálculo Diferencial</span>
@@ -721,7 +721,7 @@
 
             <div class="subject-grade-row">
               <div class="s-icon" style="background: #F0FDFA; color: #0F766E;">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
               </div>
               <div class="s-info">
                 <span class="s-name">Física Mecánica</span>
@@ -732,7 +732,7 @@
 
             <div class="subject-grade-row">
               <div class="s-icon" style="background: #FFFBEB; color: #92400E;">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
               </div>
               <div class="s-info">
                 <span class="s-name">Literatura Universal</span>
@@ -800,7 +800,7 @@
           <!-- Cabecera de Navegación del Mes -->
           <div class="calendar-month-header">
             <button class="cal-nav-btn" id="btn-cal-prev" aria-label="Mes anterior" title="Mes anterior">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-left"></use></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-left"></use></svg>
             </button>
             <div class="cal-month-title-wrap">
               <h3 class="cal-month-title" id="cal-month-title">Octubre 2026</h3>
@@ -808,11 +808,11 @@
             </div>
             <div class="cal-header-actions">
               <button class="cal-today-btn" id="btn-cal-today" title="Saltar al examen más próximo">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-today"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-today"></use></svg>
                 <span>Hoy</span>
               </button>
               <button class="cal-nav-btn" id="btn-cal-next" aria-label="Mes siguiente" title="Mes siguiente">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-right"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-right"></use></svg>
               </button>
             </div>
           </div>
@@ -837,7 +837,7 @@
           <div class="daily-evaluations-panel" id="daily-evaluations-panel">
             <div class="daily-evals-header">
               <div class="daily-title-row">
-                <svg class="evals-header-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+                <svg class="evals-header-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
                 <h4 class="daily-title" id="daily-evals-title">Evaluaciones del 15 de Octubre</h4>
                 <span class="daily-count-badge" id="daily-evals-count">(1)</span>
               </div>
@@ -920,7 +920,7 @@
           <div class="grade-simulator-card" id="interactive-grade-simulator">
             <div class="simulator-header">
               <div class="sim-icon-box">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
               </div>
               <div class="sim-header-text">
                 <h3 class="sim-title">Simulador de Nota Requerida</h3>
@@ -930,7 +930,7 @@
 
             <!-- Banner de Estado Táctil (SimulatorStatus) -->
             <div class="sim-status-banner status-achievable" id="sim-status-banner">
-              <svg class="sim-status-icon" id="sim-status-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-check"></use></svg>
+              <svg class="sim-status-icon" id="sim-status-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-check"></use></svg>
               <span class="sim-status-text" id="sim-status-text">Meta alcanzable • Necesitas 7.2 en lo restante</span>
             </div>
 
@@ -1042,7 +1042,7 @@
           <div class="studio-top-bar">
             <div class="studio-title-group">
               <div class="studio-badge-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
               </div>
               <div>
                 <h3 class="studio-heading">Apariencia y Estudio Cromático</h3>
@@ -1052,11 +1052,11 @@
 
             <div class="theme-mode-segmented" role="group" aria-label="Modo de iluminación del tema">
               <button type="button" class="mode-seg-btn active" data-theme-mode-btn="light" aria-pressed="true">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightmode"></use></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightmode"></use></svg>
                 <span>Claro</span>
               </button>
               <button type="button" class="mode-seg-btn" data-theme-mode-btn="dark" aria-pressed="false">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-darkmode"></use></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-darkmode"></use></svg>
                 <span>Oscuro</span>
               </button>
             </div>
@@ -1184,7 +1184,7 @@
           <div class="theme-live-preview-mini">
             <div class="preview-mini-left">
               <div class="preview-mini-avatar">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
               </div>
               <div class="preview-mini-text">
                 <span class="preview-mini-title" id="preview-mini-title">Vista previa: NotiFast Classic</span>
@@ -1243,7 +1243,7 @@
               </div>
               <div class="notif-main-row">
                 <div class="notif-type-icon" id="notif-type-icon">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
                 </div>
                 <div class="notif-text-col">
                   <div class="notif-banner-title" id="notif-banner-title">Clase en 15 min: Cálculo Diferencial</div>
@@ -1264,7 +1264,7 @@
               <div class="channel-row-top">
                 <div class="channel-title-group">
                   <div class="channel-icon-box">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
                   </div>
                   <div class="channel-text">
                     <span class="channel-name">Alertas de Clases</span>
@@ -1285,7 +1285,7 @@
               <div class="channel-row-top">
                 <div class="channel-title-group">
                   <div class="channel-icon-box">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-quiz"></use></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-quiz"></use></svg>
                   </div>
                   <div class="channel-text">
                     <span class="channel-name">Alertas de Evaluaciones</span>
@@ -1306,7 +1306,7 @@
               <div class="channel-row-top">
                 <div class="channel-title-group">
                   <div class="channel-icon-box">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightmode"></use></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightmode"></use></svg>
                   </div>
                   <div class="channel-text">
                     <span class="channel-name">Resumen Matutino (07:00 AM)</span>
@@ -1322,7 +1322,7 @@
           <div class="notif-test-footer">
             <span class="notif-test-hint">Idéntico al botón verificador de Ajustes en la app</span>
             <button type="button" class="btn-trigger-notif" id="btn-test-notification">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
               <span>Enviar notificación de prueba</span>
             </button>
           </div>
@@ -1372,20 +1372,20 @@
           <!-- Simulación de Transferencia P2P en el Aula -->
           <div class="p2p-simulation-stage">
             <div class="device-node device-sender">
-              <div class="device-avatar"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
+              <div class="device-avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
               <span class="device-name">Tu Teléfono</span>
               <span class="device-status">Generando QR / Pack</span>
             </div>
 
             <div class="transfer-waves">
               <div class="nearby-signal-pulse">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
               </div>
               <span class="transfer-speed">QR Directo &bull; Drive Sync</span>
             </div>
 
             <div class="device-node device-receiver">
-              <div class="device-avatar"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
+              <div class="device-avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
               <span class="device-name">Compañero</span>
               <span class="device-status-success">¡Materia Importada!</span>
             </div>
@@ -1427,7 +1427,7 @@
         <article class="subject-feature-card card-calculus-detail" tabindex="0">
           <div class="subject-card-top-row">
             <div class="subject-hero-icon" style="background: #EFF6FF; color: #2563EB;">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
             </div>
             <div class="subject-grade-pill" style="background: #EFF6FF; color: #1D4ED8;">
               <span class="grade-pill-label">Promedio</span>
@@ -1461,7 +1461,7 @@
         <article class="subject-feature-card card-physics-detail" tabindex="0">
           <div class="subject-card-top-row">
             <div class="subject-hero-icon" style="background: #F0FDFA; color: #0F766E;">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
             </div>
             <div class="subject-grade-pill" style="background: #F0FDFA; color: #0F766E;">
               <span class="grade-pill-label">Promedio</span>
@@ -1495,7 +1495,7 @@
         <article class="subject-feature-card card-literature-detail" tabindex="0">
           <div class="subject-card-top-row">
             <div class="subject-hero-icon" style="background: #FFFBEB; color: #92400E;">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
             </div>
             <div class="subject-grade-pill" style="background: #FFFBEB; color: #B45309;">
               <span class="grade-pill-label">Promedio</span>
@@ -1529,7 +1529,7 @@
         <article class="subject-feature-card card-chemistry-detail" tabindex="0">
           <div class="subject-card-top-row">
             <div class="subject-hero-icon" style="background: #ECFDF5; color: #047857;">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-biotech"></use></svg>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-biotech"></use></svg>
             </div>
             <div class="subject-grade-pill" style="background: #ECFDF5; color: #047857;">
               <span class="grade-pill-label">Promedio</span>
@@ -1576,7 +1576,7 @@
         <article class="bento-card bento-col-8">
           <div>
             <div class="bento-icon-wrapper icon-bg-ruby">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
             </div>
             <h3 class="bento-card-title">Editor por Bloques &amp; Anotador de Fotos de Pizarra</h3>
             <p class="bento-card-desc">
@@ -1594,7 +1594,7 @@
         <article class="bento-card bento-col-4">
           <div>
             <div class="bento-icon-wrapper icon-bg-aqua">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
             </div>
             <h3 class="bento-card-title">100% Offline-First &amp; Google Drive Privado</h3>
             <p class="bento-card-desc">
@@ -1610,7 +1610,7 @@
         <article class="bento-card bento-col-6">
           <div>
             <div class="bento-icon-wrapper icon-bg-amber">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
             </div>
             <h3 class="bento-card-title">Directorio de Profesores &amp; Acción Contextual</h3>
             <p class="bento-card-desc">
@@ -1627,7 +1627,7 @@
         <article class="bento-card bento-col-6">
           <div>
             <div class="bento-icon-wrapper icon-bg-sage">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
             </div>
             <h3 class="bento-card-title">Estudio Cromático AAA &amp; Alertas WorkManager</h3>
             <p class="bento-card-desc">
@@ -1668,35 +1668,35 @@
       </a>
       <div class="radar-links">
         <a href="#agenda" class="radar-chip" data-target="#agenda" title="Horario en Curso">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
           <span>Agenda</span>
         </a>
         <a href="#apuntes" class="radar-chip" data-target="#apuntes" title="Apuntes Markdown">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
           <span>Apuntes</span>
         </a>
         <a href="#calificaciones" class="radar-chip" data-target="#calificaciones" title="Calificaciones Multiescala">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
           <span>Notas</span>
         </a>
         <a href="#evaluaciones" class="radar-chip" data-target="#evaluaciones" title="Calendario de Evaluaciones">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
           <span>Exámenes</span>
         </a>
         <a href="#analiticas" class="radar-chip" data-target="#analiticas" title="Analíticas & Proyecciones">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg>
           <span>Analíticas</span>
         </a>
         <a href="#temas" class="radar-chip" data-target="#temas" title="Estudio de Temas Personalizables">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
           <span>Temas</span>
         </a>
         <a href="#notificaciones" class="radar-chip" data-target="#notificaciones" title="Notificaciones Proactivas">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
           <span>Alertas</span>
         </a>
         <a href="#compartir" class="radar-chip" data-target="#compartir" title="Compartir P2P & Backup Drive">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
           <span>P2P</span>
         </a>
       </div>
@@ -1745,15 +1745,15 @@
           </p>
           <div class="footer-trust-chips">
             <span class="trust-chip">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
               <span>Room SQLite Local</span>
             </span>
             <span class="trust-chip">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
               <span>Google Drive Privado</span>
             </span>
             <span class="trust-chip">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
               <span>Temas WCAG AAA</span>
             </span>
           </div>
@@ -1763,14 +1763,14 @@
         <div class="footer-col">
           <h4 class="footer-heading">Módulos del Hub</h4>
           <ul class="footer-links footer-nav-list" aria-label="Enlaces del pie de página">
-            <li><a href="#agenda"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg> Agenda &amp; Horario Activo</a></li>
-            <li><a href="#apuntes"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg> Apuntes por Bloques</a></li>
-            <li><a href="#calificaciones"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg> Calificaciones Multiescala</a></li>
-            <li><a href="#evaluaciones"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg> Calendario de Evaluaciones</a></li>
-            <li><a href="#analiticas"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg> Analíticas &amp; Simulador</a></li>
-            <li><a href="#temas"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg> Estudio de Temas AAA</a></li>
-            <li><a href="#notificaciones"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg> Notificaciones Proactivas</a></li>
-            <li><a href="#compartir"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg> Pack P2P &amp; Backup Drive</a></li>
+            <li><a href="#agenda"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg> Agenda &amp; Horario Activo</a></li>
+            <li><a href="#apuntes"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg> Apuntes por Bloques</a></li>
+            <li><a href="#calificaciones"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg> Calificaciones Multiescala</a></li>
+            <li><a href="#evaluaciones"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg> Calendario de Evaluaciones</a></li>
+            <li><a href="#analiticas"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg> Analíticas &amp; Simulador</a></li>
+            <li><a href="#temas"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg> Estudio de Temas AAA</a></li>
+            <li><a href="#notificaciones"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg> Notificaciones Proactivas</a></li>
+            <li><a href="#compartir"><svg class="footer-nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg> Pack P2P &amp; Backup Drive</a></li>
           </ul>
         </div>
 
@@ -1824,8 +1824,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="js/background.js" defer></script>
-  <script src="js/interactive-showcase.js" defer></script>
-  <script src="js/main.js" defer></script>
+  <script src="js/background.js?v=3.2.1" defer></script>
+  <script src="js/interactive-showcase.js?v=3.2.1" defer></script>
+  <script src="js/main.js?v=3.2.1" defer></script>
 </body>
 </html>

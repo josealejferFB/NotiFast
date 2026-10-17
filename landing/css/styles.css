@@ -9,6 +9,17 @@
   padding: 0;
 }
 
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+svg:not([width]) {
+  width: 24px;
+  height: 24px;
+}
+
 html {
   font-family: var(--font-sans);
   background-color: var(--bg-canvas);
@@ -610,11 +621,8 @@ body {
    ========================================================================== */
 
 #bg-particles-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  inset: 0;
   pointer-events: none;
   z-index: 1;
   overflow: hidden;

@@ -46,20 +46,23 @@
     const el = document.createElement('div');
     el.className = `study-sticker ${COLOR_CLASSES[i % COLOR_CLASSES.length]}`;
 
-    // Randomize initial positions (spread throughout viewport and below fold)
+    // Randomize initial positions within fixed viewport
     const leftPercent = 8 + (i * 24) % 84; // 8% to 92%
-    const topPercent = (i * 14) % 110;     // distributed along page
+    const topPercent = 10 + (i * 22) % 78; // 10% to 88%
     const size = 32 + ((i * 6) % 18);      // 32px to 50px
     const iconId = ICONS[i % ICONS.length];
 
+    el.style.position = 'absolute';
     el.style.left = `${leftPercent}%`;
     el.style.top = `${topPercent}%`;
     el.style.width = `${size}px`;
     el.style.height = `${size}px`;
+    el.style.opacity = '0.035';
+    el.style.pointerEvents = 'none';
 
-    // SVG icon reference from inline sprite
+    // SVG icon reference from inline sprite with defensive inline dimensions
     el.innerHTML = `
-      <svg class="sticker-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <svg class="sticker-svg" width="${size}" height="${size}" style="width: 100%; height: 100%;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <use href="#${iconId}"></use>
       </svg>
     `;
