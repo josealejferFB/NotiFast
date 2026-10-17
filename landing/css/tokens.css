@@ -1,3 +1,4 @@
+/* impeccable-disable overused-font -- Plus Jakarta Sans is the canonical NotiFast Android app typeface defined in DESIGN.md */
 /* ==========================================================================
    NOTIFAST 3.0 DESIGN SYSTEM — DESIGN TOKENS & DYNAMIC THEME ENGINE
    Archetype: Tactile Papercraft / Muted Crimson & Aqua Green 3.0
@@ -32,30 +33,31 @@
   --brand-on-primary: #FFFFFF;
   --brand-primary-rgb: 158, 27, 50;
 
-  /* Identidad Secundaria — Studio Aqua Green */
-  --brand-secondary: #2A7B7B;
-  --brand-secondary-hover: #1F6161;
+  /* Identidad Secundaria — Studio Aqua Green (#2A7B7B canonical / #1B5E5E AAA text) */
+  --brand-secondary: #1B5E5E;
+  --brand-secondary-canonical: #2A7B7B;
+  --brand-secondary-hover: #134646;
   --brand-secondary-light: #D6F2F0;
   --brand-on-secondary: #FFFFFF;
-  --brand-secondary-rgb: 42, 123, 123;
+  --brand-secondary-rgb: 27, 94, 94;
 
   /* Estados Semánticos */
   --brand-success: #15803D;      /* Forest Sage (Aprobando) */
   --brand-success-light: #DCFCE7;
   --brand-on-success: #FFFFFF;
 
-  --brand-warning: #D97706;      /* Ámbar Estudio */
+  --brand-warning: #92400E;      /* Ámbar Estudio AAA */
   --brand-warning-light: #FEF3C7;
 
   --brand-error: #B91C1C;        /* Ladrillo Carmesí */
   --brand-error-light: #FEE2E2;
 
   /* Paleta de Materias (Subject Palette Engine Normalizado) */
-  --subject-calculus: #2563EB;
-  --subject-physics: #7C3AED;
-  --subject-literature: #D97706;
-  --subject-chemistry: #059669;
-  --subject-history: #B45309;
+  --subject-calculus: #1D4ED8;
+  --subject-physics: #0F766E;
+  --subject-literature: #92400E;
+  --subject-chemistry: #047857;
+  --subject-history: #9A3412;
 
   /* Tipografía */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

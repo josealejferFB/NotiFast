@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- impeccable-disable overused-font -- Plus Jakarta Sans is the canonical NotiFast Android app typeface defined in DESIGN.md -->
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -197,6 +198,31 @@
       <symbol id="icon-settings" viewBox="0 0 24 24">
         <path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
       </symbol>
+
+      <!-- Smartphone (P2P Device Node) -->
+      <symbol id="icon-smartphone" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+      </symbol>
+
+      <!-- CheckBox (DockedAccessoryToolbar.kt) -->
+      <symbol id="icon-checkbox" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </symbol>
+
+      <!-- PhotoCamera (DockedAccessoryToolbar.kt) -->
+      <symbol id="icon-camera" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
+      </symbol>
+
+      <!-- Menu Hamburger -->
+      <symbol id="icon-menu" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+      </symbol>
+
+      <!-- Close X -->
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -224,9 +250,54 @@
           <span class="theme-dot-live" aria-hidden="true"></span>
           <span id="nav-theme-mode-label">Tema en Vivo</span>
         </button>
-        <a href="#descargar" class="btn btn-primary btn-sm">Descargar App</a>
+        <a href="#descargar" class="btn btn-primary btn-sm nav-desktop-cta">Descargar App</a>
+        <button type="button" class="mobile-menu-toggle" id="btn-mobile-menu" aria-expanded="false" aria-controls="mobile-nav-drawer" aria-label="Abrir menú de navegación">
+          <svg class="menu-icon-open" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menu"></use></svg>
+          <svg class="menu-icon-close" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-close"></use></svg>
+        </button>
       </div>
     </div>
+
+    <!-- Mobile Navigation Drawer (< 992px) -->
+    <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Navegación móvil" hidden>
+      <div class="mobile-nav-grid">
+        <a href="#agenda" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+          <span>Agenda Activa</span>
+        </a>
+        <a href="#apuntes" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
+          <span>Apuntes &amp; LaTeX</span>
+        </a>
+        <a href="#calificaciones" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
+          <span>Calificaciones</span>
+        </a>
+        <a href="#evaluaciones" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-event"></use></svg>
+          <span>Calendario</span>
+        </a>
+        <a href="#temas" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
+          <span>Temas AAA</span>
+        </a>
+        <a href="#notificaciones" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-notifications"></use></svg>
+          <span>Notificaciones</span>
+        </a>
+        <a href="#analiticas" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-analytics"></use></svg>
+          <span>Analíticas</span>
+        </a>
+        <a href="#compartir" class="mobile-nav-item">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-qr"></use></svg>
+          <span>Pack P2P &amp; Drive</span>
+        </a>
+      </div>
+      <div class="mobile-nav-footer">
+        <a href="#descargar" class="btn btn-primary" style="width: 100%;">Descargar NotiFast para Android</a>
+      </div>
+    </nav>
   </header>
 
   <main id="main-content">
@@ -290,7 +361,7 @@
             </div>
             <div class="headsup-copy">
               <div class="headsup-title-row">
-                <span class="headsup-title" id="hero-headsup-title">⏰ Clase en 15 min: Cálculo</span>
+                <span class="headsup-title" id="hero-headsup-title">Clase en 15 min: Cálculo</span>
                 <span class="headsup-time">Ahora</span>
               </div>
               <p class="headsup-desc" id="hero-headsup-desc">08:00 - 10:00 • Aula 204. Toca para preparar tu apunte.</p>
@@ -349,17 +420,17 @@
               </div>
 
               <div class="phone-notes-mini-list">
-                <div class="phone-note-mini-card" style="border-left-color: #2563EB;">
+                <div class="phone-note-mini-card">
                   <div class="phone-note-mini-head">
                     <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
                     <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">Cálculo</span>
                   </div>
                   <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
                 </div>
-                <div class="phone-note-mini-card" style="border-left-color: #7C3AED;">
+                <div class="phone-note-mini-card">
                   <div class="phone-note-mini-head">
                     <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
-                    <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #7C3AED;">Física</span>
+                    <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #0F766E;">Física</span>
                   </div>
                   <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
                 </div>
@@ -635,11 +706,11 @@
             <button class="tb-btn tb-badge">H1</button>
             <button class="tb-btn tb-badge">H2</button>
             <span class="tb-divider" aria-hidden="true"></span>
-            <button class="tb-btn" title="Casilla de verificación">☑</button>
+            <button class="tb-btn" title="Casilla de verificación"><svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-checkbox"></use></svg></button>
             <button class="tb-btn" title="Viñeta">•</button>
             <span class="tb-divider" aria-hidden="true"></span>
             <button class="tb-btn tb-fx" title="Fórmula Matemática"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-functions"></use></svg></button>
-            <button class="tb-btn" title="Adjuntar foto">📷</button>
+            <button class="tb-btn" title="Adjuntar foto"><svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-camera"></use></svg></button>
           </div>
 
           <!-- Hoja Renderizada del Editor (rich-editor-sheet) -->
@@ -754,7 +825,7 @@
             </div>
 
             <div class="subject-grade-row">
-              <div class="s-icon" style="background: #F5F3FF; color: #7C3AED;">
+              <div class="s-icon" style="background: #F0FDFA; color: #0F766E;">
                 <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
               </div>
               <div class="s-info">
@@ -765,7 +836,7 @@
             </div>
 
             <div class="subject-grade-row">
-              <div class="s-icon" style="background: #FFFBEB; color: #D97706;">
+              <div class="s-icon" style="background: #FFFBEB; color: #92400E;">
                 <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
               </div>
               <div class="s-info">
@@ -1141,7 +1212,7 @@
 
               <button type="button" class="accent-swatch-btn" data-accent-preset="sakura_zen" role="radio" aria-checked="false">
                 <div class="swatch-dual-circle">
-                  <span class="swatch-half" style="background: #6D28D9;"></span>
+                  <span class="swatch-half" style="background: #0F766E;"></span>
                   <span class="swatch-half" style="background: #BE185D;"></span>
                 </div>
                 <span class="swatch-name">Sakura Zen</span>
@@ -1150,7 +1221,7 @@
 
               <button type="button" class="accent-swatch-btn" data-accent-preset="ocean_cyan" role="radio" aria-checked="false">
                 <div class="swatch-dual-circle">
-                  <span class="swatch-half" style="background: #0284C7;"></span>
+                  <span class="swatch-half" style="background: #0369A1;"></span>
                   <span class="swatch-half" style="background: #0F766E;"></span>
                 </div>
                 <span class="swatch-name">Minimal Nórdico</span>
@@ -1163,7 +1234,7 @@
           <div>
             <div class="studio-section-label">
               <span>2. Tono de Lienzo (BackgroundPreset)</span>
-              <span style="font-size: 0.7rem; color: var(--text-tertiary);">Independiente del acento</span>
+              <span style="font-size: 0.75rem; color: var(--text-tertiary);">Independiente del acento</span>
             </div>
             <div class="canvas-presets-strip" role="radiogroup" aria-label="Tonos de lienzo de fondo">
               <button type="button" class="canvas-swatch-chip active" data-bg-preset="classic" role="radio" aria-checked="true">
@@ -1183,7 +1254,7 @@
                 <span class="canvas-chip-name">Papiro</span>
               </button>
               <button type="button" class="canvas-swatch-chip" data-bg-preset="sakura_zen" role="radio" aria-checked="false">
-                <span class="canvas-chip-preview" style="background: #F2EAF7;"></span>
+                <span class="canvas-chip-preview" style="background: #E8EEF5;"></span>
                 <span class="canvas-chip-name">Lavanda</span>
               </button>
               <button type="button" class="canvas-swatch-chip" data-bg-preset="ocean_cyan" role="radio" aria-checked="false">
@@ -1280,7 +1351,7 @@
                   <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
                 </div>
                 <div class="notif-text-col">
-                  <div class="notif-banner-title" id="notif-banner-title">⏰ Clase en 15 min: Cálculo Diferencial</div>
+                  <div class="notif-banner-title" id="notif-banner-title">Clase en 15 min: Cálculo Diferencial</div>
                   <p class="notif-banner-body" id="notif-banner-body">08:00 - 10:00 • Aula 204 (Edificio Ciencias). Toca para abrir tu cuaderno de la sesión.</p>
                 </div>
               </div>
@@ -1367,7 +1438,7 @@
     <!-- 9. MÓDULO 6: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (Pack .notifast, QR Offline & Google Drive) -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
-        <div class="feature-pill-badge" style="background: #E0F2FE; color: #0284C7;">
+        <div class="feature-pill-badge" style="background: #E0F2FE; color: #0369A1;">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
           <span>Pack Académico P2P • QR Offline &amp; Drive Backup</span>
         </div>
@@ -1379,15 +1450,15 @@
         </p>
         <ul class="feature-bullets">
           <li>
-            <div class="bullet-icon" style="background: #E0F2FE; color: #0284C7;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
             <span><strong>Código QR &amp; Pack <code>.notifast</code>:</strong> Exporta horarios, apuntes y estructura de evaluaciones sin gastar datos móviles.</span>
           </li>
           <li>
-            <div class="bullet-icon" style="background: #E0F2FE; color: #0284C7;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
             <span><strong>Resolución inteligente de conflictos:</strong> Previsualiza el contenido del paquete antes de importar y evita duplicados automáticamente.</span>
           </li>
           <li>
-            <div class="bullet-icon" style="background: #E0F2FE; color: #0284C7;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
             <span><strong>Google Drive Cloud Backup:</strong> Respaldo cifrado en tu cuenta personal con restauración atómica y cero servidores intermediarios.</span>
           </li>
         </ul>
@@ -1406,7 +1477,7 @@
           <!-- Simulación de Transferencia P2P en el Aula -->
           <div class="p2p-simulation-stage">
             <div class="device-node device-sender">
-              <div class="device-avatar">📱</div>
+              <div class="device-avatar"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
               <span class="device-name">Tu Teléfono</span>
               <span class="device-status">Generando QR / Pack</span>
             </div>
@@ -1419,7 +1490,7 @@
             </div>
 
             <div class="device-node device-receiver">
-              <div class="device-avatar">📱</div>
+              <div class="device-avatar"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
               <span class="device-name">Compañero</span>
               <span class="device-status-success">¡Materia Importada!</span>
             </div>
@@ -1494,10 +1565,10 @@
         <!-- 2. Física -->
         <article class="subject-feature-card card-physics-detail" tabindex="0">
           <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #F5F3FF; color: #7C3AED;">
+            <div class="subject-hero-icon" style="background: #F0FDFA; color: #0F766E;">
               <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
             </div>
-            <div class="subject-grade-pill" style="background: #F5F3FF; color: #6D28D9;">
+            <div class="subject-grade-pill" style="background: #F0FDFA; color: #0F766E;">
               <span class="grade-pill-label">Promedio</span>
               <span class="grade-pill-val">8.5</span>
             </div>
@@ -1515,7 +1586,7 @@
               <span class="subj-progress-ratio">2 / 4 (50%)</span>
             </div>
             <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 50%; background: #7C3AED;"></div>
+              <div class="subj-progress-fill" style="width: 50%; background: #0F766E;"></div>
             </div>
           </div>
           <div class="subject-tags-strip">
@@ -1528,7 +1599,7 @@
         <!-- 3. Literatura -->
         <article class="subject-feature-card card-literature-detail" tabindex="0">
           <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #FFFBEB; color: #D97706;">
+            <div class="subject-hero-icon" style="background: #FFFBEB; color: #92400E;">
               <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
             </div>
             <div class="subject-grade-pill" style="background: #FFFBEB; color: #B45309;">
@@ -1549,7 +1620,7 @@
               <span class="subj-progress-ratio">2 / 2 (100%)</span>
             </div>
             <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 100%; background: #D97706;"></div>
+              <div class="subj-progress-fill" style="width: 100%; background: #92400E;"></div>
             </div>
           </div>
           <div class="subject-tags-strip">
@@ -1562,7 +1633,7 @@
         <!-- 4. Química Orgánica -->
         <article class="subject-feature-card card-chemistry-detail" tabindex="0">
           <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #ECFDF5; color: #059669;">
+            <div class="subject-hero-icon" style="background: #ECFDF5; color: #047857;">
               <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-biotech"></use></svg>
             </div>
             <div class="subject-grade-pill" style="background: #ECFDF5; color: #047857;">
@@ -1583,7 +1654,7 @@
               <span class="subj-progress-ratio">1 / 3 (33%)</span>
             </div>
             <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 33%; background: #059669;"></div>
+              <div class="subj-progress-fill" style="width: 33%; background: #047857;"></div>
             </div>
           </div>
           <div class="subject-tags-strip">

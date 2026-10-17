@@ -107,7 +107,7 @@
             <div style="font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.6; color: var(--text-primary);">
               <p style="color: var(--brand-primary); font-weight: 700;"># Teorema de Lagrange</p>
               <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto *c* tal que:</p>
-              <p style="color: #7C3AED; background: #F5F3FF; padding: 4px 8px; border-radius: 4px;">$$ f'(c) = \\frac{f(b) - f(a)}{b - a} $$</p>
+              <p style="color: #0F766E; background: #F0FDFA; padding: 4px 8px; border-radius: 4px;">$$ f'(c) = \\frac{f(b) - f(a)}{b - a} $$</p>
               <p>- [x] Demostración con el Teorema de Rolle<br>- [x] Ejercicios resueltos de optimización de costos<br>- [ ] Revisar guía para el examen del viernes</p>
               <p style="color: #881337;">> "La recta secante es paralela a la recta tangente en el punto c."</p>
             </div>
@@ -136,13 +136,14 @@
 
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // A. 3D Magnetic Parallax on Mousemove
+    // A. 3D Magnetic Parallax on Mousemove (Desktop orbital layout > 860px)
     if (!isReducedMotion) {
-      if (typeof gsap !== 'undefined') {
+      if (typeof gsap !== 'undefined' && window.innerWidth > 860) {
         gsap.set('.popout-subjects, .popout-alerts', { xPercent: -50 });
       }
 
       stage.addEventListener('mousemove', (e) => {
+        if (window.innerWidth <= 860) return;
         const rect = stage.getBoundingClientRect();
         const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
         const ny = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
@@ -179,6 +180,7 @@
       });
 
       stage.addEventListener('mouseleave', () => {
+        if (window.innerWidth <= 860) return;
         if (typeof gsap !== 'undefined') {
           gsap.to(stage, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'power2.out' });
           if (brandCore) gsap.to(brandCore, { x: 0, y: 0, duration: 0.7, ease: 'power2.out' });
@@ -352,40 +354,43 @@
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReducedMotion) return;
 
-    // A. Initial entry explosion of popout items
+    // A. Initial entry of popout items
     gsap.from('.popout-item', {
-      scale: 0,
+      scale: 0.92,
       opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'back.out(1.7)',
+      duration: 0.65,
+      stagger: 0.08,
+      ease: 'power2.out',
       scrollTrigger: {
         trigger: '.magic-box-showcase',
-        start: 'top 75%'
+        start: 'top 80%'
       }
     });
 
-    // B. Scrollytelling Choreography: As user scrolls down, items disperse outward & down towards features
-    ScrollTrigger.create({
-      trigger: '.notifast-hub-showcase',
-      start: 'top 20%',
-      end: 'bottom top',
-      scrub: 1.2,
-      onUpdate: (self) => {
-        const p = self.progress;
-        // Subtle flight trajectories: modules migrate towards destination sections
-        gsap.to('.popout-notes', { x: -45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-grades', { x: 45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-agenda', { x: -55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-nearby', { x: 55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-subjects', { xPercent: -50, y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.popout-alerts', { xPercent: -50, y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-        gsap.to('.notifast-floating-brand', { scale: 1 - 0.12 * p, opacity: 1 - 0.25 * p, overwrite: 'auto' });
-      }
-    });
+    // B. Scrollytelling Choreography (Desktop orbital layout > 860px only)
+    if (window.innerWidth > 860) {
+      ScrollTrigger.create({
+        trigger: '.notifast-hub-showcase',
+        start: 'top 20%',
+        end: 'bottom top',
+        scrub: 1.2,
+        onUpdate: (self) => {
+          if (window.innerWidth <= 860) return;
+          const p = self.progress;
+          gsap.to('.popout-notes', { x: -45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+          gsap.to('.popout-grades', { x: 45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+          gsap.to('.popout-agenda', { x: -55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+          gsap.to('.popout-nearby', { x: 55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+          gsap.to('.popout-subjects', { xPercent: -50, y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+          gsap.to('.popout-alerts', { xPercent: -50, y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+          gsap.to('.notifast-floating-brand', { scale: 1 - 0.12 * p, opacity: 1 - 0.25 * p, overwrite: 'auto' });
+        }
+      });
+    }
 
-    // C. Zig-zag rows animation with section landing triggers
+    // C. Zig-zag rows animation with section landing triggers (vertical-only on mobile)
     const rows = document.querySelectorAll('.dynamic-feature-row');
+    const isDesktop = window.innerWidth > 991;
     rows.forEach((row) => {
       const visual = row.querySelector('.feature-visual');
       const info = row.querySelector('.feature-info');
@@ -393,26 +398,28 @@
 
       if (visual) {
         gsap.from(visual, {
-          x: isReverse ? -50 : 50,
+          x: isDesktop ? (isReverse ? -36 : 36) : 0,
+          y: isDesktop ? 0 : 24,
           opacity: 0,
-          duration: 0.85,
+          duration: 0.75,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: row,
-            start: 'top 75%'
+            start: 'top 80%'
           }
         });
       }
 
       if (info) {
         gsap.from(info, {
-          x: isReverse ? 40 : -40,
+          x: isDesktop ? (isReverse ? 28 : -28) : 0,
+          y: isDesktop ? 0 : 20,
           opacity: 0,
-          duration: 0.85,
+          duration: 0.75,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: row,
-            start: 'top 75%'
+            start: 'top 80%'
           }
         });
       }
@@ -589,7 +596,7 @@
       type: 'EXAM',
       icon: '#icon-quiz',
       subject: 'Química Orgánica',
-      subjectColor: '#059669',
+      subjectColor: '#047857',
       weight: 15,
       isPresented: true,
       grade: '9.8 / 10',
@@ -597,7 +604,7 @@
       statusText: '✓ Calificada • 9.8 pts',
       isGraded: true,
       tintBg: '#ECFDF5',
-      iconTint: '#059669',
+      iconTint: '#047857',
       dotClass: 'dot-aqua-eval'
     },
     {
@@ -613,7 +620,7 @@
       isPresented: false,
       grade: null,
       timeText: 'Jueves 08:00 AM • Aula 204',
-      statusText: '⏰ En 2 días • Alta Ponderación',
+      statusText: 'En 2 días • Alta Ponderación',
       isGraded: false,
       tintBg: '#FFF1F2',
       iconTint: '#9E1B32',
@@ -627,12 +634,12 @@
       type: 'PROJECT',
       icon: '#icon-assignment',
       subject: 'Física Mecánica',
-      subjectColor: '#7C3AED',
+      subjectColor: '#0F766E',
       weight: 30,
       isPresented: false,
       grade: null,
       timeText: 'Jueves 14:00 • Informe + Código',
-      statusText: '📅 En 9 días • Trabajo Grupal',
+      statusText: 'En 9 días • Trabajo Grupal',
       isGraded: false,
       tintBg: '#F0FDFA',
       iconTint: '#2A7B7B',
@@ -646,15 +653,15 @@
       type: 'PRESENTATION',
       icon: '#icon-school',
       subject: 'Literatura Universal',
-      subjectColor: '#D97706',
+      subjectColor: '#92400E',
       weight: 20,
       isPresented: false,
       grade: null,
       timeText: 'Miércoles 10:00 AM • Auditorio',
-      statusText: '📅 En 15 días • Diapositivas',
+      statusText: 'En 15 días • Diapositivas',
       isGraded: false,
       tintBg: '#FFFBEB',
-      iconTint: '#D97706',
+      iconTint: '#92400E',
       dotClass: 'dot-amber-eval'
     }
   ];
@@ -914,7 +921,7 @@
           statRequired.style.color = 'var(--brand-primary)';
         } else {
           statRequired.innerHTML = `${formattedRequired} <small>/ 10</small>`;
-          statRequired.style.color = required >= 8.5 ? '#D97706' : 'var(--brand-secondary)';
+          statRequired.style.color = required >= 8.5 ? '#92400E' : 'var(--brand-secondary)';
         }
       }
 
@@ -1017,7 +1024,7 @@
     if (bellBtn) {
       bellBtn.addEventListener('click', () => {
         triggerPhoneHeadsup(
-          '⏰ Clase en 15 min: Cálculo',
+          'Clase en 15 min: Cálculo',
           '08:00 - 10:00 • Aula 204. Toca para preparar tu apunte.'
         );
       });
@@ -1051,17 +1058,17 @@
           </div>
 
           <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card" style="border-left-color: #2563EB;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
                 <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">Cálculo</span>
               </div>
               <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: #7C3AED;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
-                <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #7C3AED;">Física</span>
+                <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #0F766E;">Física</span>
               </div>
               <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
             </div>
@@ -1081,24 +1088,24 @@
           </div>
 
           <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card" style="border-left-color: var(--brand-primary);">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Parcial II: Optimización</span>
                 <span class="phone-note-mini-tag" style="background: var(--brand-primary-light); color: var(--brand-primary);">35% Nota</span>
               </div>
-              <p class="phone-note-mini-preview">⏰ En 2 días • Recordatorio WorkManager activo</p>
+              <p class="phone-note-mini-preview">En 2 días • Recordatorio WorkManager activo</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: var(--brand-secondary);">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Proyecto Péndulo Doble</span>
                 <span class="phone-note-mini-tag" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">30% Nota</span>
               </div>
-              <p class="phone-note-mini-preview">📅 22 Oct • Entrega grupal + código fuente</p>
+              <p class="phone-note-mini-preview">22 Oct • Entrega grupal + código fuente</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: #059669;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Prof. Carlos Gómez (Cátedra)</span>
-                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.14); color: #059669;">WhatsApp</span>
+                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.14); color: #047857;">WhatsApp</span>
               </div>
               <p class="phone-note-mini-preview">Cubículo 302 • Asesorías Mar/Jue 14:00</p>
             </div>
@@ -1117,24 +1124,24 @@
           </div>
 
           <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card" style="border-left-color: #2563EB;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Cálculo Diferencial</span>
                 <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">8.80 / 10</span>
               </div>
               <p class="phone-note-mini-preview">Necesitas 7.20 en el 35% restante para cerrar en 8.5</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: #D97706;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Literatura Universal</span>
-                <span class="phone-note-mini-tag" style="background: rgba(217,119,6,0.12); color: #D97706;">9.10 / 10</span>
+                <span class="phone-note-mini-tag" style="background: rgba(217,119,6,0.12); color: #92400E;">9.10 / 10</span>
               </div>
               <p class="phone-note-mini-preview">100% evaluado • Materia aprobada con distinción</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: #059669;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Química Orgánica</span>
-                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.12); color: #059669;">8.80 / 10</span>
+                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.12); color: #047857;">8.80 / 10</span>
               </div>
               <p class="phone-note-mini-preview">Quiz I: 9.8 pts (15%) • 2 exámenes pendientes</p>
             </div>
@@ -1145,24 +1152,24 @@
         title: 'Ajustes & Estudio AAA',
         html: `
           <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card" style="border-left-color: var(--brand-primary);">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Paleta &amp; Lienzo Activo</span>
                 <span class="phone-note-mini-tag" style="background: var(--brand-primary-light); color: var(--brand-primary);">WCAG AAA</span>
               </div>
               <p class="phone-note-mini-preview">6 Acentos + 6 Lienzos + Estudio Hex/HSL sincronizado</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: var(--brand-secondary);">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Notificaciones Proactivas</span>
                 <span class="phone-note-mini-tag" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">Activas</span>
               </div>
               <p class="phone-note-mini-preview">Clases (15m) • Exámenes (2d) • Resumen 07:00 AM</p>
             </div>
-            <div class="phone-note-mini-card" style="border-left-color: #0284C7;">
+            <div class="phone-note-mini-card">
               <div class="phone-note-mini-head">
                 <span class="phone-note-mini-title">Google Drive Cloud Backup</span>
-                <span class="phone-note-mini-tag" style="background: rgba(2,132,199,0.14); color: #0284C7;">Cifrado</span>
+                <span class="phone-note-mini-tag" style="background: rgba(2,132,199,0.14); color: #0369A1;">Cifrado</span>
               </div>
               <p class="phone-note-mini-preview">Carpeta privada appDataFolder • Room SQLite</p>
             </div>
@@ -1196,7 +1203,7 @@
     // Trigger a subtle welcome heads-up notification 1.8s after load
     setTimeout(() => {
       triggerPhoneHeadsup(
-        '⏰ Clase en 15 min: Cálculo',
+        'Clase en 15 min: Cálculo',
         '08:00 - 10:00 • Aula 204. Toca la campana o prueba los temas.'
       );
     }, 1800);
@@ -1226,12 +1233,12 @@
     },
     sakura_zen: {
       name: 'Sakura Zen',
-      light: { primary: '#6D28D9', secondary: '#BE185D', primaryLight: '#F3E8FF', secondaryLight: '#FCE7F3' },
+      light: { primary: '#0F766E', secondary: '#BE185D', primaryLight: '#F3E8FF', secondaryLight: '#FCE7F3' },
       dark:  { primary: '#A78BFA', secondary: '#F472B6', primaryLight: 'rgba(167,139,250,0.16)', secondaryLight: 'rgba(244,114,182,0.16)' }
     },
     ocean_cyan: {
       name: 'Minimal Nórdico',
-      light: { primary: '#0284C7', secondary: '#0F766E', primaryLight: '#E0F2FE', secondaryLight: '#CCFBF1' },
+      light: { primary: '#0369A1', secondary: '#0F766E', primaryLight: '#E0F2FE', secondaryLight: '#CCFBF1' },
       dark:  { primary: '#38BDF8', secondary: '#2DD4BF', primaryLight: 'rgba(56,189,248,0.16)', secondaryLight: 'rgba(45,212,191,0.16)' }
     }
   };
@@ -1259,7 +1266,7 @@
     },
     sakura_zen: {
       name: 'Lavanda',
-      light: { canvas: '#F2EAF7', surface: '#FAF6FC', container: '#E4D3EE' },
+      light: { canvas: '#E8EEF5', surface: '#FAF6FC', container: '#E4D3EE' },
       dark:  { canvas: '#130B1C', surface: '#20122E', container: '#2F1B43' }
     },
     ocean_cyan: {
@@ -1498,7 +1505,7 @@
         return {
           tag: 'CANAL CLASES • WORKMANAGER',
           icon: '#icon-school',
-          title: `⏰ Clase en ${classLead}: Cálculo Diferencial`,
+          title: `Clase en ${classLead}: Cálculo Diferencial`,
           body: '08:00 - 10:00 • Aula 204 (Edificio Ciencias). Toca para abrir el cuaderno de la sesión.',
           action: 'Abrir apunte de clase'
         };
@@ -1507,7 +1514,7 @@
         return {
           tag: 'CANAL EVALUACIONES • ALARMA EXACTA',
           icon: '#icon-quiz',
-          title: `📝 Evaluación en ${examLead}: Parcial II Optimización`,
+          title: `Evaluación en ${examLead}: Parcial II Optimización`,
           body: 'Cálculo Diferencial • Representa el 35% de tu nota final. ¡Buen momento para repasar!',
           action: 'Simular nota requerida'
         };
@@ -1515,7 +1522,7 @@
       return {
         tag: 'RESUMEN MATUTINO • 07:00 AM',
         icon: '#icon-lightmode',
-        title: '☀️ Buenos días: Tu agenda de hoy en NotiFast',
+        title: 'Buenos días: Tu agenda de hoy en NotiFast',
         body: 'Tienes 3 clases programadas (primera a las 08:00 AM) y 1 entrega próxima esta semana.',
         action: 'Ver agenda del día'
       };
@@ -1597,7 +1604,45 @@
     }
   }
 
+  // 12. Mobile Navigation Drawer Toggle (< 992px)
+  function setupMobileNavigation() {
+    const toggleBtn = document.getElementById('btn-mobile-menu');
+    const drawer = document.getElementById('mobile-nav-drawer');
+    if (!toggleBtn || !drawer) return;
+
+    function closeMenu() {
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      toggleBtn.classList.remove('open');
+      drawer.hidden = true;
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const isOpen = toggleBtn.getAttribute('aria-expanded') === 'true';
+      if (isOpen) {
+        closeMenu();
+      } else {
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        toggleBtn.classList.add('open');
+        drawer.hidden = false;
+      }
+    });
+
+    drawer.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        closeMenu();
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !drawer.hidden) {
+        closeMenu();
+        toggleBtn.focus();
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    setupMobileNavigation();
     setupStudioBox();
     setupHubInteractions();
     setupFloatingRadarDock();

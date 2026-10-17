@@ -275,6 +275,33 @@ class TestLandingStructure(unittest.TestCase):
             html = f.read()
         self.assertIn("https://notifast.pages.dev/", html)
 
+    def test_mobile_responsiveness_and_zero_emojis(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        with open("landing/css/styles.css", "r", encoding="utf-8") as f:
+            styles = f.read()
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            showcase_css = f.read()
+
+        # 1. Mobile navigation drawer and button
+        self.assertIn('id="btn-mobile-menu"', html)
+        self.assertIn('id="mobile-nav-drawer"', html)
+        self.assertIn("setupMobileNavigation", js)
+        self.assertIn(".mobile-menu-toggle", styles)
+        self.assertIn(".mobile-nav-drawer", styles)
+
+        # 2. Responsive media queries for mobile & tablet viewports
+        self.assertIn("@media (max-width: 860px)", showcase_css)
+        self.assertIn("@media (max-width: 640px)", showcase_css)
+        self.assertIn("@media (max-width: 540px)", showcase_css)
+
+        # 3. Zero emojis across HTML and JS
+        for forbidden_emoji in ["⏰", "☑", "📷", "📱", "📅", "📝", "☀️", "🚀", "✨", "🔥", "💡"]:
+            self.assertNotIn(forbidden_emoji, html)
+            self.assertNotIn(forbidden_emoji, js)
+
 if __name__ == "__main__":
     unittest.main()
 
