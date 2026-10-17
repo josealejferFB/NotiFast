@@ -206,5 +206,62 @@ class UserPrefsRepositoryTest {
         val result = repository.setBackgroundPresetId("sakura_zen")
         assertTrue(result.isSuccess)
     }
+
+    @Test
+    fun `exportAll includes theme preset, background preset and custom hex when present`() = runTest {
+        val prefs = mockk<Preferences>()
+        val themePresetKey = stringPreferencesKey("theme_preset_id")
+        val backgroundPresetKey = stringPreferencesKey("background_preset_id")
+        val customHexKey = stringPreferencesKey("custom_theme_primary_hex")
+
+        every { prefs[isDarkModeKey] } returns true
+        every { prefs[hasDarkModeSetKey] } returns true
+        every { prefs[stringPreferencesKey("theme_accent")] } returns "ruby"
+        every { prefs[booleanPreferencesKey("haptics_enabled")] } returns null
+        every { prefs[booleanPreferencesKey("class_alerts_enabled")] } returns null
+        every { prefs[androidx.datastore.preferences.core.intPreferencesKey("class_alert_minutes")] } returns null
+        every { prefs[booleanPreferencesKey("eval_alerts_enabled")] } returns null
+        every { prefs[androidx.datastore.preferences.core.intPreferencesKey("eval_alert_days")] } returns null
+        every { prefs[booleanPreferencesKey("daily_summary_enabled")] } returns null
+        every { prefs[defaultGradeScaleKey] } returns "0-20"
+        every { prefs[androidx.datastore.preferences.core.floatPreferencesKey("min_passing_grade")] } returns 10.5f
+        every { prefs[stringPreferencesKey("active_academic_cycle")] } returns "2026-II"
+        every { prefs[stringPreferencesKey("first_day_of_week")] } returns "MONDAY"
+        every { prefs[showCompletedEvaluationsKey] } returns true
+        every { prefs[themePresetKey] } returns "forest_sage"
+        every { prefs[backgroundPresetKey] } returns "warm_mocha"
+        every { prefs[customHexKey] } returns "#15803D"
+
+        every { dataStore.data } returns flowOf(prefs)
+
+        val exported = repository.exportAll()
+        assertEquals("forest_sage", exported["theme_preset_id"])
+        assertEquals("warm_mocha", exported["background_preset_id"])
+        assertEquals("#15803D", exported["custom_theme_primary_hex"])
+        assertEquals("true", exported["is_dark_mode"])
+        assertEquals("0-20", exported["default_grade_scale"])
+    }
+
+    @Test
+    fun `importAll handles legacy backup without theme keys gracefully`() = runTest {
+        val legacyBackupMap = mapOf(
+            "is_dark_mode" to "true",
+            "has_dark_mode_set" to "true",
+            "default_grade_scale" to "0-20"
+        )
+        val result = repository.importAll(legacyBackupMap)
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `importAll handles complete backup with theme and background presets`() = runTest {
+        val modernBackupMap = mapOf(
+            "theme_preset_id" to "midnight_indigo",
+            "background_preset_id" to "ocean_cyan",
+            "custom_theme_primary_hex" to "#4F46E5"
+        )
+        val result = repository.importAll(modernBackupMap)
+        assertTrue(result.isSuccess)
+    }
 }
 
