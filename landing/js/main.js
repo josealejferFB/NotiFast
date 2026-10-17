@@ -8,7 +8,7 @@
 
   // Modal / Toast for Google Play Download CTA
   function setupDownloadModal() {
-    const downloadButtons = document.querySelectorAll('a[href="#descargar"], #btn-download-hero, #btn-download-cta');
+    const downloadButtons = document.querySelectorAll('a[href="#descargar"]');
     const toast = document.getElementById('download-toast');
     const toastCloseBtn = document.getElementById('toast-close-btn');
 

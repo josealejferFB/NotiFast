@@ -103,17 +103,16 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("0-100", js)
         self.assertIn("A-F", js)
 
-    def test_notifast_central_hub_present(self):
+    def test_notifast_hero_showcase_and_radar_present(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
-        self.assertIn("magic-box-showcase", html)
-        self.assertIn("notifast-core-hub", html)
-        self.assertIn("notifast-core-icon", html)
-        self.assertIn("popout-notes", html)
-        self.assertIn("popout-grades", html)
+        self.assertIn("hero-phone-frame", html)
+        self.assertIn("phone-bottom-nav", html)
+        self.assertIn("phone-screen-body", html)
         self.assertIn("hub-floating-radar", html)
-        self.assertIn("en un solo lugar", html.lower())
-        # Verificar que se eliminó la sobrecarga cognitiva de 'desplegado desde modulo'
+        # Verificar que se eliminó el hub orbital redundante y la sobrecarga cognitiva
+        self.assertNotIn("magic-box-showcase", html)
+        self.assertNotIn("notifast-core-hub", html)
         self.assertNotIn("section-origin-indicator", html)
         self.assertNotIn("Desplegado desde", html)
 
@@ -124,7 +123,7 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("btn-download-hero", html)
         self.assertIn("btn-download-cta", html)
         self.assertIn("download-toast", html)
-        self.assertIn("Google Play", html)
+        self.assertIn("Descargar APK", html)
 
     def test_evaluations_calendar_section_exists(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
@@ -207,14 +206,13 @@ class TestLandingStructure(unittest.TestCase):
     def test_showcase_hover_bounds_and_centering(self):
         with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
             css = f.read()
-        self.assertIn(".popout-subjects:hover", css)
-        self.assertIn(".popout-alerts:hover", css)
+        self.assertIn(".hub-floating-radar", css)
         self.assertIn("translateX(-50%)", css)
 
         with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
             js = f.read()
-        self.assertIn("xPercent: -50", js)
-        self.assertIn(".popout-subjects, .popout-alerts", js)
+        self.assertIn("setupFloatingRadarDock", js)
+        self.assertIn("hub-floating-radar", js)
 
     def test_enhanced_footer_structure(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
@@ -293,9 +291,8 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".mobile-nav-drawer", styles)
 
         # 2. Responsive media queries for mobile & tablet viewports
-        self.assertIn("@media (max-width: 860px)", showcase_css)
+        self.assertIn("@media (max-width: 992px)", showcase_css)
         self.assertIn("@media (max-width: 640px)", showcase_css)
-        self.assertIn("@media (max-width: 540px)", showcase_css)
 
         # 3. Zero emojis across HTML and JS
         for forbidden_emoji in ["⏰", "☑", "📷", "📱", "📅", "📝", "☀️", "🚀", "✨", "🔥", "💡"]:

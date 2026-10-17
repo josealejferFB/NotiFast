@@ -38,7 +38,7 @@
     'sticker-blue'
   ];
 
-  const PARTICLE_COUNT = 16;
+  const PARTICLE_COUNT = 8;
   const particles = [];
 
   // Generate particles distributed across the page height
@@ -47,9 +47,9 @@
     el.className = `study-sticker ${COLOR_CLASSES[i % COLOR_CLASSES.length]}`;
 
     // Randomize initial positions (spread throughout viewport and below fold)
-    const leftPercent = 5 + (i * 21) % 88; // 5% to 93%
-    const topPercent = (i * 7.5) % 110;     // distributed along page
-    const size = 38 + ((i * 7) % 24);      // 38px to 62px
+    const leftPercent = 8 + (i * 24) % 84; // 8% to 92%
+    const topPercent = (i * 14) % 110;     // distributed along page
+    const size = 32 + ((i * 6) % 18);      // 32px to 50px
     const iconId = ICONS[i % ICONS.length];
 
     el.style.left = `${leftPercent}%`;
@@ -69,10 +69,10 @@
     particles.push({
       el,
       baseTop: topPercent,
-      speed: 0.08 + (i % 5) * 0.04,
-      amplitude: 12 + (i % 4) * 6,
+      speed: 0.04 + (i % 4) * 0.02,
+      amplitude: 6 + (i % 3) * 3,
       phase: (i * 1.3),
-      rotationSpeed: (i % 2 === 0 ? 1 : -1) * (0.015 + (i % 3) * 0.008)
+      rotationSpeed: (i % 2 === 0 ? 1 : -1) * (0.008 + (i % 3) * 0.004)
     });
   }
 

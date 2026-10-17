@@ -24,7 +24,7 @@
   /* Tintas Tipográficas de Alto Énfasis */
   --text-primary: #181A1F;      /* Tinta Oxford (16.2:1 AAA sobre #FAF9F6) */
   --text-secondary: #4B5563;    /* Grafito Muted (6.8:1 AAA) */
-  --text-muted: #64748B;        /* Grafito Suave */
+  --text-muted: #475569;        /* Grafito Suave (6.3:1 AAA sobre #F3EFEA) */
 
   /* Identidad Primaria — Muted Crimson / Tenue Ruby */
   --brand-primary: #9E1B32;

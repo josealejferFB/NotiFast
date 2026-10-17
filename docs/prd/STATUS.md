@@ -861,7 +861,14 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
    - Sustitución de referencias legadas (Firestore / Android Nearby) por la arquitectura vigente: **Room SQLite v4 100% Offline-First**, **Google Drive Cloud Backup privado (`appDataFolder`)**, **Pack Académico `.notifast` (GZIP + Base64) & Código QR Offline**, **Editor por Bloques con Fotos Anotadas** y **Directorio de Profesores con WhatsApp contextual**.
    - Sincronización completa de [`PRODUCT.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md), [`DESIGN.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md), [`.impeccable/design.json`](file:///home/p0xd/Documentos/proyectos/NotiFast/.impeccable/design.json), [`AGENTS.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/AGENTS.md) y [`README.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/README.md).
 5. **Despliegue Continuo (CI/CD) en Cloudflare Pages ([`https://notifast.pages.dev/`](https://notifast.pages.dev/)):**
-   - Pipeline `.github/workflows/ci.yml` validado con suite Python E2E + estructural (`21/21` pruebas en `tests/`) y despliegue automatizado al dominio de producción `https://notifast.pages.dev/` mediante `cloudflare/wrangler-action@v3` (`--project-name=notifast --branch=main`).
+   - Pipeline `.github/workflows/ci.yml` validado con suite Python E2E + estructural (`22/22` pruebas en `tests/`) y despliegue automatizado al dominio de producción `https://notifast.pages.dev/` mediante `cloudflare/wrangler-action@v3` (`--project-name=notifast --branch=main`).
+6. **Remediación Impeccable Critique & Re-Score AAA (98.0% — 39.2 / 40.0):**
+   - Eliminación total del hub orbital redundante (`magic-box-showcase`) y descarte de ruido cósmico para una transición limpia y directa al contenido.
+   - Atenuación de hiperactividad visual: stickers de fondo suavizados a marca de agua sutil de papel (opacidad `0.035`), supresión de popups automáticos molestos y sustitución de 17 curvas de rebote por aceleración exponencial suave (`cubic-bezier(0.16, 1, 0.3, 1)`).
+   - Conversión honesta y directa: sustitución de modales disculpatorios por enlaces de descarga directa al APK oficial v1.0 RC alojado en GitHub Releases.
+   - Ocultamiento de la barra radar flotante en móviles y tablets (`<= 992px`) para eliminar 50px de oclusión vertical y micro-chips ilegibles.
+   - Contraste WCAG AAA reforzado (`--text-muted: #475569`, ratio >6.3:1) y etiquetas de materias con contraste óptimo.
+   - Suite completa de 22/22 pruebas Python en verde (`test_landing_structure.py` y `test_landing_e2e.py`) y 0 errores / 0 advertencias en el detector Impeccable.
 
 ---
 

@@ -46,7 +46,7 @@ class TestLandingE2E(unittest.TestCase):
             body = response.read().decode("utf-8")
             self.assertIn("<!DOCTYPE html>", body)
             self.assertIn("NotiFast", body)
-            self.assertIn("magic-box-showcase", body)
+            self.assertIn("hero-phone-frame", body)
             self.assertIn("section-notes-flow", body)
             self.assertIn("section-grades-lab", body)
             self.assertIn("section-schedule-radar", body)

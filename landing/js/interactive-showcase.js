@@ -10,31 +10,6 @@
 (function () {
   'use strict';
 
-  // 1. Studio Box Unboxing
-  function setupStudioBox() {
-    const chestContainer = document.querySelector('.study-chest-container');
-    if (!chestContainer) return;
-
-    // Toggle on click
-    chestContainer.addEventListener('click', () => {
-      chestContainer.classList.toggle('chest-open');
-    });
-
-    // Auto-open on scroll into view
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            chestContainer.classList.add('chest-open');
-          }
-        });
-      }, { threshold: 0.3 });
-
-      observer.observe(chestContainer);
-    } else {
-      chestContainer.classList.add('chest-open');
-    }
-  }
 
   // 2. "Tomar Apuntes" Quick Action from Schedule Card
   function setupTakeNotesAction() {
@@ -125,152 +100,6 @@
     });
   }
 
-  // 4. Hub 3D Magnetic Parallax, Beam Highlights & Click-to-Fly Spotlight
-  function setupHubInteractions() {
-    const stage = document.getElementById('hub-interactive-stage');
-    const brandCore = document.querySelector('.notifast-floating-brand');
-    const popoutItems = document.querySelectorAll('.popout-item');
-    const aura = document.querySelector('.notifast-icon-aura');
-
-    if (!stage) return;
-
-    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // A. 3D Magnetic Parallax on Mousemove (Desktop orbital layout > 860px)
-    if (!isReducedMotion) {
-      if (typeof gsap !== 'undefined' && window.innerWidth > 860) {
-        gsap.set('.popout-subjects, .popout-alerts', { xPercent: -50 });
-      }
-
-      stage.addEventListener('mousemove', (e) => {
-        if (window.innerWidth <= 860) return;
-        const rect = stage.getBoundingClientRect();
-        const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-        const ny = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-
-        if (typeof gsap !== 'undefined') {
-          gsap.to(stage, {
-            rotateX: -ny * 4,
-            rotateY: nx * 4,
-            duration: 0.4,
-            ease: 'power1.out'
-          });
-
-          if (brandCore) {
-            gsap.to(brandCore, {
-              x: nx * 8,
-              y: ny * 8,
-              duration: 0.4,
-              ease: 'power1.out'
-            });
-          }
-
-          popoutItems.forEach((item, idx) => {
-            const isCentered = item.classList.contains('popout-subjects') || item.classList.contains('popout-alerts');
-            const factor = (idx % 2 === 0) ? 1.1 : -0.9;
-            gsap.to(item, {
-              xPercent: isCentered ? -50 : 0,
-              x: nx * 5 * factor,
-              y: ny * 4 * factor,
-              duration: 0.45,
-              ease: 'power1.out'
-            });
-          });
-        }
-      });
-
-      stage.addEventListener('mouseleave', () => {
-        if (window.innerWidth <= 860) return;
-        if (typeof gsap !== 'undefined') {
-          gsap.to(stage, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'power2.out' });
-          if (brandCore) gsap.to(brandCore, { x: 0, y: 0, duration: 0.7, ease: 'power2.out' });
-          popoutItems.forEach(item => {
-            const isCentered = item.classList.contains('popout-subjects') || item.classList.contains('popout-alerts');
-            gsap.to(item, {
-              xPercent: isCentered ? -50 : 0,
-              x: 0,
-              y: 0,
-              duration: 0.7,
-              ease: 'power2.out'
-            });
-          });
-        }
-      });
-    }
-
-    // B. Beam Highlight & Aura Reaction on Popout Hover
-    const BEAM_MAP = {
-      'popout-notes': '#beam-notes',
-      'popout-grades': '#beam-grades',
-      'popout-agenda': '#beam-agenda',
-      'popout-nearby': '#beam-nearby',
-      'popout-subjects': '#beam-subjects',
-      'popout-alerts': '#beam-alerts'
-    };
-
-    popoutItems.forEach(item => {
-      // Find matching beam
-      let targetBeamId = null;
-      for (const [cls, beamId] of Object.entries(BEAM_MAP)) {
-        if (item.classList.contains(cls)) {
-          targetBeamId = beamId;
-          break;
-        }
-      }
-
-      const beamEl = targetBeamId ? document.querySelector(targetBeamId) : null;
-
-      item.addEventListener('mouseenter', () => {
-        if (beamEl) beamEl.style.stroke = 'rgba(158, 27, 50, 0.35)';
-        if (aura) {
-          aura.style.transform = 'translate(-50%, -50%) scale(1.15)';
-          aura.style.opacity = '0.9';
-        }
-      });
-
-      item.addEventListener('mouseleave', () => {
-        if (beamEl) beamEl.style.stroke = '';
-        if (aura) {
-          aura.style.transform = '';
-          aura.style.opacity = '';
-        }
-      });
-
-      // C. Click-to-Fly Spotlight Navigation
-      function triggerNavigation(e) {
-        e.preventDefault();
-        const targetSelector = item.getAttribute('data-target');
-        if (!targetSelector) return;
-
-        const targetSection = document.querySelector(targetSelector);
-        if (!targetSection) return;
-
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        // Highlight main visual feature card
-        const spotlightTarget = targetSection.querySelector(
-          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .theme-studio-workbench, .notifications-simulator-card, .nearby-transfer-card, .subjects-grid'
-        );
-
-        if (spotlightTarget) {
-          spotlightTarget.classList.remove('section-spotlight-active');
-          void spotlightTarget.offsetWidth; // Force reflow
-          spotlightTarget.classList.add('section-spotlight-active');
-
-          setTimeout(() => {
-            spotlightTarget.classList.remove('section-spotlight-active');
-          }, 1800);
-        }
-      }
-
-      item.addEventListener('click', triggerNavigation);
-      item.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          triggerNavigation(e);
-        }
-      });
-    });
-  }
 
   // 5. Persistent Scrollytelling Radar Dock
   function setupFloatingRadarDock() {
@@ -354,38 +183,40 @@
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReducedMotion) return;
 
-    // A. Initial entry of popout items
-    gsap.from('.popout-item', {
-      scale: 0.92,
-      opacity: 0,
-      duration: 0.65,
-      stagger: 0.08,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.magic-box-showcase',
-        start: 'top 80%'
-      }
-    });
-
-    // B. Scrollytelling Choreography (Desktop orbital layout > 860px only)
-    if (window.innerWidth > 860) {
-      ScrollTrigger.create({
-        trigger: '.notifast-hub-showcase',
-        start: 'top 20%',
-        end: 'bottom top',
-        scrub: 1.2,
-        onUpdate: (self) => {
-          if (window.innerWidth <= 860) return;
-          const p = self.progress;
-          gsap.to('.popout-notes', { x: -45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-          gsap.to('.popout-grades', { x: 45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-          gsap.to('.popout-agenda', { x: -55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-          gsap.to('.popout-nearby', { x: 55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-          gsap.to('.popout-subjects', { xPercent: -50, y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-          gsap.to('.popout-alerts', { xPercent: -50, y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-          gsap.to('.notifast-floating-brand', { scale: 1 - 0.12 * p, opacity: 1 - 0.25 * p, overwrite: 'auto' });
+    // A. Initial entry of popout items (if hub section exists)
+    if (document.querySelector('.magic-box-showcase')) {
+      gsap.from('.popout-item', {
+        scale: 0.92,
+        opacity: 0,
+        duration: 0.65,
+        stagger: 0.08,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.magic-box-showcase',
+          start: 'top 80%'
         }
       });
+
+      // B. Scrollytelling Choreography (Desktop orbital layout > 860px only)
+      if (window.innerWidth > 860) {
+        ScrollTrigger.create({
+          trigger: '.notifast-hub-showcase',
+          start: 'top 20%',
+          end: 'bottom top',
+          scrub: 1.2,
+          onUpdate: (self) => {
+            if (window.innerWidth <= 860) return;
+            const p = self.progress;
+            gsap.to('.popout-notes', { x: -45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+            gsap.to('.popout-grades', { x: 45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+            gsap.to('.popout-agenda', { x: -55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+            gsap.to('.popout-nearby', { x: 55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+            gsap.to('.popout-subjects', { xPercent: -50, y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+            gsap.to('.popout-alerts', { xPercent: -50, y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
+            gsap.to('.notifast-floating-brand', { scale: 1 - 0.12 * p, opacity: 1 - 0.25 * p, overwrite: 'auto' });
+          }
+        });
+      }
     }
 
     // C. Zig-zag rows animation with section landing triggers (vertical-only on mobile)
@@ -435,7 +266,7 @@
         if (prog) {
           prog.style.width = '0%';
           setTimeout(() => {
-            prog.style.transition = 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            prog.style.transition = 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
             prog.style.width = '62.5%';
           }, 100);
         }
@@ -1200,13 +1031,6 @@
       });
     });
 
-    // Trigger a subtle welcome heads-up notification 1.8s after load
-    setTimeout(() => {
-      triggerPhoneHeadsup(
-        'Clase en 15 min: Cálculo',
-        '08:00 - 10:00 • Aula 204. Toca la campana o prueba los temas.'
-      );
-    }, 1800);
   }
 
   // 10. Live Theme Customizer Studio (Exact Presets from ThemePreset.kt & BackgroundPreset.kt)
@@ -1643,8 +1467,6 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     setupMobileNavigation();
-    setupStudioBox();
-    setupHubInteractions();
     setupFloatingRadarDock();
     setupTakeNotesAction();
     setupEditorSimulator();

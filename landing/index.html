@@ -248,9 +248,9 @@
       <div class="nav-actions">
         <button type="button" class="nav-theme-quick-btn" id="btn-nav-theme-mode" title="Alternar Modo Claro / Oscuro en vivo" aria-label="Alternar Modo Claro u Oscuro">
           <span class="theme-dot-live" aria-hidden="true"></span>
-          <span id="nav-theme-mode-label">Tema en Vivo</span>
+          <span id="nav-theme-mode-label">Modo Oscuro</span>
         </button>
-        <a href="#descargar" class="btn btn-primary btn-sm nav-desktop-cta">Descargar App</a>
+        <a href="https://github.com/P0X-D/NotiFast/releases/latest" class="btn btn-primary btn-sm nav-desktop-cta" target="_blank" rel="noopener noreferrer">Descargar APK</a>
         <button type="button" class="mobile-menu-toggle" id="btn-mobile-menu" aria-expanded="false" aria-controls="mobile-nav-drawer" aria-label="Abrir menú de navegación">
           <svg class="menu-icon-open" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menu"></use></svg>
           <svg class="menu-icon-close" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-close"></use></svg>
@@ -295,7 +295,7 @@
         </a>
       </div>
       <div class="mobile-nav-footer">
-        <a href="#descargar" class="btn btn-primary" style="width: 100%;">Descargar NotiFast para Android</a>
+        <a href="https://github.com/P0X-D/NotiFast/releases/latest" class="btn btn-primary" style="width: 100%;" target="_blank" rel="noopener noreferrer">Descargar NotiFast APK (v1.0 RC)</a>
       </div>
     </nav>
   </header>
@@ -322,11 +322,11 @@
           </p>
 
           <div class="hero-ctas">
-            <a href="#descargar" id="btn-download-hero" class="btn btn-primary">
+            <a href="https://github.com/P0X-D/NotiFast/releases/latest" id="btn-download-hero" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
               <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M3.609 1.814L13.792 12 3.61 22.186a1.99 1.99 0 0 1-.61-.954V2.768c.112-.375.328-.71.609-.954zm11.605 11.605l2.42 2.42-12.723 7.348 10.303-9.768zm0-2.838L4.91 3.233 17.634 10.58l-2.42 2.421zm1.42 1.419l3.528-2.037a1.996 1.996 0 0 1 0 3.473l-3.528 2.037-1.42-1.42 1.42-1.42v-.633z"/>
+                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
               </svg>
-              Descargar en Google Play
+              Descargar APK v1.0 RC
             </a>
             <a href="#temas" class="btn btn-secondary">
               <svg style="width: 18px; height: 18px; color: var(--brand-primary);" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
@@ -423,14 +423,14 @@
                 <div class="phone-note-mini-card">
                   <div class="phone-note-mini-head">
                     <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
-                    <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">Cálculo</span>
+                    <span class="phone-note-mini-tag" style="background: rgba(29,78,216,0.12); color: #1D4ED8;">Cálculo</span>
                   </div>
                   <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
                 </div>
                 <div class="phone-note-mini-card">
                   <div class="phone-note-mini-head">
                     <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
-                    <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #0F766E;">Física</span>
+                    <span class="phone-note-mini-tag" style="background: rgba(15,118,110,0.12); color: #115E59;">Física</span>
                   </div>
                   <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
                 </div>
@@ -461,111 +461,6 @@
       </div>
     </section>
 
-    <!-- 1. EL NÚCLEO ACADÉMICO NOTIFAST: TODAS TUS FUNCIONALIDADES EN UN SOLO LUGAR -->
-    <section class="magic-box-showcase notifast-hub-showcase">
-      <div class="hero-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
-        <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
-        <span>El Ecosistema Todo en Uno</span>
-      </div>
-      <h2 class="section-title" style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-top: 12px;">
-        Todas tus funcionalidades,<br><span class="accent-ruby">en un solo lugar: NotiFast.</span>
-      </h2>
-      <p class="section-desc" style="max-width: 640px; margin: 12px auto 0; font-size: 1.125rem; color: var(--text-secondary);">
-        Apuntes por bloques con fotos anotadas, promedios en cualquier escala, temas personalizables AAA, recordatorios proactivos y packs P2P offline: todo converge en NotiFast.
-      </p>
-
-      <div class="box-stage hub-stage" id="hub-interactive-stage">
-        <!-- Lienzo de Órbitas Gravitacionales Minimalistas -->
-        <svg class="hub-orbit-canvas" viewBox="0 0 800 520" aria-hidden="true" focusable="false">
-          <ellipse cx="400" cy="260" rx="340" ry="210" class="orbit-path orbit-outer" />
-          <ellipse cx="400" cy="260" rx="230" ry="145" class="orbit-path orbit-inner" />
-          <line x1="400" y1="260" x2="160" y2="90" class="orbit-beam beam-notes" id="beam-notes" />
-          <line x1="400" y1="260" x2="640" y2="80" class="orbit-beam beam-grades" id="beam-grades" />
-          <line x1="400" y1="260" x2="140" y2="420" class="orbit-beam beam-agenda" id="beam-agenda" />
-          <line x1="400" y1="260" x2="650" y2="430" class="orbit-beam beam-nearby" id="beam-nearby" />
-          <line x1="400" y1="260" x2="400" y2="50" class="orbit-beam beam-subjects" id="beam-subjects" />
-          <line x1="400" y1="260" x2="400" y2="470" class="orbit-beam beam-alerts" id="beam-alerts" />
-        </svg>
-
-        <div class="chest-glow-rays hub-orbit-aura" aria-hidden="true"></div>
-
-        <!-- Módulo 1: Apuntes por Bloques & LaTeX (Top-Left) -->
-        <div class="popout-item popout-notes" data-target="#apuntes" role="button" tabindex="0" title="Ver Módulo de Apuntes">
-          <div class="popout-icon-box icon-notes-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
-          </div>
-          <div class="popout-text-stack">
-            <span class="popout-title">Apuntes &amp; Bloques</span>
-            <span class="popout-meta">Markdown • LaTeX • Fotos Anotadas</span>
-          </div>
-        </div>
-
-        <!-- Módulo 2: Promedio Global Multiescala (Top-Right) -->
-        <div class="popout-item popout-grades" data-target="#calificaciones" role="button" tabindex="0" title="Ver Módulo de Calificaciones">
-          <div class="popout-icon-box icon-grades-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
-          </div>
-          <div class="popout-text-stack">
-            <span class="popout-title">Promedio: 8.70</span>
-            <span class="popout-meta">4 Escalas • Simulador de Meta</span>
-          </div>
-        </div>
-
-        <!-- Módulo 3: Horario en Curso y Baliza (Bottom-Left) -->
-        <div class="popout-item popout-agenda" data-target="#agenda" role="button" tabindex="0" title="Ver Horario Activo">
-          <div class="popout-icon-box icon-agenda-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
-          </div>
-          <div class="popout-text-stack">
-            <span class="popout-title"><span class="beacon-mini-dot"></span> En curso: Cálculo</span>
-            <span class="popout-meta">08:00 - 10:00 • Acción en 1 toque</span>
-          </div>
-        </div>
-
-        <!-- Módulo 4: Pack P2P Offline & QR (Bottom-Right) -->
-        <div class="popout-item popout-math popout-nearby" data-target="#compartir" role="button" tabindex="0" title="Ver Transferencia P2P y Respaldo Cloud">
-          <div class="popout-icon-box icon-nearby-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
-          </div>
-          <div class="popout-text-stack">
-            <span class="popout-title">Pack P2P &amp; QR Offline</span>
-            <span class="popout-meta">Archivo .notifast • Drive Backup</span>
-          </div>
-        </div>
-
-        <!-- Módulo 5: Estudio de Temas Personalizables AAA (Top-Center) -->
-        <div class="popout-item popout-subjects" data-target="#temas" role="button" tabindex="0" title="Ver Estudio de Temas Personalizables">
-          <div class="popout-icon-box icon-subjects-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
-          </div>
-          <div class="popout-text-stack">
-            <span class="popout-title">Temas &amp; Lienzos AAA</span>
-            <span class="popout-meta">6 Acentos • 6 Fondos • Hex Studio</span>
-          </div>
-        </div>
-
-        <!-- Módulo 6: Motor de Notificaciones Proactivas (Bottom-Center) -->
-        <div class="popout-item popout-alerts" data-target="#notificaciones" role="button" tabindex="0" title="Ver Motor de Notificaciones Proactivas">
-          <div class="popout-icon-box icon-alerts-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
-          </div>
-          <div class="popout-text-stack">
-            <span class="popout-title">Alertas Proactivas</span>
-            <span class="popout-meta">Clases • Exámenes • Resumen 07:00</span>
-          </div>
-        </div>
-
-        <!-- El Núcleo Central: Solo el icono y el nombre NotiFast flotando -->
-        <div class="study-chest-container notifast-core-hub" title="NotiFast — El Ecosistema Todo en Uno">
-          <div class="notifast-floating-brand">
-            <div class="notifast-icon-aura" aria-hidden="true"></div>
-            <img src="assets/logo.png" alt="NotiFast App Icon" class="notifast-core-icon">
-            <span class="notifast-core-name">NotiFast</span>
-            <span class="notifast-core-pill">Cuaderno &amp; Hub Académico</span>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- 2. MÓDULO 1: AGENDA & CLASE EN CURSO (ScheduleLiveStatusCard fiel a la app) -->
     <section class="dynamic-feature-row section-schedule-radar" id="agenda">
@@ -1755,11 +1650,11 @@
           Descarga NotiFast de forma gratuita y transforma la sobrecarga académica en control total, temas a tu medida y orden táctil.
         </p>
         <div class="hero-ctas">
-          <a href="#descargar" id="btn-download-cta" class="btn btn-primary">
+          <a href="https://github.com/P0X-D/NotiFast/releases/latest" id="btn-download-cta" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
             <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M3.609 1.814L13.792 12 3.61 22.186a1.99 1.99 0 0 1-.61-.954V2.768c.112-.375.328-.71.609-.954zm11.605 11.605l2.42 2.42-12.723 7.348 10.303-9.768zm0-2.838L4.91 3.233 17.634 10.58l-2.42 2.421zm1.42 1.419l3.528-2.037a1.996 1.996 0 0 1 0 3.473l-3.528 2.037-1.42-1.42 1.42-1.42v-.633z"/>
+              <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
             </svg>
-            Descargar en Google Play
+            Descargar NotiFast APK (v1.0 RC)
           </a>
         </div>
         <p class="final-cta-meta">Compatible con Android 8.0 Oreo (API 26) o superior • 100% Gratuito, Offline-First y Libre de Anuncios</p>
@@ -1768,7 +1663,7 @@
 
     <!-- Barra Flotante de Radar Scrollytelling (Sincronizada con el scroll del usuario) -->
     <nav class="hub-floating-radar" id="hub-floating-radar" aria-label="Navegación de módulos NotiFast">
-      <a href="#hub-interactive-stage" class="radar-brand-mini" title="Volver al Núcleo NotiFast">
+      <a href="#main-content" class="radar-brand-mini" title="Volver al Inicio NotiFast">
         <img src="assets/logo.png" alt="NotiFast App Icon" class="radar-mini-logo">
       </a>
       <div class="radar-links">
@@ -1808,22 +1703,30 @@
     </nav>
   </main>
 
-  <!-- Download Modal Toast -->
+  <!-- Download Modal / Installation Hub -->
   <div class="download-toast-overlay" id="download-toast" role="dialog" aria-modal="true" aria-labelledby="toast-title" aria-hidden="true">
     <div class="download-toast-card">
       <button class="toast-close-btn" id="toast-close-btn" aria-label="Cerrar modal">&times;</button>
       <div class="toast-icon">
-        <svg style="width: 30px; height: 30px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-10h2v8h-2z"/></svg>
+        <svg style="width: 32px; height: 32px;" viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
       </div>
-      <h3 class="toast-title" id="toast-title">¡NotiFast llega muy pronto a Google Play!</h3>
+      <h3 class="toast-title" id="toast-title">Instalar NotiFast en Android</h3>
       <p class="toast-message">
-        Estamos ultimando los detalles de la versión oficial v1.0 RC para Google Play Store. Puedes explorar el código fuente completo en GitHub o clonar el repositorio para compilarlo en Android Studio.
+        Descarga directamente el paquete de instalación oficial <strong>APK v1.0 RC</strong> verificado, 100% libre de anuncios y sin telemetría de usuario. También disponible el código fuente completo en GitHub.
       </p>
-      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-        <button class="btn btn-primary" onclick="document.getElementById('download-toast').classList.remove('visible');">
-          ¡Entendido, gracias!
-        </button>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
+        <a href="https://github.com/P0X-D/NotiFast/releases/latest" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+          Descargar APK (v1.0 RC)
+        </a>
+        <a href="https://github.com/P0X-D/NotiFast" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+          <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+          Repositorio GitHub
+        </a>
       </div>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 14px; margin-bottom: 0;">
+        Compatible con Android 8.0 Oreo (API 26+) o superior • SHA-256 verificado • 684 tests unitarios
+      </p>
     </div>
   </div>
 
@@ -1889,13 +1792,13 @@
           <h4 class="footer-heading">Acceso &amp; Comunidad</h4>
           <p class="footer-subtext">Descarga la app en Android o explora la arquitectura y pruebas en GitHub.</p>
           <div class="footer-actions">
-            <a href="#descargar" class="btn btn-primary footer-action-btn">
+            <a href="https://github.com/P0X-D/NotiFast/releases/latest" target="_blank" rel="noopener noreferrer" class="btn btn-primary footer-action-btn">
               <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M3.609 1.814L13.792 12 3.61 22.186a1.99 1.99 0 0 1-.61-.954V2.768c.112-.375.328-.71.609-.954zm11.605 11.605l2.42 2.42-12.723 7.348 10.303-9.768zm0-2.838L4.91 3.233 17.634 10.58l-2.42 2.421zm1.42 1.419l3.528-2.037a1.996 1.996 0 0 1 0 3.473l-3.528 2.037-1.42-1.42 1.42-1.42v-.633z"/>
+                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
               </svg>
-              <span>Google Play</span>
+              <span>Descargar APK</span>
             </a>
-            <a href="https://github.com/josealejferFB/NotiFast" target="_blank" rel="noopener noreferrer" class="btn btn-secondary footer-action-btn">
+            <a href="https://github.com/P0X-D/NotiFast" target="_blank" rel="noopener noreferrer" class="btn btn-secondary footer-action-btn">
               <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
               </svg>
