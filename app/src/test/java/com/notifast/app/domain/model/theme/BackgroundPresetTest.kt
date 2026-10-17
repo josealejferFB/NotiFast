@@ -43,14 +43,24 @@ class BackgroundPresetTest {
             assertTrue("backgroundLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.backgroundLightHex))
             assertTrue("surfaceLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceLightHex))
             assertTrue("surfaceContainerLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceContainerLightHex))
+            assertTrue("surfaceContainerHighLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceContainerHighLightHex))
+            assertTrue("surfaceVariantLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceVariantLightHex))
             assertTrue("onBackgroundLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.onBackgroundLightHex))
             assertTrue("onSurfaceLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.onSurfaceLightHex))
+            assertTrue("onSurfaceVariantLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.onSurfaceVariantLightHex))
+            assertTrue("outlineVariantLightHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.outlineVariantLightHex))
 
             assertTrue("backgroundDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.backgroundDarkHex))
             assertTrue("surfaceDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceDarkHex))
             assertTrue("surfaceContainerDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceContainerDarkHex))
+            assertTrue("surfaceContainerHighDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceContainerHighDarkHex))
+            assertTrue("surfaceVariantDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.surfaceVariantDarkHex))
             assertTrue("onBackgroundDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.onBackgroundDarkHex))
             assertTrue("onSurfaceDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.onSurfaceDarkHex))
+            assertTrue("onSurfaceVariantDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.onSurfaceVariantDarkHex))
+            assertTrue("outlineVariantDarkHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.outlineVariantDarkHex))
+
+            assertTrue("accentPipHex for ${preset.name} should match #RRGGBB", hexRegex.matches(preset.accentPipHex))
         }
     }
 

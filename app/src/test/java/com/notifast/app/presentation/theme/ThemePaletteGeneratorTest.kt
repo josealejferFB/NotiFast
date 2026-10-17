@@ -92,6 +92,9 @@ class ThemePaletteGeneratorTest {
             assertEquals(bgPreset.backgroundLightHex.toSafeComposeColor(), lightScheme.background)
             assertEquals(bgPreset.surfaceLightHex.toSafeComposeColor(), lightScheme.surface)
             assertEquals(bgPreset.surfaceContainerLightHex.toSafeComposeColor(), lightScheme.surfaceContainer)
+            assertEquals(bgPreset.surfaceContainerHighLightHex.toSafeComposeColor(), lightScheme.surfaceContainerHigh)
+            assertEquals(bgPreset.surfaceVariantLightHex.toSafeComposeColor(), lightScheme.surfaceVariant)
+            assertEquals(bgPreset.onSurfaceVariantLightHex.toSafeComposeColor(), lightScheme.onSurfaceVariant)
             assertEquals(bgPreset.outlineVariantLightHex.toSafeComposeColor(), lightScheme.outlineVariant)
 
             val lightTextContrast = ThemePaletteGenerator.calculateContrastRatio(lightScheme.onBackground, lightScheme.background)
@@ -108,6 +111,9 @@ class ThemePaletteGeneratorTest {
             assertEquals(bgPreset.backgroundDarkHex.toSafeComposeColor(), darkScheme.background)
             assertEquals(bgPreset.surfaceDarkHex.toSafeComposeColor(), darkScheme.surface)
             assertEquals(bgPreset.surfaceContainerDarkHex.toSafeComposeColor(), darkScheme.surfaceContainer)
+            assertEquals(bgPreset.surfaceContainerHighDarkHex.toSafeComposeColor(), darkScheme.surfaceContainerHigh)
+            assertEquals(bgPreset.surfaceVariantDarkHex.toSafeComposeColor(), darkScheme.surfaceVariant)
+            assertEquals(bgPreset.onSurfaceVariantDarkHex.toSafeComposeColor(), darkScheme.onSurfaceVariant)
             assertEquals(bgPreset.outlineVariantDarkHex.toSafeComposeColor(), darkScheme.outlineVariant)
 
             val darkTextContrast = ThemePaletteGenerator.calculateContrastRatio(darkScheme.onBackground, darkScheme.background)

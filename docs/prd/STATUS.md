@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.0
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.0**  
-> **Última actualización:** 14 de Octubre, 2026  
+> **Última actualización:** 17 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/NotiFast/PRODUCT.md)
 
 ---
@@ -26,12 +26,12 @@ Copia en la Nube (Google Drive)   [███████████████
 Cloud Hub AAA & Rediseño Táctil   [████████████████] 100% (4/4 objetivos) ✅
 Onboarding & Acceso Cloud Sync    [████████████████] 100% (4/4 pilares) ✅
 Grades Hub & Analíticas AAA       [████████████████] 100% (5/5 pilares) ✅
-Sistema de Temas Dinámicos AAA    [████████████████] 100% (8/8 tareas) ✅
+Sistema de Temas Dinámicos AAA    [████████████████] 100% (15/15 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  98% (170/176 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    634 tests pasando (0 fallos, 0 ignorados) ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████]  98% (177/183 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    645 tests pasando (0 fallos, 0 ignorados) ✅
 ```
 
 ---
@@ -733,12 +733,23 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
      - Botón de acceso al Estudio de Personalización con icono y gradiente de color.
      - Banner descriptivo contextual del tema activo.
      - Respuesta háptica (`LocalHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)`).
-6. **Higiene de Código, Clean Architecture y Modularidad:**
-   - **Límite Estricto $\le 250$ LOC Cumplido:** `ThemePreviewMiniCard.kt` (133 LOC), `CustomThemePaletteSheet.kt` (198 LOC), `ThemeSwatchItems.kt` (209 LOC), `ThemeSelectorCard.kt` (187 LOC), `SettingsSectionsContent.kt` (226 LOC), `SettingsScreen.kt` (181 LOC).
+6. **Tonalidades de Fondo Independientes de Alto Contraste (`BackgroundPreset`):**
+   - 6 paletas de fondo desacopladas del color de énfasis, adaptables a Modo Claro y Oscuro con contraste WCAG AAA ($\ge 4.5:1$ y $\ge 14:1$ en texto principal):
+     - **Classic:** Lienzo pergamino neutral (`#FAF9F6`) / Pizarra oscura (`#0E131F`).
+     - **Forest Sage:** Apuntes botánicos / Sage linen (`#EAF4ED`) / Bosque pino oscuro (`#0A1610`).
+     - **Midnight Indigo:** Polar / Papel ártico (`#E6F0F8`) / Índigo cósmico (`#09101D`).
+     - **Warm Mocha:** Papiro clásico / Café nórdico (`#F5ECE1`) / Espresso tostado (`#150F0B`).
+     - **Sakura Zen:** Lavanda serena / Niebla lila (`#F2EAF7`) / Violeta crepúsculo (`#130B1C`).
+     - **Ocean Cyan:** Brisa marina / Seafoam (`#E5F3F5`) / Abismo marino (`#061418`).
+   - Tokens dinámicos de alto contraste: `background`, `surface`, `surfaceContainer`, `surfaceContainerHigh`, `surfaceVariant`, `outlineVariant`, `onBackground`, `onSurface`, `onSurfaceVariant`.
+   - **Muestra Táctil Mini-Lienzo (`BackgroundSwatchItem`):** Squircle con previsualización en miniatura del lienzo (`bgColor`), ficha interior elevada (`surfaceContainer`), micro-borde nítido (`outlineVariant`) y pip cromático de identidad (`accentPipHex`).
+   - **Cero Solapamiento de Cards:** Estructura Bento aplanada eliminando doble anidamiento de cards redundantes y asegurando padding armónico sin clipping horizontal.
+7. **Higiene de Código, Clean Architecture y Modularidad:**
+   - **Límite Estricto $\le 250$ LOC Cumplido:** `BackgroundSwatchItems.kt` (158 LOC), `ThemeSelectorCard.kt` (222 LOC), `SettingsSectionsContent.kt` (234 LOC), `BackgroundPreset.kt` (204 LOC), `CustomThemePaletteSheet.kt` (198 LOC), `ThemePreviewMiniCard.kt` (133 LOC).
    - **Cero Strings Quemados:** 100% de títulos, nombres de temas, descripciones y etiquetas accesibles centralizados en `res/values/strings.xml` en español.
    - **Cero Lógica en UI:** Estado MVI centralizado en un único StateFlow (`SettingsUiState`), interacción mediante eventos sellados (`SettingsEvent`), y lógica cromática pura en dominio/presentación.
-7. **Verificación Basada en Evidencia:**
-   - **634 pruebas unitarias automatizadas ejecutadas y aprobadas al 100%** (0 fallos, 0 errores, 0 ignorados), incluyendo tests de dominio (`ThemePresetTest`), generador de color (`ThemePaletteGeneratorTest`), repositorio (`UserPrefsRepositoryTest`), casos de uso cloud (`BuildCloudOverviewUseCaseTest`) y ViewModel (`SettingsViewModelTest`).
+8. **Verificación Basada en Evidencia:**
+   - **645 pruebas unitarias automatizadas ejecutadas y aprobadas al 100%** (0 fallos, 0 errores, 0 ignorados), incluyendo tests de dominio (`ThemePresetTest`, `BackgroundPresetTest`), generador de color (`ThemePaletteGeneratorTest`), repositorio (`UserPrefsRepositoryTest`), casos de uso cloud (`BuildCloudOverviewUseCaseTest`) y ViewModel (`SettingsViewModelTest`).
    - Compilación exitosa de build debug (`./gradlew assembleDebug`).
 
 ---

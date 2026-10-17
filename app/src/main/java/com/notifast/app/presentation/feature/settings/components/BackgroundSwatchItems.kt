@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
@@ -26,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -39,14 +39,17 @@ import com.notifast.app.R
 import com.notifast.app.domain.model.theme.BackgroundPreset
 import com.notifast.app.presentation.theme.color.BackgroundDark
 import com.notifast.app.presentation.theme.color.BackgroundLight
+import com.notifast.app.presentation.theme.color.OutlineVariantDark
+import com.notifast.app.presentation.theme.color.OutlineVariantLight
+import com.notifast.app.presentation.theme.color.PrimaryLight
 import com.notifast.app.presentation.theme.color.SurfaceContainerDark
 import com.notifast.app.presentation.theme.color.SurfaceContainerLight
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
 import com.notifast.app.presentation.theme.isDark
 
 /**
- * Circular swatch item for selecting an independent academic background/canvas preset.
- * Follows Tactile Bento aesthetics with bounce animation and WCAG AAA touch targets.
+ * High-contrast mini-canvas swatch item for selecting academic background presets.
+ * Renders a miniature papercraft card preview displaying canvas, surface, and signature pip.
  */
 @Composable
 fun BackgroundSwatchItem(
@@ -58,6 +61,7 @@ fun BackgroundSwatchItem(
     val isSystemDark = MaterialTheme.colorScheme.isDark
     val bgFallback = if (isSystemDark) BackgroundDark else BackgroundLight
     val containerFallback = if (isSystemDark) SurfaceContainerDark else SurfaceContainerLight
+    val outlineFallback = if (isSystemDark) OutlineVariantDark else OutlineVariantLight
 
     val bgColor = remember(preset, isSystemDark) {
         (if (isSystemDark) preset.backgroundDarkHex else preset.backgroundLightHex)
@@ -67,9 +71,16 @@ fun BackgroundSwatchItem(
         (if (isSystemDark) preset.surfaceContainerDarkHex else preset.surfaceContainerLightHex)
             .toSafeComposeColor(containerFallback)
     }
+    val outlineColor = remember(preset, isSystemDark) {
+        (if (isSystemDark) preset.outlineVariantDarkHex else preset.outlineVariantLightHex)
+            .toSafeComposeColor(outlineFallback)
+    }
+    val accentPipColor = remember(preset) {
+        preset.accentPipHex.toSafeComposeColor(PrimaryLight)
+    }
 
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.12f else 1.0f,
+        targetValue = if (isSelected) 1.10f else 1.0f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMediumLow
@@ -86,7 +97,7 @@ fun BackgroundSwatchItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .width(66.dp)
+            .width(68.dp)
             .padding(vertical = 4.dp)
             .selectable(
                 selected = isSelected,
@@ -97,31 +108,47 @@ fun BackgroundSwatchItem(
     ) {
         Box(
             modifier = Modifier
-                .size(46.dp)
+                .size(48.dp)
                 .scale(scale)
-                .clip(CircleShape)
-                .background(Brush.linearGradient(listOf(bgColor, containerColor)))
+                .clip(RoundedCornerShape(14.dp))
+                .background(bgColor)
                 .border(
-                    width = if (isSelected) 3.dp else 1.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-                    shape = CircleShape
+                    width = if (isSelected) 2.5.dp else 1.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else outlineColor,
+                    shape = RoundedCornerShape(14.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
-                )
+            Box(
+                modifier = Modifier
+                    .size(width = 30.dp, height = 24.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(containerColor)
+                    .border(1.dp, outlineColor.copy(alpha = 0.8f), RoundedCornerShape(6.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isSelected) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(accentPipColor)
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = presetName,
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             maxLines = 1,

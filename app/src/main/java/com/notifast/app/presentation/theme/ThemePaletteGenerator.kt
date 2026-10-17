@@ -166,9 +166,11 @@ object ThemePaletteGenerator {
         val bg = backgroundPreset.backgroundLightHex.toSafeComposeColor(BackgroundLight)
         val surface = backgroundPreset.surfaceLightHex.toSafeComposeColor(SurfaceLight)
         val surfaceContainer = backgroundPreset.surfaceContainerLightHex.toSafeComposeColor(SurfaceContainerLight)
+        val surfaceContainerHigh = backgroundPreset.surfaceContainerHighLightHex.toSafeComposeColor(SurfaceContainerHighLight)
         val surfaceVariant = backgroundPreset.surfaceVariantLightHex.toSafeComposeColor(SurfaceVariantLight)
         val onBackground = backgroundPreset.onBackgroundLightHex.toSafeComposeColor(OnBackgroundLight)
         val onSurface = backgroundPreset.onSurfaceLightHex.toSafeComposeColor(OnSurfaceLight)
+        val onSurfaceVariant = backgroundPreset.onSurfaceVariantLightHex.toSafeComposeColor(OnSurfaceVariantLight)
         val outlineVariant = backgroundPreset.outlineVariantLightHex.toSafeComposeColor(OutlineVariantLight)
 
         return lightColorScheme(
@@ -189,9 +191,9 @@ object ThemePaletteGenerator {
             surface = surface,
             onSurface = onSurface,
             surfaceVariant = surfaceVariant,
-            onSurfaceVariant = OnSurfaceVariantLight,
+            onSurfaceVariant = onSurfaceVariant,
             surfaceContainer = surfaceContainer,
-            surfaceContainerHigh = SurfaceContainerHighLight,
+            surfaceContainerHigh = surfaceContainerHigh,
             outline = OutlineLight,
             outlineVariant = outlineVariant,
             error = ErrorLight,
@@ -233,9 +235,11 @@ object ThemePaletteGenerator {
         val bg = backgroundPreset.backgroundDarkHex.toSafeComposeColor(BackgroundDark)
         val surface = backgroundPreset.surfaceDarkHex.toSafeComposeColor(SurfaceDark)
         val surfaceContainer = backgroundPreset.surfaceContainerDarkHex.toSafeComposeColor(SurfaceContainerDark)
+        val surfaceContainerHigh = backgroundPreset.surfaceContainerHighDarkHex.toSafeComposeColor(SurfaceContainerHighDark)
         val surfaceVariant = backgroundPreset.surfaceVariantDarkHex.toSafeComposeColor(SurfaceVariantDark)
         val onBackground = backgroundPreset.onBackgroundDarkHex.toSafeComposeColor(OnBackgroundDark)
         val onSurface = backgroundPreset.onSurfaceDarkHex.toSafeComposeColor(OnSurfaceDark)
+        val onSurfaceVariant = backgroundPreset.onSurfaceVariantDarkHex.toSafeComposeColor(OnSurfaceVariantDark)
         val outlineVariant = backgroundPreset.outlineVariantDarkHex.toSafeComposeColor(OutlineVariantDark)
 
         return darkColorScheme(
@@ -256,9 +260,9 @@ object ThemePaletteGenerator {
             surface = surface,
             onSurface = onSurface,
             surfaceVariant = surfaceVariant,
-            onSurfaceVariant = OnSurfaceVariantDark,
+            onSurfaceVariant = onSurfaceVariant,
             surfaceContainer = surfaceContainer,
-            surfaceContainerHigh = SurfaceContainerHighDark,
+            surfaceContainerHigh = surfaceContainerHigh,
             outline = OutlineDark,
             outlineVariant = outlineVariant,
             error = ErrorDark,
