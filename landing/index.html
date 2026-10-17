@@ -24,9 +24,15 @@
 
   <link rel="canonical" href="https://notifast.pages.dev/">
   <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="stylesheet" href="css/tokens.css?v=3.2.1">
-  <link rel="stylesheet" href="css/styles.css?v=3.2.1">
-  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.2.1">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono (Direct Fast Load) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
+
+  <link rel="stylesheet" href="css/tokens.css?v=3.3.0">
+  <link rel="stylesheet" href="css/styles.css?v=3.3.0">
+  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.3.0">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -971,47 +977,42 @@
       </div>
     </section>
 
-    <!-- 7. MÓDULO NUEVO: ESTUDIO DE TEMAS PERSONALIZABLES & LIENZOS AAA (ThemePreset.kt, BackgroundPreset.kt & HexColorStudioPicker.kt) -->
+    <!-- 7. MÓDULO: PERSONALIZACIÓN & DESCANSO VISUAL (ThemePreset.kt & BackgroundPreset.kt) -->
     <section class="dynamic-feature-row row-reverse section-theme-studio" id="temas">
       <div class="feature-info">
         <div class="feature-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
-          <span>Motor de Temas Dinámicos • WCAG AAA</span>
+          <span>Personalización &amp; Descanso</span>
         </div>
         <h2 class="feature-title">
-          Estudio de Temas en Vivo:<br><span class="accent-ruby">6 acentos, 6 lienzos y Hex Studio.</span>
+          Tus materias, tus colores.<br><span class="accent-ruby">Estudia sin fatiga visual.</span>
         </h2>
         <p class="feature-desc">
-          Personaliza la atmósfera visual de tu semestre. En la app móvil, NotiFast separa la <strong>paleta de acentos</strong> del <strong>tono de lienzo de papel</strong>, permitiéndote combinar 6 temas editoriales, 6 fondos de lectura descansada, Modo Claro/Oscuro y un <strong>Estudio Hex/HSL propio</strong> con validación de contraste WCAG AAA.
+          Elige la combinación que mejor te acompaña. Cambia entre modo claro y oscuro, organiza tus asignaturas con tonos limpios y activa lienzos de papel diseñados para leer sin cansancio en noches de estudio.
         </p>
 
         <ul class="feature-bullets">
           <li>
             <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span><strong>¡Pruébalo aquí mismo!</strong> Haz clic en cualquier acento, lienzo o modo oscuro en el panel interactivo y observa cómo <strong>toda esta página web y el teléfono cambian en tiempo real</strong>.</span>
+            <span><strong>Paletas claras para cada materia:</strong> Asigna colores únicos para ubicar apuntes, horarios y exámenes al instante.</span>
           </li>
           <li>
             <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span><strong>6 Lienzos de Papel Curados:</strong> Pergamino, Menta, Polar, Papiro, Lavanda y Glaciar diseñados para evitar el deslumbramiento en sesiones nocturnas.</span>
-          </li>
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span><strong>Hex Color Studio &amp; Arcoíris HSL:</strong> Crea tu propio código Hexadecimal para acento primario, secundario y superficie con persistencia instantánea.</span>
+            <span><strong>Lienzos de papel anti-fatiga:</strong> Fondos suaves como Pergamino o Lavanda que cuidan tu vista en repasos largos.</span>
           </li>
         </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Estudio de Temas Fiel a SettingsAppearanceSection.kt, ThemeSelectorCard.kt y CustomThemePaletteSheet.kt -->
         <div class="theme-studio-workbench" id="theme-studio-workbench">
           <!-- Cabecera con Selector de Modo Claro / Oscuro -->
           <div class="studio-top-bar">
             <div class="studio-title-group">
               <div class="studio-badge-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
               </div>
               <div>
-                <h3 class="studio-heading">Apariencia y Estudio Cromático</h3>
+                <h3 class="studio-heading">Personaliza tu Espacio</h3>
                 <p class="studio-subheading" id="studio-active-summary">NotiFast Classic • Lienzo Pergamino</p>
               </div>
             </div>
@@ -1028,11 +1029,10 @@
             </div>
           </div>
 
-          <!-- 1. Paleta de Acentos Oficiales (ThemePreset.kt) -->
+          <!-- 1. Paleta de Acentos -->
           <div>
             <div class="studio-section-label">
-              <span>1. Paleta de Acentos (ThemePreset)</span>
-              <span class="studio-aaa-pill">✓ Contraste WCAG AAA</span>
+              <span>1. Color de materias</span>
             </div>
             <div class="accent-presets-grid" role="radiogroup" aria-label="Paletas de acento de NotiFast">
               <button type="button" class="accent-swatch-btn active" data-accent-preset="classic" role="radio" aria-checked="true">
@@ -1040,7 +1040,7 @@
                   <span class="swatch-half" style="background: #9E1B32;"></span>
                   <span class="swatch-half" style="background: #2A7B7B;"></span>
                 </div>
-                <span class="swatch-name">Classic</span>
+                <span class="swatch-name">Clásico</span>
                 <span class="swatch-desc">Ruby &amp; Aqua</span>
               </button>
 
@@ -1058,7 +1058,7 @@
                   <span class="swatch-half" style="background: #4338CA;"></span>
                   <span class="swatch-half" style="background: #0891B2;"></span>
                 </div>
-                <span class="swatch-name">Cyber Nocturno</span>
+                <span class="swatch-name">Nocturno</span>
                 <span class="swatch-desc">Índigo &amp; Cian</span>
               </button>
 
@@ -1085,17 +1085,16 @@
                   <span class="swatch-half" style="background: #0369A1;"></span>
                   <span class="swatch-half" style="background: #0F766E;"></span>
                 </div>
-                <span class="swatch-name">Minimal Nórdico</span>
-                <span class="swatch-desc">Océano &amp; Teal</span>
+                <span class="swatch-name">Océano</span>
+                <span class="swatch-desc">Azul &amp; Menta</span>
               </button>
             </div>
           </div>
 
-          <!-- 2. Tono de Fondo / Lienzo de Papel (BackgroundPreset.kt) -->
+          <!-- 2. Tono de Fondo / Lienzo de Papel -->
           <div>
             <div class="studio-section-label">
-              <span>2. Tono de Lienzo (BackgroundPreset)</span>
-              <span style="font-size: 0.75rem; color: var(--text-tertiary);">Independiente del acento</span>
+              <span>2. Tono de papel para lectura</span>
             </div>
             <div class="canvas-presets-strip" role="radiogroup" aria-label="Tonos de lienzo de fondo">
               <button type="button" class="canvas-swatch-chip active" data-bg-preset="classic" role="radio" aria-checked="true">
@@ -1125,39 +1124,18 @@
             </div>
           </div>
 
-          <!-- 3. Estudio Hexadecimal & Barra HSL en Vivo (HexColorStudioPicker.kt) -->
-          <div class="custom-hex-studio-box">
-            <div class="hex-studio-header">
-              <span class="hex-studio-title">
-                <svg style="width: 15px; height: 15px; color: var(--brand-primary);" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-brush"></use></svg>
-                <span>Estudio Hexadecimal &amp; Matiz HSL Personalizado</span>
-              </span>
-              <span class="hex-code-badge" id="studio-hex-readout">#9E1B32</span>
-            </div>
-            <input type="range" class="hue-rainbow-slider" id="studio-hue-slider" min="0" max="360" value="350" aria-label="Deslizador de matiz HSL para acento personalizado">
-            <div class="hex-controls-row">
-              <div class="hex-input-wrap">
-                <span>HEX</span>
-                <input type="text" class="hex-text-input" id="studio-hex-input" value="9E1B32" maxlength="6" aria-label="Código hexadecimal de color primario">
-              </div>
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-studio-reset" style="padding: 6px 12px; font-size: 0.75rem;">
-                Restaurar Classic
-              </button>
-            </div>
-          </div>
-
-          <!-- 4. Vista Previa en Vivo (ThemePreviewMiniCard.kt) -->
+          <!-- 3. Vista Previa en Vivo -->
           <div class="theme-live-preview-mini">
             <div class="preview-mini-left">
               <div class="preview-mini-avatar">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
               </div>
               <div class="preview-mini-text">
-                <span class="preview-mini-title" id="preview-mini-title">Vista previa: NotiFast Classic</span>
-                <span class="preview-mini-sub" id="preview-mini-sub">Acento primario y secundario aplicados a toda la interfaz</span>
+                <span class="preview-mini-title" id="preview-mini-title">Tema aplicado en vivo</span>
+                <span class="preview-mini-sub" id="preview-mini-sub">Toca cualquier acento o modo para ver cómo cambia la interfaz</span>
               </div>
             </div>
-            <span class="preview-mini-cta-pill" id="preview-mini-badge">Activo en Web</span>
+            <span class="preview-mini-cta-pill" id="preview-mini-badge">Activo</span>
           </div>
         </div>
       </div>
@@ -1790,8 +1768,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="js/background.js?v=3.2.1" defer></script>
-  <script src="js/interactive-showcase.js?v=3.2.1" defer></script>
-  <script src="js/main.js?v=3.2.1" defer></script>
+  <script src="js/background.js?v=3.3.0" defer></script>
+  <script src="js/interactive-showcase.js?v=3.3.0" defer></script>
+  <script src="js/main.js?v=3.3.0" defer></script>
 </body>
 </html>

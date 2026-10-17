@@ -219,7 +219,7 @@
       }
     }
 
-    // C. Zig-zag rows animation with section landing triggers (vertical-only on mobile)
+    // C. Zig-zag rows animation with section landing triggers (subtle translation without opacity suppression)
     const rows = document.querySelectorAll('.dynamic-feature-row');
     const isDesktop = window.innerWidth > 991;
     rows.forEach((row) => {
@@ -229,28 +229,26 @@
 
       if (visual) {
         gsap.from(visual, {
-          x: isDesktop ? (isReverse ? -36 : 36) : 0,
-          y: isDesktop ? 0 : 24,
-          opacity: 0,
-          duration: 0.75,
+          x: isDesktop ? (isReverse ? -24 : 24) : 0,
+          y: isDesktop ? 0 : 16,
+          duration: 0.6,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: row,
-            start: 'top 80%'
+            start: 'top 85%'
           }
         });
       }
 
       if (info) {
         gsap.from(info, {
-          x: isDesktop ? (isReverse ? 28 : -28) : 0,
-          y: isDesktop ? 0 : 20,
-          opacity: 0,
-          duration: 0.75,
+          x: isDesktop ? (isReverse ? 20 : -20) : 0,
+          y: isDesktop ? 0 : 14,
+          duration: 0.6,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: row,
-            start: 'top 80%'
+            start: 'top 85%'
           }
         });
       }
@@ -988,17 +986,12 @@
     const summaryEl = document.getElementById('studio-active-summary');
     const previewTitleEl = document.getElementById('preview-mini-title');
     const previewSubEl = document.getElementById('preview-mini-sub');
-    const hueSlider = document.getElementById('studio-hue-slider');
-    const hexInput = document.getElementById('studio-hex-input');
-    const hexReadout = document.getElementById('studio-hex-readout');
-    const resetBtn = document.getElementById('btn-studio-reset');
 
     if (!accentBtns.length) return;
 
     let currentMode = 'light';
     let currentAccentId = 'classic';
     let currentCanvasId = 'classic';
-    let customPrimaryHex = null;
 
     function applyThemeToDOM() {
       const accentObj = ACCENT_PRESETS[currentAccentId] || ACCENT_PRESETS.classic;
@@ -1007,7 +1000,7 @@
       const accentPalette = currentMode === 'dark' ? accentObj.dark : accentObj.light;
       const canvasPalette = currentMode === 'dark' ? canvasObj.dark : canvasObj.light;
 
-      const primaryColor = customPrimaryHex || accentPalette.primary;
+      const primaryColor = accentPalette.primary;
       const secondaryColor = accentPalette.secondary;
 
       // Apply data-theme-mode attribute for Dark/Light tokens
@@ -1017,7 +1010,7 @@
       root.style.setProperty('--brand-primary', primaryColor);
       root.style.setProperty('--brand-primary-hover', primaryColor);
       root.style.setProperty('--brand-primary-rgb', hexToRgbString(primaryColor));
-      root.style.setProperty('--brand-primary-light', customPrimaryHex ? `rgba(${hexToRgbString(primaryColor)}, 0.14)` : accentPalette.primaryLight);
+      root.style.setProperty('--brand-primary-light', accentPalette.primaryLight);
       root.style.setProperty('--brand-secondary', secondaryColor);
       root.style.setProperty('--brand-secondary-rgb', hexToRgbString(secondaryColor));
       root.style.setProperty('--brand-secondary-light', accentPalette.secondaryLight);
@@ -1039,19 +1032,14 @@
 
       // Update UI labels
       const modeName = currentMode === 'dark' ? 'Modo Oscuro' : 'Modo Claro';
-      const accentLabel = customPrimaryHex ? `Hex Studio (${primaryColor})` : accentObj.name;
       if (summaryEl) {
-        summaryEl.textContent = `${accentLabel} • Lienzo ${canvasObj.name} • ${modeName}`;
+        summaryEl.textContent = accentObj.name + ' • Lienzo ' + canvasObj.name + ' • ' + modeName;
       }
       if (previewTitleEl) {
-        previewTitleEl.textContent = `Vista previa: ${accentLabel} + ${canvasObj.name}`;
+        previewTitleEl.textContent = 'Paleta: ' + accentObj.name + ' + Papel ' + canvasObj.name;
       }
       if (previewSubEl) {
-        previewSubEl.textContent = `${modeName} activo • Contraste verificado WCAG AAA en toda la web`;
-      }
-      if (hexReadout) hexReadout.textContent = primaryColor.toUpperCase();
-      if (hexInput && document.activeElement !== hexInput) {
-        hexInput.value = primaryColor.replace('#', '').toUpperCase();
+        previewSubEl.textContent = modeName + ' activo • Interfaz y apuntes sincronizados';
       }
       if (navModeLabel) {
         navModeLabel.textContent = currentMode === 'dark' ? 'Modo Oscuro' : 'Modo Claro';
@@ -1062,7 +1050,6 @@
     accentBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         currentAccentId = btn.getAttribute('data-accent-preset');
-        customPrimaryHex = null;
         accentBtns.forEach(b => {
           const active = b === btn;
           b.classList.toggle('active', active);
@@ -1109,60 +1096,8 @@
       });
     }
 
-    // Custom HSL Rainbow Slider
-    if (hueSlider) {
-      hueSlider.addEventListener('input', (e) => {
-        const hue = parseInt(e.target.value, 10);
-        const lightness = currentMode === 'dark' ? 66 : 38;
-        customPrimaryHex = hslToHex(hue, 76, lightness);
-        accentBtns.forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-checked', 'false');
-        });
-        applyThemeToDOM();
-      });
-    }
-
-    // Custom Hex Text Input
-    if (hexInput) {
-      hexInput.addEventListener('input', (e) => {
-        const cleaned = e.target.value.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
-        e.target.value = cleaned;
-        if (cleaned.length === 6) {
-          customPrimaryHex = `#${cleaned}`;
-          accentBtns.forEach(b => {
-            b.classList.remove('active');
-            b.setAttribute('aria-checked', 'false');
-          });
-          applyThemeToDOM();
-        }
-      });
-    }
-
-    // Reset button
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        currentAccentId = 'classic';
-        currentCanvasId = 'classic';
-        currentMode = 'light';
-        customPrimaryHex = null;
-        accentBtns.forEach(b => {
-          const active = b.getAttribute('data-accent-preset') === 'classic';
-          b.classList.toggle('active', active);
-          b.setAttribute('aria-checked', active ? 'true' : 'false');
-        });
-        canvasBtns.forEach(c => {
-          const active = c.getAttribute('data-bg-preset') === 'classic';
-          c.classList.toggle('active', active);
-          c.setAttribute('aria-checked', active ? 'true' : 'false');
-        });
-        setMode('light');
-      });
-    }
-
     applyThemeToDOM();
   }
-
   // 11. Interactive Proactive Notifications Engine Simulator (SettingsNotificationsSection.kt & NotificationSender.kt)
   function setupNotificationsSimulator() {
     const channelRows = document.querySelectorAll('.notif-channel-row');

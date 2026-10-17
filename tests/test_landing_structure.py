@@ -244,8 +244,9 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn('data-accent-preset="sakura_zen"', html)
         self.assertIn('data-accent-preset="ocean_cyan"', html)
         self.assertIn('data-bg-preset="classic"', html)
-        self.assertIn("studio-hue-slider", html)
-        self.assertIn("studio-hex-input", html)
+        # Verificar que se removió la barra de selección hex para simplificar la experiencia estudiantil
+        self.assertNotIn("studio-hue-slider", html)
+        self.assertNotIn("studio-hex-input", html)
 
         with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
             js = f.read()
