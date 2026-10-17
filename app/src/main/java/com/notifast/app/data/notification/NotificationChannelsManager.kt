@@ -20,6 +20,7 @@ object NotificationChannelsManager {
             ).apply {
                 description = context.getString(R.string.channel_evaluations_desc)
                 enableVibration(true)
+                vibrationPattern = longArrayOf(0, 250, 250, 250)
             }
 
             val classChannel = NotificationChannel(
@@ -29,6 +30,7 @@ object NotificationChannelsManager {
             ).apply {
                 description = context.getString(R.string.channel_classes_desc)
                 enableVibration(true)
+                vibrationPattern = longArrayOf(0, 200, 200, 200)
             }
 
             val summaryChannel = NotificationChannel(

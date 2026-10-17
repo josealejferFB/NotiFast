@@ -183,6 +183,31 @@ enum class BackgroundPreset(
         onSurfaceVariantDarkHex = "#88C1CB",
         outlineVariantDarkHex = "#20434F",
         accentPipHex = "#06B6D4"
+    ),
+
+    CUSTOM(
+        id = "custom",
+        nameRes = R.string.bg_preset_custom_name,
+        descriptionRes = R.string.bg_preset_custom_desc,
+        backgroundLightHex = "#FAF9F6",
+        surfaceLightHex = "#FFFFFF",
+        surfaceContainerLightHex = "#F3EFEA",
+        surfaceContainerHighLightHex = "#EBE6DF",
+        surfaceVariantLightHex = "#F3EFEA",
+        onBackgroundLightHex = "#181A1F",
+        onSurfaceLightHex = "#181A1F",
+        onSurfaceVariantLightHex = "#4B5563",
+        outlineVariantLightHex = "#E5DFD7",
+        backgroundDarkHex = "#0E131F",
+        surfaceDarkHex = "#161E2D",
+        surfaceContainerDarkHex = "#1C2638",
+        surfaceContainerHighDarkHex = "#202A3C",
+        surfaceVariantDarkHex = "#1C2638",
+        onBackgroundDarkHex = "#F1F5F9",
+        onSurfaceDarkHex = "#F1F5F9",
+        onSurfaceVariantDarkHex = "#94A3B8",
+        outlineVariantDarkHex = "#2A384E",
+        accentPipHex = "#3B9797"
     );
 
     companion object {

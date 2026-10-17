@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -156,3 +159,82 @@ fun BackgroundSwatchItem(
         )
     }
 }
+
+/**
+ * Custom studio swatch button for the background palettes row.
+ */
+@Composable
+fun CustomBackgroundSwatchItem(
+    customBackgroundHex: String? = null,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.10f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "custom_bg_swatch_scale"
+    )
+
+    val a11yDesc = stringResource(R.string.settings_theme_custom_bg_swatch_cd)
+    val customColor = remember(customBackgroundHex) {
+        if (customBackgroundHex.isNullOrBlank()) null
+        else customBackgroundHex.toSafeComposeColor(Color.Transparent)
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .width(68.dp)
+            .padding(vertical = 4.dp)
+            .selectable(
+                selected = isSelected,
+                role = Role.RadioButton,
+                onClick = onClick
+            )
+            .semantics { contentDescription = a11yDesc }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .scale(scale)
+                .clip(RoundedCornerShape(14.dp))
+                .background(customColor ?: MaterialTheme.colorScheme.surfaceContainer)
+                .border(
+                    width = if (isSelected) 2.5.dp else 1.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(14.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.ColorLens,
+                contentDescription = null,
+                tint = if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else if (customColor != null && customColor != Color.Transparent && customColor.luminance() > 0.5f) {
+                    Color.Black.copy(alpha = 0.65f)
+                } else if (customColor != null && customColor != Color.Transparent) {
+                    Color.White.copy(alpha = 0.85f)
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = stringResource(R.string.theme_preset_custom_name),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+

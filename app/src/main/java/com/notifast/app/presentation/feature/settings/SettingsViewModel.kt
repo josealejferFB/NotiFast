@@ -16,8 +16,10 @@ import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
 import com.notifast.app.domain.usecase.ConvertGradeScaleUseCase
 import com.notifast.app.domain.usecase.RescheduleAllAlertsUseCase
+import com.notifast.app.data.notification.NotificationSender
 import com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase
 import com.notifast.app.domain.util.ErrorSanitizer
+import com.notifast.app.presentation.feature.settings.components.CustomStudioTab
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +43,8 @@ class SettingsViewModel @Inject constructor(
     private val rescheduleAllAlertsUseCase: RescheduleAllAlertsUseCase,
     private val googleAccountRepository: GoogleAccountRepository,
     @param:ApplicationContext private val context: Context,
-    private val observeLocalSyncSummaryUseCase: ObserveLocalSyncSummaryUseCase? = null
+    private val observeLocalSyncSummaryUseCase: ObserveLocalSyncSummaryUseCase? = null,
+    private val notificationSender: NotificationSender? = null
 ) : ViewModel() {
 
     private companion object {
@@ -62,6 +65,7 @@ class SettingsViewModel @Inject constructor(
         loadConvertibleEvaluationCount()
         observeGoogleAccount()
         observeSyncSummary()
+        checkNotificationPermission()
     }
 
     private fun loadProfile() {
@@ -198,6 +202,11 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { it.copy(customPrimaryHex = hex) }
             }
         }
+        viewModelScope.launch {
+            userPrefsRepository.customBackgroundHexFlow.collect { hex ->
+                _uiState.update { it.copy(customBackgroundHex = hex) }
+            }
+        }
     }
 
     private fun loadConvertibleEvaluationCount() {
@@ -316,6 +325,33 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.DismissDialog -> _uiState.update { it.copy(activeDialog = null) }
             is SettingsEvent.OpenCloudHub -> _uiState.update { it.copy(isCloudHubOpen = true) }
             is SettingsEvent.CloseCloudHub -> _uiState.update { it.copy(isCloudHubOpen = false) }
+            is SettingsEvent.RefreshNotificationPermission -> checkNotificationPermission()
+            is SettingsEvent.UpdateNotificationPermission -> {
+                _uiState.update { it.copy(isSystemNotificationPermissionGranted = event.isGranted) }
+            }
+            is SettingsEvent.OnNotificationPermissionResult -> {
+                _uiState.update { it.copy(isSystemNotificationPermissionGranted = event.isGranted) }
+                if (event.isGranted) {
+                    viewModelScope.launch { rescheduleAllAlertsUseCase() }
+                } else if (event.shouldShowRationale) {
+                    _uiState.update { it.copy(activeDialog = SettingsDialogType.NOTIFICATION_PERMISSION_RATIONALE) }
+                }
+            }
+            is SettingsEvent.SendTestNotification -> {
+                val sent = notificationSender?.sendTestNotification() ?: false
+                if (sent) {
+                    _uiState.update {
+                        it.copy(snackbarMessage = "Notificación de prueba enviada con éxito")
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isSystemNotificationPermissionGranted = false,
+                            activeDialog = SettingsDialogType.NOTIFICATION_PERMISSION_RATIONALE
+                        )
+                    }
+                }
+            }
             is SettingsEvent.ClearSnackbar -> _uiState.update {
                 it.copy(snackbarMessage = null, error = null, lastScaleLabel = null)
             }
@@ -328,9 +364,11 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.SelectThemePreset -> selectThemePreset(event.presetId)
             is SettingsEvent.SelectBackgroundPreset -> selectBackgroundPreset(event.presetId)
             is SettingsEvent.SetCustomPrimaryHex -> setCustomPrimaryHex(event.hex)
-            is SettingsEvent.OpenCustomThemeSheet -> openCustomThemeSheet()
+            is SettingsEvent.OpenCustomThemeSheet -> openCustomThemeSheet(event.initialTab)
             is SettingsEvent.CloseCustomThemeSheet -> _uiState.update { it.copy(isCustomThemeSheetOpen = false) }
             is SettingsEvent.UpdateCustomDraftColor -> _uiState.update { it.copy(customDraftColorHex = event.hex) }
+            is SettingsEvent.UpdateCustomDraftBackgroundPreset -> _uiState.update { it.copy(customDraftBackgroundPresetId = event.presetId) }
+            is SettingsEvent.UpdateCustomDraftBackgroundHex -> _uiState.update { it.copy(customDraftBackgroundHex = event.hex) }
             is SettingsEvent.ApplyCustomTheme -> applyCustomTheme()
         }
     }
@@ -359,12 +397,23 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun openCustomThemeSheet() {
-        val initialDraft = _uiState.value.customPrimaryHex ?: "#9E1B32"
+    private fun openCustomThemeSheet(initialTab: CustomStudioTab = CustomStudioTab.ACCENT) {
+        val isDark = _uiState.value.isDarkMode == true
+        val activeTheme = com.notifast.app.domain.model.theme.ThemePreset.fromId(_uiState.value.themePresetId)
+        val initialDraft = _uiState.value.customPrimaryHex
+            ?: if (isDark) activeTheme.primaryDarkHex else activeTheme.primaryLightHex
+
+        val activeBg = com.notifast.app.domain.model.theme.BackgroundPreset.fromId(_uiState.value.backgroundPresetId)
+        val initialBgHex = _uiState.value.customBackgroundHex
+            ?: if (isDark) activeBg.backgroundDarkHex else activeBg.backgroundLightHex
+
         _uiState.update {
             it.copy(
                 isCustomThemeSheetOpen = true,
-                customDraftColorHex = initialDraft
+                customThemeSheetInitialTab = initialTab,
+                customDraftColorHex = initialDraft,
+                customDraftBackgroundPresetId = _uiState.value.backgroundPresetId,
+                customDraftBackgroundHex = initialBgHex
             )
         }
     }
@@ -372,10 +421,18 @@ class SettingsViewModel @Inject constructor(
     private fun applyCustomTheme() {
         viewModelScope.launch {
             val draft = _uiState.value.customDraftColorHex
+            val draftBgHex = _uiState.value.customDraftBackgroundHex
             userPrefsRepository.setThemePresetId("custom")
             userPrefsRepository.setCustomPrimaryHex(draft)
+            userPrefsRepository.setBackgroundPresetId("custom")
+            userPrefsRepository.setCustomBackgroundHex(draftBgHex)
             _uiState.update { it.copy(isCustomThemeSheetOpen = false) }
         }
+    }
+
+    private fun checkNotificationPermission() {
+        val granted = notificationSender?.areNotificationsEnabled() ?: true
+        _uiState.update { it.copy(isSystemNotificationPermissionGranted = granted) }
     }
 
     private fun observeGoogleAccount() {

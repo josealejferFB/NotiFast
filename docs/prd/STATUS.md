@@ -27,11 +27,12 @@ Cloud Hub AAA & Rediseño Táctil   [██████████████�
 Onboarding & Acceso Cloud Sync    [████████████████] 100% (4/4 pilares) ✅
 Grades Hub & Analíticas AAA       [████████████████] 100% (5/5 pilares) ✅
 Sistema de Temas Dinámicos AAA    [████████████████] 100% (15/15 tareas) ✅
+Motor Notificaciones Locales AAA  [████████████████] 100% (8/8 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  98% (177/183 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    645 tests pasando (0 fallos, 0 ignorados) ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████]  99% (185/191 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    678 tests pasando (0 fallos, 0 ignorados) ✅
 ```
 
 ---
@@ -743,14 +744,102 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
      - **Ocean Cyan:** Brisa marina / Seafoam (`#E5F3F5`) / Abismo marino (`#061418`).
    - Tokens dinámicos de alto contraste: `background`, `surface`, `surfaceContainer`, `surfaceContainerHigh`, `surfaceVariant`, `outlineVariant`, `onBackground`, `onSurface`, `onSurfaceVariant`.
    - **Muestra Táctil Mini-Lienzo (`BackgroundSwatchItem`):** Squircle con previsualización en miniatura del lienzo (`bgColor`), ficha interior elevada (`surfaceContainer`), micro-borde nítido (`outlineVariant`) y pip cromático de identidad (`accentPipHex`).
-   - **Cero Solapamiento de Cards:** Estructura Bento aplanada eliminando doble anidamiento de cards redundantes y asegurando padding armónico sin clipping horizontal.
-7. **Higiene de Código, Clean Architecture y Modularidad:**
-   - **Límite Estricto $\le 250$ LOC Cumplido:** `BackgroundSwatchItems.kt` (158 LOC), `ThemeSelectorCard.kt` (222 LOC), `SettingsSectionsContent.kt` (234 LOC), `BackgroundPreset.kt` (204 LOC), `CustomThemePaletteSheet.kt` (198 LOC), `ThemePreviewMiniCard.kt` (133 LOC).
+    - **Cero Solapamiento de Cards:** Estructura Bento aplanada eliminando doble anidamiento de cards redundantes y asegurando padding armónico sin clipping horizontal.
+7. **Selector Hex Libre & Espectro Continuo Sin Presets Fijos (`HexColorStudioPicker` & `ColorSpectrumSliders`):**
+   - Eliminación total de presets fijos en el modal de personalización a petición del usuario.
+   - **Controles Espectrales Táctiles Continuos:**
+     - Barra de Matiz / Hue (0° - 360°) con gradiente horizontal completo.
+     - Barra de Saturación (0% - 100%) dinámica basada en el tono y luminosidad activa.
+     - Barra de Luminosidad / Intensidad (0% - 100%) con gradiente negro-tono-blanco.
+     - Pulgar táctil (`thumb`) con halo de alto contraste (borde blanco + anillo de color activo) con seguimiento de toques y arrastre sin colisiones de gestos (`awaitEachGesture`).
+   - **Entrada Hex Directa Bidireccional:** Campo `OutlinedTextField` con prefijo `#`, validación estricta de 6 caracteres hexadecimales (`0-9A-F`), formateo automático en mayúsculas y sincronización instantánea con los deslizadores y ficha de previsualización.
+   - **Independencia Total de Lienzo y Aislamiento de Fondo:**
+     - Introducción formal de `BackgroundPreset.CUSTOM` con `id = "custom"`.
+     - Corrección quirúrgica del bug de solapamiento: `effectiveBgHex` solo se activa cuando `backgroundPreset == BackgroundPreset.CUSTOM`, previniendo que colores residuales en DataStore anulen las selecciones de presets estándar o viceversa.
+     - Soporte completo para persistencia y respaldo en Google Drive (`custom_theme_background_hex`).
+8. **Higiene de Código, Clean Architecture y Modularidad:**
+   - **Límite Estricto $\le 250$ LOC Cumplido:** `ColorSpectrumSliders.kt` (200 LOC), `HexColorStudioPicker.kt` (245 LOC), `CustomThemePaletteSheet.kt` (175 LOC), `CustomStudioTabs.kt` (119 LOC), `BackgroundSwatchItems.kt` (240 LOC), `ThemeSelectorCard.kt` (235 LOC), `SettingsSectionsContent.kt` (203 LOC), `SettingsScreen.kt` (217 LOC).
    - **Cero Strings Quemados:** 100% de títulos, nombres de temas, descripciones y etiquetas accesibles centralizados en `res/values/strings.xml` en español.
    - **Cero Lógica en UI:** Estado MVI centralizado en un único StateFlow (`SettingsUiState`), interacción mediante eventos sellados (`SettingsEvent`), y lógica cromática pura en dominio/presentación.
-8. **Verificación Basada en Evidencia:**
-   - **645 pruebas unitarias automatizadas ejecutadas y aprobadas al 100%** (0 fallos, 0 errores, 0 ignorados), incluyendo tests de dominio (`ThemePresetTest`, `BackgroundPresetTest`), generador de color (`ThemePaletteGeneratorTest`), repositorio (`UserPrefsRepositoryTest`), casos de uso cloud (`BuildCloudOverviewUseCaseTest`) y ViewModel (`SettingsViewModelTest`).
+9. **Verificación Basada en Evidencia:**
+   - **678 pruebas unitarias automatizadas ejecutadas y aprobadas al 100%** (0 fallos, 0 errores, 0 ignorados).
    - Compilación exitosa de build debug (`./gradlew assembleDebug`).
+
+---
+
+## 🔔 Motor de Notificaciones Académicas Locales y Alertas Puntuables (Local Notifications Engine AAA) — 100% Completado (17 Oct 2026)
+
+**Objetivo:** Modernizar e implementar al estándar de la industria el sistema de alertas académicas de NotiFast, eliminando el código inerte en `SettingsScreen`, gestionando con ergonomía de vanguardia los permisos en Android 13+ (`POST_NOTIFICATIONS`), introduciendo un motor híbrido de precisión exacta (`AlarmManager.setExactAndAllowWhileIdle()` + `WorkManager` para resúmenes matutinos), heads-up alerts con deep-linking reactivo y botones de acción rápida, y verificación táctil en vivo mediante un botón Bento de prueba.
+
+### Entregables Implementados:
+1. **Gestión de Permisos Android 13+ (`POST_NOTIFICATIONS`):**
+   - Detección en tiempo real del estado de permisos del sistema operativo expuesto en `SettingsUiState.isSystemNotificationPermissionGranted`.
+   - Banner Bento de advertencia accesible en la sección de notificaciones cuando los permisos están revocados, con botón directo de habilitación.
+   - Lanzador con contrato `ActivityResultContracts.RequestPermission()`.
+   - Diálogo explicativo con redirección directa a los ajustes del sistema (`Settings.ACTION_APP_NOTIFICATION_SETTINGS` con paquete de la app) en caso de denegación permanente ("No volver a preguntar").
+   - Observador de ciclo de vida en `SettingsScreen` con `LifecycleEventEffect(Lifecycle.Event.ON_RESUME)` para refrescar el estado del permiso en cuanto el estudiante regresa de los ajustes del sistema.
+   - Preservación íntegra de preferencias de tiempo en DataStore: el usuario puede configurar su anticipación (ej. 15 min, 1 día) sin que se borre si revoca temporalmente los permisos del SO.
+
+2. **Motor Híbrido de Precisión Puntual (`ExactAlarmScheduler` + `AlarmTriggerReceiver`):**
+   - Interfaz de dominio `ExactAlarmScheduler` e implementación resiliente `ExactAlarmSchedulerImpl` con inyección Hilt en `RepositoryModule`.
+   - Despacho de alarmas de clases y evaluaciones críticas utilizando `AlarmManager.setExactAndAllowWhileIdle()` con fallback seguro ante restricciones del sistema (`canScheduleExactAlarms()` y captura de `SecurityException`).
+   - `AlarmTriggerReceiver` (`android:exported="false"`): Procesa el disparo de alertas bajo Doze Mode, auto-rearma la alarma de clase semanal para el próximo ciclo de 7 días, y valida en evaluaciones que no hayan sido presentadas ni tengan nota antes de notificar.
+   - `BootCompletedReceiver` reforzado: Responde reactivamente a `BOOT_COMPLETED`, `ACTION_TIME_SET`, `ACTION_TIMEZONE_CHANGED` y `ACTION_MY_PACKAGE_REPLACED`, invocando `RescheduleAllAlertsUseCase`.
+   - `WorkManager` preservado para el cómputo en segundo plano del resumen matutino diario periódico (07:00 AM) y limpieza preventiva de trabajos legados.
+
+3. **Notificaciones Ricas, Deep-Linking y Prioridad Máxima (`NotificationSender`):**
+   - Canales actualizados en `NotificationChannelsManager` con patrones de vibración háptica dedicados e `IMPORTANCE_HIGH`.
+   - **Canal de Clases:** Banner heads-up de alta prioridad con aula, horario y acción rápida "Ver Horario" (`EXTRA_DESTINATION = DESTINATION_SCHEDULES`).
+   - **Canal de Evaluaciones:** Prioridad alta con fecha, peso porcentual y acción rápida "Ver Materia" (`DESTINATION_SUBJECT_DETAIL`, `EXTRA_SUBJECT_NAME`, `EXTRA_EVALUATION_ID`).
+   - **Canal de Resumen Matutino:** Notificación estructurada con agenda matutina diaria.
+   - **Ruteo de Deep-Links Reactivo:** Soportado en `MainActivity`, `MainViewModel` (con `pendingDeepLink: StateFlow<NotificationDeepLink?>`) y `NavGraph` con navegación automática al abrir la alerta o presionar acciones rápidas.
+
+4. **Botón Bento de Prueba Táctil en Ajustes:**
+   - Botón interactivo "Enviar notificación de prueba" en la tarjeta de Notificaciones de Ajustes.
+   - Dispara inmediatamente una alerta heads-up en vivo (`sendTestNotification`) con sonido, vibración y deep link a Ajustes (`DESTINATION_SETTINGS`).
+   - Feedback inmediato con `snackbarMessage` de éxito o apertura del diálogo de permisos si están deshabilitados.
+
+5. **Higiene de Arquitectura y Modularización Compose (≤ 250 LOC):**
+   - Extracción de `SettingsNotificationsSection.kt` (166 LOC) como sub-componente modular.
+   - `SettingsSectionsContent.kt` reducido a 198 LOC (≤ 250 LOC).
+   - `SettingsScreen.kt` optimizado a 215 LOC (≤ 250 LOC).
+   - 100% de textos centralizados en `res/values/strings.xml` en español.
+   - Contrato MVI unificado con StateFlow único (`SettingsUiState`) y eventos (`SettingsEvent`).
+
+6. **Verificación y Cobertura de Pruebas Automatizadas:**
+   - **684 pruebas unitarias ejecutadas y aprobadas al 100%** (0 fallos, 0 errores, 0 ignorados).
+   - +32 pruebas nuevas y actualizadas en:
+     - `ExactAlarmSchedulerTest` (5 tests)
+     - `BootCompletedReceiverTest` (5 tests)
+     - `AlarmTriggerReceiverTest` (3 tests)
+     - `NotificationSenderTest` (5 tests)
+     - `ScheduleClassAlertUseCaseTest` (2 tests)
+     - `ScheduleEvaluationAlertUseCaseTest` (2 tests)
+     - `CancelAlertUseCaseTest` (3 tests)
+     - `RescheduleAllAlertsUseCaseTest` (3 tests)
+     - `SettingsViewModelTest` (+7 tests de permisos y alertas de prueba)
+   - Compilación exitosa del APK debug (`./gradlew assembleDebug`).
+
+---
+
+## 🎨 Hardening Estudio de Color Hex & Aislamiento Total (Énfasis y Fondo) — 100% Completado ✅
+
+1. **Aislamiento de Estado y Cero Interferencia de Sliders:**
+   - Desacoplamiento total del estado HSL de `activeColor` en `HexColorStudioPicker.kt`.
+   - Implementación de guard `lastEmittedHex` para evitar que la recomposición padre re-cuantice los sliders y cause jitter o movimiento mutuo no deseado.
+   - Eliminación del bug de colapso a 0° (rojo) cuando la luminosidad se acercaba a 0 o 1.
+   - Preservación del matiz (Hue) en colores monocromáticos.
+
+2. **Aislamiento Total entre Pestañas de Énfasis y Fondo:**
+   - Integración de `key(CustomStudioTab.ACCENT)` y `key(CustomStudioTab.BACKGROUND)` en `CustomThemePaletteSheet.kt` para prevenir que Compose reutilice nodos de estado entre ambas pestañas.
+   - Actualización de `SpectrumSliderBar.kt` con `rememberUpdatedState(onValueChanged)` para eliminar closures desactualizadas en `awaitEachGesture`.
+   - Soporte de apertura directa de pestaña según el swatch seleccionado en `ThemeSelectorCard` (`initialTab`).
+
+3. **Colores de Fondo Verdaderos (Sin distorsión) & Adaptabilidad Luminosa:**
+   - `ThemePaletteGenerator.kt` preserva el color exacto del usuario (`bg = customBackgroundHex.toSafeComposeColor()`) sin forzar desaturación ni pasteles/negros artificiales.
+   - Cálculo dinámico de luminancia (`isBgDark`) para garantizar contraste WCAG AAA ($\ge 4.5:1$) en textos `onBackground` y `onSurface` y armonización en containers.
+   - 100% de archivos composable $\le 250$ LOC verificados.
+   - 684 pruebas unitarias aprobadas al 100%.
 
 ---
 

@@ -1,6 +1,8 @@
 package com.notifast.app.presentation.feature.settings
 
+import android.Manifest
 import android.app.Activity
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -70,6 +74,34 @@ fun SettingsScreen(
         } else {
             viewModel.onEvent(SettingsEvent.AuthResult(null))
         }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val shouldShowRationale = if (!isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && context is Activity) {
+            context.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            false
+        }
+        viewModel.onEvent(
+            SettingsEvent.OnNotificationPermissionResult(
+                isGranted = isGranted,
+                shouldShowRationale = !isGranted && !shouldShowRationale
+            )
+        )
+    }
+
+    val requestNotificationPermission = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            viewModel.onEvent(SettingsEvent.RefreshNotificationPermission)
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onEvent(SettingsEvent.RefreshNotificationPermission)
     }
 
     LaunchedEffect(uiState.pendingAuthIntent) {
@@ -149,6 +181,7 @@ fun SettingsScreen(
                 context = context,
                 onEditProfile = onEditProfile,
                 onEvent = viewModel::onEvent,
+                onRequestPermission = requestNotificationPermission,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
@@ -169,13 +202,17 @@ fun SettingsScreen(
         )
     }
 
-    com.notifast.app.presentation.feature.settings.components.CustomThemePaletteSheet(
-        isOpen = uiState.isCustomThemeSheetOpen,
-        draftHex = uiState.customDraftColorHex,
-        isDark = MaterialTheme.colorScheme.isDark,
-        onColorSelected = { viewModel.onEvent(SettingsEvent.UpdateCustomDraftColor(it)) },
-        onApply = { viewModel.onEvent(SettingsEvent.ApplyCustomTheme) },
-        onDismiss = { viewModel.onEvent(SettingsEvent.CloseCustomThemeSheet) }
-    )
+    if (uiState.isCustomThemeSheetOpen) {
+        com.notifast.app.presentation.feature.settings.components.CustomThemePaletteSheet(
+            draftHex = uiState.customDraftColorHex,
+            draftBackgroundHex = uiState.customDraftBackgroundHex,
+            isDark = MaterialTheme.colorScheme.isDark,
+            initialTab = uiState.customThemeSheetInitialTab,
+            onColorSelected = { viewModel.onEvent(SettingsEvent.UpdateCustomDraftColor(it)) },
+            onBackgroundHexSelected = { viewModel.onEvent(SettingsEvent.UpdateCustomDraftBackgroundHex(it)) },
+            onApply = { viewModel.onEvent(SettingsEvent.ApplyCustomTheme) },
+            onDismiss = { viewModel.onEvent(SettingsEvent.CloseCustomThemeSheet) }
+        )
+    }
 }
 

@@ -81,20 +81,28 @@ object ThemePaletteGenerator {
 
     /**
      * Generates a Material 3 ColorScheme from a preset or custom hex value,
-     * harmonized with an independent background/canvas preset.
+     * harmonized with an independent background/canvas preset or custom background hex.
      */
     fun generateColorScheme(
         preset: ThemePreset,
         isDark: Boolean,
         customPrimaryHex: String? = null,
-        backgroundPreset: BackgroundPreset = BackgroundPreset.CLASSIC
+        backgroundPreset: BackgroundPreset = BackgroundPreset.CLASSIC,
+        customBackgroundHex: String? = null
     ): ColorScheme {
+        val effectiveBgHex = if (backgroundPreset == BackgroundPreset.CUSTOM) {
+            customBackgroundHex
+        } else {
+            null
+        }
+
         return if (preset == ThemePreset.CUSTOM) {
             val baseColor = customPrimaryHex?.toSafeComposeColor(PrimaryLight) ?: PrimaryLight
             createCustomScheme(
                 primaryColor = baseColor,
                 isDark = isDark,
-                backgroundPreset = backgroundPreset
+                backgroundPreset = backgroundPreset,
+                customBackgroundHex = effectiveBgHex
             )
         } else {
             val primaryHex = if (isDark) preset.primaryDarkHex else preset.primaryLightHex
@@ -105,21 +113,30 @@ object ThemePaletteGenerator {
                 primaryColor = primaryColor,
                 isDark = isDark,
                 secondaryColor = secondaryColor,
-                backgroundPreset = backgroundPreset
+                backgroundPreset = backgroundPreset,
+                customBackgroundHex = effectiveBgHex
             )
         }
     }
 
     /**
      * Dynamically creates a compliant ColorScheme from primary and optional secondary colors
-     * combined with the chosen background canvas preset.
+     * combined with the chosen background canvas preset or free custom background hex.
      */
     fun createCustomScheme(
         primaryColor: Color,
         isDark: Boolean,
         secondaryColor: Color? = null,
-        backgroundPreset: BackgroundPreset = BackgroundPreset.CLASSIC
+        backgroundPreset: BackgroundPreset = BackgroundPreset.CLASSIC,
+        customBackgroundHex: String? = null
     ): ColorScheme {
+        val effectiveIsDark = if (backgroundPreset == BackgroundPreset.CUSTOM && !customBackgroundHex.isNullOrBlank()) {
+            val bg = customBackgroundHex.toSafeComposeColor(if (isDark) BackgroundDark else BackgroundLight)
+            calculateLuminance(bg) < 0.45f
+        } else {
+            isDark
+        }
+
         val primaryHsl = ThemeUtils.rgbToHsl(primaryColor.red, primaryColor.green, primaryColor.blue)
         val secColor = secondaryColor ?: run {
             val rotatedHue = (primaryHsl[0] + 35f) % 360f
@@ -127,17 +144,18 @@ object ThemePaletteGenerator {
         }
         val secondaryHsl = ThemeUtils.rgbToHsl(secColor.red, secColor.green, secColor.blue)
 
-        return if (isDark) {
-            createDarkScheme(primaryHsl, secondaryHsl, backgroundPreset)
+        return if (effectiveIsDark) {
+            createDarkScheme(primaryHsl, secondaryHsl, backgroundPreset, customBackgroundHex)
         } else {
-            createLightScheme(primaryHsl, secondaryHsl, backgroundPreset)
+            createLightScheme(primaryHsl, secondaryHsl, backgroundPreset, customBackgroundHex)
         }
     }
 
     private fun createLightScheme(
         primaryHsl: FloatArray,
         secondaryHsl: FloatArray,
-        backgroundPreset: BackgroundPreset
+        backgroundPreset: BackgroundPreset,
+        customBackgroundHex: String? = null
     ): ColorScheme {
         val pHue = primaryHsl[0]
         val pSat = primaryHsl[1].coerceIn(0.65f, 0.85f)
@@ -163,15 +181,7 @@ object ThemePaletteGenerator {
         val secondaryContainer = ThemeUtils.hslToColor(sHue, 0.30f, 0.95f)
         val onSecondaryContainer = ThemeUtils.hslToColor(sHue, 0.85f, 0.16f)
 
-        val bg = backgroundPreset.backgroundLightHex.toSafeComposeColor(BackgroundLight)
-        val surface = backgroundPreset.surfaceLightHex.toSafeComposeColor(SurfaceLight)
-        val surfaceContainer = backgroundPreset.surfaceContainerLightHex.toSafeComposeColor(SurfaceContainerLight)
-        val surfaceContainerHigh = backgroundPreset.surfaceContainerHighLightHex.toSafeComposeColor(SurfaceContainerHighLight)
-        val surfaceVariant = backgroundPreset.surfaceVariantLightHex.toSafeComposeColor(SurfaceVariantLight)
-        val onBackground = backgroundPreset.onBackgroundLightHex.toSafeComposeColor(OnBackgroundLight)
-        val onSurface = backgroundPreset.onSurfaceLightHex.toSafeComposeColor(OnSurfaceLight)
-        val onSurfaceVariant = backgroundPreset.onSurfaceVariantLightHex.toSafeComposeColor(OnSurfaceVariantLight)
-        val outlineVariant = backgroundPreset.outlineVariantLightHex.toSafeComposeColor(OutlineVariantLight)
+        val bgTokens = deriveLightBackgroundTokens(backgroundPreset, customBackgroundHex)
 
         return lightColorScheme(
             primary = primary,
@@ -186,16 +196,16 @@ object ThemePaletteGenerator {
             onTertiary = OnTertiaryLight,
             tertiaryContainer = TertiaryContainerLight,
             onTertiaryContainer = OnTertiaryContainerLight,
-            background = bg,
-            onBackground = onBackground,
-            surface = surface,
-            onSurface = onSurface,
-            surfaceVariant = surfaceVariant,
-            onSurfaceVariant = onSurfaceVariant,
-            surfaceContainer = surfaceContainer,
-            surfaceContainerHigh = surfaceContainerHigh,
+            background = bgTokens.bg,
+            onBackground = bgTokens.onBackground,
+            surface = bgTokens.surface,
+            onSurface = bgTokens.onSurface,
+            surfaceVariant = bgTokens.surfaceVariant,
+            onSurfaceVariant = bgTokens.onSurfaceVariant,
+            surfaceContainer = bgTokens.surfaceContainer,
+            surfaceContainerHigh = bgTokens.surfaceContainerHigh,
             outline = OutlineLight,
-            outlineVariant = outlineVariant,
+            outlineVariant = bgTokens.outlineVariant,
             error = ErrorLight,
             onError = OnErrorLight,
             errorContainer = ErrorContainerLight,
@@ -206,7 +216,8 @@ object ThemePaletteGenerator {
     private fun createDarkScheme(
         primaryHsl: FloatArray,
         secondaryHsl: FloatArray,
-        backgroundPreset: BackgroundPreset
+        backgroundPreset: BackgroundPreset,
+        customBackgroundHex: String? = null
     ): ColorScheme {
         val pHue = primaryHsl[0]
         val pSat = primaryHsl[1].coerceIn(0.65f, 0.80f)
@@ -226,21 +237,13 @@ object ThemePaletteGenerator {
         val onSecondary = ThemeUtils.hslToColor(sHue, 0.90f, 0.08f)
         var secondary = ThemeUtils.hslToColor(sHue, sSat, sLight)
         while (calculateContrastRatio(onSecondary, secondary) < 4.5f && sLight < 0.88f) {
-            sLight += 0.02f
+            sLight -= 0.02f
             secondary = ThemeUtils.hslToColor(sHue, sSat, sLight)
         }
         val secondaryContainer = ThemeUtils.hslToColor(sHue, 0.50f, 0.22f)
         val onSecondaryContainer = ThemeUtils.hslToColor(sHue, 0.30f, 0.92f)
 
-        val bg = backgroundPreset.backgroundDarkHex.toSafeComposeColor(BackgroundDark)
-        val surface = backgroundPreset.surfaceDarkHex.toSafeComposeColor(SurfaceDark)
-        val surfaceContainer = backgroundPreset.surfaceContainerDarkHex.toSafeComposeColor(SurfaceContainerDark)
-        val surfaceContainerHigh = backgroundPreset.surfaceContainerHighDarkHex.toSafeComposeColor(SurfaceContainerHighDark)
-        val surfaceVariant = backgroundPreset.surfaceVariantDarkHex.toSafeComposeColor(SurfaceVariantDark)
-        val onBackground = backgroundPreset.onBackgroundDarkHex.toSafeComposeColor(OnBackgroundDark)
-        val onSurface = backgroundPreset.onSurfaceDarkHex.toSafeComposeColor(OnSurfaceDark)
-        val onSurfaceVariant = backgroundPreset.onSurfaceVariantDarkHex.toSafeComposeColor(OnSurfaceVariantDark)
-        val outlineVariant = backgroundPreset.outlineVariantDarkHex.toSafeComposeColor(OutlineVariantDark)
+        val bgTokens = deriveDarkBackgroundTokens(backgroundPreset, customBackgroundHex)
 
         return darkColorScheme(
             primary = primary,
@@ -255,20 +258,123 @@ object ThemePaletteGenerator {
             onTertiary = OnTertiaryDark,
             tertiaryContainer = TertiaryContainerDark,
             onTertiaryContainer = OnTertiaryContainerDark,
-            background = bg,
-            onBackground = onBackground,
-            surface = surface,
-            onSurface = onSurface,
-            surfaceVariant = surfaceVariant,
-            onSurfaceVariant = onSurfaceVariant,
-            surfaceContainer = surfaceContainer,
-            surfaceContainerHigh = surfaceContainerHigh,
+            background = bgTokens.bg,
+            onBackground = bgTokens.onBackground,
+            surface = bgTokens.surface,
+            onSurface = bgTokens.onSurface,
+            surfaceVariant = bgTokens.surfaceVariant,
+            onSurfaceVariant = bgTokens.onSurfaceVariant,
+            surfaceContainer = bgTokens.surfaceContainer,
+            surfaceContainerHigh = bgTokens.surfaceContainerHigh,
             outline = OutlineDark,
-            outlineVariant = outlineVariant,
+            outlineVariant = bgTokens.outlineVariant,
             error = ErrorDark,
             onError = OnErrorDark,
             errorContainer = ErrorContainerDark,
             onErrorContainer = OnErrorContainerDark
+        )
+    }
+
+    private data class BackgroundTokens(
+        val bg: Color,
+        val surface: Color,
+        val surfaceContainer: Color,
+        val surfaceContainerHigh: Color,
+        val surfaceVariant: Color,
+        val onBackground: Color,
+        val onSurface: Color,
+        val onSurfaceVariant: Color,
+        val outlineVariant: Color
+    )
+
+    private fun deriveCustomBackgroundTokens(customBackgroundHex: String, isDark: Boolean): BackgroundTokens {
+        val bg = customBackgroundHex.toSafeComposeColor(if (isDark) BackgroundDark else BackgroundLight)
+        val isBgDark = calculateLuminance(bg) < 0.45f
+        val hsl = ThemeUtils.rgbToHsl(bg.red, bg.green, bg.blue)
+        val bHue = hsl[0]
+        val bSat = hsl[1]
+        val bLight = hsl[2]
+
+        return if (isBgDark) {
+            val surface = ThemeUtils.hslToColor(bHue, (bSat * 0.9f).coerceAtMost(0.30f), (bLight + 0.05f).coerceIn(0.06f, 0.30f))
+            val container = ThemeUtils.hslToColor(bHue, (bSat * 0.9f).coerceAtMost(0.30f), (bLight + 0.08f).coerceIn(0.09f, 0.35f))
+            val containerHigh = ThemeUtils.hslToColor(bHue, (bSat * 0.9f).coerceAtMost(0.30f), (bLight + 0.12f).coerceIn(0.13f, 0.40f))
+            val onBg = if (calculateContrastRatio(Color.White, bg) >= 4.5f) Color.White else Color(0xFFF1F5F9)
+            val onSubtle = Color(0xFF94A3B8)
+            val outline = ThemeUtils.hslToColor(bHue, 0.15f, (bLight + 0.18f).coerceIn(0.20f, 0.45f))
+
+            BackgroundTokens(
+                bg = bg,
+                surface = surface,
+                surfaceContainer = container,
+                surfaceContainerHigh = containerHigh,
+                surfaceVariant = container,
+                onBackground = onBg,
+                onSurface = onBg,
+                onSurfaceVariant = onSubtle,
+                outlineVariant = outline
+            )
+        } else {
+            val surface = Color.White
+            val container = ThemeUtils.hslToColor(bHue, (bSat * 0.8f).coerceAtMost(0.25f), (bLight - 0.03f).coerceIn(0.85f, 0.97f))
+            val containerHigh = ThemeUtils.hslToColor(bHue, (bSat * 0.8f).coerceAtMost(0.25f), (bLight - 0.06f).coerceIn(0.80f, 0.94f))
+            val onBg = if (calculateContrastRatio(Color(0xFF0F172A), bg) >= 4.5f) Color(0xFF0F172A) else Color.Black
+            val onSubtle = Color(0xFF475569)
+            val outline = ThemeUtils.hslToColor(bHue, 0.12f, (bLight - 0.12f).coerceIn(0.72f, 0.88f))
+
+            BackgroundTokens(
+                bg = bg,
+                surface = surface,
+                surfaceContainer = container,
+                surfaceContainerHigh = containerHigh,
+                surfaceVariant = container,
+                onBackground = onBg,
+                onSurface = onBg,
+                onSurfaceVariant = onSubtle,
+                outlineVariant = outline
+            )
+        }
+    }
+
+    private fun deriveLightBackgroundTokens(
+        backgroundPreset: BackgroundPreset,
+        customBackgroundHex: String?
+    ): BackgroundTokens {
+        if (!customBackgroundHex.isNullOrBlank()) {
+            return deriveCustomBackgroundTokens(customBackgroundHex, isDark = false)
+        }
+
+        return BackgroundTokens(
+            bg = backgroundPreset.backgroundLightHex.toSafeComposeColor(BackgroundLight),
+            surface = backgroundPreset.surfaceLightHex.toSafeComposeColor(SurfaceLight),
+            surfaceContainer = backgroundPreset.surfaceContainerLightHex.toSafeComposeColor(SurfaceContainerLight),
+            surfaceContainerHigh = backgroundPreset.surfaceContainerHighLightHex.toSafeComposeColor(SurfaceContainerHighLight),
+            surfaceVariant = backgroundPreset.surfaceVariantLightHex.toSafeComposeColor(SurfaceVariantLight),
+            onBackground = backgroundPreset.onBackgroundLightHex.toSafeComposeColor(OnBackgroundLight),
+            onSurface = backgroundPreset.onSurfaceLightHex.toSafeComposeColor(OnSurfaceLight),
+            onSurfaceVariant = backgroundPreset.onSurfaceVariantLightHex.toSafeComposeColor(OnSurfaceVariantLight),
+            outlineVariant = backgroundPreset.outlineVariantLightHex.toSafeComposeColor(OutlineVariantLight)
+        )
+    }
+
+    private fun deriveDarkBackgroundTokens(
+        backgroundPreset: BackgroundPreset,
+        customBackgroundHex: String?
+    ): BackgroundTokens {
+        if (!customBackgroundHex.isNullOrBlank()) {
+            return deriveCustomBackgroundTokens(customBackgroundHex, isDark = true)
+        }
+
+        return BackgroundTokens(
+            bg = backgroundPreset.backgroundDarkHex.toSafeComposeColor(BackgroundDark),
+            surface = backgroundPreset.surfaceDarkHex.toSafeComposeColor(SurfaceDark),
+            surfaceContainer = backgroundPreset.surfaceContainerDarkHex.toSafeComposeColor(SurfaceContainerDark),
+            surfaceContainerHigh = backgroundPreset.surfaceContainerHighDarkHex.toSafeComposeColor(SurfaceContainerHighDark),
+            surfaceVariant = backgroundPreset.surfaceVariantDarkHex.toSafeComposeColor(SurfaceVariantDark),
+            onBackground = backgroundPreset.onBackgroundDarkHex.toSafeComposeColor(OnBackgroundDark),
+            onSurface = backgroundPreset.onSurfaceDarkHex.toSafeComposeColor(OnSurfaceDark),
+            onSurfaceVariant = backgroundPreset.onSurfaceVariantDarkHex.toSafeComposeColor(OnSurfaceVariantDark),
+            outlineVariant = backgroundPreset.outlineVariantDarkHex.toSafeComposeColor(OutlineVariantDark)
         )
     }
 }

@@ -1,9 +1,8 @@
 package com.notifast.app.domain.usecase
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.notifast.app.data.model.Evaluation
+import com.notifast.app.domain.notification.ExactAlarmScheduler
 import com.notifast.app.domain.repository.UserPrefsRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -16,6 +15,7 @@ import java.util.Calendar
 
 class ScheduleEvaluationAlertUseCaseTest {
 
+    private val exactAlarmScheduler: ExactAlarmScheduler = mockk(relaxed = true)
     private val workManager: WorkManager = mockk(relaxed = true)
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
 
@@ -25,11 +25,11 @@ class ScheduleEvaluationAlertUseCaseTest {
     fun setUp() {
         every { userPrefsRepository.evalAlertsEnabledFlow } returns flowOf(true)
         every { userPrefsRepository.evalAlertDaysFlow } returns flowOf(1)
-        useCase = ScheduleEvaluationAlertUseCase(workManager, userPrefsRepository)
+        useCase = ScheduleEvaluationAlertUseCase(exactAlarmScheduler, workManager, userPrefsRepository)
     }
 
     @Test
-    fun `when evaluation date is in future, enqueues unique work with eval tag`() = runTest {
+    fun `when evaluation date is in future, schedules exact alarm and cancels legacy work`() = runTest {
         val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 3) }
         val evaluation = Evaluation(
             id = "eval_123",
@@ -42,16 +42,20 @@ class ScheduleEvaluationAlertUseCaseTest {
         useCase(evaluation)
 
         verify {
-            workManager.enqueueUniqueWork(
-                "eval_eval_123",
-                ExistingWorkPolicy.REPLACE,
-                any<OneTimeWorkRequest>()
+            exactAlarmScheduler.scheduleEvaluationAlarm(
+                evaluationId = "eval_123",
+                subjectName = "Cálculo",
+                title = "Examen Parcial",
+                dateText = any(),
+                weight = 20.0,
+                triggerAtMillis = any()
             )
+            workManager.cancelUniqueWork("eval_eval_123")
         }
     }
 
     @Test
-    fun `when eval alerts disabled in preferences, does not enqueue work`() = runTest {
+    fun `when eval alerts disabled in preferences, does not schedule alarm`() = runTest {
         every { userPrefsRepository.evalAlertsEnabledFlow } returns flowOf(false)
         val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 3) }
         val evaluation = Evaluation(
@@ -65,7 +69,7 @@ class ScheduleEvaluationAlertUseCaseTest {
         useCase(evaluation)
 
         verify(exactly = 0) {
-            workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+            exactAlarmScheduler.scheduleEvaluationAlarm(any(), any(), any(), any(), any(), any())
         }
     }
 }

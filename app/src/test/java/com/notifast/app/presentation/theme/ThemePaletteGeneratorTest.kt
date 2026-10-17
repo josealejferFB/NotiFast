@@ -195,4 +195,41 @@ class ThemePaletteGeneratorTest {
         assertNotNull(nullHexScheme)
         assertEquals(BackgroundDark, nullHexScheme.background)
     }
+
+    @Test
+    fun `custom background hex applies when backgroundPreset is CUSTOM`() {
+        val lightScheme = ThemePaletteGenerator.generateColorScheme(
+            preset = ThemePreset.CUSTOM,
+            isDark = false,
+            customPrimaryHex = "#BF092F",
+            backgroundPreset = BackgroundPreset.CUSTOM,
+            customBackgroundHex = "#E0F2FE"
+        )
+        assertNotNull(lightScheme)
+        // Background should not be the classic default
+        assertTrue(ThemePaletteGenerator.calculateContrastRatio(lightScheme.onBackground, lightScheme.background) >= 4.5f)
+
+        val darkScheme = ThemePaletteGenerator.generateColorScheme(
+            preset = ThemePreset.CUSTOM,
+            isDark = true,
+            customPrimaryHex = "#BF092F",
+            backgroundPreset = BackgroundPreset.CUSTOM,
+            customBackgroundHex = "#0F172A"
+        )
+        assertNotNull(darkScheme)
+        assertTrue(ThemePaletteGenerator.calculateContrastRatio(darkScheme.onBackground, darkScheme.background) >= 4.5f)
+    }
+
+    @Test
+    fun `preset background is preserved even when customBackgroundHex is present in preferences`() {
+        val lightScheme = ThemePaletteGenerator.generateColorScheme(
+            preset = ThemePreset.CLASSIC,
+            isDark = false,
+            backgroundPreset = BackgroundPreset.FOREST_SAGE,
+            customBackgroundHex = "#E0F2FE"
+        )
+        // Must use FOREST_SAGE tokens, not customBackgroundHex
+        assertEquals(BackgroundPreset.FOREST_SAGE.backgroundLightHex.toSafeComposeColor(), lightScheme.background)
+        assertEquals(BackgroundPreset.FOREST_SAGE.surfaceContainerLightHex.toSafeComposeColor(), lightScheme.surfaceContainer)
+    }
 }

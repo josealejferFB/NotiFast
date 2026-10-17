@@ -1,11 +1,8 @@
 package com.notifast.app.domain.usecase
 
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.notifast.app.data.model.Schedule
-import com.notifast.app.data.worker.ClassScheduleWorker
+import com.notifast.app.domain.notification.ExactAlarmScheduler
 import com.notifast.app.domain.repository.UserPrefsRepository
 import kotlinx.coroutines.flow.first
 import java.util.Calendar
@@ -13,6 +10,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ScheduleClassAlertUseCase @Inject constructor(
+    private val exactAlarmScheduler: ExactAlarmScheduler,
     private val workManager: WorkManager,
     private val userPrefsRepository: UserPrefsRepository
 ) {
@@ -55,23 +53,14 @@ class ScheduleClassAlertUseCase @Inject constructor(
         }
         if (effectiveDelay < 0) return
 
-        val inputData = Data.Builder()
-            .putString(ClassScheduleWorker.KEY_SCHEDULE_ID, schedule.id)
-            .putString(ClassScheduleWorker.KEY_SUBJECT_NAME, schedule.subjectName)
-            .putString(ClassScheduleWorker.KEY_START_TIME, schedule.startTime)
-            .putString(ClassScheduleWorker.KEY_CLASSROOM, schedule.classroom)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<ClassScheduleWorker>()
-            .setInitialDelay(effectiveDelay, TimeUnit.MILLISECONDS)
-            .setInputData(inputData)
-            .addTag("class_${schedule.id}")
-            .build()
-
-        workManager.enqueueUniqueWork(
-            "class_${schedule.id}",
-            ExistingWorkPolicy.REPLACE,
-            workRequest
+        val triggerAtMillis = now.timeInMillis + effectiveDelay
+        exactAlarmScheduler.scheduleClassAlarm(
+            scheduleId = schedule.id,
+            subjectName = schedule.subjectName,
+            classroom = schedule.classroom,
+            startTime = schedule.startTime,
+            triggerAtMillis = triggerAtMillis
         )
+        workManager.cancelUniqueWork("class_${schedule.id}")
     }
 }

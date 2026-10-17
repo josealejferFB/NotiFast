@@ -127,6 +127,7 @@ fun NotiFastTheme(
     themePreset: com.notifast.app.domain.model.theme.ThemePreset = com.notifast.app.domain.model.theme.ThemePreset.CLASSIC,
     backgroundPreset: com.notifast.app.domain.model.theme.BackgroundPreset = com.notifast.app.domain.model.theme.BackgroundPreset.CLASSIC,
     customPrimaryHex: String? = null,
+    customBackgroundHex: String? = null,
     dynamicColor: Boolean = false, // Forced false to maintain NotiFast 3.0 tactile branding
     content: @Composable () -> Unit
 ) {
@@ -137,7 +138,8 @@ fun NotiFastTheme(
         }
         themePreset == com.notifast.app.domain.model.theme.ThemePreset.CLASSIC &&
         backgroundPreset == com.notifast.app.domain.model.theme.BackgroundPreset.CLASSIC &&
-        customPrimaryHex.isNullOrBlank() -> {
+        customPrimaryHex.isNullOrBlank() &&
+        customBackgroundHex.isNullOrBlank() -> {
             if (darkTheme) DarkColorScheme else LightColorScheme
         }
         else -> {
@@ -145,7 +147,8 @@ fun NotiFastTheme(
                 preset = themePreset,
                 isDark = darkTheme,
                 customPrimaryHex = customPrimaryHex,
-                backgroundPreset = backgroundPreset
+                backgroundPreset = backgroundPreset,
+                customBackgroundHex = customBackgroundHex
             )
         }
     }

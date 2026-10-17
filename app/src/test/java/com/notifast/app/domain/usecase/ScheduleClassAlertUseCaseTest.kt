@@ -1,9 +1,8 @@
 package com.notifast.app.domain.usecase
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.notifast.app.data.model.Schedule
+import com.notifast.app.domain.notification.ExactAlarmScheduler
 import com.notifast.app.domain.repository.UserPrefsRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -15,6 +14,7 @@ import org.junit.Test
 
 class ScheduleClassAlertUseCaseTest {
 
+    private val exactAlarmScheduler: ExactAlarmScheduler = mockk(relaxed = true)
     private val workManager: WorkManager = mockk(relaxed = true)
     private val userPrefsRepository: UserPrefsRepository = mockk(relaxed = true)
 
@@ -24,11 +24,11 @@ class ScheduleClassAlertUseCaseTest {
     fun setUp() {
         every { userPrefsRepository.classAlertsEnabledFlow } returns flowOf(true)
         every { userPrefsRepository.classAlertMinutesFlow } returns flowOf(15)
-        useCase = ScheduleClassAlertUseCase(workManager, userPrefsRepository)
+        useCase = ScheduleClassAlertUseCase(exactAlarmScheduler, workManager, userPrefsRepository)
     }
 
     @Test
-    fun `when schedule provided, enqueues unique work with class tag`() = runTest {
+    fun `when schedule provided, schedules exact alarm and cancels legacy work`() = runTest {
         val schedule = Schedule(
             id = "sch_123",
             subjectName = "Algoritmos",
@@ -41,16 +41,19 @@ class ScheduleClassAlertUseCaseTest {
         useCase(schedule)
 
         verify {
-            workManager.enqueueUniqueWork(
-                "class_sch_123",
-                ExistingWorkPolicy.REPLACE,
-                any<OneTimeWorkRequest>()
+            exactAlarmScheduler.scheduleClassAlarm(
+                scheduleId = "sch_123",
+                subjectName = "Algoritmos",
+                classroom = "Lab 4",
+                startTime = "08:00",
+                triggerAtMillis = any()
             )
+            workManager.cancelUniqueWork("class_sch_123")
         }
     }
 
     @Test
-    fun `when class alerts disabled in preferences, does not enqueue work`() = runTest {
+    fun `when class alerts disabled in preferences, does not schedule alarm`() = runTest {
         every { userPrefsRepository.classAlertsEnabledFlow } returns flowOf(false)
         val schedule = Schedule(
             id = "sch_456",
@@ -63,7 +66,7 @@ class ScheduleClassAlertUseCaseTest {
         useCase(schedule)
 
         verify(exactly = 0) {
-            workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+            exactAlarmScheduler.scheduleClassAlarm(any(), any(), any(), any(), any())
         }
     }
 }

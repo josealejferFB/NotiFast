@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.settings
 
 import android.content.Context
+import com.notifast.app.data.notification.NotificationSender
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.domain.model.cloud.CloudAccount
 import com.notifast.app.domain.model.cloud.LocalSyncSummary
@@ -46,6 +47,7 @@ class SettingsViewModelTest {
     private val rescheduleAllAlertsUseCase: RescheduleAllAlertsUseCase = mockk(relaxed = true)
     private val googleAccountRepository: GoogleAccountRepository = mockk(relaxed = true)
     private val observeLocalSyncSummaryUseCase: ObserveLocalSyncSummaryUseCase = mockk(relaxed = true)
+    private val notificationSender: NotificationSender = mockk(relaxed = true)
     private val context: Context = mockk(relaxed = true)
     private val cacheDir: File = mockk(relaxed = true)
 
@@ -65,7 +67,8 @@ class SettingsViewModelTest {
             rescheduleAllAlertsUseCase = rescheduleAllAlertsUseCase,
             googleAccountRepository = googleAccountRepository,
             context = context,
-            observeLocalSyncSummaryUseCase = observeLocalSyncSummaryUseCase
+            observeLocalSyncSummaryUseCase = observeLocalSyncSummaryUseCase,
+            notificationSender = notificationSender
         )
 
     @Before
@@ -76,6 +79,7 @@ class SettingsViewModelTest {
 
         coEvery { userPrefsRepository.isDarkModeFlow } returns flowOf(null)
         coEvery { userPrefsRepository.hapticsEnabledFlow } returns flowOf(true)
+        every { notificationSender.areNotificationsEnabled() } returns true
         coEvery { userPrefsRepository.classAlertsEnabledFlow } returns flowOf(true)
         coEvery { userPrefsRepository.classAlertMinutesFlow } returns flowOf(15)
         coEvery { userPrefsRepository.evalAlertsEnabledFlow } returns flowOf(true)
@@ -88,6 +92,9 @@ class SettingsViewModelTest {
         coEvery { userPrefsRepository.themePresetIdFlow } returns flowOf("classic")
         coEvery { userPrefsRepository.backgroundPresetIdFlow } returns flowOf("classic")
         coEvery { userPrefsRepository.customPrimaryHexFlow } returns flowOf(null)
+        coEvery { userPrefsRepository.customBackgroundHexFlow } returns flowOf(null)
+        coEvery { userPrefsRepository.setCustomPrimaryHex(any()) } returns Result.success(Unit)
+        coEvery { userPrefsRepository.setCustomBackgroundHex(any()) } returns Result.success(Unit)
         coEvery { googleAccountRepository.account } returns flowOf(null)
         coEvery { googleAccountRepository.unlink() } returns Result.success(Unit)
         coEvery { googleAccountRepository.signIn(any()) } returns Result.success(
@@ -441,15 +448,17 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `when OpenCustomThemeSheet event, opens sheet and initializes draft color`() = runTest {
+    fun `when OpenCustomThemeSheet event, opens sheet and initializes draft color and background preset`() = runTest {
+        coEvery { userPrefsRepository.backgroundPresetIdFlow } returns flowOf("warm_mocha")
         val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
-        viewModel.onEvent(SettingsEvent.OpenCustomThemeSheet)
+        viewModel.onEvent(SettingsEvent.OpenCustomThemeSheet())
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.isCustomThemeSheetOpen)
         assertNotNull(viewModel.uiState.value.customDraftColorHex)
+        assertEquals("warm_mocha", viewModel.uiState.value.customDraftBackgroundPresetId)
     }
 
     @Test
@@ -464,17 +473,42 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `when ApplyCustomTheme event, persists custom preset and custom hex and closes sheet`() = runTest {
+    fun `when UpdateCustomDraftBackgroundPreset event, updates customDraftBackgroundPresetId in state`() = runTest {
         val viewModel = createSettingsViewModel()
         advanceUntilIdle()
 
-        viewModel.onEvent(SettingsEvent.OpenCustomThemeSheet)
+        viewModel.onEvent(SettingsEvent.UpdateCustomDraftBackgroundPreset("midnight_indigo"))
+        advanceUntilIdle()
+
+        assertEquals("midnight_indigo", viewModel.uiState.value.customDraftBackgroundPresetId)
+    }
+
+    @Test
+    fun `when UpdateCustomDraftBackgroundHex event, updates customDraftBackgroundHex in state`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.UpdateCustomDraftBackgroundHex("#0E131F"))
+        advanceUntilIdle()
+
+        assertEquals("#0E131F", viewModel.uiState.value.customDraftBackgroundHex)
+    }
+
+    @Test
+    fun `when ApplyCustomTheme event, persists custom preset, custom hex, and custom background hex and closes sheet`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.OpenCustomThemeSheet())
         viewModel.onEvent(SettingsEvent.UpdateCustomDraftColor("#4F46E5"))
+        viewModel.onEvent(SettingsEvent.UpdateCustomDraftBackgroundHex("#0A1610"))
         viewModel.onEvent(SettingsEvent.ApplyCustomTheme)
         advanceUntilIdle()
 
         coVerify(exactly = 1) { userPrefsRepository.setThemePresetId("custom") }
         coVerify(exactly = 1) { userPrefsRepository.setCustomPrimaryHex("#4F46E5") }
+        coVerify(exactly = 1) { userPrefsRepository.setBackgroundPresetId("custom") }
+        coVerify(exactly = 1) { userPrefsRepository.setCustomBackgroundHex("#0A1610") }
         assertFalse(viewModel.uiState.value.isCustomThemeSheetOpen)
     }
 
@@ -487,6 +521,86 @@ class SettingsViewModelTest {
         advanceUntilIdle()
 
         coVerify(exactly = 1) { userPrefsRepository.setBackgroundPresetId("warm_mocha") }
+    }
+
+    @Test
+    fun `when created and permission granted, uiState reflects permission granted`() = runTest {
+        every { notificationSender.areNotificationsEnabled() } returns true
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isSystemNotificationPermissionGranted)
+    }
+
+    @Test
+    fun `when created and permission denied, uiState reflects permission denied`() = runTest {
+        every { notificationSender.areNotificationsEnabled() } returns false
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSystemNotificationPermissionGranted)
+    }
+
+    @Test
+    fun `when RefreshNotificationPermission event, updates isSystemNotificationPermissionGranted`() = runTest {
+        every { notificationSender.areNotificationsEnabled() } returns true
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        every { notificationSender.areNotificationsEnabled() } returns false
+        viewModel.onEvent(SettingsEvent.RefreshNotificationPermission)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSystemNotificationPermissionGranted)
+    }
+
+    @Test
+    fun `when SendTestNotification event succeeds, sets success snackbar`() = runTest {
+        every { notificationSender.sendTestNotification() } returns true
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.SendTestNotification)
+        advanceUntilIdle()
+
+        assertEquals("Notificación de prueba enviada con éxito", viewModel.uiState.value.snackbarMessage)
+    }
+
+    @Test
+    fun `when SendTestNotification event fails due to permission, opens rationale dialog`() = runTest {
+        every { notificationSender.sendTestNotification() } returns false
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.SendTestNotification)
+        advanceUntilIdle()
+
+        assertEquals(SettingsDialogType.NOTIFICATION_PERMISSION_RATIONALE, viewModel.uiState.value.activeDialog)
+        assertFalse(viewModel.uiState.value.isSystemNotificationPermissionGranted)
+    }
+
+    @Test
+    fun `when OnNotificationPermissionResult granted, reschedules alerts`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.OnNotificationPermissionResult(isGranted = true, shouldShowRationale = false))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isSystemNotificationPermissionGranted)
+        coVerify(atLeast = 1) { rescheduleAllAlertsUseCase() }
+    }
+
+    @Test
+    fun `when OnNotificationPermissionResult denied with rationale, opens rationale dialog`() = runTest {
+        val viewModel = createSettingsViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(SettingsEvent.OnNotificationPermissionResult(isGranted = false, shouldShowRationale = true))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSystemNotificationPermissionGranted)
+        assertEquals(SettingsDialogType.NOTIFICATION_PERMISSION_RATIONALE, viewModel.uiState.value.activeDialog)
     }
 }
 

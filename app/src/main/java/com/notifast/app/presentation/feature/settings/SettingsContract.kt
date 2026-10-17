@@ -6,6 +6,7 @@ import android.content.Intent
 import com.notifast.app.data.model.User
 import com.notifast.app.domain.model.cloud.CloudAccount
 import com.notifast.app.domain.model.cloud.LocalSyncSummary
+import com.notifast.app.presentation.feature.settings.components.CustomStudioTab
 
 enum class SettingsDialogType {
     THEME,
@@ -14,6 +15,7 @@ enum class SettingsDialogType {
     FIRST_DAY_OF_WEEK,
     CLASS_ALERT_TIMING,
     EVAL_ALERT_TIMING,
+    NOTIFICATION_PERMISSION_RATIONALE,
     ABOUT_BOTTOM_SHEET,
     PRIVACY_POLICY,
     LOGOUT,
@@ -53,16 +55,25 @@ data class SettingsUiState(
     val activeDialog: SettingsDialogType? = null,
     val snackbarMessage: String? = null,
     val isLoggedOut: Boolean = false,
+    val isSystemNotificationPermissionGranted: Boolean = true,
     val themePresetId: String = "classic",
     val backgroundPresetId: String = "classic",
     val customPrimaryHex: String? = null,
+    val customBackgroundHex: String? = null,
     val isCustomThemeSheetOpen: Boolean = false,
-    val customDraftColorHex: String = "#9E1B32"
+    val customDraftColorHex: String = "#9E1B32",
+    val customDraftBackgroundPresetId: String = "classic",
+    val customDraftBackgroundHex: String = "#0E131F",
+    val customThemeSheetInitialTab: CustomStudioTab = CustomStudioTab.ACCENT
 )
 
 sealed interface SettingsEvent {
     data object LoadProfile : SettingsEvent
     data object RefreshCacheSize : SettingsEvent
+    data object RefreshNotificationPermission : SettingsEvent
+    data class UpdateNotificationPermission(val isGranted: Boolean) : SettingsEvent
+    data object SendTestNotification : SettingsEvent
+    data class OnNotificationPermissionResult(val isGranted: Boolean, val shouldShowRationale: Boolean) : SettingsEvent
     data class SetDarkMode(val enabled: Boolean?) : SettingsEvent
     data class SetHapticsEnabled(val enabled: Boolean) : SettingsEvent
     data class SetClassAlertsEnabled(val enabled: Boolean) : SettingsEvent
@@ -88,9 +99,11 @@ sealed interface SettingsEvent {
     data class SelectThemePreset(val presetId: String) : SettingsEvent
     data class SelectBackgroundPreset(val presetId: String) : SettingsEvent
     data class SetCustomPrimaryHex(val hex: String) : SettingsEvent
-    data object OpenCustomThemeSheet : SettingsEvent
+    data class OpenCustomThemeSheet(val initialTab: CustomStudioTab = CustomStudioTab.ACCENT) : SettingsEvent
     data object CloseCustomThemeSheet : SettingsEvent
     data class UpdateCustomDraftColor(val hex: String) : SettingsEvent
+    data class UpdateCustomDraftBackgroundPreset(val presetId: String) : SettingsEvent
+    data class UpdateCustomDraftBackgroundHex(val hex: String) : SettingsEvent
     data object ApplyCustomTheme : SettingsEvent
 }
 

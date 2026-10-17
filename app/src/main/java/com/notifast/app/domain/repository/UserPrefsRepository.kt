@@ -57,6 +57,16 @@ interface UserPrefsRepository {
     suspend fun setCustomPrimaryHex(hex: String?): Result<Unit>
 
     /**
+     * Flow emitting custom background canvas color hex code (e.g. "#0E131F"), or null if using presets.
+     */
+    val customBackgroundHexFlow: Flow<String?>
+
+    /**
+     * Sets custom background color hex preference. Pass null to clear.
+     */
+    suspend fun setCustomBackgroundHex(hex: String?): Result<Unit>
+
+    /**
      * Flow emitting whether tactile haptic feedback is enabled.
      */
     val hapticsEnabledFlow: Flow<Boolean>

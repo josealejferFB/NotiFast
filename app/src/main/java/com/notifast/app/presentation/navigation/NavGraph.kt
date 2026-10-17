@@ -74,6 +74,29 @@ fun MainContent() {
 
     val startDestination = if (authState == true) Screen.Notes.route else Screen.Onboarding.route
 
+    val pendingDeepLink by mainViewModel.pendingDeepLink.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pendingDeepLink, authState) {
+        val link = pendingDeepLink
+        if (link != null && authState == true) {
+            when (link) {
+                is com.notifast.app.presentation.feature.main.NotificationDeepLink.Schedules -> {
+                    navController.navigate(Screen.Schedules.route)
+                }
+                is com.notifast.app.presentation.feature.main.NotificationDeepLink.SubjectDetail -> {
+                    navController.navigate(Screen.SubjectDetail.createRoute(link.subjectName))
+                    if (link.evaluationId != null) {
+                        activeEvaluationEditorArgs = Pair(link.evaluationId, null)
+                    }
+                }
+                is com.notifast.app.presentation.feature.main.NotificationDeepLink.Settings -> {
+                    navController.navigate(Screen.Settings.route)
+                }
+            }
+            mainViewModel.clearPendingDeepLink()
+        }
+    }
+
     LaunchedEffect(authState) {
         val currentRoute = navController.currentDestination?.route
         when {

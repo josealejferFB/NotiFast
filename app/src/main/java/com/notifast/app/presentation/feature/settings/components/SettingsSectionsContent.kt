@@ -46,6 +46,7 @@ fun SettingsSectionsContent(
     context: Context,
     onEditProfile: () -> Unit,
     onEvent: (SettingsEvent) -> Unit,
+    onRequestPermission: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -69,7 +70,11 @@ fun SettingsSectionsContent(
         )
         Spacer(modifier = Modifier.height(14.dp))
         SettingsAcademicSection(uiState = uiState, onEvent = onEvent)
-        SettingsNotificationsSection(uiState = uiState, onEvent = onEvent)
+        SettingsNotificationsSection(
+            uiState = uiState,
+            onEvent = onEvent,
+            onRequestPermission = onRequestPermission
+        )
         SettingsAppearanceSection(uiState = uiState, onEvent = onEvent)
         SettingsStorageAboutSection(uiState = uiState, context = context, onEvent = onEvent)
         Spacer(modifier = Modifier.height(110.dp))
@@ -114,54 +119,18 @@ private fun SettingsAcademicSection(uiState: SettingsUiState, onEvent: (Settings
 }
 
 @Composable
-private fun SettingsNotificationsSection(uiState: SettingsUiState, onEvent: (SettingsEvent) -> Unit) {
-    SettingsSectionContainer(title = stringResource(R.string.settings_section_notifications), icon = Icons.Default.Notifications) {
-        val classSub = if (uiState.classAlertsEnabled) stringResource(R.string.settings_notifications_classes_subtitle, uiState.classAlertMinutes) else stringResource(R.string.settings_notifications_classes_disabled)
-        val evalSub = if (uiState.evalAlertsEnabled) stringResource(R.string.settings_notifications_evaluations_subtitle, uiState.evalAlertDays) else stringResource(R.string.settings_notifications_evaluations_disabled)
-        SettingsRowItem(
-            title = stringResource(R.string.settings_notifications_classes_title),
-            subtitle = classSub,
-            icon = Icons.Default.NotificationsActive,
-            trailing = SettingsTrailingContent.SwitchToggle(
-                checked = uiState.classAlertsEnabled,
-                onCheckedChange = { onEvent(SettingsEvent.SetClassAlertsEnabled(it)) },
-                badgeText = stringResource(R.string.settings_notifications_badge_min, uiState.classAlertMinutes)
-            ),
-            onClick = if (uiState.classAlertsEnabled) ({ onEvent(SettingsEvent.OpenDialog(SettingsDialogType.CLASS_ALERT_TIMING)) }) else null
-        )
-        SettingsRowItem(
-            title = stringResource(R.string.settings_notifications_evaluations_title),
-            subtitle = evalSub,
-            icon = Icons.Default.CalendarMonth,
-            trailing = SettingsTrailingContent.SwitchToggle(
-                checked = uiState.evalAlertsEnabled,
-                onCheckedChange = { onEvent(SettingsEvent.SetEvalAlertsEnabled(it)) },
-                badgeText = stringResource(R.string.settings_notifications_badge_days, uiState.evalAlertDays)
-            ),
-            onClick = if (uiState.evalAlertsEnabled) ({ onEvent(SettingsEvent.OpenDialog(SettingsDialogType.EVAL_ALERT_TIMING)) }) else null
-        )
-        SettingsRowItem(
-            title = stringResource(R.string.settings_notifications_daily_summary_title),
-            subtitle = stringResource(R.string.settings_notifications_daily_summary_subtitle),
-            icon = Icons.Default.WbSunny,
-            trailing = SettingsTrailingContent.SwitchToggle(checked = uiState.dailySummaryEnabled, onCheckedChange = { onEvent(SettingsEvent.SetDailySummaryEnabled(it)) }),
-            showDivider = false
-        )
-    }
-}
-
-@Composable
 private fun SettingsAppearanceSection(uiState: SettingsUiState, onEvent: (SettingsEvent) -> Unit) {
     SettingsSectionContainer(title = stringResource(R.string.settings_section_appearance), icon = Icons.Default.Palette) {
         ThemeSelectorCard(
             currentPresetId = uiState.themePresetId,
             currentBackgroundPresetId = uiState.backgroundPresetId,
             customPrimaryHex = uiState.customPrimaryHex,
+            customBackgroundHex = uiState.customBackgroundHex,
             isDarkMode = uiState.isDarkMode,
             onSelectPreset = { onEvent(SettingsEvent.SelectThemePreset(it)) },
             onSelectBackgroundPreset = { onEvent(SettingsEvent.SelectBackgroundPreset(it)) },
             onSetDarkMode = { onEvent(SettingsEvent.SetDarkMode(it)) },
-            onOpenCustomStudio = { onEvent(SettingsEvent.OpenCustomThemeSheet) }
+            onOpenCustomStudio = { tab -> onEvent(SettingsEvent.OpenCustomThemeSheet(tab)) }
         )
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),

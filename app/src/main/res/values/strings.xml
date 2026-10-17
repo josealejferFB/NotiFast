@@ -354,10 +354,16 @@
     <string name="settings_theme_mode_system">Sistema</string>
     <string name="settings_theme_mode_light">Claro</string>
     <string name="settings_theme_mode_dark">Oscuro</string>
-    <string name="settings_theme_custom_studio_btn">Personalizar Color</string>
-    <string name="settings_theme_custom_sheet_title">Estudio de Color Académico</string>
-    <string name="settings_theme_custom_sheet_subtitle">Selecciona tu color de estudio. Calibramos automáticamente un esquema Material 3 con contraste WCAG AAA garantizado.</string>
+    <string name="settings_theme_custom_studio_btn">Personalizar Paleta</string>
+    <string name="settings_theme_custom_sheet_title">Estudio de Paletas Académicas</string>
+    <string name="settings_theme_custom_sheet_subtitle">Personaliza tu color de énfasis y la tonalidad del fondo. Calibramos automáticamente un esquema con contraste WCAG AAA garantizado.</string>
+    <string name="settings_theme_custom_tab_accent">Color de Énfasis</string>
+    <string name="settings_theme_custom_tab_background">Tonalidad de Fondo</string>
+    <string name="settings_theme_custom_hues_title">Paleta de Estudio (12 tonalidades)</string>
+    <string name="settings_theme_custom_backgrounds_title">Lienzo Académico (6 texturas)</string>
+    <string name="settings_theme_custom_wcag_badge">WCAG AAA • Contraste Seguro</string>
     <string name="settings_theme_custom_apply_btn">Aplicar Paleta</string>
+    <string name="settings_theme_custom_bg_swatch_cd">Abrir estudio para personalizar lienzo de fondo</string>
     <string name="settings_theme_preview_label">Previsualización en Vivo</string>
     <string name="settings_theme_preview_sample_subject">Matemática Discreta</string>
     <string name="settings_theme_preview_sample_eval">Parcial I • Pendiente</string>
@@ -378,8 +384,17 @@
     <string name="bg_preset_sakura_zen_desc">Atmósfera relajante y serena para reducir el estrés</string>
     <string name="bg_preset_ocean_cyan_name">Glaciar</string>
     <string name="bg_preset_ocean_cyan_desc">Tono fresco y estructurado para máxima concentración</string>
+    <string name="bg_preset_custom_name">Personalizado</string>
+    <string name="bg_preset_custom_desc">Lienzo y tonalidades definidas libremente con código hexadecimal</string>
     <string name="settings_theme_accent_title">Color de Énfasis</string>
     <string name="settings_theme_background_title">Tonalidad de Fondo</string>
+    <string name="settings_theme_hex_input_label">Código Hexadecimal</string>
+    <string name="settings_theme_hex_input_placeholder">Ej: 3B9797</string>
+    <string name="settings_theme_hex_hue_label">Espectro de Tono (Matiz 0° - 360°)</string>
+    <string name="settings_theme_hex_saturation_label">Saturación (0% - 100%)</string>
+    <string name="settings_theme_hex_lightness_label">Luminosidad / Intensidad (0% - 100%)</string>
+    <string name="settings_theme_hex_quick_palette_label">Puntos Cromáticos de Referencia</string>
+    <string name="settings_theme_hex_invalid_error">Código hexadecimal inválido (usa 6 caracteres A-F, 0-9)</string>
     <string name="bg_swatch_selected_cd">Fondo %1$s, seleccionado</string>
     <string name="bg_swatch_unselected_cd">Fondo %1$s</string>
 
@@ -529,6 +544,19 @@
     <string name="notification_class_body">Comienza a las %1$s • Salón: %2$s</string>
     <string name="notification_daily_summary_title">Tu Jornada de Hoy en NotiFast</string>
     <string name="notification_daily_summary_body">Tienes %1$d clases y %2$d evaluaciones programadas para hoy.</string>
+    <string name="notification_action_view_schedule">Ver Horario</string>
+    <string name="notification_action_view_subject">Ver Materia</string>
+    <string name="notification_test_title">Prueba de Alertas Académicas</string>
+    <string name="notification_test_body">¡Excelente! Sonido, vibración y banner heads-up configurados con máxima prioridad.</string>
+    <string name="settings_notifications_test_btn">Enviar notificación de prueba</string>
+    <string name="settings_notifications_test_btn_desc">Comprueba el sonido, vibración y banner heads-up en este dispositivo</string>
+    <string name="settings_notifications_test_sent">Notificación de prueba enviada con éxito</string>
+    <string name="settings_notifications_permission_warning_title">Permisos de Notificación Desactivados</string>
+    <string name="settings_notifications_permission_warning_desc">El sistema operativo tiene las notificaciones bloqueadas para NotiFast. Las alertas de clases y evaluaciones no sonarán.</string>
+    <string name="settings_notifications_permission_enable_btn">Habilitar Permisos</string>
+    <string name="settings_notifications_permission_dialog_title">Activar Notificaciones de NotiFast</string>
+    <string name="settings_notifications_permission_dialog_desc">Para que NotiFast pueda avisarte puntualmente antes de tus clases y recordarte tus exámenes importantes, necesitamos permiso para mostrarte notificaciones y alertas prioritarias.</string>
+    <string name="settings_notifications_permission_open_settings">Abrir Ajustes del Sistema</string>
 
     <!-- Academic Analytics & Predictive Dashboard (Sprint 3.2) -->
     <string name="grades_tab_subjects">Materias</string>

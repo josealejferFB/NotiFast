@@ -43,11 +43,12 @@ fun ThemeSelectorCard(
     currentPresetId: String,
     currentBackgroundPresetId: String,
     customPrimaryHex: String?,
+    customBackgroundHex: String? = null,
     isDarkMode: Boolean?,
     onSelectPreset: (String) -> Unit,
     onSelectBackgroundPreset: (String) -> Unit,
     onSetDarkMode: (Boolean?) -> Unit,
-    onOpenCustomStudio: () -> Unit,
+    onOpenCustomStudio: (CustomStudioTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
@@ -160,7 +161,7 @@ fun ThemeSelectorCard(
                     isSelected = isCustomSelected,
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onOpenCustomStudio()
+                        onOpenCustomStudio(CustomStudioTab.ACCENT)
                     }
                 )
             }
@@ -196,6 +197,18 @@ fun ThemeSelectorCard(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onSelectBackgroundPreset(bgPreset.id)
+                    }
+                )
+            }
+
+            // Custom Background Studio Swatch Item
+            item(key = "custom_background_swatch") {
+                CustomBackgroundSwatchItem(
+                    customBackgroundHex = customBackgroundHex,
+                    isSelected = activeBackgroundPreset == com.notifast.app.domain.model.theme.BackgroundPreset.CUSTOM,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onOpenCustomStudio(CustomStudioTab.BACKGROUND)
                     }
                 )
             }

@@ -208,11 +208,43 @@ class UserPrefsRepositoryTest {
     }
 
     @Test
+    fun `customBackgroundHexFlow returns null by default`() = runTest {
+        every { dataStore.data } returns flowOf(emptyPreferences())
+
+        repository.customBackgroundHexFlow.test {
+            val value = awaitItem()
+            assertNull(value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `customBackgroundHexFlow returns configured hex`() = runTest {
+        val customBgHexKey = stringPreferencesKey("custom_theme_background_hex")
+        val prefs = mockk<Preferences>()
+        every { prefs[customBgHexKey] } returns "#0E131F"
+        every { dataStore.data } returns flowOf(prefs)
+
+        repository.customBackgroundHexFlow.test {
+            val value = awaitItem()
+            assertEquals("#0E131F", value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setCustomBackgroundHex returns success`() = runTest {
+        val result = repository.setCustomBackgroundHex("#0E131F")
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
     fun `exportAll includes theme preset, background preset and custom hex when present`() = runTest {
         val prefs = mockk<Preferences>()
         val themePresetKey = stringPreferencesKey("theme_preset_id")
         val backgroundPresetKey = stringPreferencesKey("background_preset_id")
         val customHexKey = stringPreferencesKey("custom_theme_primary_hex")
+        val customBgHexKey = stringPreferencesKey("custom_theme_background_hex")
 
         every { prefs[isDarkModeKey] } returns true
         every { prefs[hasDarkModeSetKey] } returns true
@@ -231,6 +263,7 @@ class UserPrefsRepositoryTest {
         every { prefs[themePresetKey] } returns "forest_sage"
         every { prefs[backgroundPresetKey] } returns "warm_mocha"
         every { prefs[customHexKey] } returns "#15803D"
+        every { prefs[customBgHexKey] } returns "#0E131F"
 
         every { dataStore.data } returns flowOf(prefs)
 
@@ -238,6 +271,7 @@ class UserPrefsRepositoryTest {
         assertEquals("forest_sage", exported["theme_preset_id"])
         assertEquals("warm_mocha", exported["background_preset_id"])
         assertEquals("#15803D", exported["custom_theme_primary_hex"])
+        assertEquals("#0E131F", exported["custom_theme_background_hex"])
         assertEquals("true", exported["is_dark_mode"])
         assertEquals("0-20", exported["default_grade_scale"])
     }
@@ -258,7 +292,8 @@ class UserPrefsRepositoryTest {
         val modernBackupMap = mapOf(
             "theme_preset_id" to "midnight_indigo",
             "background_preset_id" to "ocean_cyan",
-            "custom_theme_primary_hex" to "#4F46E5"
+            "custom_theme_primary_hex" to "#4F46E5",
+            "custom_theme_background_hex" to "#0A1610"
         )
         val result = repository.importAll(modernBackupMap)
         assertTrue(result.isSuccess)

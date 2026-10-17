@@ -79,4 +79,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindNetworkMonitor(impl: com.notifast.app.data.remote.DefaultNetworkMonitor): com.notifast.app.domain.util.NetworkMonitor
+
+    @Binds
+    @Singleton
+    abstract fun bindExactAlarmScheduler(impl: com.notifast.app.data.notification.ExactAlarmSchedulerImpl): com.notifast.app.domain.notification.ExactAlarmScheduler
 }

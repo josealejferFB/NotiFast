@@ -47,6 +47,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
         val THEME_PRESET_ID = stringPreferencesKey("theme_preset_id")
         val BACKGROUND_PRESET_ID = stringPreferencesKey("background_preset_id")
         val CUSTOM_THEME_PRIMARY_HEX = stringPreferencesKey("custom_theme_primary_hex")
+        val CUSTOM_THEME_BACKGROUND_HEX = stringPreferencesKey("custom_theme_background_hex")
     }
 
     private fun <T> safeDataFlow(mapper: (Preferences) -> T): Flow<T> {
@@ -157,6 +158,27 @@ class UserPrefsRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save custom primary hex preference", e)
+            Result.failure(e)
+        }
+    }
+
+    override val customBackgroundHexFlow: Flow<String?>
+        get() = safeDataFlow { preferences ->
+            preferences[PreferencesKeys.CUSTOM_THEME_BACKGROUND_HEX]
+        }
+
+    override suspend fun setCustomBackgroundHex(hex: String?): Result<Unit> {
+        return try {
+            dataStore.edit { preferences ->
+                if (hex.isNullOrBlank()) {
+                    preferences.remove(PreferencesKeys.CUSTOM_THEME_BACKGROUND_HEX)
+                } else {
+                    preferences[PreferencesKeys.CUSTOM_THEME_BACKGROUND_HEX] = hex
+                }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save custom background hex preference", e)
             Result.failure(e)
         }
     }
@@ -370,6 +392,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
             prefs[PreferencesKeys.THEME_PRESET_ID]?.let { map["theme_preset_id"] = it }
             prefs[PreferencesKeys.BACKGROUND_PRESET_ID]?.let { map["background_preset_id"] = it }
             prefs[PreferencesKeys.CUSTOM_THEME_PRIMARY_HEX]?.let { map["custom_theme_primary_hex"] = it }
+            prefs[PreferencesKeys.CUSTOM_THEME_BACKGROUND_HEX]?.let { map["custom_theme_background_hex"] = it }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to export preferences", e)
         }
@@ -396,6 +419,7 @@ class UserPrefsRepositoryImpl @Inject constructor(
                 values["theme_preset_id"]?.let { prefs[PreferencesKeys.THEME_PRESET_ID] = it }
                 values["background_preset_id"]?.let { prefs[PreferencesKeys.BACKGROUND_PRESET_ID] = it }
                 values["custom_theme_primary_hex"]?.let { prefs[PreferencesKeys.CUSTOM_THEME_PRIMARY_HEX] = it }
+                values["custom_theme_background_hex"]?.let { prefs[PreferencesKeys.CUSTOM_THEME_BACKGROUND_HEX] = it }
             }
             Result.success(Unit)
         } catch (e: Exception) {

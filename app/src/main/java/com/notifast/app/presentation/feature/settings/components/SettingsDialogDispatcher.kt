@@ -99,6 +99,24 @@ fun SettingsDialogDispatcher(
                 onDismiss = { onEvent(SettingsEvent.DismissDialog) }
             )
         }
+        SettingsDialogType.NOTIFICATION_PERMISSION_RATIONALE -> {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            NotiFastDialog(
+                title = stringResource(R.string.settings_notifications_permission_dialog_title),
+                message = stringResource(R.string.settings_notifications_permission_dialog_desc),
+                confirmText = stringResource(R.string.settings_notifications_permission_open_settings),
+                dismissText = stringResource(R.string.btn_cancel),
+                confirmColor = MaterialTheme.colorScheme.primary,
+                onConfirm = {
+                    onEvent(SettingsEvent.DismissDialog)
+                    val intent = android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                },
+                onDismiss = { onEvent(SettingsEvent.DismissDialog) }
+            )
+        }
         null -> {}
     }
 }

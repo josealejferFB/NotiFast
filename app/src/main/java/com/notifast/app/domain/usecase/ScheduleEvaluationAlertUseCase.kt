@@ -1,11 +1,8 @@
 package com.notifast.app.domain.usecase
 
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.notifast.app.data.model.Evaluation
-import com.notifast.app.data.worker.EvaluationReminderWorker
+import com.notifast.app.domain.notification.ExactAlarmScheduler
 import com.notifast.app.domain.repository.UserPrefsRepository
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
@@ -15,6 +12,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ScheduleEvaluationAlertUseCase @Inject constructor(
+    private val exactAlarmScheduler: ExactAlarmScheduler,
     private val workManager: WorkManager,
     private val userPrefsRepository: UserPrefsRepository
 ) {
@@ -53,25 +51,16 @@ class ScheduleEvaluationAlertUseCase @Inject constructor(
         }
 
         val formattedDate = dateFormat.format(evalDate)
+        val triggerAtMillis = now + delayMillis
 
-        val inputData = Data.Builder()
-            .putString(EvaluationReminderWorker.KEY_EVALUATION_ID, evaluation.id)
-            .putString(EvaluationReminderWorker.KEY_SUBJECT_NAME, evaluation.subjectName)
-            .putString(EvaluationReminderWorker.KEY_TITLE, evaluation.title)
-            .putString(EvaluationReminderWorker.KEY_DATE, formattedDate)
-            .putDouble(EvaluationReminderWorker.KEY_WEIGHT, evaluation.weight ?: 0.0)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<EvaluationReminderWorker>()
-            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
-            .setInputData(inputData)
-            .addTag("eval_${evaluation.id}")
-            .build()
-
-        workManager.enqueueUniqueWork(
-            "eval_${evaluation.id}",
-            ExistingWorkPolicy.REPLACE,
-            workRequest
+        exactAlarmScheduler.scheduleEvaluationAlarm(
+            evaluationId = evaluation.id,
+            subjectName = evaluation.subjectName,
+            title = evaluation.title,
+            dateText = formattedDate,
+            weight = evaluation.weight ?: 0.0,
+            triggerAtMillis = triggerAtMillis
         )
+        workManager.cancelUniqueWork("eval_${evaluation.id}")
     }
 }

@@ -18,27 +18,66 @@ import javax.inject.Singleton
 
 @Singleton
 class NotificationSender @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
+
+    fun areNotificationsEnabled(): Boolean {
+        val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+        return permissionGranted && NotificationManagerCompat.from(context).areNotificationsEnabled()
+    }
 
     fun sendEvaluationNotification(
         notificationId: Int,
         subjectName: String,
         evalTitle: String,
         dateText: String,
-        weight: Double
+        weight: Double,
+        evaluationId: String? = null
     ) {
-        if (!hasNotificationPermission()) return
+        if (!areNotificationsEnabled()) return
 
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val contentIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SUBJECT_DETAIL)
+            putExtra(MainActivity.EXTRA_SUBJECT_NAME, subjectName)
+            if (evaluationId != null) {
+                putExtra(MainActivity.EXTRA_EVALUATION_ID, evaluationId)
+            }
         }
         val pendingIntent = PendingIntent.getActivity(
             context,
             notificationId,
-            intent,
+            contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+
+        val actionIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SUBJECT_DETAIL)
+            putExtra(MainActivity.EXTRA_SUBJECT_NAME, subjectName)
+            if (evaluationId != null) {
+                putExtra(MainActivity.EXTRA_EVALUATION_ID, evaluationId)
+            }
+        }
+        val actionPendingIntent = PendingIntent.getActivity(
+            context,
+            notificationId + ACTION_REQUEST_CODE_OFFSET,
+            actionIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val quickAction = NotificationCompat.Action.Builder(
+            0,
+            context.getString(R.string.notification_action_view_subject),
+            actionPendingIntent
+        ).build()
 
         val body = context.getString(
             R.string.notification_eval_body,
@@ -53,7 +92,10 @@ class NotificationSender @Inject constructor(
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setVibrate(longArrayOf(0, 250, 250, 250))
             .setContentIntent(pendingIntent)
+            .addAction(quickAction)
             .setAutoCancel(true)
             .build()
 
@@ -66,17 +108,35 @@ class NotificationSender @Inject constructor(
         classroom: String,
         startTime: String
     ) {
-        if (!hasNotificationPermission()) return
+        if (!areNotificationsEnabled()) return
 
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val contentIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SCHEDULES)
         }
         val pendingIntent = PendingIntent.getActivity(
             context,
             notificationId,
-            intent,
+            contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+
+        val actionIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SCHEDULES)
+        }
+        val actionPendingIntent = PendingIntent.getActivity(
+            context,
+            notificationId + ACTION_REQUEST_CODE_OFFSET,
+            actionIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val quickAction = NotificationCompat.Action.Builder(
+            0,
+            context.getString(R.string.notification_action_view_schedule),
+            actionPendingIntent
+        ).build()
 
         val body = context.getString(R.string.notification_class_body, startTime, classroom.ifBlank { "N/A" })
 
@@ -86,21 +146,58 @@ class NotificationSender @Inject constructor(
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setVibrate(longArrayOf(0, 200, 200, 200))
             .setContentIntent(pendingIntent)
+            .addAction(quickAction)
             .setAutoCancel(true)
             .build()
 
         NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
+    fun sendTestNotification(): Boolean {
+        if (!areNotificationsEnabled()) return false
+
+        val contentIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SETTINGS)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            TEST_NOTIFICATION_ID,
+            contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val title = context.getString(R.string.notification_test_title)
+        val body = context.getString(R.string.notification_test_body)
+
+        val notification = NotificationCompat.Builder(context, NotificationChannelsManager.CHANNEL_CLASSES)
+            .setSmallIcon(R.drawable.logo)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setVibrate(longArrayOf(0, 250, 250, 250))
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(TEST_NOTIFICATION_ID, notification)
+        return true
+    }
+
     fun sendDailySummaryNotification(
         notificationId: Int,
         summaryBody: String
     ) {
-        if (!hasNotificationPermission()) return
+        if (!areNotificationsEnabled()) return
 
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, MainActivity.DESTINATION_SCHEDULES)
         }
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -122,14 +219,8 @@ class NotificationSender @Inject constructor(
         NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
-    private fun hasNotificationPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
+    companion object {
+        const val TEST_NOTIFICATION_ID = 9999
+        private const val ACTION_REQUEST_CODE_OFFSET = 100_000
     }
 }
