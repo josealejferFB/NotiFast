@@ -45,13 +45,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages (https://notifast.pages.dev/)
         uses: cloudflare/wrangler-action@v3
         continue-on-error: true
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy landing --project-name=notifast --commit-dirty=true
+          command: pages deploy landing --project-name=notifast --branch=main --commit-dirty=true
 
   android-tests:
     name: Android Unit Tests & Static Verification

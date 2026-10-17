@@ -1,180 +1,156 @@
-# 📚 NotiFast
+# 📚 NotiFast — Cuaderno Académico Inteligente & Hub de Estudio
 
-> **Tu aprendizaje, a la velocidad de tus ideas.**
+> **Todo tu semestre, desplegado con calma táctil. 100% Offline-First, personalizable y libre de anuncios.**
+>
+> 🌐 **Landing Page Interactiva en Vivo (Cloudflare Pages):** [**https://notifast.pages.dev/**](https://notifast.pages.dev/)
 
-NotiFast es un **hub educativo** para estudiantes — un cuaderno académico con esteroides. Organiza tus apuntes por materia, gestiona evaluaciones y calificaciones, consulta tu calendario académico y mantén tu rendimiento bajo control.
+**NotiFast** es una aplicación Android nativa escrita en **Kotlin 2.0** con **Jetpack Compose** y **Material 3**, diseñada para transformar la sobrecarga académica de estudiantes de secundaria y universidad en serenidad, control y enfoque. Combina un editor de apuntes por bloques (estilo OneNote) con cálculo matemático exacto de promedios ponderados, un motor de temas personalizables WCAG AAA, alertas proactivas exactas y respaldo cifrado en tu propio Google Drive.
 
 ---
 
-## ✨ Features
+## ✨ Funcionalidades Principales (v1.0 RC — Design System 3.2)
 
-| Feature | Descripción |
+| Módulo | Capacidades Reales en la App |
 |---|---|
-| 🔐 **Autenticación** | Login con email/contraseña y Google Sign-In |
-| 📝 **Apuntes** | Crea, edita y elimina notas con imágenes por materia |
-| 📚 **Materias** | Organiza contenido con icono y color personalizables |
-| 📊 **Calificaciones** | Seguimiento de evaluaciones con promedio ponderado |
-| 📅 **Calendario** | Vista mensual con evaluaciones y notas por día |
-| 🕐 **Horarios** | Visualización de horarios semanales por materia |
-| 👤 **Perfil** | Edición de nombre, apellido y foto de perfil |
-| ⚙️ **Ajustes** | Gestión de cuenta y cierre de sesión |
+| 📝 **Editor de Apuntes por Bloques & Fotos Anotadas** | `NoteEditorBottomSheet` expandible con barra `DockedAccessoryToolbar` acoplada sobre el teclado, bloques ricos (encabezados, listas ordenadas/viñetas, checklists interactivos, citas, bloques matemáticos LaTeX) y **lienzo de dibujo a mano alzada sobre fotos de pizarra (`PhotoAnnotatorScreen`)**. |
+| 🎨 **Estudio de Temas Personalizables & Lienzos AAA** | **6 Paletas de Acento (`ThemePreset`):** *NotiFast Classic*, *Campus Verde*, *Cyber Nocturno*, *Café Nórdico*, *Sakura Zen* y *Minimalista Nórdico*. **6 Lienzos de Papel Independientes (`BackgroundPreset`):** *Pergamino*, *Menta*, *Polar*, *Papiro*, *Lavanda* y *Glaciar*, más **Estudio Espectral Hex/HSL continuo** con calibración automática de contraste **WCAG AAA**. |
+| 🔔 **Motor de Notificaciones Proactivas (AlarmManager + WorkManager)** | Alertas locales puntuales en 3 canales (`IMPORTANCE_HIGH`): **Alertas de Clases** (`10`, `15` o `30 min antes`), **Alertas de Evaluaciones** (`1`, `2` o `3 días antes` con su peso porcentual) y **Resumen Matutino (`07:00 AM`)**, con deep-linking reactivo y botón verificador de notificación de prueba en Ajustes. |
+| 📊 **Calificaciones Multiescala & Simulador de Meta** | Motor único `GradePolicy` con precisión IEEE 754 adaptable a **4 escalas** (`0–10`, `0–20`, `0–100%` y letras `A–F`), **Simulador Interactivo de Nota Requerida** en tiempo real (*«¿Cuánto necesito sacar en el % restante?»*) y lista visual de Salud Académica por asignatura. |
+| 🕐 **Agenda en Vivo & Calendario de Evaluaciones** | Baliza en tiempo real de **Clase en Curso (`ScheduleLiveStatusCard`)** con temporizador en `JetBrains Mono` y acceso directo al apunte de la sesión, matriz mensual interactiva de exámenes y `NotiFastExpandableFab`. |
+| 👨‍🏫 **Directorio de Profesores & WhatsApp Contextual** | Gestión de docentes de **Cátedra y Laboratorio** vinculados a materias y horarios, con cubículo, correo, teléfono y acción en 1 toque a **WhatsApp con saludo académico pre-rellenado**. |
+| ☁️ **100% Offline-First + Google Drive Cloud Backup Privado** | Base de datos local **Room SQLite v4** ultrarrápida y privada, con sincronización diferencial inteligente (`SHA-256`) en la carpeta oculta `appDataFolder` de tu propio **Google Drive (`CloudHubSheet`)**. |
+| 📦 **Pack Académico P2P (`.notifast` & Código QR Offline)** | Exportación e importación de materias completas (apuntes, horarios, evaluaciones y docente) mediante archivos comprimidos `.notifast` (`GZIP + Base64`) o **Código QR Offline** con resolución de conflictos. |
+| 🔍 **Búsqueda Global Instantánea** | Motor multi-entidad que indexa apuntes, bloques de texto, etiquetas `#tags`, materias, profesores y evaluaciones en milisegundos. |
+| 🌐 **Landing Page Interactiva ([`https://notifast.pages.dev/`](https://notifast.pages.dev/))** | Desplegada en **Cloudflare Pages** con CI/CD automatizado: teléfono Android interactivo de 4 pestañas, Estudio de Temas en Vivo que recolorea toda la web en tiempo real y simulador de notificaciones Heads-Up. |
 
 ---
 
-## 🏗️ Arquitectura
+## 🏗️ Arquitectura del Sistema
 
 ```
-Clean Architecture + MVVM + MVI Contracts
+Clean Architecture + MVVM + MVI Unidirectional StateFlow
 ```
 
 ```
-app/src/main/java/com/example/notifast/
-├── data/                    # Capa de datos
-│   ├── model/               # Data classes (Note, Evaluation, Schedule, User, SubjectData)
-│   └── repository/          # Implementaciones de repositorios (Firebase)
+app/src/main/java/com/notifast/app/
+├── data/                    # Capa de Datos (100% Offline-First + Google Drive Backup)
+│   ├── backup/              # Google Drive REST API v3 (appDataFolder), CloudDiffEngine, GlobalSnapshot
+│   ├── local/               # Room SQLite v4 (Entities, DAOs, Migrations 1->2->3->4) + DataStore Prefs
+│   ├── model/               # Modelos de datos (Note, NoteBlock, Evaluation, Schedule, SubjectData, Teacher)
+│   ├── notification/        # ExactAlarmSchedulerImpl, AlarmTriggerReceiver, BootCompletedReceiver, Workers
+│   └── repository/          # Implementaciones locales (Room/DataStore) y CloudBackupRepositoryImpl
 │
-├── di/                      # Inyección de dependencias (Hilt)
-│   ├── AppModule.kt         # Provee FirebaseFirestore, FirebaseAuth
-│   └── RepositoryModule.kt  # Bindings de interfaces → implementaciones
+├── domain/                  # Capa de Dominio (Reglas de Negocio Puras)
+│   ├── model/               # ThemePreset, BackgroundPreset, GradeScale, AcademicPack, CloudSyncModels
+│   ├── notification/        # ExactAlarmScheduler, NotificationSender, NotificationChannelsManager
+│   ├── policy/              # GradePolicy (fórmula unificada de promedios y ponderaciones)
+│   ├── repository/          # Contratos de repositorios
+│   ├── usecase/             # Casos de uso (CalculateAcademicStats, ScheduleAlerts, Export/ImportPack, etc.)
+│   └── util/                # ReminderTimeCalculator, TeacherFormatters, TextSpanOps
 │
-├── domain/                  # Capa de dominio
-│   └── repository/          # Interfaces de repositorios
+├── presentation/            # Capa de Presentación (Jetpack Compose + Material 3)
+│   ├── atoms/               # Design System 3.2 (NotiFastCard, NotiFastButton, NotiFastTopBar, etc.)
+│   ├── feature/             # 17 módulos de presentación con ViewModel + MVI Contract (<= 250 LOC por archivo)
+│   ├── navigation/          # NavGraph, Screen routes y Deep-Linking reactivo
+│   └── theme/               # ThemePaletteGenerator, Color, Typography, Shape, ThemeUtils
 │
-├── presentation/            # Capa de presentación
-│   ├── atoms/               # Design system (15 componentes reutilizables)
-│   ├── feature/             # Features (14 pantallas con ViewModel + Contract)
-│   │   ├── auth/            # Login / Sign-up
-│   │   ├── notes/           # Lista de materias y notas
-│   │   ├── addnote/         # Crear nota
-│   │   ├── editnote/        # Editar nota
-│   │   ├── addsubject/      # Crear materia
-│   │   ├── subjectdetail/   # Detalle de materia
-│   │   ├── calendar/        # Calendario académico
-│   │   ├── grades/          # Rendimiento y calificaciones
-│   │   ├── schedules/       # Horarios semanales
-│   │   ├── addevaluation/   # Crear evaluación
-│   │   ├── editevaluation/  # Editar evaluación
-│   │   ├── settings/        # Ajustes
-│   │   └── editprofile/     # Editar perfil
-│   ├── navigation/          # NavGraph + Screen routes
-│   └── theme/               # Color, Typography, Theme
-│
-├── MainActivity.kt          # Entry point (@AndroidEntryPoint)
-└── NotiFastApplication.kt   # @HiltAndroidApp
+├── di/                      # Inyección de Dependencias con Hilt (AppModule, RepositoryModule, UseCaseModule)
+├── MainActivity.kt          # Entry point (@AndroidEntryPoint) con soporte de Deep-Links
+└── NotiFastApplication.kt   # @HiltAndroidApp + Inicialización de canales y WorkManager
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Stack Tecnológico Oficial
 
 | Tecnología | Versión | Propósito |
 |---|---|---|
-| **Kotlin** | 2.0.21 | Lenguaje principal |
-| **Jetpack Compose** | BOM 2024.09.00 | UI declarativa |
-| **Material 3** | BOM | Design system |
-| **Firebase Auth** | BOM 33.9.0 | Autenticación |
-| **Firebase Firestore** | BOM 33.9.0 | Base de datos en la nube |
-| **Firebase Storage** | BOM 33.9.0 | Almacenamiento de archivos |
-| **Hilt** | 2.59 | Inyección de dependencias |
-| **Coil** | 2.7.0 | Carga de imágenes |
-| **Navigation Compose** | 2.8.5 | Navegación |
-| **AGP** | 9.0.1 | Build system |
-| **KSP** | 2.0.21-1.0.28 | Procesamiento de anotaciones |
+| **Kotlin** | `2.0.21` | Lenguaje principal de producción y tests |
+| **Jetpack Compose** | `BOM 2024.09.00` | UI declarativa reactiva + Material 3 |
+| **Room SQLite** | `2.7.2` | Base de datos relacional local 100% Offline-First (Esquema `v4`) |
+| **Jetpack DataStore** | `1.1.2` | Persistencia reactiva de preferencias, temas y configuración de alertas |
+| **WorkManager + AlarmManager** | `2.10.0` | Motor híbrido de notificaciones exactas y resumen matutino 07:00 AM |
+| **Google Drive REST API (OkHttp)** | `4.12.0` | Respaldo privado en la nube (`appDataFolder`) con diffing SHA-256 |
+| **Credential Manager & Google ID** | `1.3.0` / `1.1.1` | Autenticación OAuth2 nativa para respaldo en Google Drive |
+| **ZXing & Play Code Scanner** | `3.5.3` / `16.1.0` | Generación y escaneo de Códigos QR Offline para paquetes P2P `.notifast` |
+| **Hilt (Dagger)** | `2.59` | Inyección de dependencias en UI, Repositorios y Workers |
+| **Coil** | `2.7.0` | Carga eficiente de imágenes y fotografías anotadas |
+| **Navigation Compose** | `2.8.5` | Navegación declarativa, BottomSheets modales y Deep-Links |
+| **Firebase Crashlytics & Analytics** | `BOM 33.9.0` | Monitoreo de estabilidad y salud de la aplicación |
+| **AGP & KSP** | `9.0.1` / `2.0.21-1.0.28` | Sistema de compilación (`compileSdk 36`, `minSdk 26`) |
 
 ---
 
-## 🚀 Setup
+## 🚀 Instalación y Ejecución
 
 ### Prerrequisitos
-- Android Studio (Ladybug o superior)
-- JDK 17+
-- Cuenta de Firebase
+- **Android Studio** Ladybug o superior
+- **JDK 17+**
+- Dispositivo físico o emulador con **Android 8.0+ (API 26+)**
 
-### Instalación
+### Pasos Rápidos
 
-1. **Clona el repositorio:**
+1. **Clonar el repositorio:**
    ```bash
    git clone https://github.com/josealejferFB/NotiFast.git
    cd NotiFast
    ```
 
-2. **Configura Firebase:**
-   - Crea un proyecto en [Firebase Console](https://console.firebase.google.com/)
-   - Habilita Authentication (Email/Password + Google)
-   - Habilita Cloud Firestore
-   - Descarga `google-services.json` y colócalo en `app/`
-
-3. **Compila y ejecuta:**
+2. **Compilar el APK Debug (Funciona 100% Offline de inmediato):**
    ```bash
    ./gradlew assembleDebug
    ```
-   O abre el proyecto en Android Studio y presiona ▶️
+
+3. **Ejecutar la suite completa de pruebas unitarias (684 tests):**
+   ```bash
+   ./gradlew testDebugUnitTest
+   ```
+
+4. **Explorar la Landing Page Interactiva:**
+   Abre [`landing/index.html`](landing/index.html) en cualquier navegador moderno o sírvela localmente para interactuar con el Estudio de Temas AAA en vivo, el simulador de notificaciones y el teléfono Android interactivo.
 
 ---
 
-## 📁 Estructura de Firestore
+## 🎨 Sistema de Diseño 3.2: "Tactile Papercraft & Dynamic Academic Studio"
 
-```
-users/
-└── {userId}/
-    ├── firstName, lastName, email, profilePictureUrl
-    ├── subjects/
-    │   └── {subjectName}/
-    │       ├── name, icon, colorHex
-    │       └── notes/
-    │           └── {noteId}/
-    │               ├── title, content, subject, imageUrl, timestamp
-    ├── evaluations/
-    │   └── {evalId}/
-    │       ├── title, description, subjectName, date, grade, weight, isPresented, imageUrl, quickTips
-    └── schedules/
-        └── {scheduleId}/
-            ├── subjectName, dayOfWeek, startTime, endTime, classroom, teacher, color
-```
+NotiFast incluye un motor cromático algorítmico (`ThemePaletteGenerator`) que permite combinar **6 paletas de acento** con **6 tonos de lienzo de papel** o cualquier color hexadecimal personalizado:
+
+| Colección (`ThemePreset`) | Primario Claro / Oscuro | Secundario Claro / Oscuro | Lienzo Asociado (`BackgroundPreset`) |
+|---|---|---|---|
+| **NotiFast Classic** | `#9E1B32` / `#E05A6E` | `#2A7B7B` / `#38B2AC` | **Pergamino** (`#FAF9F6` / `#0E131F`) |
+| **Campus Verde** | `#15803D` / `#34D399` | `#854D0E` / `#FBBF24` | **Menta** (`#EAF4ED` / `#0A1610`) |
+| **Cyber Nocturno** | `#4338CA` / `#818CF8` | `#0891B2` / `#22D3EE` | **Polar** (`#E6F0F8` / `#09101D`) |
+| **Café Nórdico** | `#C2410C` / `#FB923C` | `#B45309` / `#FCD34D` | **Papiro** (`#F5ECE1` / `#150F0B`) |
+| **Sakura Zen** | `#6D28D9` / `#A78BFA` | `#BE185D` / `#F472B6` | **Lavanda** (`#F2EAF7` / `#130B1C`) |
+| **Minimalista Nórdico** | `#0284C7` / `#38BDF8` | `#0F766E` / `#2DD4BF` | **Glaciar** (`#E5F3F5` / `#061418`) |
 
 ---
 
-## 🎨 Identidad Visual
-
-| Color | Hex | Uso |
-|---|---|---|
-| **Ruby** | `#BF092F` | Color primario, acciones principales |
-| **Aqua** | `#3B9797` | Color secundario, estados positivos |
-
----
-
-## 📖 Documentación
+## 📖 Documentación del Proyecto
 
 | Documento | Ubicación |
 |---|---|
-| PRD Maestro v2.0 | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) |
-| Estado del Roadmap | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) |
-| Kickoff Fase 4 (Siguiente) | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) |
-| Auditoría completa | [`docs/audit/`](docs/audit/) |
-| Planes de implementación | [`docs/superpowers/plans/`](docs/superpowers/plans/) |
-| Specs de diseño | [`docs/superpowers/specs/`](docs/superpowers/specs/) |
-| Matriz de Escenarios Cloud | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) |
-| Guía para agentes AI | [`AGENTS.md`](AGENTS.md) |
+| **Especificación de Producto (`PRODUCT.md`)** | [`PRODUCT.md`](PRODUCT.md) |
+| **Sistema de Diseño 3.2 (`DESIGN.md`)** | [`DESIGN.md`](DESIGN.md) |
+| **Guía Maestra para Agentes AI (`AGENTS.md`)** | [`AGENTS.md`](AGENTS.md) |
+| **Estado del Roadmap en Tiempo Real (`STATUS.md`)** | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) |
+| **PRD Maestro v2.0** | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) |
+| **Especificación Cloud Backup Google Drive** | [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md) |
+| **Matriz de Escenarios Cloud Backup (51 casos)** | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) |
+| **Kickoff Fase 4 (Pulido, a11y & Rendimiento)** | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) |
 
 ---
 
-## 📊 Métricas
+## 📊 Métricas Actuales de Ingeniería
 
-- **~8,300** líneas de código Kotlin
-- **56** archivos fuente
-- **14** features implementadas
-- **15** componentes del design system
-- **5** repositorios
-- **12** ViewModels
-
----
-
-## ⚠️ Estado Actual
-
-Este proyecto está en **desarrollo activo**. Consulta la [auditoría](docs/audit/2026-06-18-full-audit.md) para ver el estado actual de calidad, seguridad y próximos pasos.
+- **~44,260** líneas de código Kotlin de producción
+- **360** archivos fuente Kotlin modulares (cumpliendo $\le 250$ LOC por archivo `@Composable`)
+- **92** suites de pruebas automatizadas con **684 tests unitarios pasando al 100%**
+- **17** módulos de presentación con arquitectura MVI + Clean Architecture
+- **4** versiones de esquema Room SQLite con migraciones transaccionales probadas en memoria
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto es privado y de uso exclusivo del equipo de desarrollo de NotiFast.
+Este proyecto es de autoría académica y comercial del equipo de desarrollo de **NotiFast**.

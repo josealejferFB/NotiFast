@@ -9,17 +9,19 @@
   
   <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://notifast.pages.dev/">
   <meta property="og:site_name" content="NotiFast">
   <meta property="og:title" content="NotiFast — Cuaderno Académico Inteligente & Hub de Estudio">
-  <meta property="og:description" content="Apuntes en Markdown, cálculo de promedios ponderados, horarios en curso y transferencia P2P sin conexión. Diseñado para estudiantes.">
-  <meta property="og:image" content="assets/logo.png">
+  <meta property="og:description" content="Apuntes por bloques en Markdown y LaTeX, promedios ponderados, estudio de temas personalizables AAA, notificaciones proactivas y packs P2P sin conexión.">
+  <meta property="og:image" content="https://notifast.pages.dev/assets/logo.png">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="NotiFast — Cuaderno Académico Inteligente & Hub de Estudio">
-  <meta name="twitter:description" content="Apuntes en Markdown, cálculo de promedios ponderados, horarios en curso y transferencia P2P sin conexión.">
-  <meta name="twitter:image" content="assets/logo.png">
+  <meta name="twitter:description" content="Apuntes en Markdown, promedios ponderados, temas personalizables AAA, notificaciones proactivas y packs P2P offline.">
+  <meta name="twitter:image" content="https://notifast.pages.dev/assets/logo.png">
 
+  <link rel="canonical" href="https://notifast.pages.dev/">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -165,6 +167,36 @@
       <symbol id="icon-analytics" viewBox="0 0 24 24">
         <path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
       </symbol>
+
+      <!-- Notifications / Bell (SettingsNotificationsSection.kt & NotificationSender.kt) -->
+      <symbol id="icon-notifications" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+      </symbol>
+
+      <!-- Dark Mode Moon (SettingsAppearanceSection.kt) -->
+      <symbol id="icon-darkmode" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+      </symbol>
+
+      <!-- Light Mode Sun (SettingsAppearanceSection.kt) -->
+      <symbol id="icon-lightmode" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+      </symbol>
+
+      <!-- Cloud Backup / Google Drive appDataFolder (CloudBackupSection.kt) -->
+      <symbol id="icon-cloud-drive" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+      </symbol>
+
+      <!-- Global Search (GlobalSearchScreen.kt) -->
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </symbol>
+
+      <!-- Settings / Tune (SettingsScreen.kt) -->
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -172,7 +204,7 @@
   <div id="bg-particles-container" aria-hidden="true"></div>
 
   <!-- Header & Navigation -->
-  <header class="header">
+  <header class="header" id="main-header">
     <div class="nav-container">
       <a href="#" class="brand-logo" aria-label="NotiFast Inicio">
         <img src="assets/logo.png" alt="NotiFast Logo" style="width: 32px; height: 32px; border-radius: 8px;">
@@ -182,39 +214,179 @@
         <a href="#agenda">Agenda</a>
         <a href="#apuntes">Apuntes</a>
         <a href="#calificaciones">Calificaciones</a>
-        <a href="#evaluaciones">Evaluaciones</a>
+        <a href="#temas">Temas AAA</a>
+        <a href="#notificaciones">Notificaciones</a>
         <a href="#analiticas">Analíticas</a>
-        <a href="#compartir">Compartir P2P</a>
+        <a href="#compartir">Pack P2P</a>
       </nav>
       <div class="nav-actions">
+        <button type="button" class="nav-theme-quick-btn" id="btn-nav-theme-mode" title="Alternar Modo Claro / Oscuro en vivo" aria-label="Alternar Modo Claro u Oscuro">
+          <span class="theme-dot-live" aria-hidden="true"></span>
+          <span id="nav-theme-mode-label">Tema en Vivo</span>
+        </button>
         <a href="#descargar" class="btn btn-primary btn-sm">Descargar App</a>
       </div>
     </div>
   </header>
 
   <main id="main-content">
-    <!-- Hero Section -->
+    <!-- Hero Section: Split Asymmetric Showcase with Interactive Android Mockup -->
     <section class="hero-section">
-      <div class="hero-pill-badge">
-        <svg style="width: 16px; height: 16px; color: var(--brand-secondary);" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-lightbulb"></use></svg>
-        <span>NotiFast 3.0 • El Cuaderno Académico Inteligente</span>
-      </div>
-      <h1 class="hero-title">
-        Todo tu semestre,<br><span class="accent-ruby">desplegado ante ti.</span>
-      </h1>
-      <p class="hero-subtitle">
-        Diseñado para eliminar la sobrecarga académica. Apuntes organizados en Markdown, cálculo exacto de promedios ponderados, horarios en curso y transferencia de materias sin internet.
-      </p>
-      <div class="hero-ctas">
-        <a href="#descargar" id="btn-download-hero" class="btn btn-primary">
-          <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M3.609 1.814L13.792 12 3.61 22.186a1.99 1.99 0 0 1-.61-.954V2.768c.112-.375.328-.71.609-.954zm11.605 11.605l2.42 2.42-12.723 7.348 10.303-9.768zm0-2.838L4.91 3.233 17.634 10.58l-2.42 2.421zm1.42 1.419l3.528-2.037a1.996 1.996 0 0 1 0 3.473l-3.528 2.037-1.42-1.42 1.42-1.42v-.633z"/>
-          </svg>
-          Descargar en Google Play
-        </a>
-        <a href="#apuntes" class="btn btn-secondary">
-          Explorar Funciones
-        </a>
+      <div class="hero-split-grid">
+        <!-- Columna Izquierda: Propuesta de Valor & Métricas Reales -->
+        <div class="hero-copy-col">
+          <div class="hero-status-strip">
+            <div class="hero-pill-badge">
+              <svg style="width: 15px; height: 15px; color: var(--brand-secondary);" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-autoawesome"></use></svg>
+              <span>NotiFast v1.0 RC • Android Nativo</span>
+            </div>
+            <span class="hero-arch-tag">Kotlin 2.0 • Jetpack Compose • Room SQLite</span>
+          </div>
+
+          <h1 class="hero-title">
+            Todo tu semestre,<br><span class="accent-ruby">desplegado con calma táctil.</span>
+          </h1>
+          <p class="hero-subtitle">
+            El cuaderno académico inteligente y hub de estudio 100% Offline-First. Apuntes por bloques en Markdown y LaTeX, promedios ponderados con exactitud IEEE 754, temas personalizables WCAG AAA, alertas proactivas sin ansiedad y transferencia P2P por QR o archivo <code>.notifast</code>.
+          </p>
+
+          <div class="hero-ctas">
+            <a href="#descargar" id="btn-download-hero" class="btn btn-primary">
+              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3.609 1.814L13.792 12 3.61 22.186a1.99 1.99 0 0 1-.61-.954V2.768c.112-.375.328-.71.609-.954zm11.605 11.605l2.42 2.42-12.723 7.348 10.303-9.768zm0-2.838L4.91 3.233 17.634 10.58l-2.42 2.421zm1.42 1.419l3.528-2.037a1.996 1.996 0 0 1 0 3.473l-3.528 2.037-1.42-1.42 1.42-1.42v-.633z"/>
+              </svg>
+              Descargar en Google Play
+            </a>
+            <a href="#temas" class="btn btn-secondary">
+              <svg style="width: 18px; height: 18px; color: var(--brand-primary);" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
+              Probar Estudio de Temas
+            </a>
+          </div>
+
+          <div class="hero-proof-bar" aria-label="Indicadores de ingeniería del proyecto">
+            <div class="proof-metric">
+              <span class="proof-value">100% Local</span>
+              <span class="proof-label">Room SQLite + Backup Drive Privado</span>
+            </div>
+            <div class="proof-metric">
+              <span class="proof-value">684 Tests</span>
+              <span class="proof-label">Suite Unitaria &amp; Precisión IEEE 754</span>
+            </div>
+            <div class="proof-metric">
+              <span class="proof-value">WCAG AAA</span>
+              <span class="proof-label">6 Paletas + Estudio Hex/HSL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Dispositivo Android Interactivo en Vivo -->
+        <div class="hero-device-stage">
+          <div class="hero-device-glow" aria-hidden="true"></div>
+
+          <!-- Toast Flotante de Notificación Proactiva en el Teléfono -->
+          <div class="hero-floating-headsup" id="hero-phone-headsup" role="status" aria-live="polite">
+            <div class="headsup-icon-circle">
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+            </div>
+            <div class="headsup-copy">
+              <div class="headsup-title-row">
+                <span class="headsup-title" id="hero-headsup-title">⏰ Clase en 15 min: Cálculo</span>
+                <span class="headsup-time">Ahora</span>
+              </div>
+              <p class="headsup-desc" id="hero-headsup-desc">08:00 - 10:00 • Aula 204. Toca para preparar tu apunte.</p>
+            </div>
+          </div>
+
+          <!-- Chasis del Dispositivo Android (NotiFast Mobile Preview) -->
+          <div class="hero-phone-frame" aria-label="Vista previa interactiva de la app móvil NotiFast">
+            <!-- Barra de Estado Android -->
+            <div class="phone-status-bar" aria-hidden="true">
+              <span>07:45</span>
+              <div class="phone-camera-pill"></div>
+              <div class="phone-status-icons">
+                <span>5G</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+            <!-- NotiFastTopBar -->
+            <div class="phone-app-topbar">
+              <div class="phone-topbar-title">
+                <img src="assets/logo.png" alt="" aria-hidden="true">
+                <span id="phone-topbar-label">NotiFast</span>
+              </div>
+              <div class="phone-topbar-actions">
+                <button type="button" class="phone-icon-btn" id="btn-phone-trigger-notif" title="Probar alerta proactiva en el teléfono" aria-label="Disparar notificación de prueba en el teléfono">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+                </button>
+                <a href="#temas" class="phone-icon-btn" title="Personalizar tema de la app" aria-label="Ir al estudio de temas">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Cuerpo Dinámico Cambiable por Pestañas (Apuntes / Agenda / Notas / Ajustes) -->
+            <div class="phone-screen-body" id="phone-screen-body">
+              <!-- Contenido inyectado/actualizado por setupHeroPhoneMockup() con fallback inicial rico -->
+              <div class="phone-live-class-pill">
+                <div class="phone-live-top">
+                  <span class="phone-live-badge"><span class="beacon-mini-dot"></span> EN CURSO AHORA</span>
+                  <span class="phone-live-rem">Faltan 45 min</span>
+                </div>
+                <div class="phone-live-subj">Cálculo Diferencial</div>
+                <div class="phone-live-meta">08:00 - 10:00 • Aula 204 • Prof. Gómez</div>
+                <div class="phone-live-bar">
+                  <div class="phone-live-bar-fill"></div>
+                </div>
+              </div>
+
+              <div class="phone-avg-mini">
+                <div>
+                  <span class="phone-avg-label">PROMEDIO PONDERADO</span>
+                  <span class="phone-avg-sub">4 materias activas • Escala 0-10</span>
+                </div>
+                <span class="phone-avg-val" id="phone-mini-avg-val">8.70</span>
+              </div>
+
+              <div class="phone-notes-mini-list">
+                <div class="phone-note-mini-card" style="border-left-color: #2563EB;">
+                  <div class="phone-note-mini-head">
+                    <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
+                    <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">Cálculo</span>
+                  </div>
+                  <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
+                </div>
+                <div class="phone-note-mini-card" style="border-left-color: #7C3AED;">
+                  <div class="phone-note-mini-head">
+                    <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
+                    <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #7C3AED;">Física</span>
+                  </div>
+                  <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barra de Navegación Inferior Material 3 (4 Pestañas Reales de la App) -->
+            <div class="phone-bottom-nav" role="tablist" aria-label="Navegación del teléfono interactivo">
+              <button type="button" class="phone-nav-tab active" data-phone-tab="apuntes" role="tab" aria-selected="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
+                <span>Apuntes</span>
+              </button>
+              <button type="button" class="phone-nav-tab" data-phone-tab="agenda" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+                <span>Agenda</span>
+              </button>
+              <button type="button" class="phone-nav-tab" data-phone-tab="notas" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
+                <span>Notas</span>
+              </button>
+              <button type="button" class="phone-nav-tab" data-phone-tab="ajustes" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-settings"></use></svg>
+                <span>Ajustes</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -228,7 +400,7 @@
         Todas tus funcionalidades,<br><span class="accent-ruby">en un solo lugar: NotiFast.</span>
       </h2>
       <p class="section-desc" style="max-width: 640px; margin: 12px auto 0; font-size: 1.125rem; color: var(--text-secondary);">
-        Apuntes en Markdown, cálculo de promedios en cualquier escala, horarios en curso y transferencia sin conexión: todo converge de forma armónica en NotiFast.
+        Apuntes por bloques con fotos anotadas, promedios en cualquier escala, temas personalizables AAA, recordatorios proactivos y packs P2P offline: todo converge en NotiFast.
       </p>
 
       <div class="box-stage hub-stage" id="hub-interactive-stage">
@@ -246,14 +418,14 @@
 
         <div class="chest-glow-rays hub-orbit-aura" aria-hidden="true"></div>
 
-        <!-- Módulo 1: Apuntes en Markdown (Top-Left) -->
+        <!-- Módulo 1: Apuntes por Bloques & LaTeX (Top-Left) -->
         <div class="popout-item popout-notes" data-target="#apuntes" role="button" tabindex="0" title="Ver Módulo de Apuntes">
           <div class="popout-icon-box icon-notes-tint">
             <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
           </div>
           <div class="popout-text-stack">
-            <span class="popout-title">Apuntes en Markdown</span>
-            <span class="popout-meta">LaTeX • Resaltado • #tags</span>
+            <span class="popout-title">Apuntes &amp; Bloques</span>
+            <span class="popout-meta">Markdown • LaTeX • Fotos Anotadas</span>
           </div>
         </div>
 
@@ -264,7 +436,7 @@
           </div>
           <div class="popout-text-stack">
             <span class="popout-title">Promedio: 8.70</span>
-            <span class="popout-meta">4 Escalas Adaptables</span>
+            <span class="popout-meta">4 Escalas • Simulador de Meta</span>
           </div>
         </div>
 
@@ -275,40 +447,40 @@
           </div>
           <div class="popout-text-stack">
             <span class="popout-title"><span class="beacon-mini-dot"></span> En curso: Cálculo</span>
-            <span class="popout-meta">08:00 - 10:00 • Tomar notas</span>
+            <span class="popout-meta">08:00 - 10:00 • Acción en 1 toque</span>
           </div>
         </div>
 
-        <!-- Módulo 4: Pack P2P Offline Nearby (Bottom-Right) -->
-        <div class="popout-item popout-math popout-nearby" data-target="#compartir" role="button" tabindex="0" title="Ver Transferencia P2P">
+        <!-- Módulo 4: Pack P2P Offline & QR (Bottom-Right) -->
+        <div class="popout-item popout-math popout-nearby" data-target="#compartir" role="button" tabindex="0" title="Ver Transferencia P2P y Respaldo Cloud">
           <div class="popout-icon-box icon-nearby-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
           </div>
           <div class="popout-text-stack">
-            <span class="popout-title">Pack P2P Offline</span>
-            <span class="popout-meta">Android Nearby • .notifast</span>
+            <span class="popout-title">Pack P2P &amp; QR Offline</span>
+            <span class="popout-meta">Archivo .notifast • Drive Backup</span>
           </div>
         </div>
 
-        <!-- Módulo 5: Materias Personalizadas (Top-Center) -->
-        <div class="popout-item popout-subjects" data-target="#materias" role="button" tabindex="0" title="Ver Personalización de Materias">
+        <!-- Módulo 5: Estudio de Temas Personalizables AAA (Top-Center) -->
+        <div class="popout-item popout-subjects" data-target="#temas" role="button" tabindex="0" title="Ver Estudio de Temas Personalizables">
           <div class="popout-icon-box icon-subjects-tint">
             <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
           </div>
           <div class="popout-text-stack">
-            <span class="popout-title">Materias con Identidad</span>
-            <span class="popout-meta">Paleta HSL • WCAG AAA</span>
+            <span class="popout-title">Temas &amp; Lienzos AAA</span>
+            <span class="popout-meta">6 Acentos • 6 Fondos • Hex Studio</span>
           </div>
         </div>
 
-        <!-- Módulo 6: Calendario de Exámenes y Alertas (Bottom-Center) -->
-        <div class="popout-item popout-alerts" data-target="#evaluaciones" role="button" tabindex="0" title="Ver Calendario de Evaluaciones">
+        <!-- Módulo 6: Motor de Notificaciones Proactivas (Bottom-Center) -->
+        <div class="popout-item popout-alerts" data-target="#notificaciones" role="button" tabindex="0" title="Ver Motor de Notificaciones Proactivas">
           <div class="popout-icon-box icon-alerts-tint">
-            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
           </div>
           <div class="popout-text-stack">
-            <span class="popout-title">Calendario de Exámenes</span>
-            <span class="popout-meta">35% Parcial • Avisos 24h &amp; 2h</span>
+            <span class="popout-title">Alertas Proactivas</span>
+            <span class="popout-meta">Clases • Exámenes • Resumen 07:00</span>
           </div>
         </div>
 
@@ -451,7 +623,7 @@
 
           <!-- Título del Apunte -->
           <div class="editor-title-container">
-            <h4 class="editor-note-title">Teorema del Valor Medio y Optimización</h4>
+            <h3 class="editor-note-title">Teorema del Valor Medio y Optimización</h3>
           </div>
 
           <!-- Barra Docked Accessory de Markdown (DockedAccessoryToolbar.kt) -->
@@ -473,7 +645,7 @@
           <!-- Hoja Renderizada del Editor (rich-editor-sheet) -->
           <div class="rich-editor-sheet">
             <div class="rendered-markdown-content">
-              <h5># Teorema de Lagrange</h5>
+              <h4># Teorema de Lagrange</h4>
               <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto <em>c</em> tal que:</p>
               
               <div class="math-latex-card">
@@ -785,7 +957,7 @@
                 <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
               </div>
               <div class="sim-header-text">
-                <h4 class="sim-title">Simulador de Nota Requerida</h4>
+                <h3 class="sim-title">Simulador de Nota Requerida</h3>
                 <p class="sim-subject-name">Cálculo Diferencial • Parcial II (35% restante)</p>
               </div>
             </div>
@@ -867,31 +1039,356 @@
       </div>
     </section>
 
-    <!-- 7. MÓDULO 6: COMPARTIR MATERIA P2P OFFLINE (Android Nearby & Código QR) -->
+    <!-- 7. MÓDULO NUEVO: ESTUDIO DE TEMAS PERSONALIZABLES & LIENZOS AAA (ThemePreset.kt, BackgroundPreset.kt & HexColorStudioPicker.kt) -->
+    <section class="dynamic-feature-row row-reverse section-theme-studio" id="temas">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-primary-light); color: var(--brand-primary);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+          <span>Motor de Temas Dinámicos • WCAG AAA</span>
+        </div>
+        <h2 class="feature-title">
+          Estudio de Temas en Vivo:<br><span class="accent-ruby">6 acentos, 6 lienzos y Hex Studio.</span>
+        </h2>
+        <p class="feature-desc">
+          Personaliza la atmósfera visual de tu semestre. En la app móvil, NotiFast separa la <strong>paleta de acentos</strong> del <strong>tono de lienzo de papel</strong>, permitiéndote combinar 6 temas editoriales, 6 fondos de lectura descansada, Modo Claro/Oscuro y un <strong>Estudio Hex/HSL propio</strong> con validación de contraste WCAG AAA.
+        </p>
+
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>¡Pruébalo aquí mismo!</strong> Haz clic en cualquier acento, lienzo o modo oscuro en el panel interactivo y observa cómo <strong>toda esta página web y el teléfono cambian en tiempo real</strong>.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>6 Lienzos de Papel Curados:</strong> Pergamino, Menta, Polar, Papiro, Lavanda y Glaciar diseñados para evitar el deslumbramiento en sesiones nocturnas.</span>
+          </li>
+          <li>
+            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Hex Color Studio &amp; Arcoíris HSL:</strong> Crea tu propio código Hexadecimal para acento primario, secundario y superficie con persistencia instantánea.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Estudio de Temas Fiel a SettingsAppearanceSection.kt, ThemeSelectorCard.kt y CustomThemePaletteSheet.kt -->
+        <div class="theme-studio-workbench" id="theme-studio-workbench">
+          <!-- Cabecera con Selector de Modo Claro / Oscuro -->
+          <div class="studio-top-bar">
+            <div class="studio-title-group">
+              <div class="studio-badge-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+              </div>
+              <div>
+                <h3 class="studio-heading">Apariencia y Estudio Cromático</h3>
+                <p class="studio-subheading" id="studio-active-summary">NotiFast Classic • Lienzo Pergamino</p>
+              </div>
+            </div>
+
+            <div class="theme-mode-segmented" role="group" aria-label="Modo de iluminación del tema">
+              <button type="button" class="mode-seg-btn active" data-theme-mode-btn="light" aria-pressed="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightmode"></use></svg>
+                <span>Claro</span>
+              </button>
+              <button type="button" class="mode-seg-btn" data-theme-mode-btn="dark" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-darkmode"></use></svg>
+                <span>Oscuro</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 1. Paleta de Acentos Oficiales (ThemePreset.kt) -->
+          <div>
+            <div class="studio-section-label">
+              <span>1. Paleta de Acentos (ThemePreset)</span>
+              <span class="studio-aaa-pill">✓ Contraste WCAG AAA</span>
+            </div>
+            <div class="accent-presets-grid" role="radiogroup" aria-label="Paletas de acento de NotiFast">
+              <button type="button" class="accent-swatch-btn active" data-accent-preset="classic" role="radio" aria-checked="true">
+                <div class="swatch-dual-circle">
+                  <span class="swatch-half" style="background: #9E1B32;"></span>
+                  <span class="swatch-half" style="background: #2A7B7B;"></span>
+                </div>
+                <span class="swatch-name">Classic</span>
+                <span class="swatch-desc">Ruby &amp; Aqua</span>
+              </button>
+
+              <button type="button" class="accent-swatch-btn" data-accent-preset="forest_sage" role="radio" aria-checked="false">
+                <div class="swatch-dual-circle">
+                  <span class="swatch-half" style="background: #15803D;"></span>
+                  <span class="swatch-half" style="background: #854D0E;"></span>
+                </div>
+                <span class="swatch-name">Campus Verde</span>
+                <span class="swatch-desc">Bosque &amp; Ámbar</span>
+              </button>
+
+              <button type="button" class="accent-swatch-btn" data-accent-preset="midnight_indigo" role="radio" aria-checked="false">
+                <div class="swatch-dual-circle">
+                  <span class="swatch-half" style="background: #4338CA;"></span>
+                  <span class="swatch-half" style="background: #0891B2;"></span>
+                </div>
+                <span class="swatch-name">Cyber Nocturno</span>
+                <span class="swatch-desc">Índigo &amp; Cian</span>
+              </button>
+
+              <button type="button" class="accent-swatch-btn" data-accent-preset="warm_mocha" role="radio" aria-checked="false">
+                <div class="swatch-dual-circle">
+                  <span class="swatch-half" style="background: #C2410C;"></span>
+                  <span class="swatch-half" style="background: #B45309;"></span>
+                </div>
+                <span class="swatch-name">Café Nórdico</span>
+                <span class="swatch-desc">Terracota &amp; Miel</span>
+              </button>
+
+              <button type="button" class="accent-swatch-btn" data-accent-preset="sakura_zen" role="radio" aria-checked="false">
+                <div class="swatch-dual-circle">
+                  <span class="swatch-half" style="background: #6D28D9;"></span>
+                  <span class="swatch-half" style="background: #BE185D;"></span>
+                </div>
+                <span class="swatch-name">Sakura Zen</span>
+                <span class="swatch-desc">Violeta &amp; Cerezo</span>
+              </button>
+
+              <button type="button" class="accent-swatch-btn" data-accent-preset="ocean_cyan" role="radio" aria-checked="false">
+                <div class="swatch-dual-circle">
+                  <span class="swatch-half" style="background: #0284C7;"></span>
+                  <span class="swatch-half" style="background: #0F766E;"></span>
+                </div>
+                <span class="swatch-name">Minimal Nórdico</span>
+                <span class="swatch-desc">Océano &amp; Teal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Tono de Fondo / Lienzo de Papel (BackgroundPreset.kt) -->
+          <div>
+            <div class="studio-section-label">
+              <span>2. Tono de Lienzo (BackgroundPreset)</span>
+              <span style="font-size: 0.7rem; color: var(--text-tertiary);">Independiente del acento</span>
+            </div>
+            <div class="canvas-presets-strip" role="radiogroup" aria-label="Tonos de lienzo de fondo">
+              <button type="button" class="canvas-swatch-chip active" data-bg-preset="classic" role="radio" aria-checked="true">
+                <span class="canvas-chip-preview" style="background: #FAF9F6;"></span>
+                <span class="canvas-chip-name">Pergamino</span>
+              </button>
+              <button type="button" class="canvas-swatch-chip" data-bg-preset="forest_sage" role="radio" aria-checked="false">
+                <span class="canvas-chip-preview" style="background: #EAF4ED;"></span>
+                <span class="canvas-chip-name">Menta</span>
+              </button>
+              <button type="button" class="canvas-swatch-chip" data-bg-preset="midnight_indigo" role="radio" aria-checked="false">
+                <span class="canvas-chip-preview" style="background: #E6F0F8;"></span>
+                <span class="canvas-chip-name">Polar</span>
+              </button>
+              <button type="button" class="canvas-swatch-chip" data-bg-preset="warm_mocha" role="radio" aria-checked="false">
+                <span class="canvas-chip-preview" style="background: #F5ECE1;"></span>
+                <span class="canvas-chip-name">Papiro</span>
+              </button>
+              <button type="button" class="canvas-swatch-chip" data-bg-preset="sakura_zen" role="radio" aria-checked="false">
+                <span class="canvas-chip-preview" style="background: #F2EAF7;"></span>
+                <span class="canvas-chip-name">Lavanda</span>
+              </button>
+              <button type="button" class="canvas-swatch-chip" data-bg-preset="ocean_cyan" role="radio" aria-checked="false">
+                <span class="canvas-chip-preview" style="background: #E5F3F5;"></span>
+                <span class="canvas-chip-name">Glaciar</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Estudio Hexadecimal & Barra HSL en Vivo (HexColorStudioPicker.kt) -->
+          <div class="custom-hex-studio-box">
+            <div class="hex-studio-header">
+              <span class="hex-studio-title">
+                <svg style="width: 15px; height: 15px; color: var(--brand-primary);" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-brush"></use></svg>
+                <span>Estudio Hexadecimal &amp; Matiz HSL Personalizado</span>
+              </span>
+              <span class="hex-code-badge" id="studio-hex-readout">#9E1B32</span>
+            </div>
+            <input type="range" class="hue-rainbow-slider" id="studio-hue-slider" min="0" max="360" value="350" aria-label="Deslizador de matiz HSL para acento personalizado">
+            <div class="hex-controls-row">
+              <div class="hex-input-wrap">
+                <span>HEX</span>
+                <input type="text" class="hex-text-input" id="studio-hex-input" value="9E1B32" maxlength="6" aria-label="Código hexadecimal de color primario">
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-studio-reset" style="padding: 6px 12px; font-size: 0.75rem;">
+                Restaurar Classic
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Vista Previa en Vivo (ThemePreviewMiniCard.kt) -->
+          <div class="theme-live-preview-mini">
+            <div class="preview-mini-left">
+              <div class="preview-mini-avatar">
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
+              </div>
+              <div class="preview-mini-text">
+                <span class="preview-mini-title" id="preview-mini-title">Vista previa: NotiFast Classic</span>
+                <span class="preview-mini-sub" id="preview-mini-sub">Acento primario y secundario aplicados a toda la interfaz</span>
+              </div>
+            </div>
+            <span class="preview-mini-cta-pill" id="preview-mini-badge">Activo en Web</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. MÓDULO NUEVO: MOTOR DE NOTIFICACIONES PROACTIVAS (SettingsNotificationsSection.kt & NotificationSender.kt) -->
+    <section class="dynamic-feature-row section-notifications-engine" id="notificaciones">
+      <div class="feature-info">
+        <div class="feature-pill-badge" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+          <span>WorkManager &amp; Alarmas Exactas • Sin Ansiedad</span>
+        </div>
+        <h2 class="feature-title">
+          Notificaciones proactivas,<br><span class="accent-aqua">que acompañan sin abrumar.</span>
+        </h2>
+        <p class="feature-desc">
+          Olvídate de las apps que drenan tu batería o te estresan a medianoche. NotiFast programa alertas locales exactas con <strong>Android WorkManager</strong> en tres canales independientes y configurables: recordatorios antes de entrar al aula, avisos anticipados de evaluaciones con su porcentaje de impacto y un resumen matutino sereno a las <strong>07:00 AM</strong>.
+        </p>
+
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Alertas de Clases (10, 15 o 30 min antes):</strong> Te indica el aula, el bloque horario y abre el apunte de esa materia en un toque.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Alertas de Evaluaciones (1, 2 o 3 días antes):</strong> Prioriza tu repaso avisándote el peso porcentual del examen (ej. 35% Parcial II).</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span><strong>Resumen Matutino (07:00 AM) + Botón de Prueba:</strong> Empieza el día sabiendo cuántas clases y entregas tienes hoy, con verificador en vivo en Ajustes.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Simulador Fiel a SettingsNotificationsSection.kt y NotificationSender.kt -->
+        <div class="notifications-simulator-card" id="notifications-simulator-card">
+          <!-- Escenario de Previsualización de Banner Android Heads-Up -->
+          <div class="android-headsup-stage">
+            <span class="stage-status-pill">PREVISUALIZACIÓN HEADS-UP ANDROID 14</span>
+            <div class="android-notif-banner" id="live-android-notif-banner" role="region" aria-live="polite" aria-label="Vista previa de notificación de Android">
+              <div class="notif-app-header">
+                <div class="notif-app-brand">
+                  <img src="assets/logo.png" alt="" aria-hidden="true">
+                  <span>NOTIFAST • <strong id="notif-channel-tag">CANAL CLASES</strong></span>
+                </div>
+                <span class="notif-timestamp" id="notif-timestamp">Hace 1 min</span>
+              </div>
+              <div class="notif-main-row">
+                <div class="notif-type-icon" id="notif-type-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+                </div>
+                <div class="notif-text-col">
+                  <div class="notif-banner-title" id="notif-banner-title">⏰ Clase en 15 min: Cálculo Diferencial</div>
+                  <p class="notif-banner-body" id="notif-banner-body">08:00 - 10:00 • Aula 204 (Edificio Ciencias). Toca para abrir tu cuaderno de la sesión.</p>
+                </div>
+              </div>
+              <div class="notif-actions-strip">
+                <button type="button" class="notif-action-btn" id="notif-action-primary">Abrir apunte de clase</button>
+                <button type="button" class="notif-action-btn secondary" id="notif-action-secondary">Silenciar hoy</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controles de Canales y Anticipación (SettingsNotificationsSection.kt) -->
+          <div class="notif-channels-list" role="tablist" aria-label="Canales de notificaciones de NotiFast">
+            <!-- Canal 1: Alertas de Clases -->
+            <div class="notif-channel-row active-preview" data-notif-channel="class" role="tab" aria-selected="true" tabindex="0">
+              <div class="channel-row-top">
+                <div class="channel-title-group">
+                  <div class="channel-icon-box">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+                  </div>
+                  <div class="channel-text">
+                    <span class="channel-name">Alertas de Clases</span>
+                    <span class="channel-desc">Recordatorio automático antes de cada bloque horario</span>
+                  </div>
+                </div>
+                <span class="notif-switch-pill" aria-hidden="true"></span>
+              </div>
+              <div class="timing-chips-row" aria-label="Tiempo de anticipación para clases">
+                <button type="button" class="timing-chip" data-channel="class" data-lead="10 min">10 min antes</button>
+                <button type="button" class="timing-chip active" data-channel="class" data-lead="15 min">15 min antes</button>
+                <button type="button" class="timing-chip" data-channel="class" data-lead="30 min">30 min antes</button>
+              </div>
+            </div>
+
+            <!-- Canal 2: Alertas de Evaluaciones -->
+            <div class="notif-channel-row" data-notif-channel="exam" role="tab" aria-selected="false" tabindex="0">
+              <div class="channel-row-top">
+                <div class="channel-title-group">
+                  <div class="channel-icon-box">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-quiz"></use></svg>
+                  </div>
+                  <div class="channel-text">
+                    <span class="channel-name">Alertas de Evaluaciones</span>
+                    <span class="channel-desc">Aviso preventivo con peso porcentual del examen o entrega</span>
+                  </div>
+                </div>
+                <span class="notif-switch-pill" aria-hidden="true"></span>
+              </div>
+              <div class="timing-chips-row" aria-label="Días de anticipación para evaluaciones">
+                <button type="button" class="timing-chip" data-channel="exam" data-lead="1 día">1 día antes</button>
+                <button type="button" class="timing-chip active" data-channel="exam" data-lead="2 días">2 días antes</button>
+                <button type="button" class="timing-chip" data-channel="exam" data-lead="3 días">3 días antes</button>
+              </div>
+            </div>
+
+            <!-- Canal 3: Resumen Matutino -->
+            <div class="notif-channel-row" data-notif-channel="morning" role="tab" aria-selected="false" tabindex="0">
+              <div class="channel-row-top">
+                <div class="channel-title-group">
+                  <div class="channel-icon-box">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightmode"></use></svg>
+                  </div>
+                  <div class="channel-text">
+                    <span class="channel-name">Resumen Matutino (07:00 AM)</span>
+                    <span class="channel-desc">Síntesis diaria de tus clases y entregas al despertar</span>
+                  </div>
+                </div>
+                <span class="notif-switch-pill" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pie con Disparo de Notificación de Prueba (send_test_notification) -->
+          <div class="notif-test-footer">
+            <span class="notif-test-hint">Idéntico al botón verificador de Ajustes en la app</span>
+            <button type="button" class="btn-trigger-notif" id="btn-test-notification">
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+              <span>Enviar notificación de prueba</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. MÓDULO 6: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (Pack .notifast, QR Offline & Google Drive) -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
         <div class="feature-pill-badge" style="background: #E0F2FE; color: #0284C7;">
-          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
-          <span>P2P Offline • Pack Académico</span>
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+          <span>Pack Académico P2P • QR Offline &amp; Drive Backup</span>
         </div>
         <h2 class="feature-title">
-          Comparte la materia al instante.<br><span class="accent-ruby">Sin internet, vía Android Nearby.</span>
+          Comparte materias por QR o archivo,<br><span class="accent-ruby">y respalda en tu Google Drive privado.</span>
         </h2>
         <p class="feature-desc">
-          ¿Un compañero faltó a clases o recién se inscribió en la materia? Exporta tu asignatura en un pack <code>.notifast</code> y transmítelo directamente mediante <strong>Android Nearby</strong> o escaneando un <strong>Código QR Offline</strong>. Todo se carga de inmediato en su teléfono sin consumir datos móviles.
+          ¿Un compañero faltó a clases o cambiaste de teléfono? Comprime cualquier asignatura en un paquete <code>.notifast</code> (GZIP + Base64) para compartirlo al instante por <strong>Código QR Offline</strong> o archivo directo. Además, sincroniza toda tu base de datos SQLite en la carpeta privada <code>appDataFolder</code> de tu propio <strong>Google Drive</strong>.
         </p>
         <ul class="feature-bullets">
           <li>
             <div class="bullet-icon" style="background: #E0F2FE; color: #0284C7;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Transferencia directa entre dispositivos Android sin requerir Wi-Fi ni datos.</span>
+            <span><strong>Código QR &amp; Pack <code>.notifast</code>:</strong> Exporta horarios, apuntes y estructura de evaluaciones sin gastar datos móviles.</span>
           </li>
           <li>
             <div class="bullet-icon" style="background: #E0F2FE; color: #0284C7;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Incluye syllabus, horarios semanales, notas clave y fechas de exámenes.</span>
+            <span><strong>Resolución inteligente de conflictos:</strong> Previsualiza el contenido del paquete antes de importar y evita duplicados automáticamente.</span>
           </li>
           <li>
             <div class="bullet-icon" style="background: #E0F2FE; color: #0284C7;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Importación en 1 toque con resolución automática de nombres duplicados.</span>
+            <span><strong>Google Drive Cloud Backup:</strong> Respaldo cifrado en tu cuenta personal con restauración atómica y cero servidores intermediarios.</span>
           </li>
         </ul>
       </div>
@@ -901,7 +1398,7 @@
           <div class="transfer-card-header">
             <div class="offline-beacon">
               <span class="offline-dot"></span>
-              <span>100% Sin Conexión</span>
+              <span>QR Offline &amp; GZIP Base64</span>
             </div>
             <span class="pack-badge">Pack .notifast</span>
           </div>
@@ -911,20 +1408,20 @@
             <div class="device-node device-sender">
               <div class="device-avatar">📱</div>
               <span class="device-name">Tu Teléfono</span>
-              <span class="device-status">Transmitiendo</span>
+              <span class="device-status">Generando QR / Pack</span>
             </div>
 
             <div class="transfer-waves">
               <div class="nearby-signal-pulse">
-                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
               </div>
-              <span class="transfer-speed">Android Nearby Direct</span>
+              <span class="transfer-speed">QR Directo &bull; Drive Sync</span>
             </div>
 
             <div class="device-node device-receiver">
               <div class="device-avatar">📱</div>
               <span class="device-name">Compañero</span>
-              <span class="device-status-success">¡Materia Cargada!</span>
+              <span class="device-status-success">¡Materia Importada!</span>
             </div>
           </div>
 
@@ -935,27 +1432,27 @@
               <span>Cálculo Diferencial.notifast</span>
             </div>
             <div class="pack-meta-grid">
-              <span>✓ 12 Apuntes completos</span>
+              <span>✓ 12 Apuntes por bloques</span>
               <span>✓ 2 Horarios semanales</span>
               <span>✓ 3 Fechas de parciales</span>
-              <span>✓ Criterios de ponderación</span>
+              <span>✓ Ponderación &amp; Docente</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 6. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper) -->
+    <!-- 10. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper) -->
     <section class="subjects-gallery-section subjects-gallery" id="materias">
       <div class="subjects-gallery-header">
         <span class="feature-pill-badge" style="background: #FEF3C7; color: #B45309; margin: 0 auto 12px;">
-          <span>Personalización Total</span>
+          <span>Identidad por Asignatura</span>
         </span>
         <h2 class="section-title" style="font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 800;">
-          Cada materia, con su propia identidad.
+          Cada materia, con su propio icono, color y docente.
         </h2>
         <p class="section-desc" style="color: var(--text-secondary); margin-top: 8px;">
-          Diseña tu propio ecosistema de estudio. Asigna paletas cromáticas accesibles (WCAG AAA) e iconos oficiales a cada una de tus asignaturas.
+          Asigna paletas cromáticas accesibles (WCAG AAA), iconos académicos de nuestro catálogo de 33 símbolos y vincula a tu profesor de cátedra o laboratorio.
         </p>
       </div>
 
@@ -1098,82 +1595,82 @@
       </div>
     </section>
 
-    <!-- 7. Bento Grid Section: Superpoderes Académicos -->
+    <!-- 11. Bento Grid Section: Superpoderes Académicos Reales de la App -->
     <section class="bento-section">
       <div class="bento-header">
-        <span class="section-tag">Superpoderes Académicos</span>
-        <h2 class="section-title">Tecnología de autor para tu rendimiento.</h2>
+        <span class="section-tag">Arquitectura &amp; Superpoderes</span>
+        <h2 class="section-title">Ingeniería nativa pensada para el aula real.</h2>
         <p class="section-desc">
-          Cada detalle de NotiFast está concebido con arquitectura limpia y ergonomía táctil para que estudies con serenidad.
+          Contrastado al 100% con nuestra app Android: velocidad instantánea en SQLite, privacidad absoluta y herramientas diseñadas para la vida universitaria.
         </p>
       </div>
 
       <div class="bento-grid">
-        <!-- Tarjeta 1: Ponderación (8 cols) -->
+        <!-- Tarjeta 1: Ponderación + Fotos Anotadas (8 cols) -->
         <article class="bento-card bento-col-8">
           <div>
             <div class="bento-icon-wrapper icon-bg-ruby">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
             </div>
-            <h3 class="bento-card-title">Motor de Promedios Ponderados en Vivo</h3>
+            <h3 class="bento-card-title">Editor por Bloques &amp; Anotador de Fotos de Pizarra</h3>
             <p class="bento-card-desc">
-              Define los porcentajes exactos de quizes, parciales, proyectos y talleres. NotiFast calcula instantáneamente tu calificación final y simula qué necesitas para alcanzar tu meta académica.
+              Combina bloques de texto Markdown, listas interactivas, tablas de datos y fotografías de la pizarra con trazos a mano alzada sobre el lienzo. Busca cualquier apunte, materia o evaluación en milisegundos con el motor de Búsqueda Global.
             </p>
           </div>
           <div class="bento-visual-preview">
-            <span class="preview-pill pill-calc">Cálculo Ponderado: 35% + 35% + 30%</span>
-            <span class="preview-pill pill-calc">Fórmula: Exactitud IEEE 754</span>
+            <span class="preview-pill pill-calc">Bloques estilo OneNote</span>
+            <span class="preview-pill pill-calc">Dibujo sobre Fotos</span>
+            <span class="preview-pill pill-calc">Búsqueda Global Instantánea</span>
           </div>
         </article>
 
-        <!-- Tarjeta 2: Sincronización Nube (4 cols) -->
+        <!-- Tarjeta 2: Room SQLite + Google Drive appDataFolder (4 cols) -->
         <article class="bento-card bento-col-4">
           <div>
             <div class="bento-icon-wrapper icon-bg-aqua">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
             </div>
-            <h3 class="bento-card-title">Sincronización Cloud Offline-First</h3>
+            <h3 class="bento-card-title">100% Offline-First &amp; Google Drive Privado</h3>
             <p class="bento-card-desc">
-              Tus apuntes se respaldan en tiempo real con Firebase Firestore. Toma notas sin conexión en el aula y sincroniza al volver al Wi-Fi.
+              Base de datos Room SQLite ultrarrápida sin bloqueos de red, respaldada en la carpeta oculta <code>appDataFolder</code> de tu propio Google Drive.
             </p>
           </div>
           <div class="bento-visual-preview">
-            <span class="preview-pill pill-sync">100% Offline-Ready</span>
+            <span class="preview-pill pill-sync">Room SQLite + Drive API</span>
           </div>
         </article>
 
-        <!-- Tarjeta 3: Notificaciones sin ansiedad (6 cols) -->
+        <!-- Tarjeta 3: Directorio de Profesores & WhatsApp Contextual (6 cols) -->
         <article class="bento-card bento-col-6">
           <div>
             <div class="bento-icon-wrapper icon-bg-amber">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightbulb"></use></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
             </div>
-            <h3 class="bento-card-title">Recordatorios Proactivos con WorkManager</h3>
+            <h3 class="bento-card-title">Directorio de Profesores &amp; Acción Contextual</h3>
             <p class="bento-card-desc">
-              Notificaciones locales que te recuerdan preparar tus clases y exámenes con antelación, sin alertas estridentes ni pánico pre-entrega.
+              Registra a tu docente de cátedra y de laboratorio con su cubículo, horario de asesoría, correo e integración directa a WhatsApp con saludo académico pre-rellenado según la materia.
             </p>
           </div>
           <div class="bento-visual-preview">
-            <span class="preview-pill pill-bell">Aviso 24h &amp; 2h antes</span>
-            <span class="preview-pill pill-bell">Zero Batería Vampiro</span>
+            <span class="preview-pill pill-bell">WhatsApp Contextual</span>
+            <span class="preview-pill pill-bell">Cátedra &amp; Laboratorio</span>
           </div>
         </article>
 
-        <!-- Tarjeta 4: Paleta cromática por materia (6 cols) -->
+        <!-- Tarjeta 4: Temas Personalizables & Notificaciones WorkManager (6 cols) -->
         <article class="bento-card bento-col-6">
           <div>
             <div class="bento-icon-wrapper icon-bg-sage">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
             </div>
-            <h3 class="bento-card-title">Paleta Cromática de Estudio Personalizada</h3>
+            <h3 class="bento-card-title">Estudio Cromático AAA &amp; Alertas WorkManager</h3>
             <p class="bento-card-desc">
-              Asigna a cada materia su propio color e icono temático. El motor cromático HSL garantiza contraste accesible (WCAG AAA) en todo momento.
+              6 paletas de acento, 6 lienzos de papel, Estudio Hex/HSL personalizado y 3 canales de recordatorios proactivos (Clases, Evaluaciones y Resumen 07:00 AM) con cero drenaje de batería.
             </p>
           </div>
           <div class="bento-visual-preview">
-            <span class="preview-pill" style="background-color: rgba(37, 99, 235, 0.15); color: #2563EB;">Cálculo</span>
-            <span class="preview-pill" style="background-color: rgba(124, 58, 237, 0.15); color: #7C3AED;">Física</span>
-            <span class="preview-pill" style="background-color: rgba(217, 119, 6, 0.15); color: #D97706;">Literatura</span>
+            <span class="preview-pill" style="background-color: rgba(158, 27, 50, 0.14); color: var(--brand-primary);">6 Temas + Hex Studio</span>
+            <span class="preview-pill" style="background-color: rgba(42, 123, 123, 0.14); color: var(--brand-secondary);">Alertas Exactas</span>
           </div>
         </article>
       </div>
@@ -1184,7 +1681,7 @@
       <div class="final-cta-card">
         <h2 class="final-cta-title">Empieza hoy tu nuevo semestre con serenidad.</h2>
         <p class="final-cta-desc">
-          Descarga NotiFast de forma gratuita y transforma la sobrecarga académica en control total y orden táctil.
+          Descarga NotiFast de forma gratuita y transforma la sobrecarga académica en control total, temas a tu medida y orden táctil.
         </p>
         <div class="hero-ctas">
           <a href="#descargar" id="btn-download-cta" class="btn btn-primary">
@@ -1194,7 +1691,7 @@
             Descargar en Google Play
           </a>
         </div>
-        <p class="final-cta-meta">Compatible con Android 8.0 Oreo o superior • 100% Gratuito y Libre de Anuncios</p>
+        <p class="final-cta-meta">Compatible con Android 8.0 Oreo (API 26) o superior • 100% Gratuito, Offline-First y Libre de Anuncios</p>
       </div>
     </section>
 
@@ -1224,13 +1721,17 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg>
           <span>Analíticas</span>
         </a>
-        <a href="#compartir" class="radar-chip" data-target="#compartir" title="Compartir P2P Offline">
-          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
-          <span>P2P</span>
-        </a>
-        <a href="#materias" class="radar-chip" data-target="#materias" title="Materias con Identidad">
+        <a href="#temas" class="radar-chip" data-target="#temas" title="Estudio de Temas Personalizables">
           <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
-          <span>Materias</span>
+          <span>Temas</span>
+        </a>
+        <a href="#notificaciones" class="radar-chip" data-target="#notificaciones" title="Notificaciones Proactivas">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+          <span>Alertas</span>
+        </a>
+        <a href="#compartir" class="radar-chip" data-target="#compartir" title="Compartir P2P & Backup Drive">
+          <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+          <span>P2P</span>
         </a>
       </div>
     </nav>
@@ -1245,7 +1746,7 @@
       </div>
       <h3 class="toast-title" id="toast-title">¡NotiFast llega muy pronto a Google Play!</h3>
       <p class="toast-message">
-        Estamos ultimando los detalles de la versión oficial para la tienda de Google. Puedes consultar el progreso del desarrollo en este repositorio o clonar el proyecto para compilarlo en Android Studio.
+        Estamos ultimando los detalles de la versión oficial v1.0 RC para Google Play Store. Puedes explorar el código fuente completo en GitHub o clonar el repositorio para compilarlo en Android Studio.
       </p>
       <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
         <button class="btn btn-primary" onclick="document.getElementById('download-toast').classList.remove('visible');">
@@ -1263,23 +1764,23 @@
           <div class="footer-brand">
             <img src="assets/logo.png" alt="NotiFast Logo" class="footer-brand-logo">
             <span class="logo-text">NotiFast</span>
-            <span class="logo-badge">v3.0</span>
+            <span class="logo-badge">v1.0 RC</span>
           </div>
           <p class="footer-mission-text">
-            El hub educativo y cuaderno académico inteligente para estudiantes de secundaria y universidad. Creado con arquitectura limpia para eliminar la sobrecarga académica y estudiar con serenidad y orden táctil.
+            El hub educativo y cuaderno académico inteligente para estudiantes de secundaria y universidad. Creado con arquitectura limpia 100% Offline-First para eliminar la sobrecarga académica y estudiar con serenidad y orden táctil.
           </p>
           <div class="footer-trust-chips">
             <span class="trust-chip">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-              <span>100% Privacidad Local</span>
+              <span>Room SQLite Local</span>
             </span>
             <span class="trust-chip">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
-              <span>Nearby Offline</span>
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
+              <span>Google Drive Privado</span>
             </span>
             <span class="trust-chip">
-              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-lightbulb"></use></svg>
-              <span>Sin Anuncios</span>
+              <svg viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
+              <span>Temas WCAG AAA</span>
             </span>
           </div>
         </div>
@@ -1288,14 +1789,14 @@
         <div class="footer-col">
           <h4 class="footer-heading">Módulos del Hub</h4>
           <ul class="footer-links footer-nav-list" aria-label="Enlaces del pie de página">
-            <li><a href="#agenda"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg> Agenda &amp; Horario</a></li>
-            <li><a href="#apuntes"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg> Apuntes Markdown</a></li>
+            <li><a href="#agenda"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg> Agenda &amp; Horario Activo</a></li>
+            <li><a href="#apuntes"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg> Apuntes por Bloques</a></li>
             <li><a href="#calificaciones"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg> Calificaciones Multiescala</a></li>
             <li><a href="#evaluaciones"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg> Calendario de Evaluaciones</a></li>
             <li><a href="#analiticas"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-analytics"></use></svg> Analíticas &amp; Simulador</a></li>
-            <li><a href="#compartir"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg> Compartir P2P Offline</a></li>
-            <li><a href="#materias"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg> Materias con Identidad</a></li>
-            <li><a href="#descargar"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg> Descarga</a></li>
+            <li><a href="#temas"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg> Estudio de Temas AAA</a></li>
+            <li><a href="#notificaciones"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg> Notificaciones Proactivas</a></li>
+            <li><a href="#compartir"><svg class="footer-nav-icon" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg> Pack P2P &amp; Backup Drive</a></li>
           </ul>
         </div>
 
@@ -1303,19 +1804,19 @@
         <div class="footer-col">
           <h4 class="footer-heading">Ingeniería &amp; Tesis</h4>
           <ul class="footer-nav-list tech-list">
-            <li><span class="tech-item-badge">Kotlin 2.0 &amp; Jetpack Compose</span></li>
-            <li><span class="tech-item-badge">Clean Architecture &amp; Hilt DI</span></li>
-            <li><span class="tech-item-badge">Android WorkManager Proactivo</span></li>
-            <li><span class="tech-item-badge">Firebase Firestore Sync</span></li>
-            <li><span class="tech-item-badge">Android Nearby Connections API</span></li>
-            <li><span class="tech-item-badge">Accesibilidad WCAG AAA</span></li>
+            <li><span class="tech-item-badge">Kotlin 2.0.21 &amp; Jetpack Compose</span></li>
+            <li><span class="tech-item-badge">Clean Architecture + MVI + Hilt</span></li>
+            <li><span class="tech-item-badge">Room SQLite 100% Offline-First</span></li>
+            <li><span class="tech-item-badge">Google Drive API (appDataFolder)</span></li>
+            <li><span class="tech-item-badge">WorkManager &amp; Alarmas Exactas</span></li>
+            <li><span class="tech-item-badge">684 Unit Tests &amp; WCAG AAA</span></li>
           </ul>
         </div>
 
         <!-- Columna 4: Descarga y Repositorio -->
         <div class="footer-col">
           <h4 class="footer-heading">Acceso &amp; Comunidad</h4>
-          <p class="footer-subtext">Descarga la app en Android o explora el código fuente del proyecto en GitHub.</p>
+          <p class="footer-subtext">Descarga la app en Android o explora la arquitectura y pruebas en GitHub.</p>
           <div class="footer-actions">
             <a href="#descargar" class="btn btn-primary footer-action-btn">
               <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -1335,9 +1836,9 @@
 
       <!-- Barra de Cierre / Sub-footer -->
       <div class="footer-bottom-bar">
-        <p class="footer-copy">&copy; 2026 NotiFast. Diseñado con arquitectura limpia para serenidad y enfoque estudiantil.</p>
+        <p class="footer-copy">&copy; 2026 NotiFast. Diseñado con Clean Architecture y Material 3 para serenidad y enfoque estudiantil.</p>
         <div class="footer-bottom-right">
-          <span class="footer-badge-pill">Jetpack Compose &bull; Material 3</span>
+          <span class="footer-badge-pill">Jetpack Compose &bull; Room SQLite &bull; WCAG AAA</span>
           <a href="#main-header" class="footer-back-to-top" title="Volver al inicio de la página">
             <span>Volver arriba</span>
             <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>

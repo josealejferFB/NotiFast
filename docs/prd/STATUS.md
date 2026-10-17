@@ -1,8 +1,8 @@
-# 📊 Estado de Ejecución y Roadmap — NotiFast v3.0
+# 📊 Estado de Ejecución y Roadmap — NotiFast v3.2
 
-> **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.0**  
+> **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.2**  
 > **Última actualización:** 17 de Octubre, 2026  
-> **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/NotiFast/PRODUCT.md)
+> **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md)
 
 ---
 
@@ -28,11 +28,13 @@ Onboarding & Acceso Cloud Sync    [███████████████
 Grades Hub & Analíticas AAA       [████████████████] 100% (5/5 pilares) ✅
 Sistema de Temas Dinámicos AAA    [████████████████] 100% (15/15 tareas) ✅
 Motor Notificaciones Locales AAA  [████████████████] 100% (8/8 tareas) ✅
+Landing Page 3.2 & Docs Sync      [████████████████] 100% (6/6 bloques) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  99% (185/191 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    678 tests pasando (0 fallos, 0 ignorados) ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████]  99% (191/197 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    684 tests pasando (0 fallos, 0 ignorados) ✅
+MÉTRICAS DE CÓDIGO:               360 archivos Kotlin (~44,260 LOC) + 92 suites test ✅
 ```
 
 ---
@@ -843,11 +845,32 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
+## 🌐 Renovación Integral de Landing Page 3.2 & Sincronización de Documentación / Impeccable — 100% Completado (17 Oct 2026)
+
+**Objetivo:** Elevar la landing page (`landing/index.html`, `landing/css/*.css`, `landing/js/interactive-showcase.js`) a un showcase interactivo de nivel profesional contrastado 1:1 con la app móvil real, incorporando el Estudio de Temas Personalizables en vivo, el Simulador de Notificaciones Proactivas y un dispositivo Android interactivo en el Hero, además de actualizar toda la documentación maestra (`README.md`, `AGENTS.md`, `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`) al stack real actual.
+
+### Entregables Implementados:
+1. **Hero Asimétrico con Dispositivo Android Interactivo (`.hero-phone-frame`):**
+   - Maqueta interactiva de la app móvil con `NotiFastTopBar`, las 4 pestañas reales de navegación inferior (`Apuntes`, `Agenda`, `Notas`, `Ajustes`), botón de campana que dispara alertas heads-up flotantes (`.hero-floating-headsup`) y barra de pruebas de ingeniería (`100% Local`, `684 Tests`, `WCAG AAA`).
+2. **Estudio de Temas Personalizables & Lienzos AAA en Vivo (`#temas`):**
+   - Réplica interactiva exacta de `ThemePreset.kt` (6 paletas de acento: *Classic*, *Campus Verde*, *Cyber Nocturno*, *Café Nórdico*, *Sakura Zen*, *Minimal Nórdico*) y `BackgroundPreset.kt` (6 lienzos de papel: *Pergamino*, *Menta*, *Polar*, *Papiro*, *Lavanda*, *Glaciar*).
+   - Selector de Modo Claro / Oscuro (`[data-theme-mode="dark"]`) + Estudio Hexadecimal y barra HSL arcoíris que recolorean toda la landing page y el teléfono del Hero en tiempo real.
+3. **Simulador del Motor de Notificaciones Proactivas (`#notificaciones`):**
+   - Escenario Android 14 Heads-Up interactivo con los 3 canales reales (`Alertas de Clases` 10/15/30 min, `Alertas de Evaluaciones` 1/2/3 días y `Resumen Matutino 07:00 AM`) y botón verificador *«Enviar notificación de prueba»*.
+4. **Alineación Arquitectónica Real en Landing y Documentos Maestros:**
+   - Sustitución de referencias legadas (Firestore / Android Nearby) por la arquitectura vigente: **Room SQLite v4 100% Offline-First**, **Google Drive Cloud Backup privado (`appDataFolder`)**, **Pack Académico `.notifast` (GZIP + Base64) & Código QR Offline**, **Editor por Bloques con Fotos Anotadas** y **Directorio de Profesores con WhatsApp contextual**.
+   - Sincronización completa de [`PRODUCT.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md), [`DESIGN.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md), [`.impeccable/design.json`](file:///home/p0xd/Documentos/proyectos/NotiFast/.impeccable/design.json), [`AGENTS.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/AGENTS.md) y [`README.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/README.md).
+5. **Despliegue Continuo (CI/CD) en Cloudflare Pages ([`https://notifast.pages.dev/`](https://notifast.pages.dev/)):**
+   - Pipeline `.github/workflows/ci.yml` validado con suite Python E2E + estructural (`21/21` pruebas en `tests/`) y despliegue automatizado al dominio de producción `https://notifast.pages.dev/` mediante `cloudflare/wrangler-action@v3` (`--project-name=notifast --branch=main`).
+
+---
+
 ### ⚪ Fase 4: Pulido, Experiencia, Accesibilidad y Rendimiento (Siguiente Fase)
 *Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), transiciones de pantalla con View Transitions en Compose, auditoría de rendimiento y depuración de memoria.*  
-*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_4.md`](file:///home/p0xd/Documentos/NotiFast/docs/prd/KICKOFF_FASE_4.md)
+*Guía de Arranque:* [`docs/prd/KICKOFF_FASE_4.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/KICKOFF_FASE_4.md)
 
 ---
 
 ### ⚪ Fase 5: Despliegue, Métricas de Tesis y Lanzamiento en Play Store (Pendiente)
 *Meta: Testing en aula real, recolección de métricas de tesis y publicación en Google Play Store.*
+

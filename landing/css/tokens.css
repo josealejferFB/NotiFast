@@ -1,15 +1,20 @@
 /* ==========================================================================
-   NOTIFAST 3.0 DESIGN SYSTEM — DESIGN TOKENS
+   NOTIFAST 3.0 DESIGN SYSTEM — DESIGN TOKENS & DYNAMIC THEME ENGINE
    Archetype: Tactile Papercraft / Muted Crimson & Aqua Green 3.0
+   WCAG AAA Calibrated • Dual-Axis Theme & Background Presets
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
 :root {
-  /* Lienzo y Superficies — Warm Paper Canvas (Modo Claro) */
+  /* Lienzo y Superficies — Warm Paper Canvas (Modo Claro Default: Pergamino) */
   --bg-canvas: #FAF9F6;
   --bg-surface: #FFFFFF;
   --bg-surface-container: #F3EFEA;
   --bg-surface-container-high: #EBE6DF;
   --bg-surface-variant: #F3EFEA;
+  --bg-canvas-subtle: #F3EFEA;
+  --header-glass: rgba(250, 249, 246, 0.88);
 
   /* Micro-Bordes Táctiles (1px optical weight 12-16%) */
   --border-hairline: #E5DFD7;
@@ -18,19 +23,21 @@
   /* Tintas Tipográficas de Alto Énfasis */
   --text-primary: #181A1F;      /* Tinta Oxford (16.2:1 AAA sobre #FAF9F6) */
   --text-secondary: #4B5563;    /* Grafito Muted (6.8:1 AAA) */
-  --text-muted: #6B7280;        /* Grafito Suave */
+  --text-muted: #64748B;        /* Grafito Suave */
 
   /* Identidad Primaria — Muted Crimson / Tenue Ruby */
   --brand-primary: #9E1B32;
   --brand-primary-hover: #801528;
   --brand-primary-light: #FDE8EB;
   --brand-on-primary: #FFFFFF;
+  --brand-primary-rgb: 158, 27, 50;
 
   /* Identidad Secundaria — Studio Aqua Green */
   --brand-secondary: #2A7B7B;
   --brand-secondary-hover: #1F6161;
   --brand-secondary-light: #D6F2F0;
   --brand-on-secondary: #FFFFFF;
+  --brand-secondary-rgb: 42, 123, 123;
 
   /* Estados Semánticos */
   --brand-success: #15803D;      /* Forest Sage (Aprobando) */
@@ -55,8 +62,8 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Escala Tipográfica Fluida */
-  --text-display: clamp(2.25rem, 5vw, 3.5rem);     /* 36px - 56px */
-  --text-headline: clamp(1.75rem, 3.5vw, 2.5rem);  /* 28px - 40px */
+  --text-display: clamp(2.35rem, 4.6vw, 3.65rem);  /* 37px - 58px */
+  --text-headline: clamp(1.85rem, 3.4vw, 2.65rem); /* 29px - 42px */
   --text-title: clamp(1.25rem, 2vw, 1.5rem);       /* 20px - 24px */
   --text-body: 1rem;                               /* 16px */
   --text-small: 0.875rem;                          /* 14px */
@@ -80,35 +87,38 @@
   --space-xxl: 48px;
   --space-3xl: 64px;
 
-  /* Sombras y Elevaciones Táctiles */
-  --shadow-tactile: 0 4px 20px -2px rgba(24, 26, 31, 0.05);
-  --shadow-hover: 0 12px 32px -4px rgba(24, 26, 31, 0.08);
+  /* Sombras y Elevaciones Táctiles (Con offset y soft blur) */
+  --shadow-tactile: 0 6px 22px -4px rgba(24, 26, 31, 0.06), 0 2px 6px -1px rgba(24, 26, 31, 0.03);
+  --shadow-hover: 0 16px 38px -6px rgba(24, 26, 31, 0.1), 0 4px 12px -2px rgba(24, 26, 31, 0.04);
+  --shadow-elevated: 0 24px 54px -10px rgba(24, 26, 31, 0.14), 0 6px 16px -3px rgba(24, 26, 31, 0.05);
 
   /* Transiciones y Físicas */
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --duration-normal: 260ms;
+  --duration-slow: 420ms;
 }
 
 /* ==========================================================================
-   PALETA DE ESTUDIO — SIEMPRE FONDO CLARO (WARM PAPER CANVAS)
+   MODO OSCURO INTERACTIVO (CUANDO EL ESTUDIANTE CONMUTA A SLATE DESK / DARK)
    ========================================================================== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Mantenemos fondo claro pergamino para máxima legibilidad según directiva de diseño */
-    --bg-canvas: #FAF9F6;
-    --bg-surface: #FFFFFF;
-    --bg-surface-container: #F3EFEA;
-    --bg-surface-container-high: #EBE6DF;
-    --border-hairline: #E5DFD7;
-    --text-primary: #181A1F;
-    --text-secondary: #4B5563;
-    --brand-primary: #9E1B32;
-    --brand-secondary: #2A7B7B;
-    --brand-success: #15803D;
-  }
+[data-theme-mode="dark"] {
+  --bg-canvas: #0E131F;
+  --bg-surface: #161E2D;
+  --bg-surface-container: #1C2638;
+  --bg-surface-container-high: #243046;
+  --bg-surface-variant: #1C2638;
+  --bg-canvas-subtle: #1C2638;
+  --header-glass: rgba(14, 19, 31, 0.88);
+  --border-hairline: #2A384E;
+  --border-subtle: rgba(241, 245, 249, 0.08);
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --shadow-tactile: 0 8px 26px -4px rgba(0, 0, 0, 0.38), 0 2px 8px -1px rgba(0, 0, 0, 0.25);
+  --shadow-hover: 0 18px 42px -6px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 26px 60px -10px rgba(0, 0, 0, 0.65);
 }
 
 /* ==========================================================================
@@ -121,3 +131,4 @@
     --duration-slow: 0ms;
   }
 }
+

@@ -232,5 +232,49 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".footer-trust-chips", css)
         self.assertIn(".footer-bottom-bar", css)
 
+    def test_theme_studio_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="temas"', html)
+        self.assertIn("theme-studio-workbench", html)
+        self.assertIn('data-accent-preset="classic"', html)
+        self.assertIn('data-accent-preset="forest_sage"', html)
+        self.assertIn('data-accent-preset="midnight_indigo"', html)
+        self.assertIn('data-accent-preset="warm_mocha"', html)
+        self.assertIn('data-accent-preset="sakura_zen"', html)
+        self.assertIn('data-accent-preset="ocean_cyan"', html)
+        self.assertIn('data-bg-preset="classic"', html)
+        self.assertIn("studio-hue-slider", html)
+        self.assertIn("studio-hex-input", html)
+
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("ACCENT_PRESETS", js)
+        self.assertIn("CANVAS_PRESETS", js)
+        self.assertIn("setupLiveThemeStudio", js)
+
+    def test_proactive_notifications_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="notificaciones"', html)
+        self.assertIn("notifications-simulator-card", html)
+        self.assertIn("live-android-notif-banner", html)
+        self.assertIn('data-notif-channel="class"', html)
+        self.assertIn('data-notif-channel="exam"', html)
+        self.assertIn('data-notif-channel="morning"', html)
+        self.assertIn("btn-test-notification", html)
+        self.assertIn("hero-phone-frame", html)
+
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("setupNotificationsSimulator", js)
+        self.assertIn("setupHeroPhoneMockup", js)
+
+    def test_cloudflare_pages_metadata(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("https://notifast.pages.dev/", html)
+
 if __name__ == "__main__":
     unittest.main()
+

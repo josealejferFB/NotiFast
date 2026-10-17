@@ -76,7 +76,7 @@
           toggleViewBtn.classList.add('active');
           editorSheet.innerHTML = `
             <div class="rendered-markdown-content">
-              <h5># Teorema de Lagrange</h5>
+              <h4># Teorema de Lagrange</h4>
               <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto <em>c</em> tal que:</p>
               <div class="math-latex-card">
                 <code>f'(c) = [f(b) - f(a)] / (b - a)</code>
@@ -247,7 +247,7 @@
 
         // Highlight main visual feature card
         const spotlightTarget = targetSection.querySelector(
-          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .nearby-transfer-card, .subjects-grid'
+          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .theme-studio-workbench, .notifications-simulator-card, .nearby-transfer-card, .subjects-grid'
         );
 
         if (spotlightTarget) {
@@ -308,7 +308,7 @@
 
         // Highlight target feature card
         const spotlightTarget = targetSection.querySelector(
-          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .nearby-transfer-card, .subjects-grid'
+          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .theme-studio-workbench, .notifications-simulator-card, .nearby-transfer-card, .subjects-grid'
         );
         if (spotlightTarget) {
           spotlightTarget.classList.remove('section-spotlight-active');
@@ -320,7 +320,7 @@
     });
 
     // Active Section Spy using IntersectionObserver
-    const sectionIds = ['#agenda', '#apuntes', '#calificaciones', '#evaluaciones', '#analiticas', '#compartir', '#materias'];
+    const sectionIds = ['#agenda', '#apuntes', '#calificaciones', '#evaluaciones', '#analiticas', '#temas', '#notificaciones', '#compartir', '#materias'];
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -988,6 +988,615 @@
     updateSimulation(8.5);
   }
 
+  // 9. Interactive Hero Android Phone Mockup (4 Bottom-Nav Tabs + Live Notification Toast)
+  function setupHeroPhoneMockup() {
+    const tabBtns = document.querySelectorAll('.phone-nav-tab');
+    const screenBody = document.getElementById('phone-screen-body');
+    const topbarLabel = document.getElementById('phone-topbar-label');
+    const bellBtn = document.getElementById('btn-phone-trigger-notif');
+    const headsupToast = document.getElementById('hero-phone-headsup');
+
+    if (!tabBtns.length || !screenBody) return;
+
+    let toastTimer = null;
+
+    function triggerPhoneHeadsup(customTitle, customDesc) {
+      if (!headsupToast) return;
+      const titleEl = document.getElementById('hero-headsup-title');
+      const descEl = document.getElementById('hero-headsup-desc');
+      if (customTitle && titleEl) titleEl.textContent = customTitle;
+      if (customDesc && descEl) descEl.textContent = customDesc;
+
+      headsupToast.classList.add('visible');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        headsupToast.classList.remove('visible');
+      }, 3600);
+    }
+
+    if (bellBtn) {
+      bellBtn.addEventListener('click', () => {
+        triggerPhoneHeadsup(
+          '⏰ Clase en 15 min: Cálculo',
+          '08:00 - 10:00 • Aula 204. Toca para preparar tu apunte.'
+        );
+      });
+    }
+
+    // Expose helper so Notification Simulator section can also ping the Hero Phone
+    window.__notifastTriggerHeroToast = triggerPhoneHeadsup;
+
+    const PHONE_SCREENS = {
+      apuntes: {
+        title: 'NotiFast',
+        html: `
+          <div class="phone-live-class-pill">
+            <div class="phone-live-top">
+              <span class="phone-live-badge"><span class="beacon-mini-dot"></span> EN CURSO AHORA</span>
+              <span class="phone-live-rem">Faltan 45 min</span>
+            </div>
+            <div class="phone-live-subj">Cálculo Diferencial</div>
+            <div class="phone-live-meta">08:00 - 10:00 • Aula 204 • Prof. Gómez</div>
+            <div class="phone-live-bar">
+              <div class="phone-live-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="phone-avg-mini">
+            <div>
+              <span class="phone-avg-label">PROMEDIO PONDERADO</span>
+              <span class="phone-avg-sub">4 materias activas • Escala 0-10</span>
+            </div>
+            <span class="phone-avg-val">8.70</span>
+          </div>
+
+          <div class="phone-notes-mini-list">
+            <div class="phone-note-mini-card" style="border-left-color: #2563EB;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
+                <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">Cálculo</span>
+              </div>
+              <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: #7C3AED;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
+                <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #7C3AED;">Física</span>
+              </div>
+              <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
+            </div>
+          </div>
+        `
+      },
+      agenda: {
+        title: 'Agenda & Evaluaciones',
+        html: `
+          <div class="phone-live-class-pill">
+            <div class="phone-live-top">
+              <span class="phone-live-badge"><span class="beacon-mini-dot"></span> HOY • JUEVES 15 OCT</span>
+              <span class="phone-live-rem">3 Bloques</span>
+            </div>
+            <div class="phone-live-subj">08:00 Cálculo • 11:00 Física</div>
+            <div class="phone-live-meta">Aula 204 &amp; Lab 102 • Sin choques de horario</div>
+          </div>
+
+          <div class="phone-notes-mini-list">
+            <div class="phone-note-mini-card" style="border-left-color: var(--brand-primary);">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Parcial II: Optimización</span>
+                <span class="phone-note-mini-tag" style="background: var(--brand-primary-light); color: var(--brand-primary);">35% Nota</span>
+              </div>
+              <p class="phone-note-mini-preview">⏰ En 2 días • Recordatorio WorkManager activo</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: var(--brand-secondary);">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Proyecto Péndulo Doble</span>
+                <span class="phone-note-mini-tag" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">30% Nota</span>
+              </div>
+              <p class="phone-note-mini-preview">📅 22 Oct • Entrega grupal + código fuente</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: #059669;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Prof. Carlos Gómez (Cátedra)</span>
+                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.14); color: #059669;">WhatsApp</span>
+              </div>
+              <p class="phone-note-mini-preview">Cubículo 302 • Asesorías Mar/Jue 14:00</p>
+            </div>
+          </div>
+        `
+      },
+      notas: {
+        title: 'Calificaciones & Meta',
+        html: `
+          <div class="phone-avg-mini" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); color: #FFF; border: none;">
+            <div>
+              <span class="phone-avg-label" style="color: rgba(255,255,255,0.85);">PROMEDIO SEMESTRAL</span>
+              <span class="phone-avg-sub" style="color: rgba(255,255,255,0.9);">94% Tasa de éxito proyectada</span>
+            </div>
+            <span class="phone-avg-val" style="color: #FFF;">8.70</span>
+          </div>
+
+          <div class="phone-notes-mini-list">
+            <div class="phone-note-mini-card" style="border-left-color: #2563EB;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Cálculo Diferencial</span>
+                <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">8.80 / 10</span>
+              </div>
+              <p class="phone-note-mini-preview">Necesitas 7.20 en el 35% restante para cerrar en 8.5</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: #D97706;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Literatura Universal</span>
+                <span class="phone-note-mini-tag" style="background: rgba(217,119,6,0.12); color: #D97706;">9.10 / 10</span>
+              </div>
+              <p class="phone-note-mini-preview">100% evaluado • Materia aprobada con distinción</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: #059669;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Química Orgánica</span>
+                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.12); color: #059669;">8.80 / 10</span>
+              </div>
+              <p class="phone-note-mini-preview">Quiz I: 9.8 pts (15%) • 2 exámenes pendientes</p>
+            </div>
+          </div>
+        `
+      },
+      ajustes: {
+        title: 'Ajustes & Estudio AAA',
+        html: `
+          <div class="phone-notes-mini-list">
+            <div class="phone-note-mini-card" style="border-left-color: var(--brand-primary);">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Paleta &amp; Lienzo Activo</span>
+                <span class="phone-note-mini-tag" style="background: var(--brand-primary-light); color: var(--brand-primary);">WCAG AAA</span>
+              </div>
+              <p class="phone-note-mini-preview">6 Acentos + 6 Lienzos + Estudio Hex/HSL sincronizado</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: var(--brand-secondary);">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Notificaciones Proactivas</span>
+                <span class="phone-note-mini-tag" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">Activas</span>
+              </div>
+              <p class="phone-note-mini-preview">Clases (15m) • Exámenes (2d) • Resumen 07:00 AM</p>
+            </div>
+            <div class="phone-note-mini-card" style="border-left-color: #0284C7;">
+              <div class="phone-note-mini-head">
+                <span class="phone-note-mini-title">Google Drive Cloud Backup</span>
+                <span class="phone-note-mini-tag" style="background: rgba(2,132,199,0.14); color: #0284C7;">Cifrado</span>
+              </div>
+              <p class="phone-note-mini-preview">Carpeta privada appDataFolder • Room SQLite</p>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabKey = btn.getAttribute('data-phone-tab');
+        const screenData = PHONE_SCREENS[tabKey];
+        if (!screenData) return;
+
+        tabBtns.forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+
+        if (topbarLabel) topbarLabel.textContent = screenData.title;
+        screenBody.style.opacity = '0';
+        setTimeout(() => {
+          screenBody.innerHTML = screenData.html;
+          screenBody.style.transition = 'opacity 0.2s ease';
+          screenBody.style.opacity = '1';
+        }, 70);
+      });
+    });
+
+    // Trigger a subtle welcome heads-up notification 1.8s after load
+    setTimeout(() => {
+      triggerPhoneHeadsup(
+        '⏰ Clase en 15 min: Cálculo',
+        '08:00 - 10:00 • Aula 204. Toca la campana o prueba los temas.'
+      );
+    }, 1800);
+  }
+
+  // 10. Live Theme Customizer Studio (Exact Presets from ThemePreset.kt & BackgroundPreset.kt)
+  const ACCENT_PRESETS = {
+    classic: {
+      name: 'NotiFast Classic',
+      light: { primary: '#9E1B32', secondary: '#2A7B7B', primaryLight: '#FFF1F2', secondaryLight: '#F0FDFA' },
+      dark:  { primary: '#E05A6E', secondary: '#38B2AC', primaryLight: 'rgba(224,90,110,0.16)', secondaryLight: 'rgba(56,178,172,0.16)' }
+    },
+    forest_sage: {
+      name: 'Campus Verde',
+      light: { primary: '#15803D', secondary: '#854D0E', primaryLight: '#DCFCE7', secondaryLight: '#FEF9C3' },
+      dark:  { primary: '#34D399', secondary: '#FBBF24', primaryLight: 'rgba(52,211,153,0.16)', secondaryLight: 'rgba(251,191,36,0.16)' }
+    },
+    midnight_indigo: {
+      name: 'Cyber Nocturno',
+      light: { primary: '#4338CA', secondary: '#0891B2', primaryLight: '#E0E7FF', secondaryLight: '#CFFAFE' },
+      dark:  { primary: '#818CF8', secondary: '#22D3EE', primaryLight: 'rgba(129,140,248,0.16)', secondaryLight: 'rgba(34,211,238,0.16)' }
+    },
+    warm_mocha: {
+      name: 'Café Nórdico',
+      light: { primary: '#C2410C', secondary: '#B45309', primaryLight: '#FFEDD5', secondaryLight: '#FEF3C7' },
+      dark:  { primary: '#FB923C', secondary: '#FCD34D', primaryLight: 'rgba(251,146,60,0.16)', secondaryLight: 'rgba(252,211,77,0.16)' }
+    },
+    sakura_zen: {
+      name: 'Sakura Zen',
+      light: { primary: '#6D28D9', secondary: '#BE185D', primaryLight: '#F3E8FF', secondaryLight: '#FCE7F3' },
+      dark:  { primary: '#A78BFA', secondary: '#F472B6', primaryLight: 'rgba(167,139,250,0.16)', secondaryLight: 'rgba(244,114,182,0.16)' }
+    },
+    ocean_cyan: {
+      name: 'Minimal Nórdico',
+      light: { primary: '#0284C7', secondary: '#0F766E', primaryLight: '#E0F2FE', secondaryLight: '#CCFBF1' },
+      dark:  { primary: '#38BDF8', secondary: '#2DD4BF', primaryLight: 'rgba(56,189,248,0.16)', secondaryLight: 'rgba(45,212,191,0.16)' }
+    }
+  };
+
+  const CANVAS_PRESETS = {
+    classic: {
+      name: 'Pergamino',
+      light: { canvas: '#FAF9F6', surface: '#FFFFFF', container: '#F3EFEA' },
+      dark:  { canvas: '#0E131F', surface: '#161E2D', container: '#1C2638' }
+    },
+    forest_sage: {
+      name: 'Menta',
+      light: { canvas: '#EAF4ED', surface: '#F6FAF7', container: '#D7EADC' },
+      dark:  { canvas: '#0A1610', surface: '#12241B', container: '#1A3527' }
+    },
+    midnight_indigo: {
+      name: 'Polar',
+      light: { canvas: '#E6F0F8', surface: '#F5F9FD', container: '#D1E4F3' },
+      dark:  { canvas: '#09101D', surface: '#111E35', container: '#192B4B' }
+    },
+    warm_mocha: {
+      name: 'Papiro',
+      light: { canvas: '#F5ECE1', surface: '#FCFAF6', container: '#E8DAC8' },
+      dark:  { canvas: '#150F0B', surface: '#221913', container: '#32251D' }
+    },
+    sakura_zen: {
+      name: 'Lavanda',
+      light: { canvas: '#F2EAF7', surface: '#FAF6FC', container: '#E4D3EE' },
+      dark:  { canvas: '#130B1C', surface: '#20122E', container: '#2F1B43' }
+    },
+    ocean_cyan: {
+      name: 'Glaciar',
+      light: { canvas: '#E5F3F5', surface: '#F5FAFB', container: '#CCE8EB' },
+      dark:  { canvas: '#061418', surface: '#0D2026', container: '#142E37' }
+    }
+  };
+
+  function hexToRgbString(hex) {
+    const clean = hex.replace('#', '');
+    if (clean.length !== 6) return '158, 27, 50';
+    const r = parseInt(clean.substring(0, 2), 16);
+    const g = parseInt(clean.substring(2, 4), 16);
+    const b = parseInt(clean.substring(4, 6), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return '158, 27, 50';
+    return `${r}, ${g}, ${b}`;
+  }
+
+  function hslToHex(h, s, l) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
+  }
+
+  function setupLiveThemeStudio() {
+    const root = document.documentElement;
+    const accentBtns = document.querySelectorAll('.accent-swatch-btn');
+    const canvasBtns = document.querySelectorAll('.canvas-swatch-chip');
+    const modeBtns = document.querySelectorAll('[data-theme-mode-btn]');
+    const navQuickModeBtn = document.getElementById('btn-nav-theme-mode');
+    const navModeLabel = document.getElementById('nav-theme-mode-label');
+    const summaryEl = document.getElementById('studio-active-summary');
+    const previewTitleEl = document.getElementById('preview-mini-title');
+    const previewSubEl = document.getElementById('preview-mini-sub');
+    const hueSlider = document.getElementById('studio-hue-slider');
+    const hexInput = document.getElementById('studio-hex-input');
+    const hexReadout = document.getElementById('studio-hex-readout');
+    const resetBtn = document.getElementById('btn-studio-reset');
+
+    if (!accentBtns.length) return;
+
+    let currentMode = 'light';
+    let currentAccentId = 'classic';
+    let currentCanvasId = 'classic';
+    let customPrimaryHex = null;
+
+    function applyThemeToDOM() {
+      const accentObj = ACCENT_PRESETS[currentAccentId] || ACCENT_PRESETS.classic;
+      const canvasObj = CANVAS_PRESETS[currentCanvasId] || CANVAS_PRESETS.classic;
+
+      const accentPalette = currentMode === 'dark' ? accentObj.dark : accentObj.light;
+      const canvasPalette = currentMode === 'dark' ? canvasObj.dark : canvasObj.light;
+
+      const primaryColor = customPrimaryHex || accentPalette.primary;
+      const secondaryColor = accentPalette.secondary;
+
+      // Apply data-theme-mode attribute for Dark/Light tokens
+      root.setAttribute('data-theme-mode', currentMode);
+
+      // Update reactive CSS custom properties across the entire page
+      root.style.setProperty('--brand-primary', primaryColor);
+      root.style.setProperty('--brand-primary-hover', primaryColor);
+      root.style.setProperty('--brand-primary-rgb', hexToRgbString(primaryColor));
+      root.style.setProperty('--brand-primary-light', customPrimaryHex ? `rgba(${hexToRgbString(primaryColor)}, 0.14)` : accentPalette.primaryLight);
+      root.style.setProperty('--brand-secondary', secondaryColor);
+      root.style.setProperty('--brand-secondary-rgb', hexToRgbString(secondaryColor));
+      root.style.setProperty('--brand-secondary-light', accentPalette.secondaryLight);
+
+      root.style.setProperty('--bg-canvas', canvasPalette.canvas);
+      root.style.setProperty('--bg-surface', canvasPalette.surface);
+      root.style.setProperty('--bg-surface-container', canvasPalette.container);
+
+      // Update canvas swatch preview circles to reflect light/dark mode
+      canvasBtns.forEach(chip => {
+        const presetKey = chip.getAttribute('data-bg-preset');
+        const dot = chip.querySelector('.canvas-chip-preview');
+        if (dot && CANVAS_PRESETS[presetKey]) {
+          dot.style.background = currentMode === 'dark'
+            ? CANVAS_PRESETS[presetKey].dark.canvas
+            : CANVAS_PRESETS[presetKey].light.canvas;
+        }
+      });
+
+      // Update UI labels
+      const modeName = currentMode === 'dark' ? 'Modo Oscuro' : 'Modo Claro';
+      const accentLabel = customPrimaryHex ? `Hex Studio (${primaryColor})` : accentObj.name;
+      if (summaryEl) {
+        summaryEl.textContent = `${accentLabel} • Lienzo ${canvasObj.name} • ${modeName}`;
+      }
+      if (previewTitleEl) {
+        previewTitleEl.textContent = `Vista previa: ${accentLabel} + ${canvasObj.name}`;
+      }
+      if (previewSubEl) {
+        previewSubEl.textContent = `${modeName} activo • Contraste verificado WCAG AAA en toda la web`;
+      }
+      if (hexReadout) hexReadout.textContent = primaryColor.toUpperCase();
+      if (hexInput && document.activeElement !== hexInput) {
+        hexInput.value = primaryColor.replace('#', '').toUpperCase();
+      }
+      if (navModeLabel) {
+        navModeLabel.textContent = currentMode === 'dark' ? 'Modo Oscuro' : 'Modo Claro';
+      }
+    }
+
+    // Accent preset buttons
+    accentBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentAccentId = btn.getAttribute('data-accent-preset');
+        customPrimaryHex = null;
+        accentBtns.forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+        applyThemeToDOM();
+      });
+    });
+
+    // Canvas preset buttons
+    canvasBtns.forEach(chip => {
+      chip.addEventListener('click', () => {
+        currentCanvasId = chip.getAttribute('data-bg-preset');
+        canvasBtns.forEach(c => {
+          const active = c === chip;
+          c.classList.toggle('active', active);
+          c.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+        applyThemeToDOM();
+      });
+    });
+
+    // Light / Dark segmented buttons
+    function setMode(newMode) {
+      currentMode = newMode;
+      modeBtns.forEach(b => {
+        const active = b.getAttribute('data-theme-mode-btn') === newMode;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      applyThemeToDOM();
+    }
+
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setMode(btn.getAttribute('data-theme-mode-btn'));
+      });
+    });
+
+    // Header quick mode toggle
+    if (navQuickModeBtn) {
+      navQuickModeBtn.addEventListener('click', () => {
+        setMode(currentMode === 'light' ? 'dark' : 'light');
+      });
+    }
+
+    // Custom HSL Rainbow Slider
+    if (hueSlider) {
+      hueSlider.addEventListener('input', (e) => {
+        const hue = parseInt(e.target.value, 10);
+        const lightness = currentMode === 'dark' ? 66 : 38;
+        customPrimaryHex = hslToHex(hue, 76, lightness);
+        accentBtns.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-checked', 'false');
+        });
+        applyThemeToDOM();
+      });
+    }
+
+    // Custom Hex Text Input
+    if (hexInput) {
+      hexInput.addEventListener('input', (e) => {
+        const cleaned = e.target.value.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
+        e.target.value = cleaned;
+        if (cleaned.length === 6) {
+          customPrimaryHex = `#${cleaned}`;
+          accentBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-checked', 'false');
+          });
+          applyThemeToDOM();
+        }
+      });
+    }
+
+    // Reset button
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        currentAccentId = 'classic';
+        currentCanvasId = 'classic';
+        currentMode = 'light';
+        customPrimaryHex = null;
+        accentBtns.forEach(b => {
+          const active = b.getAttribute('data-accent-preset') === 'classic';
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+        canvasBtns.forEach(c => {
+          const active = c.getAttribute('data-bg-preset') === 'classic';
+          c.classList.toggle('active', active);
+          c.setAttribute('aria-checked', active ? 'true' : 'false');
+        });
+        setMode('light');
+      });
+    }
+
+    applyThemeToDOM();
+  }
+
+  // 11. Interactive Proactive Notifications Engine Simulator (SettingsNotificationsSection.kt & NotificationSender.kt)
+  function setupNotificationsSimulator() {
+    const channelRows = document.querySelectorAll('.notif-channel-row');
+    const timingChips = document.querySelectorAll('.timing-chip');
+    const banner = document.getElementById('live-android-notif-banner');
+    const channelTag = document.getElementById('notif-channel-tag');
+    const bannerTitle = document.getElementById('notif-banner-title');
+    const bannerBody = document.getElementById('notif-banner-body');
+    const typeIcon = document.getElementById('notif-type-icon');
+    const primaryAction = document.getElementById('notif-action-primary');
+    const testBtn = document.getElementById('btn-test-notification');
+
+    if (!channelRows.length || !banner) return;
+
+    let currentChannel = 'class';
+    let classLead = '15 min';
+    let examLead = '2 días';
+
+    function getChannelPayload(channel) {
+      if (channel === 'class') {
+        return {
+          tag: 'CANAL CLASES • WORKMANAGER',
+          icon: '#icon-school',
+          title: `⏰ Clase en ${classLead}: Cálculo Diferencial`,
+          body: '08:00 - 10:00 • Aula 204 (Edificio Ciencias). Toca para abrir el cuaderno de la sesión.',
+          action: 'Abrir apunte de clase'
+        };
+      }
+      if (channel === 'exam') {
+        return {
+          tag: 'CANAL EVALUACIONES • ALARMA EXACTA',
+          icon: '#icon-quiz',
+          title: `📝 Evaluación en ${examLead}: Parcial II Optimización`,
+          body: 'Cálculo Diferencial • Representa el 35% de tu nota final. ¡Buen momento para repasar!',
+          action: 'Simular nota requerida'
+        };
+      }
+      return {
+        tag: 'RESUMEN MATUTINO • 07:00 AM',
+        icon: '#icon-lightmode',
+        title: '☀️ Buenos días: Tu agenda de hoy en NotiFast',
+        body: 'Tienes 3 clases programadas (primera a las 08:00 AM) y 1 entrega próxima esta semana.',
+        action: 'Ver agenda del día'
+      };
+    }
+
+    function updateNotifPreview(channel, pulse = true) {
+      currentChannel = channel;
+      const data = getChannelPayload(channel);
+
+      channelRows.forEach(row => {
+        const active = row.getAttribute('data-notif-channel') === channel;
+        row.classList.toggle('active-preview', active);
+        row.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      if (channelTag) channelTag.textContent = data.tag;
+      if (bannerTitle) bannerTitle.textContent = data.title;
+      if (bannerBody) bannerBody.textContent = data.body;
+      if (primaryAction) primaryAction.textContent = data.action;
+      if (typeIcon) {
+        typeIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><use href="${data.icon}"></use></svg>`;
+      }
+
+      if (pulse) {
+        banner.classList.remove('notif-pulse-trigger');
+        void banner.offsetWidth;
+        banner.classList.add('notif-pulse-trigger');
+      }
+    }
+
+    channelRows.forEach(row => {
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.timing-chip')) return;
+        const ch = row.getAttribute('data-notif-channel');
+        updateNotifPreview(ch, true);
+      });
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const ch = row.getAttribute('data-notif-channel');
+          updateNotifPreview(ch, true);
+        }
+      });
+    });
+
+    timingChips.forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ch = chip.getAttribute('data-channel');
+        const lead = chip.getAttribute('data-lead');
+
+        document.querySelectorAll(`.timing-chip[data-channel="${ch}"]`).forEach(c => {
+          c.classList.toggle('active', c === chip);
+        });
+
+        if (ch === 'class') classLead = lead;
+        if (ch === 'exam') examLead = lead;
+
+        updateNotifPreview(ch, true);
+      });
+    });
+
+    if (testBtn) {
+      testBtn.addEventListener('click', () => {
+        const data = getChannelPayload(currentChannel);
+        updateNotifPreview(currentChannel, true);
+
+        const spanEl = testBtn.querySelector('span');
+        if (spanEl) {
+          const prevText = spanEl.textContent;
+          spanEl.textContent = '¡Notificación disparada!';
+          setTimeout(() => { spanEl.textContent = prevText; }, 1800);
+        }
+
+        if (typeof window.__notifastTriggerHeroToast === 'function') {
+          window.__notifastTriggerHeroToast(data.title, data.body);
+        }
+      });
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setupStudioBox();
     setupHubInteractions();
@@ -997,6 +1606,9 @@
     setupGradeScaleSwitcher();
     setupEvaluationsCalendar();
     setupAnalyticsDashboard();
+    setupHeroPhoneMockup();
+    setupLiveThemeStudio();
+    setupNotificationsSimulator();
     initGSAPAnimations();
   });
 })();

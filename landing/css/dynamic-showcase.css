@@ -864,6 +864,7 @@
   overflow-y: auto;
 }
 
+.rendered-markdown-content h4,
 .rendered-markdown-content h5 {
   font-size: 1rem;
   font-weight: 800;
@@ -2459,3 +2460,923 @@
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   9. HERO INTERACTIVE ANDROID MOCKUP & FLOATING HEADS-UP BANNER
+   ========================================================================== */
+
+.hero-device-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1200px;
+}
+
+.hero-device-aura {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--brand-primary-rgb), 0.16) 0%, rgba(var(--brand-secondary-rgb), 0.1) 50%, transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-phone-frame {
+  position: relative;
+  width: 348px;
+  min-height: 630px;
+  background-color: var(--bg-canvas);
+  border-radius: 42px;
+  border: 9px solid #181A1F;
+  box-shadow: var(--shadow-elevated), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2;
+  transition: background-color 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth);
+}
+
+[data-theme-mode="dark"] .hero-phone-frame {
+  border-color: #2A384E;
+}
+
+/* Android Status Bar */
+.hero-phone-statusbar {
+  height: 34px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.hero-status-Right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* NotiFastTopBar.kt Replica */
+.hero-app-topbar {
+  padding: 12px 16px 10px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hero-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-avatar-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
+  border: 2px solid var(--brand-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8125rem;
+}
+
+.hero-greeting-col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.hero-greeting-name {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.hero-semester-pill {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--brand-secondary);
+}
+
+.hero-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-topbar-icon-btn {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.hero-topbar-icon-btn:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.hero-bell-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--brand-warning);
+}
+
+/* Phone Viewport Screens */
+.hero-phone-viewport {
+  flex: 1;
+  position: relative;
+  background-color: var(--bg-canvas);
+  overflow: hidden;
+}
+
+.hero-screen-pane {
+  position: absolute;
+  inset: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.28s var(--ease-smooth), transform 0.28s var(--ease-smooth), visibility 0.28s;
+  overflow-y: auto;
+  scrollbar-width: none;
+  text-align: left;
+}
+
+.hero-screen-pane::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-screen-pane.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* NotesDashboardHero Bento inside Phone */
+.phone-bento-hero {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-tactile);
+}
+
+.phone-bento-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.phone-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
+}
+
+.phone-bento-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.phone-bento-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+}
+
+.phone-metrics-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.phone-metric-pill {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.phone-metric-num {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+}
+
+.phone-metric-lbl {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.phone-note-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.phone-note-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.phone-note-subj {
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: var(--brand-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.phone-note-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.phone-note-desc {
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+/* Bottom Navigation Pill (NotiFastBottomNav.kt) */
+.hero-phone-bottomnav {
+  margin: 8px 12px 12px;
+  height: 54px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 4px;
+  gap: 4px;
+  box-shadow: var(--shadow-tactile);
+}
+
+.hero-nav-tab {
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.hero-nav-tab svg {
+  width: 17px;
+  height: 17px;
+}
+
+.hero-nav-tab.active {
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+}
+
+/* Floating Heads-Up Notification Toast on Phone */
+.hero-floating-headsup {
+  position: absolute;
+  top: 44px;
+  left: 12px;
+  right: 12px;
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--brand-primary);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 30;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-20px) scale(0.95);
+  transition: all 0.35s var(--ease-spring);
+}
+
+.hero-floating-headsup.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   10. ESTUDIO DE TEMAS DINÁMICOS & PALETAS PERSONALIZABLES (ThemeSelectorCard.kt)
+   ========================================================================== */
+
+.section-theme-studio {
+  position: relative;
+}
+
+.theme-studio-workbench {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: var(--shadow-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  transition: background-color 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth);
+}
+
+.studio-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.studio-wcag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--brand-success-light);
+  color: var(--brand-success);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* Mode Segment Switcher (Claro / Oscuro) */
+.studio-mode-segmented {
+  display: inline-flex;
+  background-color: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.mode-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.mode-seg-btn.active {
+  background-color: var(--bg-surface);
+  color: var(--brand-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Swatch Rows */
+.studio-axis-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.studio-axis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studio-axis-title {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.studio-axis-active-name {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+
+.studio-swatches-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 540px) {
+  .studio-swatches-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.theme-swatch-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background-color: var(--bg-surface-container);
+  border: 1.5px solid var(--border-hairline);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.2s var(--ease-spring), border-color 0.2s, background-color 0.2s;
+}
+
+.theme-swatch-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-primary);
+}
+
+.theme-swatch-btn.active {
+  background-color: var(--bg-surface);
+  border-color: var(--brand-primary);
+  box-shadow: 0 4px 14px rgba(var(--brand-primary-rgb), 0.16);
+}
+
+.swatch-dual-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.swatch-half-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+}
+
+.swatch-half-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+}
+
+.swatch-text-col {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.swatch-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.swatch-sub {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Background Canvas Swatches (BackgroundSwatchItems.kt) */
+.bg-swatch-preview {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  position: relative;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-swatch-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Custom Hex & HSL Studio Drawer (HexColorStudioPicker.kt) */
+.custom-hex-studio-box {
+  background-color: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hex-studio-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hex-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hex-color-well {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 2px solid var(--border-hairline);
+  background-color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.hex-text-field {
+  width: 115px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-hairline);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hue-rainbow-slider {
+  width: 100%;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.hue-rainbow-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 3px solid var(--text-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+/* ThemePreviewMiniCard.kt Replica */
+.theme-live-preview-mini {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.preview-mini-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-mini-monogram {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+
+/* ==========================================================================
+   11. MOTOR DE NOTIFICACIONES PROACTIVAS AAA (SettingsNotificationsSection.kt)
+   ========================================================================== */
+
+.notifications-simulator-card {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 28px;
+  padding: 26px;
+  box-shadow: var(--shadow-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Android Heads-Up Notification Banner Preview */
+.android-headsup-stage {
+  background-color: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.android-notif-card {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--brand-primary);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  transition: transform 0.3s var(--ease-spring), border-color 0.3s;
+}
+
+.android-notif-card.notif-pop-anim {
+  animation: notifPopBounce 0.45s var(--ease-spring);
+}
+
+@keyframes notifPopBounce {
+  0% { transform: translateY(-14px) scale(0.95); opacity: 0.5; }
+  60% { transform: translateY(3px) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.notif-app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.notif-app-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand-primary);
+}
+
+.notif-app-brand img {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.notif-content-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.notif-content-body {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.notif-actions-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.notif-deeplink-btn {
+  background: transparent;
+  border: none;
+  color: var(--brand-primary);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.notif-channel-tag {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-surface-container);
+  color: var(--text-muted);
+}
+
+/* Channel Rows & Timing Chips */
+.notif-channels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notif-channel-row {
+  background-color: var(--bg-surface-container);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  text-align: left;
+}
+
+.notif-channel-row.active {
+  background-color: var(--bg-surface);
+  border-color: var(--brand-primary);
+}
+
+.notif-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notif-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-row-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-row-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.notif-row-title {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.notif-row-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.notif-timing-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-left: 50px;
+}
+
+.timing-chip-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.timing-chip-btn.active {
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  border-color: var(--brand-primary);
+}
+
+/* ==========================================================================
+   12. DARK MODE & DYNAMIC THEME ADAPTATION FOR ALL SHOWCASE CARDS
+   ========================================================================== */
+
+.popout-item,
+.schedule-live-card,
+.note-editor-simulator,
+.rich-editor-sheet,
+.scale-chip,
+.main-average-card,
+.subject-grade-row,
+.eval-filter-chip,
+.evaluations-calendar-container,
+.agenda-eval-card,
+.sim-preset-chip,
+.analytics-dashboard-container,
+.sim-stat-box,
+.histogram-preview-card,
+.nearby-transfer-card,
+.pack-contents-box,
+.subject-feature-card,
+.footer-back-to-top {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.editor-sheet-header,
+.eval-empty-card,
+.grade-simulator-card {
+  background-color: var(--bg-surface-container);
+}
+
+.markdown-toolbar {
+  background-color: var(--bg-surface-container-high);
+}
+
+.tb-btn {
+  color: var(--text-primary);
+}
+
+.hub-floating-radar {
+  background: var(--header-glass);
+}
+

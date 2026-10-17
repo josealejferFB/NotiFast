@@ -1,14 +1,47 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-13T12:15:00Z",
-  "title": "Design System: NotiFast",
+  "generatedAt": "2026-10-17T15:40:00Z",
+  "title": "Design System: NotiFast 3.2 (Tactile Papercraft & Dynamic Academic Studio)",
   "extensions": {
     "colorMeta": {
-      "primary": { "role": "primary", "displayName": "Rojo Dinámico", "canonical": "#BF092F", "tonalRamp": ["#33020C", "#590416", "#80061F", "#A60828", "#BF092F", "#D93657", "#E6738B", "#F2B3C1"] },
-      "secondary": { "role": "secondary", "displayName": "Aqua Calma", "canonical": "#3B9797", "tonalRamp": ["#0E2828", "#184545", "#216262", "#2B7E7E", "#3B9797", "#5DB3B3", "#8ED0D0", "#C8EAEA"] }
+      "primary": {
+        "role": "primary",
+        "displayName": "Muted Crimson (NotiFast Classic)",
+        "canonical": "#9E1B32",
+        "tonalRamp": ["#3D000F", "#4C0514", "#5C1120", "#7F1728", "#9E1B32", "#C4344D", "#E05A6E", "#FDE8EB"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Studio Aqua Green",
+        "canonical": "#2A7B7B",
+        "tonalRamp": ["#042C2A", "#073532", "#0E4B47", "#1D6360", "#2A7B7B", "#38B2AC", "#7CE0DA", "#D6F2F0"]
+      },
+      "tertiary": {
+        "role": "tertiary",
+        "displayName": "Forest Sage",
+        "canonical": "#15803D",
+        "tonalRamp": ["#064E3B", "#065F46", "#14532D", "#15803D", "#22C55E", "#34D399", "#86EFAC", "#DCFCE7"]
+      }
     },
+    "themePresets": [
+      { "id": "classic", "name": "NotiFast Classic", "lightPrimary": "#9E1B32", "lightSecondary": "#2A7B7B", "darkPrimary": "#E05A6E", "darkSecondary": "#38B2AC" },
+      { "id": "forest_sage", "name": "Campus Verde", "lightPrimary": "#15803D", "lightSecondary": "#854D0E", "darkPrimary": "#34D399", "darkSecondary": "#FBBF24" },
+      { "id": "midnight_indigo", "name": "Cyber Nocturno", "lightPrimary": "#4338CA", "lightSecondary": "#0891B2", "darkPrimary": "#818CF8", "darkSecondary": "#22D3EE" },
+      { "id": "warm_mocha", "name": "Café Nórdico", "lightPrimary": "#C2410C", "lightSecondary": "#B45309", "darkPrimary": "#FB923C", "darkSecondary": "#FCD34D" },
+      { "id": "sakura_zen", "name": "Sakura Zen", "lightPrimary": "#6D28D9", "lightSecondary": "#BE185D", "darkPrimary": "#A78BFA", "darkSecondary": "#F472B6" },
+      { "id": "ocean_cyan", "name": "Minimalista Nórdico", "lightPrimary": "#0284C7", "lightSecondary": "#0F766E", "darkPrimary": "#38BDF8", "darkSecondary": "#2DD4BF" }
+    ],
+    "backgroundPresets": [
+      { "id": "classic", "name": "Pergamino", "lightBg": "#FAF9F6", "darkBg": "#0E131F" },
+      { "id": "forest_sage", "name": "Menta", "lightBg": "#EAF4ED", "darkBg": "#0A1610" },
+      { "id": "midnight_indigo", "name": "Polar", "lightBg": "#E6F0F8", "darkBg": "#09101D" },
+      { "id": "warm_mocha", "name": "Papiro", "lightBg": "#F5ECE1", "darkBg": "#150F0B" },
+      { "id": "sakura_zen", "name": "Lavanda", "lightBg": "#F2EAF7", "darkBg": "#130B1C" },
+      { "id": "ocean_cyan", "name": "Glaciar", "lightBg": "#E5F3F5", "darkBg": "#061418" }
+    ],
     "typographyMeta": {
-      "body": { "displayName": "Body", "purpose": "Contenido principal, lectura de apuntes sin distracción." }
+      "body": { "displayName": "Plus Jakarta Sans", "purpose": "Contenido editorial, lectura de apuntes por bloques y cabeceras." },
+      "mono-academic": { "displayName": "JetBrains Mono", "purpose": "Promedios ponderados, porcentajes, horarios y códigos Hex." }
     }
   },
   "components": [
@@ -16,42 +49,41 @@
       "name": "NotiFast Button",
       "kind": "button",
       "refersTo": "notifast-button",
-      "description": "Botón primario táctil y amigable.",
-      "html": "<button class=\"ds-notifast-button\">AGREGAR NOTA</button>",
-      "css": ".ds-notifast-button { background: #BF092F; color: #FFFFFF; padding: 16px 24px; border-radius: 16px; border: none; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; } .ds-notifast-button:active { opacity: 0.8; }"
+      "description": "Botón primario táctil con respuesta de resorte (scale 0.97) y contraste WCAG AAA.",
+      "html": "<button class=\"ds-notifast-button\">Guardar Apunte</button>",
+      "css": ".ds-notifast-button { background: #9E1B32; color: #FFFFFF; padding: 12px 20px; border-radius: 14px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-notifast-button:active { transform: scale(0.97); }"
     },
     {
       "name": "NotiFast Card",
       "kind": "card",
       "refersTo": "notifast-card",
-      "description": "Contenedor base para agrupar contenido académico usando superficies tonales.",
-      "html": "<div class=\"ds-notifast-card\"><h3>Matemáticas</h3><p>Evaluación 1: 90/100</p></div>",
-      "css": ".ds-notifast-card { background: #FAFAFA; padding: 16px; border-radius: 16px; font-family: sans-serif; color: #1C1B1F; border: 1px solid #E6E1E5; } .ds-notifast-card h3 { margin-top: 0; margin-bottom: 8px; font-size: 18px; } .ds-notifast-card p { margin: 0; font-size: 14px; opacity: 0.8; }"
+      "description": "Contenedor táctil papercraft con micro-borde de 1dp y superficie tonal adaptable a los 6 lienzos.",
+      "html": "<div class=\"ds-notifast-card\"><h3>Cálculo Diferencial</h3><p>Parcial II • 35% • 8.80 / 10</p></div>",
+      "css": ".ds-notifast-card { background: #FFFFFF; padding: 16px; border-radius: 20px; font-family: 'Plus Jakarta Sans', sans-serif; color: #181A1F; border: 1px solid #E5DFD7; } .ds-notifast-card h3 { margin: 0 0 6px; font-size: 18px; font-weight: 700; } .ds-notifast-card p { margin: 0; font-size: 14px; color: #4B5563; }"
     }
   ],
   "narrative": {
-    "northStar": "El Cuaderno Inteligente",
-    "overview": "NotiFast es un sistema visual diseñado para sentirse como una herramienta académica indispensable: estructurada, clara y táctil. Su estética combina la familiaridad nativa de Android (Material 3) con un enfoque puro en la productividad del estudiante. La interfaz busca reducir la ansiedad académica manteniendo el orden, ofreciendo información jerarquizada y reduciendo la carga visual innecesaria.",
+    "northStar": "El Cuaderno de Estudio Táctil, Adaptable y 100% Offline-First",
+    "overview": "NotiFast combina la calidez táctil de un cuaderno físico de estudio con un motor de temas personalizables WCAG AAA (6 paletas de acento, 6 lienzos de papel independientes y Estudio Hex/HSL libre), persistencia instantánea en Room SQLite, respaldos privados en Google Drive (appDataFolder) y notificaciones locales exactas sin ansiedad.",
     "keyCharacteristics": [
-      "Claridad Estructural: Espacios limpios y superficies tonales para evitar la saturación visual.",
-      "Familiaridad Nativa: Uso profundo de Material 3 y Jetpack Compose.",
-      "Amigable y Táctil: Componentes redondeados y accesibles que invitan a interactuar."
+      "Tactile Papercraft: Lienzos cálidos tipo papel con micro-bordes de 1dp y física elástica.",
+      "Personalización Dual AAA: Separación entre acento cromático (ThemePreset) y lienzo de papel (BackgroundPreset) + Estudio Hex/HSL.",
+      "Precisión Académica: Tipografía tabular JetBrains Mono para calificaciones, simulador de metas y temporizadores de clase."
     ],
     "rules": [
-      { "name": "The Tonal Surface Rule", "body": "Las agrupaciones y jerarquías se diferencian mediante ligeros cambios en el color de fondo (superficies tonales), no mediante líneas fuertes o sombras pesadas.", "section": "colors" },
-      { "name": "The Legibility Rule", "body": "Nunca sacrificar el contraste ni el tamaño del texto por estética. El texto es el núcleo del cuaderno académico.", "section": "typography" },
-      { "name": "The Flat-By-Default Rule", "body": "Las superficies descansan planas. La separación visual entre un NotiFastCard y el fondo principal se da por el contraste de color tonal, no por sombras.", "section": "elevation" }
+      { "name": "The Tonal Surface & 1dp Hairline Rule", "body": "Las agrupaciones y jerarquías se diferencian mediante superficies tonales y micro-bordes de 1dp (outlineVariant), nunca con sombras negras difusas.", "section": "colors" },
+      { "name": "The App-Scoped Theme Rule", "body": "Usar siempre MaterialTheme.colorScheme.isDark (luminancia del fondo) en lugar de isSystemInDarkTheme() para respetar el tema elegido dentro de NotiFast.", "section": "colors" },
+      { "name": "The WCAG AAA Contrast Rule", "body": "Todo color de acento o lienzo pasa por ThemePaletteGenerator para garantizar contraste >= 4.5:1 tanto en Modo Claro como en Modo Oscuro.", "section": "typography" }
     ],
     "dos": [
-      "Do usar los componentes atómicos definidos en `presentation/atoms/` (como `NotiFastButton`, `NotiFastCard`) antes de crear componentes custom de un solo uso.",
-      "Do utilizar el sistema de elevación tonal para separar capas de información, manteniendo el diseño plano y limpio.",
-      "Do garantizar que las pantallas ofrezcan calma visual y organización frente al caos académico."
+      "Do usar los componentes atómicos de `presentation/atoms/` (`NotiFastCard`, `NotiFastButton`, `NotiFastTopBar`, `NotiFastExpandableFab`).",
+      "Do mantener cada archivo `@Composable` en <= 250 líneas de código (SRP estricto).",
+      "Do usar `JetBrains Mono` con `tabular-nums` para notas, pesos porcentuales y horas."
     ],
     "donts": [
-      "Don't hacer que la aplicación parezca un sistema escolar antiguo y aburrido como Moodle clásico.",
-      "Don't usar interfaces de gestión corporativa o tablas de datos pesadas en pantallas móviles.",
-      "Don't saturar una pantalla de información; priorizar la claridad sobre la densidad.",
-      "Don't aplicar elevaciones (sombras) exageradas en tarjetas y contenedores de listas."
+      "Don't usar `isSystemInDarkTheme()` directamente en componentes de UI.",
+      "Don't hardcodear strings en la UI ni colores fuera de los tokens semánticos.",
+      "Don't mostrar `0.0` en rojo cuando una materia aún no tiene evaluaciones calificadas; usar `—` neutro."
     ]
   }
 }

@@ -6,21 +6,25 @@
 
 ## 🎯 1. Contexto del Proyecto
 
-**NotiFast** es una aplicación Android nativa escrita en **Kotlin** con **Jetpack Compose**. Funciona como un **hub educativo integral y cuaderno académico inteligente** para estudiantes de secundaria y universidad.
+**NotiFast** es una aplicación Android nativa **100% Offline-First** escrita en **Kotlin** con **Jetpack Compose**, acompañada de su **Landing Page Interactiva (`landing/`)**. Funciona como un **hub educativo integral y cuaderno académico inteligente** para estudiantes de secundaria y universidad.
 
 ### Propósito Dual
-1. **Producto Comercial:** Distribución gratuita en Google Play Store con experiencia pulida, moderna y sin fricciones para reducir la ansiedad académica.
-2. **Proyecto Académico de Tesis:** Demostración rigurosa del ciclo completo de ingeniería de software, arquitectura limpia, testing en aula y despliegue real.
+1. **Producto Comercial:** Distribución gratuita en Google Play Store con experiencia pulida, personalizable, moderna y sin fricciones para reducir la ansiedad académica.
+2. **Proyecto Académico de Tesis:** Demostración rigurosa del ciclo completo de ingeniería de software, Clean Architecture + MVI, **684 pruebas unitarias automatizadas**, testing en aula real y despliegue.
 
-### Stack Técnico Oficial
-- **Lenguaje:** Kotlin 2.0.21
-- **UI:** Jetpack Compose con Material 3 (BOM 2024.09.00)
-- **Backend Cloud:** Firebase (Auth, Firestore, Cloud Storage, Analytics, Crashlytics)
-- **Inyección de Dependencias (DI):** Hilt 2.59 (Dagger)
-- **Carga de Imágenes:** Coil 2.7.0
-- **Navegación:** Navigation Compose 2.8.5
-- **Background Work:** Android WorkManager (notificaciones locales programadas)
-- **Build System:** Gradle con KSP y R8/Minification
+### Stack Técnico Oficial Real (Actualizado Octubre 2026)
+- **Lenguaje:** Kotlin `2.0.21` (con KSP `2.0.21-1.0.28`)
+- **UI & Design System:** Jetpack Compose con Material 3 (`BOM 2024.09.00`), Google Fonts (`Plus Jakarta Sans` & `JetBrains Mono`) y Motor de Temas Dinámicos WCAG AAA (`ThemePreset`, `BackgroundPreset`, `ThemePaletteGenerator`, `HexColorStudioPicker`)
+- **Persistencia Primaria (100% Offline-First):** Room SQLite `2.7.2` (Esquema `v4` con migraciones no destructivas `1➔2➔3➔4`) + Jetpack DataStore Preferences `1.1.2`
+- **Cloud Backup Privado:** Google Drive REST API v3 (`appDataFolder`) vía `OkHttp 4.12.0`, `Google Credential Manager 1.3.0` y `Google ID 1.1.1` con diffing incremental SHA-256 (`CloudHubSheet`)
+- **Transferencia P2P Offline:** Paquetes `.notifast` (`GZIP + Base64`) y Código QR Offline (`ZXing 3.5.3` + `Google Play Services Code Scanner 16.1.0`)
+- **Motor de Notificaciones Proactivas:** Motor híbrido `AlarmManager.setExactAndAllowWhileIdle()` (`ExactAlarmScheduler` + `AlarmTriggerReceiver` + `BootCompletedReceiver`) + `Android WorkManager 2.10.0` (Hilt Work `1.2.0`)
+- **Telemetría:** Firebase (`BOM 33.9.0`) exclusivamente para `Analytics` y `Crashlytics` (cero uso de Firestore o Firebase Storage para datos de usuario)
+- **Inyección de Dependencias (DI):** Hilt `2.59` (Dagger)
+- **Carga de Imágenes:** Coil `2.7.0`
+- **Navegación:** Navigation Compose `2.8.5` (con soporte de Deep-Linking reactivo y BottomSheets modales unificados)
+- **Testing:** JUnit 4, MockK `1.13.8`, Coroutines Test `1.9.0`, Turbine `1.0.0`, Room Testing, OkHttp MockWebServer y Robolectric `4.13` (**684 tests unitarios en verde**)
+- **Build System:** Android Gradle Plugin (AGP) `9.0.1`, `compileSdk 36`, `minSdk 26`, R8/Minification
 
 ---
 
@@ -30,20 +34,15 @@ Antes de iniciar cualquier trabajo o responder sobre el roadmap, consulta siempr
 
 | Documento | Ubicación | Propósito |
 |---|---|---|
-| **PRD Maestro v2.0** | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) | Especificación de requisitos de producto de Fases 0 a 5 (~22 semanas). |
-| **Estado del Roadmap** | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) | Tablero de control en tiempo real: tareas completadas, en progreso y pendientes. |
-| **Kickoff Fase 0** | [`docs/prd/KICKOFF_FASE_0.md`](docs/prd/KICKOFF_FASE_0.md) | Guía de arranque y prompt de sesión para estabilización y resolución de bugs (Completada). |
-| **Kickoff Fase 1** | [`docs/prd/KICKOFF_FASE_1.md`](docs/prd/KICKOFF_FASE_1.md) | Guía de arranque y prompt de sesión para Fundamentos de Arquitectura (Completada). |
-| **Kickoff Fase 2** | [`docs/prd/KICKOFF_FASE_2.md`](docs/prd/KICKOFF_FASE_2.md) | Guía de arranque y prompt de sesión para Experiencia Core — Cuaderno y Hub Académico (Completada). |
-| **Kickoff Fase 3** | [`docs/prd/KICKOFF_FASE_3.md`](docs/prd/KICKOFF_FASE_3.md) | Guía de arranque para Sprint 3.1: Notificaciones Proactivas WorkManager (Completado). |
-| **Kickoff Fase 3.1** | [`docs/prd/KICKOFF_FASE_3.1.md`](docs/prd/KICKOFF_FASE_3.1.md) | Guía de arranque para Sprint 3.2: Analíticas Predictivas en Canvas (Completado). |
-| **Kickoff Fase 3.2** | [`docs/prd/KICKOFF_FASE_3.2.md`](docs/prd/KICKOFF_FASE_3.2.md) | Guía de arranque para Sprints 3.3 y 3.4 — Búsqueda Global y Pack Académico P2P (Completada). |
+| **Producto & Visión** | [`PRODUCT.md`](PRODUCT.md) | Posicionamiento, arquetipo visual, usuarios y principios de producto actualizados. |
+| **Sistema de Diseño 3.2** | [`DESIGN.md`](DESIGN.md) | Tokens semánticos, 6 `ThemePreset`, 6 `BackgroundPreset`, Estudio Hex/HSL y tipografía. |
+| **Impeccable Design JSON** | [`.impeccable/design.json`](.impeccable/design.json) | Esquema estructurado de tokens, componentes y reglas para auditoría visual Impeccable. |
+| **PRD Maestro v2.0** | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) | Especificación de requisitos de producto de Fases 0 a 5. |
+| **Estado del Roadmap** | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) | Tablero de control en tiempo real: 99% completado, 684 tests unitarios y entregables AAA. |
 | **Cloud Backup Spec** | [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md) | Especificación de arquitectura para Google Drive Cloud Backup (`appDataFolder`). |
-| **Cloud Backup Plan** | [`docs/superpowers/plans/2026-10-15-cloud-backup-google-drive.md`](docs/superpowers/plans/2026-10-15-cloud-backup-google-drive.md) | Plan de ejecución de 21 tareas (TDD, MVI, Drive REST API). |
-| **Matriz de Resultados Cloud** | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) | Verificación de los 51 escenarios de prueba y a11y. |
-| **Kickoff Fase 4** | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) | Guía de arranque y prompt de sesión para Pulido de Experiencia, a11y y Rendimiento (Siguiente sesión). |
-| **Auditoría Histórica** | [`docs/audit/2026-06-18-full-audit.md`](docs/audit/2026-06-18-full-audit.md) | Análisis base de seguridad, arquitectura y bugs iniciales. |
-| **Planes y Specs** | [`docs/superpowers/plans/`](docs/superpowers/plans/) y [`docs/superpowers/specs/`](docs/superpowers/specs/) | Diseños y planes de ejecución atómicos. |
+| **Matriz de Resultados Cloud** | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) | Verificación de los 51 escenarios de prueba y accesibilidad. |
+| **Kickoff Fase 4** | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) | Guía de arranque para Pulido de Experiencia, a11y y Rendimiento. |
+| **Landing Page Showcase** | [`landing/index.html`](landing/index.html) • [`https://notifast.pages.dev/`](https://notifast.pages.dev/) | Web interactiva en Cloudflare Pages (CI/CD en `.github/workflows/ci.yml`) con Estudio de Temas en Vivo y Simulador de Notificaciones. |
 
 ---
 
@@ -61,55 +60,58 @@ Todo agente operando en este repositorio debe aplicar sin excepción estos 5 pil
 
 ### 🔴 3. Test-Driven Development (TDD)
 - Construir lógica de negocio y casos de uso mediante el ciclo: **Red (Prueba que falla) ➔ Green (Implementación mínima) ➔ Refactor**.
-- Toda feature nueva o corrección de cálculo matemático (ej. promedios, pesos, solapamientos) debe contar con tests unitarios reproducibles.
+- Toda feature nueva o corrección de cálculo matemático (ej. promedios `GradePolicy`, pesos, alarmas, generador de paletas) debe contar con tests unitarios reproducibles.
 
 ### 🟣 4. Verification Before Completion (Evidencia antes de Afirmaciones)
-- **Nunca dar por terminada una tarea sin verificar:** Ejecutar `./gradlew assembleDebug` y las suites de test correspondientes.
+- **Nunca dar por terminada una tarea sin verificar:** Ejecutar `./gradlew assembleDebug` y las suites de test correspondientes (`./gradlew testDebugUnitTest`), o el detector de Impeccable para cambios web.
 - Si el código no compila o no pasa pruebas, el trabajo **NO** está terminado.
 
 ### 📋 5. Mantenimiento de Estado y Generación de Kickoff Siguiente
 - Tras culminar cualquier tarea del roadmap, es **obligatorio actualizar** el archivo [`docs/prd/STATUS.md`](docs/prd/STATUS.md).
-- Al completar el **100% de una fase**, el agente DEBE **generar automáticamente el documento `docs/prd/KICKOFF_FASE_{N+1}.md`** con el prompt detallado y la guía técnica para la fase subsiguiente (ver Protocolo en Sección 8).
+- Al completar el **100% de una fase**, el agente DEBE **generar automáticamente el documento `docs/prd/KICKOFF_FASE_{N+1}.md`** con el prompt detallado y la guía técnica para la fase subsiguiente.
 
 ---
 
 ## 🏗️ 4. Arquitectura del Sistema
 
-El proyecto implementa **Clean Architecture** estricta dividida en tres capas principales:
+El proyecto implementa **Clean Architecture** estricta dividida en tres capas principales (`360` archivos Kotlin de producción, `~44,260` LOC):
 
 ```
 app/src/main/java/com/notifast/app/
-├── data/                    # CAPA DE DATOS
-│   ├── model/               # Data classes inmutables (Note, Evaluation, Schedule, User, SubjectData, etc.)
-│   └── repository/          # Implementaciones de repositorios (Firebase Firestore, Storage, Auth)
+├── data/                    # CAPA DE DATOS (Offline-First + Drive Cloud Backup)
+│   ├── backup/              # Google Drive REST API v3 (appDataFolder), CloudDiffEngine, GlobalSnapshot
+│   ├── local/               # Room Database v4 (Entities, DAOs, Migrations 1->2->3->4), DataStore Prefs
+│   ├── model/               # Data classes inmutables (Note, NoteBlock, Evaluation, Schedule, SubjectData, Teacher)
+│   ├── notification/        # ExactAlarmSchedulerImpl, AlarmTriggerReceiver, BootCompletedReceiver, Workers
+│   └── repository/          # Implementaciones locales (Room + DataStore) y CloudBackupRepositoryImpl
 │
 ├── domain/                  # CAPA DE DOMINIO (Reglas de Negocio Puras)
+│   ├── model/               # Modelos de dominio (ThemePreset, BackgroundPreset, GradeScale, AcademicPack, etc.)
+│   ├── notification/        # ExactAlarmScheduler, NotificationSender, NotificationChannelsManager
+│   ├── policy/              # GradePolicy (fórmula única de promedios y ponderaciones)
 │   ├── repository/          # Interfaces de repositorios (Inversión de dependencias)
-│   ├── usecase/             # Casos de uso reutilizables (CalculateWeightedAverageUseCase, etc.)
-│   └── util/                # Constantes y utilidades de dominio (GradeConstants)
+│   ├── usecase/             # Casos de uso (CalculateAcademicStats, Export/ImportSubjectPack, ScheduleAlerts, etc.)
+│   └── util/                # Utilidades de dominio (ReminderTimeCalculator, TeacherFormatters, TextSpanOps)
 │
-├── presentation/            # CAPA DE PRESENTACIÓN (UI + Estado)
-│   ├── atoms/               # Design System: 15+ componentes atómicos reutilizables (NotiFast*)
-│   ├── feature/             # Features modulares (MVVM + MVI Contract)
-│   ├── navigation/          # Rutas type-safe (Screen.kt) y grafo de navegación (NavGraph.kt)
-│   └── theme/               # Sistema de diseño: Color, Typography, Shape, ThemeUtils
+├── presentation/            # CAPA DE PRESENTACIÓN (UI + Estado MVI)
+│   ├── atoms/               # Design System: Componentes atómicos reutilizables (NotiFastCard, NotiFastButton, etc.)
+│   ├── feature/             # 17 Features modulares (MVVM + MVI Contract):
+│   │   ├── notes/           # Hub principal: Cuaderno, Materias y Directorio de Profesores
+│   │   ├── noteeditor/      # Editor por bloques (OneNote-like), Markdown, LaTeX, Fotos Anotadas (ModalBottomSheet)
+│   │   ├── schedules/       # Agenda activa, Calendario mensual de evaluaciones y FAB expandible
+│   │   ├── grades/          # Calificaciones multiescala, Salud Académica y Simulador Interactivo de Meta
+│   │   ├── settings/        # Ajustes: Estudio de Temas AAA (Acentos/Lienzos/Hex), Notificaciones y Respaldo
+│   │   ├── cloud/           # CloudHubSheet: Sincronización diferencial SHA-256 con Google Drive
+│   │   ├── share/           # Exportación/Importación P2P (.notifast y Código QR Offline)
+│   │   ├── search/          # Búsqueda Global instantánea multi-entidad
+│   │   └── subjectdetail/   # Panorama de materia, cuerpo docente, apuntes y evaluaciones
+│   ├── navigation/          # Rutas type-safe (Screen.kt), Deep-Linking y grafo de navegación (NavGraph.kt)
+│   └── theme/               # Sistema de diseño 3.2: ThemePaletteGenerator, Color, Typography, ThemeUtils
 │
 └── di/                      # Inyección de Dependencias (Hilt Modules)
-    ├── AppModule.kt         # Proveedores de Firebase y servicios de sistema
-    ├── RepositoryModule.kt  # Binds de interfaces de repositorios a implementaciones
+    ├── AppModule.kt         # Proveedores de Room, DataStore, WorkManager, CredentialManager y OkHttp
+    ├── RepositoryModule.kt  # Binds de interfaces de repositorios a implementaciones locales/Drive
     └── UseCaseModule.kt     # Inyección de casos de uso
-```
-
-### Patrón por Feature (MVVM + MVI Contract)
-
-Cada feature reside en su propia carpeta bajo `presentation/feature/{nombre}/`:
-
-```
-feature/{nombre}/
-├── {Nombre}Screen.kt        # Composable principal (declarativo, sin lógica)
-├── {Nombre}ViewModel.kt     # ViewModel anotado con @HiltViewModel
-├── {Nombre}Contract.kt      # UiState (data class única) + Event (sealed interface)
-└── components/               # Sub-composables modulares (si la pantalla supera ~250 LOC)
 ```
 
 ---
@@ -118,22 +120,18 @@ feature/{nombre}/
 
 ### 🧹 1. Límite de Tamaño y Responsabilidad Única (SRP)
 - **Máximo ~250 líneas por archivo composable.**
-- Si una pantalla o componente supera las 250 líneas (como ocurría con `NotesScreen` o `GradesScreen`), **debe subdividirse** extrayendo sub-composables a `components/` o `atoms/`.
+- Si una pantalla o componente supera las 250 líneas, **debe subdividirse** extrayendo sub-composables a `components/` o `atoms/`.
 - Cero composables "Dios" que mezclen layout, lógica, filtros y diálogos en un solo bloque.
 
 ### 🧠 2. Principios KISS & YAGNI y Estado MVI
 - **Un solo StateFlow por ViewModel:** `val uiState: StateFlow<FeatureUiState> = _uiState.asStateFlow()`.
 - **Prohibido:** Crear StateFlows paralelos o huérfanos (`_saved`, `_isLoading`) fuera del `UiState`.
 - **Punto único de interacción UI ➔ ViewModel:** `onEvent(event: FeatureEvent)`.
-- Resolver estrictamente la necesidad actual sin sobre-diseñar ni introducir abstracciones especulativas.
 
-### 🎨 3. Design Tokens, Colores y Componentes Atómicos
-- **Colores Corporativos:**
-  * **Ruby** (`#BF092F`): Acciones primarias, alertas, evaluaciones.
-  * **Aqua** (`#3B9797`): Acciones secundarias, confirmaciones, estados de éxito.
-- **Prohibido:** Hardcodear colores arbitrarios como `Color(0xFF...)`, `Color.Red` o parsear strings Hex directamente en composables.
-- **Obligatorio:** Utilizar `MaterialTheme.colorScheme.*` y centralizar el parseo dinámico de colores de materias en `ThemeUtils`.
-- **Uso de Átomos:** Usar **SIEMPRE** los componentes existentes en `presentation/atoms/` (`NotiFastButton`, `NotiFastCard`, `NotiFastTextField`, `NotiFastDialog`, `NotiFastTopBar`, `NotiFastEmptyState`) antes de crear componentes ad-hoc.
+### 🎨 3. Design Tokens, Motor de Temas y Componentes Atómicos
+- **Apego al Tema de la App:** Usar siempre `MaterialTheme.colorScheme.isDark` (`background.luminance() < 0.5f`) en lugar de `isSystemInDarkTheme()` para respetar el modo Claro/Oscuro seleccionado dentro de NotiFast.
+- **Prohibido:** Hardcodear colores arbitrarios o parsear strings Hex directamente en composables sin pasar por `ThemePaletteGenerator` o `ThemeUtils`.
+- **Uso de Átomos:** Usar **SIEMPRE** los componentes existentes en `presentation/atoms/` (`NotiFastButton`, `NotiFastCard`, `NotiFastTextField`, `NotiFastDialog`, `NotiFastTopBar`, `NotiFastEmptyState`, `NotiFastExpandableFab`) antes de crear componentes ad-hoc.
 
 ### 🌐 4. Cero Strings Hardcodeados en UI
 - Todo texto visible para el usuario DEBE residir en `res/values/strings.xml` y consumirse mediante `stringResource(R.string.xxx)`.
@@ -141,16 +139,15 @@ feature/{nombre}/
 
 ### ⚖️ 5. Cero Lógica de Negocio en Composables
 - Los `@Composable` son **exclusivamente declarativos**.
-- Prohibido realizar cálculos matemáticos (ej. promedios ponderados), ordenamientos pesados, validaciones de regex complejas o formateo de fechas dentro de la composición. Toda la lógica pertenece al ViewModel o Use Cases.
+- Prohibido realizar cálculos matemáticos (promedios ponderados, proyecciones de notas, diffing SHA-256) dentro de la composición. Toda la lógica pertenece al ViewModel, `GradePolicy` o Use Cases.
 
 ### 🚨 6. Manejo Riguroso de Excepciones
 - **Prohibido tragar errores:** Cero bloques `try { ... } catch (e: Exception) {}` vacíos.
-- Toda operación de escritura en repositorios debe envolverse en `try/catch` y retornar `Result<T>`.
-- Las excepciones deben registrarse con `Log.e(...)` o enviarse a Crashlytics, y propagarse al `uiState.error` para dar feedback visual (Snackbar/Diálogo) al usuario.
+- Toda operación de escritura o red debe envolverse en `try/catch` y retornar `Result<T>`.
 
 ### ⚡ 7. Compose y Ciclo de Vida
 - Usar `collectAsStateWithLifecycle()` para observar StateFlows.
-- Usar `LaunchedEffect` para side-effects (como navegación post-login o snackbars). **NUNCA** disparar navegación directamente durante la fase de composición.
+- Usar `LaunchedEffect` para side-effects (navegación, snackbars, permisos). **NUNCA** disparar navegación directamente durante la fase de composición.
 - Cero wildcard imports (`import foo.bar.*`) — importar cada clase explícitamente.
 
 ---
@@ -159,91 +156,13 @@ feature/{nombre}/
 
 | # | Anti-Patrón | Acción Correctiva Obligatoria |
 |---|---|---|
-| 1 | Poner cálculos o lógica de negocio en Composables | Extraer a ViewModel o a un Use Case en `domain/usecase/`. |
+| 1 | Poner cálculos o lógica de negocio en Composables | Extraer a ViewModel, `GradePolicy` o a un Use Case en `domain/usecase/`. |
 | 2 | Crear StateFlows dispersos fuera de `UiState` | Unificar todo el estado en un único `data class FeatureUiState`. |
-| 3 | Usar `.collect` infinito para cargas de un solo disparo | Usar `.first()` para operaciones one-shot (ej. carga en `EditEvaluation`). |
+| 3 | Usar `isSystemInDarkTheme()` en componentes UI | Usar `MaterialTheme.colorScheme.isDark` para respetar el tema interno de la app. |
 | 4 | Tragar excepciones con `catch(e) {}` vacío | Loguear el error y propagar `Result.failure(e)` al ViewModel. |
 | 5 | Hardcodear colores o textos en la UI | Usar `MaterialTheme.colorScheme` y `stringResource(R.string.*)`. |
 | 6 | Archivos composable > 250 líneas | Modularizar y extraer sub-componentes a `components/` o `atoms/`. |
-| 7 | Navegar durante la composición | Envolver la navegación en `LaunchedEffect(uiState.isSuccess)`. |
+| 7 | Navegar durante la composición | Envolver la navegación en `LaunchedEffect(...)`. |
 | 8 | Modificar código sin investigar la causa raíz | Seguir el protocolo `systematic-debugging`. |
-| 9 | Dar una tarea por completada sin compilar | Ejecutar `./gradlew assembleDebug` y verificar tests. |
-| 10 | Versionar credenciales o secrets | Mantener `google-services.json` ignorado y variables en `BuildConfig`. |
-
----
-
-## 🔄 7. Workflow Estándar para Ejecutar Tareas
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 1. INSPECCIÓN Y CONTEXTO                                    │
-│    Consultar PRD Maestro, STATUS.md y explorar con CodeGraph│
-└──────────────────────────────┬──────────────────────────────┘
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 2. TDD & DISEÑO QUIRÚRGICO                                  │
-│    Escribir prueba unitaria que falle (Red) o aislar bug    │
-└──────────────────────────────┬──────────────────────────────┘
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 3. IMPLEMENTACIÓN (KISS / YAGNI / Clean Architecture)       │
-│    Escribir código modular (≤ 250 LOC), sin anti-patrones   │
-└──────────────────────────────┬──────────────────────────────┘
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 4. VERIFICACIÓN BASADA EN EVIDENCIA                         │
-│    Compilar con ./gradlew assembleDebug y ejecutar tests    │
-└──────────────────────────────┬──────────────────────────────┘
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 5. ACTUALIZACIÓN DE ESTADO & TRANSICIÓN                     │
-│    Actualizar docs/prd/STATUS.md y generar KICKOFF siguiente│
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🏁 8. Protocolo Obligatorio de Cierre de Fase y Transición
-
-Al completar el 100% de las tareas de cualquier fase (Fase 0, Fase 1, Fase 2, Fase 3, Fase 4), el agente **DEBE ejecutar automáticamente** la siguiente secuencia de cierre antes de dar por concluida la sesión:
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│ 1. VERIFICACIÓN INTEGRAL DE SUITE DE PRUEBAS Y BUILD             │
-│    Ejecutar ./gradlew assembleDebug y validar cero regresiones   │
-└────────────────────────────────┬─────────────────────────────────┘
-                                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│ 2. ACTUALIZACIÓN DE STATUS.md                                    │
-│    Marcar fase al 100%, registrar fecha y actualizar métricas    │
-└────────────────────────────────┬─────────────────────────────────┘
-                                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│ 3. GENERACIÓN DEL KICKOFF DE LA SIGUIENTE FASE                   │
-│    Crear docs/prd/KICKOFF_FASE_{N+1}.md con prompt y guía técnica│
-└────────────────────────────────┬─────────────────────────────────┘
-                                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│ 4. ACTUALIZACIÓN DE ÍNDICES DE DOCUMENTACIÓN                     │
-│    Enlazar el nuevo Kickoff en README.md y AGENTS.md             │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-### 📝 Estándar Obligatorio para `docs/prd/KICKOFF_FASE_{N}.md`
-
-Cada nuevo archivo de Kickoff generado debe replicar con máxima rigurosidad la estructura de [`KICKOFF_FASE_0.md`](docs/prd/KICKOFF_FASE_0.md):
-
-1. **Prompt Copiable de Arranque:**
-   - Referencia obligatoria a `PRD-MAESTRO-NOTIFAST.md`, `STATUS.md` y `AGENTS.md`.
-   - Invocación explícita de skills requeridas (`systematic-debugging`, `test-driven-development`, `verification-before-completion`, `codegraph`, `impeccable`).
-   - Bloque de estándares de higiene de código (KISS, YAGNI, ≤ 250 LOC, tokens de diseño, cero strings quemados, cero lógica en UI, `Result<T>`).
-   - Desglose sprint por sprint de las tareas exactas de la fase entrante.
-2. **Buenas Prácticas y Anti-Patrones Críticos:**
-   - Recordatorio específico de los errores comunes y directivas de diseño aplicables a las features de esa fase.
-3. **Matriz de Skills Requeridas:**
-   - Detalle de qué skill utilizar y en qué momento durante esa fase específica.
-4. **Lista Detallada de Tareas y Criterios de Aceptación:**
-   - Especificaciones técnicas por componente/feature.
-5. **Reglas de Oro de Ejecución:**
-   - Conservación de Clean Architecture, no componentes ad-hoc, no secrets versionados y preservación del idioma.
-
+| 9 | Dar una tarea por completada sin compilar | Ejecutar `./gradlew assembleDebug` y verificar tests (`684` tests). |
+| 10 | Versionar credenciales o secrets | Mantener `google-services.json` y `local.properties` ignorados y variables en `BuildConfig`. |
