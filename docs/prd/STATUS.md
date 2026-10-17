@@ -868,7 +868,12 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
    - Conversión honesta y directa: sustitución de modales disculpatorios por enlaces de descarga directa al APK oficial v1.0 RC alojado en GitHub Releases.
    - Ocultamiento de la barra radar flotante en móviles y tablets (`<= 992px`) para eliminar 50px de oclusión vertical y micro-chips ilegibles.
    - Contraste WCAG AAA reforzado (`--text-muted: #475569`, ratio >6.3:1) y etiquetas de materias con contraste óptimo.
-   - Suite completa de 22/22 pruebas Python en verde (`test_landing_structure.py` y `test_landing_e2e.py`) y 0 errores / 0 advertencias en el detector Impeccable.
+7. **Destilación Impeccable Estudiantil & Limpieza de Badges / Jerga Técnica:**
+   - **Emblema Académico Formal:** Sustitución del marco de smartphone por el escenario interactivo `#hero-logo-stage` con el logo oficial NotiFast, efecto de inclinación 3D táctil y 4 nodos satélites académicos claros.
+   - **Purga de Jerga y Badges IA-Slop:** Eliminación integral de chips de alarde técnico (`WCAG AAA`, `EST. 2026`, `Kotlin 2.0`, `Jetpack Compose`, `Room SQLite`, `IEEE 754`, `WorkManager`) sustituyéndolos por beneficios directos para el estudiante (`Sin Conexión`, `Sin Anuncios`, `Modo Claro, Oscuro y Papel`, `Cálculo exacto de notas`).
+   - **Simplificación del Estudio de Temas:** Remoción total de la barra de selección hexadecimal y matiz HSL, conservando exclusivamente la selección limpia y curada de 6 paletas de acento, 6 lienzos de papel suave y el conmutador de modo claro/oscuro.
+   - **Lettering Conciso & Directo al Estudiante:** Reducción del texto denso en todas las secciones de características a 1-2 oraciones claras y viñetas simplificadas a un máximo de 2 puntos concisos orientados a beneficios reales.
+   - **Higiene de Código & Verificación:** Eliminación de CSS y funciones JS huérfanas (`hslToHex`, `.hex-controls-row`, `.hex-input-wrap`, animaciones del hub orbital descartado). Verificación completa con 22/22 pruebas unitarias pasando y 0 errores en el detector Impeccable.
 
 ---
 

@@ -183,42 +183,6 @@
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReducedMotion) return;
 
-    // A. Initial entry of popout items (if hub section exists)
-    if (document.querySelector('.magic-box-showcase')) {
-      gsap.from('.popout-item', {
-        scale: 0.92,
-        opacity: 0,
-        duration: 0.65,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: '.magic-box-showcase',
-          start: 'top 80%'
-        }
-      });
-
-      // B. Scrollytelling Choreography (Desktop orbital layout > 860px only)
-      if (window.innerWidth > 860) {
-        ScrollTrigger.create({
-          trigger: '.notifast-hub-showcase',
-          start: 'top 20%',
-          end: 'bottom top',
-          scrub: 1.2,
-          onUpdate: (self) => {
-            if (window.innerWidth <= 860) return;
-            const p = self.progress;
-            gsap.to('.popout-notes', { x: -45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-            gsap.to('.popout-grades', { x: 45 * p, y: 70 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-            gsap.to('.popout-agenda', { x: -55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-            gsap.to('.popout-nearby', { x: 55 * p, y: 110 * p, opacity: 1 - 0.6 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-            gsap.to('.popout-subjects', { xPercent: -50, y: 50 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-            gsap.to('.popout-alerts', { xPercent: -50, y: 120 * p, opacity: 1 - 0.7 * p, scale: 1 - 0.15 * p, overwrite: 'auto' });
-            gsap.to('.notifast-floating-brand', { scale: 1 - 0.12 * p, opacity: 1 - 0.25 * p, overwrite: 'auto' });
-          }
-        });
-      }
-    }
-
     // C. Zig-zag rows animation with section landing triggers (subtle translation without opacity suppression)
     const rows = document.querySelectorAll('.dynamic-feature-row');
     const isDesktop = window.innerWidth > 991;
@@ -271,16 +235,15 @@
       }
     });
 
-    // E. Subjects cards stagger
+    // E. Subjects cards stagger (subtle translation without opacity suppression)
     gsap.from('.subject-feature-card', {
-      y: 35,
-      opacity: 0,
-      duration: 0.65,
-      stagger: 0.1,
-      ease: 'back.out(1.4)',
+      y: 20,
+      duration: 0.6,
+      stagger: 0.08,
+      ease: 'power2.out',
       scrollTrigger: {
         trigger: '.subjects-gallery-section',
-        start: 'top 80%'
+        start: 'top 85%'
       }
     });
   }
@@ -963,17 +926,6 @@
     const b = parseInt(clean.substring(4, 6), 16);
     if (isNaN(r) || isNaN(g) || isNaN(b)) return '158, 27, 50';
     return `${r}, ${g}, ${b}`;
-  }
-
-  function hslToHex(h, s, l) {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
-    const f = n => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color).toString(16).padStart(2, '0');
-    };
-    return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
   }
 
   function setupLiveThemeStudio() {
