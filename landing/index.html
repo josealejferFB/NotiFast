@@ -350,111 +350,77 @@
           </div>
         </div>
 
-        <!-- Columna Derecha: Dispositivo Android Interactivo en Vivo -->
-        <div class="hero-device-stage">
-          <div class="hero-device-glow" aria-hidden="true"></div>
+        <!-- Columna Derecha: Emblema Académico & Motion del Logo NotiFast -->
+        <div class="hero-motion-stage" id="hero-logo-stage" aria-label="Emblema académico interactivo de NotiFast">
+          <!-- Aura ambiental suave y destellos de precisión -->
+          <div class="emblem-aura" aria-hidden="true"></div>
 
-          <!-- Toast Flotante de Notificación Proactiva en el Teléfono -->
-          <div class="hero-floating-headsup" id="hero-phone-headsup" role="status" aria-live="polite">
-            <div class="headsup-icon-circle">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
+          <!-- Anillos concéntricos geométricos de precisión (Astrolabio y compás académico) -->
+          <div class="emblem-orbit-outer" aria-hidden="true"></div>
+          <div class="emblem-orbit-inner" aria-hidden="true"></div>
+
+          <!-- Escudo / Tarjeta central de NotiFast -->
+          <div class="emblem-shield" id="emblem-shield">
+            <div class="emblem-watermark-tag">EST. 2026 • ANDROID NATIVO</div>
+
+            <!-- Marco de relieve y resplandor del Logo -->
+            <div class="emblem-icon-frame">
+              <div class="emblem-logo-glow" aria-hidden="true"></div>
+              <img src="assets/logo.png" alt="NotiFast Logo Oficial" class="emblem-logo-img" width="88" height="88">
             </div>
-            <div class="headsup-copy">
-              <div class="headsup-title-row">
-                <span class="headsup-title" id="hero-headsup-title">Clase en 15 min: Cálculo</span>
-                <span class="headsup-time">Ahora</span>
+
+            <!-- Nombre de marca e identidad académica -->
+            <div class="emblem-brand-card">
+              <span class="emblem-brand-title">NotiFast</span>
+              <span class="emblem-brand-subtitle">Cuaderno Académico Inteligente</span>
+              <div class="emblem-pills-row">
+                <span class="emblem-spec-pill"><span class="emblem-dot-live"></span> 100% Offline</span>
+                <span class="emblem-spec-pill">Room SQLite</span>
+                <span class="emblem-spec-pill">WCAG AAA</span>
               </div>
-              <p class="headsup-desc" id="hero-headsup-desc">08:00 - 10:00 • Aula 204. Toca para preparar tu apunte.</p>
             </div>
           </div>
 
-          <!-- Chasis del Dispositivo Android (NotiFast Mobile Preview) -->
-          <div class="hero-phone-frame" aria-label="Vista previa interactiva de la app móvil NotiFast">
-            <!-- Barra de Estado Android -->
-            <div class="phone-status-bar" aria-hidden="true">
-              <span>07:45</span>
-              <div class="phone-camera-pill"></div>
-              <div class="phone-status-icons">
-                <span>5G</span>
-                <span>100%</span>
+          <!-- Nodos Satélites de los 4 Pilares Académicos -->
+          <div class="emblem-satellites-group">
+            <div class="emblem-node node-nw" title="Editor por Bloques, Markdown & LaTeX">
+              <div class="node-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
+              </div>
+              <div class="node-text">
+                <span class="node-title">Apuntes &amp; LaTeX</span>
+                <span class="node-sub">Bloques MVI</span>
               </div>
             </div>
 
-            <!-- NotiFastTopBar -->
-            <div class="phone-app-topbar">
-              <div class="phone-topbar-title">
-                <img src="assets/logo.png" alt="" aria-hidden="true">
-                <span id="phone-topbar-label">NotiFast</span>
+            <div class="emblem-node node-ne" title="Cálculo de Promedios Ponderados y Simulador de Metas">
+              <div class="node-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
               </div>
-              <div class="phone-topbar-actions">
-                <button type="button" class="phone-icon-btn" id="btn-phone-trigger-notif" title="Probar alerta proactiva en el teléfono" aria-label="Disparar notificación de prueba en el teléfono">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-notifications"></use></svg>
-                </button>
-                <a href="#temas" class="phone-icon-btn" title="Personalizar tema de la app" aria-label="Ir al estudio de temas">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
-                </a>
+              <div class="node-text">
+                <span class="node-title">Ponderación Exacta</span>
+                <span class="node-sub">Fórmula GradePolicy</span>
               </div>
             </div>
 
-            <!-- Cuerpo Dinámico Cambiable por Pestañas (Apuntes / Agenda / Notas / Ajustes) -->
-            <div class="phone-screen-body" id="phone-screen-body">
-              <!-- Contenido inyectado/actualizado por setupHeroPhoneMockup() con fallback inicial rico -->
-              <div class="phone-live-class-pill">
-                <div class="phone-live-top">
-                  <span class="phone-live-badge"><span class="beacon-mini-dot"></span> EN CURSO AHORA</span>
-                  <span class="phone-live-rem">Faltan 45 min</span>
-                </div>
-                <div class="phone-live-subj">Cálculo Diferencial</div>
-                <div class="phone-live-meta">08:00 - 10:00 • Aula 204 • Prof. Gómez</div>
-                <div class="phone-live-bar">
-                  <div class="phone-live-bar-fill"></div>
-                </div>
+            <div class="emblem-node node-sw" title="Alertas Proactivas Híbridas ExactAlarm & WorkManager">
+              <div class="node-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-notifications"></use></svg>
               </div>
-
-              <div class="phone-avg-mini">
-                <div>
-                  <span class="phone-avg-label">PROMEDIO PONDERADO</span>
-                  <span class="phone-avg-sub">4 materias activas • Escala 0-10</span>
-                </div>
-                <span class="phone-avg-val" id="phone-mini-avg-val">8.70</span>
-              </div>
-
-              <div class="phone-notes-mini-list">
-                <div class="phone-note-mini-card">
-                  <div class="phone-note-mini-head">
-                    <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
-                    <span class="phone-note-mini-tag" style="background: rgba(29,78,216,0.12); color: #1D4ED8;">Cálculo</span>
-                  </div>
-                  <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
-                </div>
-                <div class="phone-note-mini-card">
-                  <div class="phone-note-mini-head">
-                    <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
-                    <span class="phone-note-mini-tag" style="background: rgba(15,118,110,0.12); color: #115E59;">Física</span>
-                  </div>
-                  <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
-                </div>
+              <div class="node-text">
+                <span class="node-title">Alertas Proactivas</span>
+                <span class="node-sub">ExactAlarm Cero Ansiedad</span>
               </div>
             </div>
 
-            <!-- Barra de Navegación Inferior Material 3 (4 Pestañas Reales de la App) -->
-            <div class="phone-bottom-nav" role="tablist" aria-label="Navegación del teléfono interactivo">
-              <button type="button" class="phone-nav-tab active" data-phone-tab="apuntes" role="tab" aria-selected="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
-                <span>Apuntes</span>
-              </button>
-              <button type="button" class="phone-nav-tab" data-phone-tab="agenda" role="tab" aria-selected="false">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-event"></use></svg>
-                <span>Agenda</span>
-              </button>
-              <button type="button" class="phone-nav-tab" data-phone-tab="notas" role="tab" aria-selected="false">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>
-                <span>Notas</span>
-              </button>
-              <button type="button" class="phone-nav-tab" data-phone-tab="ajustes" role="tab" aria-selected="false">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-settings"></use></svg>
-                <span>Ajustes</span>
-              </button>
+            <div class="emblem-node node-se" title="Google Drive Privado appDataFolder y Transferencia P2P QR">
+              <div class="node-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-cloud-drive"></use></svg>
+              </div>
+              <div class="node-text">
+                <span class="node-title">Cloud Backup &amp; P2P</span>
+                <span class="node-sub">SHA-256 + QR Offline</span>
+              </div>
             </div>
           </div>
         </div>

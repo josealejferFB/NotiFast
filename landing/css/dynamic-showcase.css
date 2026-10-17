@@ -2130,421 +2130,319 @@
 }
 
 /* ==========================================================================
-   9. HERO INTERACTIVE ANDROID MOCKUP & FLOATING HEADS-UP BANNER
+   9. HERO ACADEMIC MOTION STAGE & EMBLEM LOGO SHOWCASE
    ========================================================================== */
 
-.hero-device-stage {
+.hero-motion-stage {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
+  min-height: 440px;
   margin: 0 auto;
+  perspective: 1000px;
+  user-select: none;
 }
 
-.hero-device-aura,
-.hero-device-glow {
+/* Ambient Breathing Aura */
+.emblem-aura {
   position: absolute;
-  width: min(360px, 88vw);
-  height: min(360px, 88vw);
+  width: min(390px, 90vw);
+  height: min(390px, 90vw);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(24, 26, 31, 0.08) 0%, rgba(var(--brand-secondary-rgb), 0.1) 50%, transparent 72%);
+  background: radial-gradient(circle, rgba(var(--brand-primary-rgb), 0.14) 0%, rgba(var(--brand-secondary-rgb), 0.08) 46%, transparent 72%);
+  filter: blur(28px);
   pointer-events: none;
   z-index: 0;
+  animation: emblemAuraBreath 8s ease-in-out infinite alternate;
 }
 
-.hero-phone-frame {
+/* Geometric Concentric Precision Rings (Academic Astrolabe/Compass) */
+.emblem-orbit-outer {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  border: 1px dashed rgba(var(--brand-primary-rgb), 0.22);
+  pointer-events: none;
+  z-index: 1;
+  animation: emblemOrbitRotate 90s linear infinite;
+}
+
+.emblem-orbit-inner {
+  position: absolute;
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  border: 1px solid var(--border-hairline);
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Central Tactile Shield */
+.emblem-shield {
   position: relative;
-  width: 100%;
-  max-width: 348px;
-  min-height: 560px;
-  background-color: var(--bg-canvas);
-  border-radius: 38px;
-  border: 8px solid #181A1F;
-  box-shadow: var(--shadow-elevated), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+  z-index: 3;
+  width: 268px;
+  padding: 24px 20px;
+  background-color: var(--bg-surface);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 28px;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  z-index: 2;
-  transition: background-color 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth);
-}
-
-[data-theme-mode="dark"] .hero-phone-frame {
-  border-color: #2A384E;
-}
-
-/* Android Status Bar */
-.hero-phone-statusbar,
-.phone-status-bar {
-  min-height: 38px;
-  padding: 8px 18px;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
+  text-align: center;
+  transform-style: preserve-3d;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s var(--ease-smooth);
+  animation: emblemShieldLevitate 6s ease-in-out infinite alternate;
+}
+
+[data-theme-mode="dark"] .emblem-shield {
+  background-color: rgba(22, 27, 34, 0.88);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+.emblem-watermark-tag {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  color: var(--text-primary);
-  background-color: transparent;
-}
-
-.phone-camera-pill {
-  width: 54px;
-  height: 12px;
+  letter-spacing: 0.08em;
+  color: var(--brand-secondary);
+  background-color: var(--brand-secondary-light);
+  padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background-color: #181A1F;
+  margin-bottom: 16px;
 }
 
-.hero-status-Right,
-.phone-status-icons {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* NotiFastTopBar.kt Replica */
-.hero-app-topbar,
-.phone-app-topbar {
-  padding: 10px 14px;
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-hairline);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.phone-topbar-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9375rem;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.phone-topbar-title img {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-}
-
-.hero-topbar-actions,
-.phone-topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.hero-topbar-icon-btn,
-.phone-icon-btn {
+.emblem-icon-frame {
   position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--bg-surface-container);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-primary);
-  display: inline-flex;
+  width: 96px;
+  height: 96px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 0.15s, border-color 0.15s, color 0.15s;
+  margin-bottom: 14px;
 }
 
-.hero-topbar-icon-btn svg,
-.phone-icon-btn svg {
-  width: 18px;
-  height: 18px;
+.emblem-logo-glow {
+  position: absolute;
+  inset: 6px;
+  border-radius: 22px;
+  background: radial-gradient(circle, rgba(var(--brand-primary-rgb), 0.3) 0%, transparent 75%);
+  filter: blur(10px);
+  pointer-events: none;
+  transition: transform 0.4s var(--ease-smooth), opacity 0.4s var(--ease-smooth);
 }
 
-.hero-topbar-icon-btn:hover,
-.phone-icon-btn:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
+.emblem-logo-img {
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s var(--ease-smooth);
 }
 
-/* Phone Viewport Body */
-.phone-screen-body {
-  flex: 1;
-  padding: 14px;
+.emblem-brand-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background-color: var(--bg-canvas);
-  overflow-y: auto;
-  text-align: left;
-}
-
-.phone-live-class-pill {
-  background-color: transparent;
-  border-bottom: 1.5px solid var(--border-hairline);
-  border-radius: 0;
-  padding: 4px 2px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.phone-live-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.phone-live-badge {
-  display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.75rem;
+}
+
+.emblem-brand-title {
+  font-family: var(--font-sans);
+  font-size: 1.45rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--brand-primary);
-  background: var(--brand-primary-light);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.emblem-brand-subtitle {
+  font-size: 0.78125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.emblem-pills-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.emblem-spec-pill {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background-color: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
   padding: 3px 8px;
   border-radius: var(--radius-pill);
-}
-
-.phone-live-rem {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
-.phone-live-subj {
-  font-size: 0.9375rem;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.phone-live-meta {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.phone-live-bar {
-  width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background-color: var(--bg-surface-container);
-  overflow: hidden;
-  margin-top: 2px;
-}
-
-.phone-live-bar-fill {
-  width: 65%;
-  height: 100%;
-  border-radius: 999px;
-  background-color: var(--brand-primary);
-}
-
-.phone-avg-mini {
-  background-color: transparent;
-  border-bottom: 1px solid var(--border-hairline);
-  border-radius: 0;
-  padding: 6px 2px 12px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.phone-avg-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--brand-secondary);
-}
-
-.phone-avg-sub {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.phone-avg-val {
-  font-family: var(--font-mono);
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--brand-primary);
-}
-
-.phone-notes-mini-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.phone-note-mini-card {
-  background-color: transparent;
-  border-bottom: 1px solid var(--border-hairline);
-  border-radius: 0;
-  padding: 8px 2px;
-  display: flex;
-  flex-direction: column;
   gap: 4px;
 }
 
-.phone-note-mini-head {
+.emblem-dot-live {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10B981;
+}
+
+/* 4 Satellite Pillar Nodes */
+.emblem-satellites-group {
+  display: contents;
+}
+
+.emblem-node {
+  position: absolute;
+  z-index: 4;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  gap: 9px;
+  background-color: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-hairline);
+  padding: 8px 13px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
+  cursor: default;
+  transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), border-color 0.25s var(--ease-smooth);
 }
 
-.phone-note-mini-title {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--text-primary);
+[data-theme-mode="dark"] .emblem-node {
+  background-color: rgba(22, 27, 34, 0.9);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.35);
 }
 
-.phone-note-mini-tag {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: var(--radius-pill);
+.emblem-node:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: var(--brand-primary);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12);
+}
+
+.emblem-node.node-nw {
+  top: 18px;
+  left: -12px;
+  animation: emblemNodeFloat1 5.6s ease-in-out infinite alternate;
+}
+
+.emblem-node.node-ne {
+  top: 26px;
+  right: -16px;
+  animation: emblemNodeFloat2 6.2s ease-in-out infinite alternate;
+}
+
+.emblem-node.node-sw {
+  bottom: 28px;
+  left: -16px;
+  animation: emblemNodeFloat2 6s ease-in-out infinite alternate -1.2s;
+}
+
+.emblem-node.node-se {
+  bottom: 20px;
+  right: -12px;
+  animation: emblemNodeFloat1 5.8s ease-in-out infinite alternate -2.1s;
+}
+
+.node-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background-color: var(--bg-surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-primary);
   flex-shrink: 0;
 }
 
-.phone-note-mini-preview {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.35;
-  margin: 0;
-}
-
-/* Bottom Navigation Pill (NotiFastBottomNav.kt) */
-.hero-phone-bottomnav,
-.phone-bottom-nav {
-  margin: 0;
-  min-height: 54px;
-  background-color: var(--bg-surface);
-  border-top: 1px solid var(--border-hairline);
-  border-radius: 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 4px;
-  gap: 4px;
-}
-
-.hero-nav-tab,
-.phone-nav-tab {
-  border: none;
-  background: transparent;
-  border-radius: 12px;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  color: var(--text-muted);
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s var(--ease-smooth);
-}
-
-.hero-nav-tab svg,
-.phone-nav-tab svg {
+.node-icon svg {
   width: 18px;
   height: 18px;
 }
 
-.hero-nav-tab.active,
-.phone-nav-tab.active {
-  background-color: var(--brand-primary-light);
-  color: var(--brand-primary);
-}
-
-/* Floating Heads-Up Notification Toast on Phone */
-.hero-floating-headsup {
-  position: absolute;
-  top: 40px;
-  left: 14px;
-  right: 14px;
-  max-width: 320px;
-  margin: 0 auto;
-  background-color: var(--bg-surface);
-  border: 1.5px solid var(--brand-primary);
-  border-radius: 16px;
-  padding: 10px 12px;
+.node-text {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 30;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-16px) scale(0.95);
-  transition: all 0.35s var(--ease-spring);
+  flex-direction: column;
   text-align: left;
 }
 
-.hero-floating-headsup.visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-}
-
-.headsup-icon-circle {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background-color: var(--brand-primary-light);
-  color: var(--brand-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.headsup-icon-circle svg {
-  width: 18px;
-  height: 18px;
-}
-
-.headsup-copy {
-  flex: 1;
-  min-width: 0;
-}
-
-.headsup-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.headsup-title {
+.node-title {
   font-size: 0.75rem;
   font-weight: 800;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
-.headsup-time {
+.node-sub {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--text-muted);
-  flex-shrink: 0;
 }
 
-.headsup-desc {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.3;
-  margin: 2px 0 0;
+/* Keyframe Animations for Academic Motion Stage */
+@keyframes emblemOrbitRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes emblemShieldLevitate {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes emblemAuraBreath {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.06);
+    opacity: 0.95;
+  }
+}
+
+@keyframes emblemNodeFloat1 {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes emblemNodeFloat2 {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(5px);
+  }
 }
 
 /* ==========================================================================
@@ -3305,12 +3203,31 @@
     font-size: 0.96875rem;
   }
 
-  /* Hero Phone Frame on Mobile */
-  .hero-phone-frame {
-    max-width: 100%;
-    min-height: 500px;
-    border-width: 6px;
-    border-radius: 30px;
+  /* Hero Academic Emblem on Mobile */
+  .hero-motion-stage {
+    min-height: auto;
+    padding: 10px 0;
+  }
+
+  .emblem-orbit-outer,
+  .emblem-orbit-inner {
+    display: none;
+  }
+
+  .emblem-satellites-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 16px;
+    z-index: 4;
+  }
+
+  .emblem-node {
+    position: static;
+    animation: none;
+    padding: 8px 10px;
   }
 
   /* Schedule Live Card */

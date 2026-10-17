@@ -826,211 +826,68 @@
     updateSimulation(8.5);
   }
 
-  // 9. Interactive Hero Android Phone Mockup (4 Bottom-Nav Tabs + Live Notification Toast)
-  function setupHeroPhoneMockup() {
-    const tabBtns = document.querySelectorAll('.phone-nav-tab');
-    const screenBody = document.getElementById('phone-screen-body');
-    const topbarLabel = document.getElementById('phone-topbar-label');
-    const bellBtn = document.getElementById('btn-phone-trigger-notif');
-    const headsupToast = document.getElementById('hero-phone-headsup');
+  // 9. Interactive Academic Hero Logo Motion & 3D Tactile Stage
+  function setupHeroLogoMotion() {
+    const stage = document.getElementById('hero-logo-stage');
+    const shield = document.getElementById('emblem-shield');
+    if (!stage || !shield) return;
 
-    if (!tabBtns.length || !screenBody) return;
+    let isHovering = false;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let rafId = null;
 
-    let toastTimer = null;
-
-    function triggerPhoneHeadsup(customTitle, customDesc) {
-      if (!headsupToast) return;
-      const titleEl = document.getElementById('hero-headsup-title');
-      const descEl = document.getElementById('hero-headsup-desc');
-      if (customTitle && titleEl) titleEl.textContent = customTitle;
-      if (customDesc && descEl) descEl.textContent = customDesc;
-
-      headsupToast.classList.add('visible');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        headsupToast.classList.remove('visible');
-      }, 3600);
+    function onMouseMove(e) {
+      const rect = stage.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      // Damped 3D tilt: max 5 degrees for formal academic feel
+      targetX = -(y / (rect.height / 2)) * 5;
+      targetY = (x / (rect.width / 2)) * 5;
+      isHovering = true;
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateParallax);
+      }
     }
 
-    if (bellBtn) {
-      bellBtn.addEventListener('click', () => {
-        triggerPhoneHeadsup(
-          'Clase en 15 min: Cálculo',
-          '08:00 - 10:00 • Aula 204. Toca para preparar tu apunte.'
-        );
-      });
+    function onMouseLeave() {
+      targetX = 0;
+      targetY = 0;
+      isHovering = false;
     }
 
-    // Expose helper so Notification Simulator section can also ping the Hero Phone
-    window.__notifastTriggerHeroToast = triggerPhoneHeadsup;
+    function updateParallax() {
+      // Smooth exponential dampening
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
 
-    const PHONE_SCREENS = {
-      apuntes: {
-        title: 'NotiFast',
-        html: `
-          <div class="phone-live-class-pill">
-            <div class="phone-live-top">
-              <span class="phone-live-badge"><span class="beacon-mini-dot"></span> EN CURSO AHORA</span>
-              <span class="phone-live-rem">Faltan 45 min</span>
-            </div>
-            <div class="phone-live-subj">Cálculo Diferencial</div>
-            <div class="phone-live-meta">08:00 - 10:00 • Aula 204 • Prof. Gómez</div>
-            <div class="phone-live-bar">
-              <div class="phone-live-bar-fill"></div>
-            </div>
-          </div>
+      shield.style.transform = 'perspective(1000px) rotateX(' + currentX.toFixed(2) + 'deg) rotateY(' + currentY.toFixed(2) + 'deg)';
 
-          <div class="phone-avg-mini">
-            <div>
-              <span class="phone-avg-label">PROMEDIO PONDERADO</span>
-              <span class="phone-avg-sub">4 materias activas • Escala 0-10</span>
-            </div>
-            <span class="phone-avg-val">8.70</span>
-          </div>
+      if (isHovering || Math.abs(targetX - currentX) > 0.04 || Math.abs(targetY - currentY) > 0.04) {
+        rafId = requestAnimationFrame(updateParallax);
+      } else {
+        shield.style.transform = '';
+        rafId = null;
+      }
+    }
 
-          <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Teorema de Lagrange y Rolle</span>
-                <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">Cálculo</span>
-              </div>
-              <p class="phone-note-mini-preview">Sea f(x) continua en [a, b] y derivable en (a, b) • Fórmula LaTeX + 3 tareas</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Laboratorio: Péndulo Doble</span>
-                <span class="phone-note-mini-tag" style="background: rgba(124,58,237,0.12); color: #0F766E;">Física</span>
-              </div>
-              <p class="phone-note-mini-preview">Cinemática rotacional, foto de pizarra anotada y tabla de mediciones</p>
-            </div>
-          </div>
-        `
-      },
-      agenda: {
-        title: 'Agenda & Evaluaciones',
-        html: `
-          <div class="phone-live-class-pill">
-            <div class="phone-live-top">
-              <span class="phone-live-badge"><span class="beacon-mini-dot"></span> HOY • JUEVES 15 OCT</span>
-              <span class="phone-live-rem">3 Bloques</span>
-            </div>
-            <div class="phone-live-subj">08:00 Cálculo • 11:00 Física</div>
-            <div class="phone-live-meta">Aula 204 &amp; Lab 102 • Sin choques de horario</div>
-          </div>
+    stage.addEventListener('mousemove', onMouseMove, { passive: true });
+    stage.addEventListener('mouseleave', onMouseLeave, { passive: true });
 
-          <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Parcial II: Optimización</span>
-                <span class="phone-note-mini-tag" style="background: var(--brand-primary-light); color: var(--brand-primary);">35% Nota</span>
-              </div>
-              <p class="phone-note-mini-preview">En 2 días • Recordatorio WorkManager activo</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Proyecto Péndulo Doble</span>
-                <span class="phone-note-mini-tag" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">30% Nota</span>
-              </div>
-              <p class="phone-note-mini-preview">22 Oct • Entrega grupal + código fuente</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Prof. Carlos Gómez (Cátedra)</span>
-                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.14); color: #047857;">WhatsApp</span>
-              </div>
-              <p class="phone-note-mini-preview">Cubículo 302 • Asesorías Mar/Jue 14:00</p>
-            </div>
-          </div>
-        `
-      },
-      notas: {
-        title: 'Calificaciones & Meta',
-        html: `
-          <div class="phone-avg-mini" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); color: #FFF; border: none;">
-            <div>
-              <span class="phone-avg-label" style="color: rgba(255,255,255,0.85);">PROMEDIO SEMESTRAL</span>
-              <span class="phone-avg-sub" style="color: rgba(255,255,255,0.9);">94% Tasa de éxito proyectada</span>
-            </div>
-            <span class="phone-avg-val" style="color: #FFF;">8.70</span>
-          </div>
-
-          <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Cálculo Diferencial</span>
-                <span class="phone-note-mini-tag" style="background: rgba(37,99,235,0.12); color: #2563EB;">8.80 / 10</span>
-              </div>
-              <p class="phone-note-mini-preview">Necesitas 7.20 en el 35% restante para cerrar en 8.5</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Literatura Universal</span>
-                <span class="phone-note-mini-tag" style="background: rgba(217,119,6,0.12); color: #92400E;">9.10 / 10</span>
-              </div>
-              <p class="phone-note-mini-preview">100% evaluado • Materia aprobada con distinción</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Química Orgánica</span>
-                <span class="phone-note-mini-tag" style="background: rgba(5,150,105,0.12); color: #047857;">8.80 / 10</span>
-              </div>
-              <p class="phone-note-mini-preview">Quiz I: 9.8 pts (15%) • 2 exámenes pendientes</p>
-            </div>
-          </div>
-        `
-      },
-      ajustes: {
-        title: 'Ajustes & Estudio AAA',
-        html: `
-          <div class="phone-notes-mini-list">
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Paleta &amp; Lienzo Activo</span>
-                <span class="phone-note-mini-tag" style="background: var(--brand-primary-light); color: var(--brand-primary);">WCAG AAA</span>
-              </div>
-              <p class="phone-note-mini-preview">6 Acentos + 6 Lienzos + Estudio Hex/HSL sincronizado</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Notificaciones Proactivas</span>
-                <span class="phone-note-mini-tag" style="background: var(--brand-secondary-light); color: var(--brand-secondary);">Activas</span>
-              </div>
-              <p class="phone-note-mini-preview">Clases (15m) • Exámenes (2d) • Resumen 07:00 AM</p>
-            </div>
-            <div class="phone-note-mini-card">
-              <div class="phone-note-mini-head">
-                <span class="phone-note-mini-title">Google Drive Cloud Backup</span>
-                <span class="phone-note-mini-tag" style="background: rgba(2,132,199,0.14); color: #0369A1;">Cifrado</span>
-              </div>
-              <p class="phone-note-mini-preview">Carpeta privada appDataFolder • Room SQLite</p>
-            </div>
-          </div>
-        `
+    // Expose fallback helper so notification simulator triggers a graceful emblem pulse
+    window.__notifastTriggerHeroToast = function() {
+      const glow = shield.querySelector('.emblem-logo-glow');
+      if (glow) {
+        glow.style.transform = 'scale(1.35)';
+        glow.style.opacity = '1';
+        setTimeout(() => {
+          glow.style.transform = '';
+          glow.style.opacity = '';
+        }, 800);
       }
     };
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabKey = btn.getAttribute('data-phone-tab');
-        const screenData = PHONE_SCREENS[tabKey];
-        if (!screenData) return;
-
-        tabBtns.forEach(b => {
-          const active = b === btn;
-          b.classList.toggle('active', active);
-          b.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-
-        if (topbarLabel) topbarLabel.textContent = screenData.title;
-        screenBody.style.opacity = '0';
-        setTimeout(() => {
-          screenBody.innerHTML = screenData.html;
-          screenBody.style.transition = 'opacity 0.2s ease';
-          screenBody.style.opacity = '1';
-        }, 70);
-      });
-    });
-
   }
 
   // 10. Live Theme Customizer Studio (Exact Presets from ThemePreset.kt & BackgroundPreset.kt)
@@ -1473,7 +1330,7 @@
     setupGradeScaleSwitcher();
     setupEvaluationsCalendar();
     setupAnalyticsDashboard();
-    setupHeroPhoneMockup();
+    setupHeroLogoMotion();
     setupLiveThemeStudio();
     setupNotificationsSimulator();
     initGSAPAnimations();

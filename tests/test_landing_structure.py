@@ -106,10 +106,12 @@ class TestLandingStructure(unittest.TestCase):
     def test_notifast_hero_showcase_and_radar_present(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
-        self.assertIn("hero-phone-frame", html)
-        self.assertIn("phone-bottom-nav", html)
-        self.assertIn("phone-screen-body", html)
+        self.assertIn("hero-logo-stage", html)
+        self.assertIn("emblem-shield", html)
+        self.assertIn("emblem-logo-img", html)
         self.assertIn("hub-floating-radar", html)
+        # Verificar que se eliminó el simulador de smartphone
+        self.assertNotIn("hero-phone-frame", html)
         # Verificar que se eliminó el hub orbital redundante y la sobrecarga cognitiva
         self.assertNotIn("magic-box-showcase", html)
         self.assertNotIn("notifast-core-hub", html)
@@ -261,12 +263,11 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn('data-notif-channel="exam"', html)
         self.assertIn('data-notif-channel="morning"', html)
         self.assertIn("btn-test-notification", html)
-        self.assertIn("hero-phone-frame", html)
 
         with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
             js = f.read()
         self.assertIn("setupNotificationsSimulator", js)
-        self.assertIn("setupHeroPhoneMockup", js)
+        self.assertIn("setupHeroLogoMotion", js)
 
     def test_cloudflare_pages_metadata(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
