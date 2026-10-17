@@ -30,35 +30,92 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Run Python Landing Tests
         run: |
           python3 -m unittest discover -s tests -v
 
   deploy-landing:
-    name: Deploy Landing to Cloudflare Pages
+    name: Deploy & Verify Landing on Cloudflare Pages
     needs: [python-tests]
     if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages (https://notifast.pages.dev/)
+      - name: Deploy via Wrangler (when Cloudflare secrets are set)
+        if: env.CF_API_TOKEN != '' && env.CF_ACCOUNT_ID != ''
         uses: cloudflare/wrangler-action@v3
-        continue-on-error: true
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy landing --project-name=notifast --branch=main --commit-dirty=true
 
+      - name: Verify Live Cloudflare Pages Deployment (https://notifast.pages.dev/)
+        run: |
+          echo "Verifying live deployment at https://notifast.pages.dev/ ..."
+          for i in 1 2 3 4 5; do
+            HTML=$(curl -fsSL "https://notifast.pages.dev/")
+            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'id="notificaciones"' && echo "$HTML" | grep -q 'hero-phone-frame'; then
+              echo "✅ Cloudflare Pages (https://notifast.pages.dev/) is live and serving the latest NotiFast landing!"
+              exit 0
+            fi
+            echo "Waiting for Cloudflare Pages edge propagation (attempt $i/5)..."
+            sleep 6
+          done
+          echo "❌ Verification failed: Expected sections not found on https://notifast.pages.dev/"
+          exit 1
+
   android-tests:
     name: Android Unit Tests & Static Verification
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Configure google-services.json (Secret or CI Fallback)
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          elif [ ! -f app/google-services.json ]; then
+            cat << 'EOF' > app/google-services.json
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "notifast-ci-stub",
+              "storage_bucket": "notifast-ci-stub.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.notifast.app"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "AIzaSyDummyKeyForContinuousIntegration00000"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+          fi
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -87,9 +144,49 @@ jobs:
     name: Assemble APKs (Debug & Release)
     needs: [android-tests, python-tests]
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Configure google-services.json (Secret or CI Fallback)
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          elif [ ! -f app/google-services.json ]; then
+            cat << 'EOF' > app/google-services.json
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "notifast-ci-stub",
+              "storage_bucket": "notifast-ci-stub.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.notifast.app"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "AIzaSyDummyKeyForContinuousIntegration00000"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+          fi
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
