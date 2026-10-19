@@ -187,5 +187,66 @@ object NotiFastMigrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_subject_cloud_state_subjectId` ON `subject_cloud_state` (`subjectId`)")
         }
     }
+
+    /**
+     * v5 → v6: study_documents and cover_drafts tables for Study Hub.
+     */
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `study_documents` (
+                    `id` TEXT NOT NULL,
+                    `userId` TEXT NOT NULL,
+                    `subjectId` TEXT NOT NULL,
+                    `subjectName` TEXT NOT NULL,
+                    `title` TEXT NOT NULL,
+                    `fileName` TEXT NOT NULL,
+                    `docType` TEXT NOT NULL,
+                    `sizeBytes` INTEGER NOT NULL,
+                    `pageCount` INTEGER NOT NULL,
+                    `sourceType` TEXT NOT NULL,
+                    `googleDocId` TEXT,
+                    `googleWebViewLink` TEXT,
+                    `createdAt` INTEGER NOT NULL,
+                    `updatedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_study_documents_userId` ON `study_documents` (`userId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_study_documents_subjectId` ON `study_documents` (`subjectId`)")
+
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `cover_drafts` (
+                    `id` TEXT NOT NULL,
+                    `userId` TEXT NOT NULL,
+                    `templateId` TEXT NOT NULL,
+                    `subjectId` TEXT NOT NULL,
+                    `subjectName` TEXT NOT NULL,
+                    `workTitle` TEXT NOT NULL,
+                    `subtitle` TEXT NOT NULL,
+                    `authorsJson` TEXT NOT NULL,
+                    `teacherName` TEXT NOT NULL,
+                    `institutionName` TEXT NOT NULL,
+                    `facultyOrDepartment` TEXT NOT NULL,
+                    `city` TEXT NOT NULL,
+                    `formattedDate` TEXT NOT NULL,
+                    `abstractText` TEXT NOT NULL,
+                    `keywordsText` TEXT NOT NULL,
+                    `generatedLocalDocId` TEXT,
+                    `googleDocId` TEXT,
+                    `googleWebViewLink` TEXT,
+                    `createdAt` INTEGER NOT NULL,
+                    `updatedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_cover_drafts_userId` ON `cover_drafts` (`userId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_cover_drafts_subjectId` ON `cover_drafts` (`subjectId`)")
+        }
+    }
 }
 

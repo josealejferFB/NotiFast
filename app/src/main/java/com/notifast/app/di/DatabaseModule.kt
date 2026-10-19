@@ -32,7 +32,8 @@ object DatabaseModule {
             NotiFastMigrations.MIGRATION_1_2,
             NotiFastMigrations.MIGRATION_2_3,
             NotiFastMigrations.MIGRATION_3_4,
-            NotiFastMigrations.MIGRATION_4_5
+            NotiFastMigrations.MIGRATION_4_5,
+            NotiFastMigrations.MIGRATION_5_6
         ).build()
     }
 
@@ -58,4 +59,14 @@ object DatabaseModule {
     fun provideSubjectCloudStateDao(
         db: NotiFastDatabase
     ): com.notifast.app.data.local.dao.SubjectCloudStateDao = db.subjectCloudStateDao()
+
+    @Provides
+    fun provideStudyDocumentDao(
+        db: NotiFastDatabase
+    ): com.notifast.app.data.local.dao.StudyDocumentDao = db.studyDocumentDao()
+
+    @Provides
+    fun provideCoverDraftDao(
+        db: NotiFastDatabase
+    ): com.notifast.app.data.local.dao.CoverDraftDao = db.coverDraftDao()
 }

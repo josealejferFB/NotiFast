@@ -276,5 +276,97 @@ class RoomDaoInMemoryTest {
 
         assertEquals(cloudDao, DatabaseModule.provideSubjectCloudStateDao(db))
     }
+
+    @Test
+    fun insertAndRetrieveStudyDocument() = runTest {
+        val studyDocDao: com.notifast.app.data.local.dao.StudyDocumentDao = mockk(relaxed = true)
+        every { db.studyDocumentDao() } returns studyDocDao
+
+        val doc = com.notifast.app.data.local.entity.StudyDocumentEntity(
+            id = "doc-1",
+            userId = "u1",
+            subjectId = "sub-1",
+            subjectName = "Física",
+            title = "Guía Lab 1",
+            fileName = "doc-1.pdf",
+            docType = "PDF",
+            sizeBytes = 20480L,
+            pageCount = 5,
+            sourceType = "IMPORTED",
+            googleDocId = null,
+            googleWebViewLink = null,
+            createdAt = 1000L,
+            updatedAt = 1000L
+        )
+
+        coEvery { studyDocDao.getDocumentById("u1", "doc-1") } returns doc
+        every { studyDocDao.observeDocuments("u1") } returns flowOf(listOf(doc))
+
+        studyDocDao.upsertDocument(doc)
+        coVerify { studyDocDao.upsertDocument(doc) }
+
+        val retrieved = studyDocDao.getDocumentById("u1", "doc-1")
+        assertEquals("Guía Lab 1", retrieved?.title)
+        assertEquals("PDF", retrieved?.docType)
+
+        val flowDocs = studyDocDao.observeDocuments("u1").first()
+        assertEquals(1, flowDocs.size)
+
+        studyDocDao.deleteDocument("u1", "doc-1")
+        coVerify { studyDocDao.deleteDocument("u1", "doc-1") }
+
+        assertEquals(studyDocDao, DatabaseModule.provideStudyDocumentDao(db))
+    }
+
+    @Test
+    fun insertAndRetrieveCoverDraft() = runTest {
+        val draftDao: com.notifast.app.data.local.dao.CoverDraftDao = mockk(relaxed = true)
+        every { db.coverDraftDao() } returns draftDao
+
+        val draft = com.notifast.app.data.local.entity.CoverDraftEntity(
+            id = "draft-1",
+            userId = "u1",
+            templateId = "APA_7",
+            subjectId = "sub-1",
+            subjectName = "Física",
+            workTitle = "Informe Péndulo",
+            subtitle = "Lab 1",
+            authorsJson = "[\"Juan\"]",
+            teacherName = "Prof. Newton",
+            institutionName = "UCV",
+            facultyOrDepartment = "Ciencias",
+            city = "Caracas",
+            formattedDate = "19 de octubre de 2026",
+            abstractText = "",
+            keywordsText = "",
+            generatedLocalDocId = null,
+            googleDocId = null,
+            googleWebViewLink = null,
+            createdAt = 1000L,
+            updatedAt = 1000L
+        )
+
+        coEvery { draftDao.getDraftById("u1", "draft-1") } returns draft
+        coEvery { draftDao.getLatestDraft("u1") } returns draft
+        every { draftDao.observeDrafts("u1") } returns flowOf(listOf(draft))
+
+        draftDao.upsertDraft(draft)
+        coVerify { draftDao.upsertDraft(draft) }
+
+        val retrieved = draftDao.getDraftById("u1", "draft-1")
+        assertEquals("Informe Péndulo", retrieved?.workTitle)
+        assertEquals("APA_7", retrieved?.templateId)
+
+        val latest = draftDao.getLatestDraft("u1")
+        assertEquals("UCV", latest?.institutionName)
+
+        val flowDrafts = draftDao.observeDrafts("u1").first()
+        assertEquals(1, flowDrafts.size)
+
+        draftDao.deleteDraft("u1", "draft-1")
+        coVerify { draftDao.deleteDraft("u1", "draft-1") }
+
+        assertEquals(draftDao, DatabaseModule.provideCoverDraftDao(db))
+    }
 }
 

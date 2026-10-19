@@ -12,8 +12,12 @@ import com.notifast.app.data.local.dao.SubjectDao
 import com.notifast.app.data.local.dao.TeacherDao
 import com.notifast.app.data.local.dao.UserDao
 import com.notifast.app.data.local.entity.EvaluationEntity
+import com.notifast.app.data.local.dao.CoverDraftDao
+import com.notifast.app.data.local.dao.StudyDocumentDao
+import com.notifast.app.data.local.entity.CoverDraftEntity
 import com.notifast.app.data.local.entity.NoteEntity
 import com.notifast.app.data.local.entity.ScheduleEntity
+import com.notifast.app.data.local.entity.StudyDocumentEntity
 import com.notifast.app.data.local.entity.SubjectCloudStateEntity
 import com.notifast.app.data.local.entity.SubjectEntity
 import com.notifast.app.data.local.entity.TeacherEntity
@@ -27,9 +31,11 @@ import com.notifast.app.data.local.entity.UserEntity
         EvaluationEntity::class,
         ScheduleEntity::class,
         TeacherEntity::class,
-        SubjectCloudStateEntity::class
+        SubjectCloudStateEntity::class,
+        StudyDocumentEntity::class,
+        CoverDraftEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(RoomConverters::class)
@@ -41,4 +47,6 @@ abstract class NotiFastDatabase : RoomDatabase() {
     abstract fun scheduleDao(): ScheduleDao
     abstract fun teacherDao(): TeacherDao
     abstract fun subjectCloudStateDao(): SubjectCloudStateDao
+    abstract fun studyDocumentDao(): StudyDocumentDao
+    abstract fun coverDraftDao(): CoverDraftDao
 }
