@@ -87,4 +87,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindStudyDocumentRepository(impl: com.notifast.app.data.repository.LocalStudyDocumentRepositoryImpl): com.notifast.app.domain.repository.StudyDocumentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGoogleDocsExportRepository(impl: com.notifast.app.data.repository.GoogleDocsExportRepositoryImpl): com.notifast.app.domain.repository.GoogleDocsExportRepository
 }

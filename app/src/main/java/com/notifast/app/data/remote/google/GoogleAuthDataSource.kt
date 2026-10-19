@@ -41,6 +41,7 @@ sealed interface DriveAuthResult {
 interface GoogleAuthDataSource {
     suspend fun signInWithGoogle(activityContext: Context): Result<GoogleIdResult>
     suspend fun authorizeDrive(accountEmail: String): DriveAuthResult
+    suspend fun authorizeDriveFile(accountEmail: String): DriveAuthResult
     fun getAuthorizationResultFromIntent(intent: Intent): DriveAuthResult
     suspend fun clearCredentialState()
 }
@@ -53,6 +54,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
     companion object {
         private const val TAG = "GoogleAuthDataSource"
         const val DRIVE_APPDATA_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
+        const val DRIVE_FILE_SCOPE = "https://www.googleapis.com/auth/drive.file"
     }
 
     private val credentialManager: CredentialManager by lazy {
@@ -116,10 +118,18 @@ class DefaultGoogleAuthDataSource @Inject constructor(
     }
 
     override suspend fun authorizeDrive(accountEmail: String): DriveAuthResult {
+        return authorizeScopes(accountEmail, listOf(DRIVE_APPDATA_SCOPE))
+    }
+
+    override suspend fun authorizeDriveFile(accountEmail: String): DriveAuthResult {
+        return authorizeScopes(accountEmail, listOf(DRIVE_FILE_SCOPE))
+    }
+
+    private suspend fun authorizeScopes(accountEmail: String, scopeUrls: List<String>): DriveAuthResult {
         return try {
             val authClient = Identity.getAuthorizationClient(context)
             val request = AuthorizationRequest.builder()
-                .setRequestedScopes(listOf(Scope(DRIVE_APPDATA_SCOPE)))
+                .setRequestedScopes(scopeUrls.map { Scope(it) })
                 .setAccount(Account(accountEmail, "com.google"))
                 .build()
 
@@ -140,7 +150,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
                 }
             }
         } catch (e: ApiException) {
-            Log.e(TAG, "authorizeDrive ApiException statusCode=${e.statusCode}: ${e.message}", e)
+            Log.e(TAG, "authorizeScopes ApiException statusCode=${e.statusCode}: ${e.message}", e)
             when (e.statusCode) {
                 CommonStatusCodes.CANCELED -> DriveAuthResult.Failure(CloudAuthException(CloudAuthException.Reason.CANCELLED, e))
                 CommonStatusCodes.SIGN_IN_REQUIRED -> DriveAuthResult.Failure(CloudAuthException(CloudAuthException.Reason.REAUTH_REQUIRED, e))
@@ -149,7 +159,7 @@ class DefaultGoogleAuthDataSource @Inject constructor(
                 else -> DriveAuthResult.Failure(e)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "authorizeDrive unexpected error: ${e.message}", e)
+            Log.e(TAG, "authorizeScopes unexpected error: ${e.message}", e)
             DriveAuthResult.Failure(e)
         }
     }
