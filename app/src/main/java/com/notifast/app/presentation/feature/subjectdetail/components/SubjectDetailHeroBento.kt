@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.subjectdetail.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.notifast.app.presentation.theme.isDark
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,9 +59,10 @@ fun SubjectDetailHeroBento(
     onAddScheduleClick: () -> Unit,
     onShareClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subjectSection: String = ""
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.isDark
     val baseColor = ThemeUtils.getAccessibleColor(subjectColorHex, isDark)
 
     Surface(
@@ -83,15 +85,24 @@ fun SubjectDetailHeroBento(
                     }
                 }
                 Spacer(Modifier.width(12.dp))
-                Text(
-                    text = subjectName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = subjectName,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (subjectSection.isNotBlank()) {
+                        Text(
+                            text = stringResource(R.string.subject_section_chip, subjectSection),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
                 IconButton(onClick = onEditClick, modifier = Modifier.size(38.dp)) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.btn_edit), tint = Color.White)
                 }

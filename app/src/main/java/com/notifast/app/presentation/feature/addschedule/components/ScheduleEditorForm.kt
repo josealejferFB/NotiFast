@@ -19,6 +19,8 @@ import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastTextField
 import com.notifast.app.presentation.feature.schedules.components.ScheduleConflictBanner
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import com.notifast.app.presentation.theme.color.Aqua
 
 @Composable
@@ -80,6 +82,8 @@ fun ScheduleEditorForm(
                     label = stringResource(R.string.schedules_field_classroom),
                     placeholder = stringResource(R.string.schedules_placeholder_classroom),
                     leadingIcon = Icons.Default.MeetingRoom,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     modifier = Modifier.fillMaxWidth()
                 )
 

@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -161,20 +162,7 @@ fun SettingsScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                NotiFastTopBar(
-                    type = TopBarType.Home(
-                        firstName = uiState.displayFirstName,
-                        email = uiState.displayEmail,
-                        profilePictureUrl = uiState.displayPhotoUrl,
-                        contextText = stringResource(R.string.settings_title),
-                        onProfileClick = onEditProfile,
-                        onSearchClick = onSearchClick,
-                        onCloudClick = { viewModel.onEvent(SettingsEvent.OpenCloudHub) },
-                        syncSummary = uiState.syncSummary
-                    )
-                )
-            }
+            contentWindowInsets = WindowInsets(0, 0, 0, 0)
         ) { padding ->
             SettingsSectionsContent(
                 uiState = uiState,

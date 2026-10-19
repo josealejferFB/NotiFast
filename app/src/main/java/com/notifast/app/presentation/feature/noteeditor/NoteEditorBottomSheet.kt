@@ -43,6 +43,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notifast.app.presentation.atoms.clearFocusOnTapOutside
+import com.notifast.app.presentation.atoms.rememberClearFocusAction
 import com.notifast.app.presentation.feature.noteeditor.components.DockedAccessoryToolbar
 import com.notifast.app.presentation.feature.noteeditor.components.NoteEditorDiscardDialog
 import com.notifast.app.presentation.feature.noteeditor.components.NoteEditorSheetHeader
@@ -147,32 +149,17 @@ fun NoteEditorBottomSheet(
         dragHandle = { BottomSheetDefaults.DragHandle() },
         contentWindowInsets = { WindowInsets.statusBars }
     ) {
-        val sheetFocusManager = LocalFocusManager.current
-        val sheetKeyboardController = LocalSoftwareKeyboardController.current
-        val sheetView = androidx.compose.ui.platform.LocalView.current
-        val onTapOutsideSheet: () -> Unit = remember(sheetFocusManager, sheetKeyboardController, sheetView) {
-            {
-                sheetFocusManager.clearFocus(force = true)
-                sheetKeyboardController?.hide()
-                val imm = sheetView.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
-                imm?.hideSoftInputFromWindow(sheetView.windowToken, 0)
-                Unit
-            }
-        }
-        val tapOutsideModifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null
-        ) { onTapOutsideSheet() }
+        val clearFocusAndKeyboard = rememberClearFocusAction()
 
-        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight().then(tapOutsideModifier)) {
+        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight().clearFocusOnTapOutside()) {
             NoteEditorSheetHeader(
-                modifier = tapOutsideModifier,
+                modifier = Modifier.clearFocusOnTapOutside(),
                 isEditing = noteId != null,
                 isPreviewMode = uiState.isPreviewMode,
                 canSave = canSave,
                 isLoading = uiState.isLoading,
                 onCloseClick = {
-                    onTapOutsideSheet()
+                    clearFocusAndKeyboard()
                     if (hasUnsavedChanges) showDiscardDialog = true else dismissSheet()
                 },
                 onTogglePreview = { viewModel.onEvent(NoteEditorEvent.TogglePreview(!uiState.isPreviewMode)) },
@@ -184,7 +171,7 @@ fun NoteEditorBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .then(tapOutsideModifier)
+                    .clearFocusOnTapOutside()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp, vertical = 6.dp)
             ) {
@@ -213,7 +200,7 @@ fun NoteEditorBottomSheet(
                     onImageSelected = { viewModel.onEvent(NoteEditorEvent.ImageSelected(it)) },
                     onCreateSubjectClick = handleCreateSubject,
                     bringIntoViewRequester = bringIntoViewRequester,
-                    onTapOutside = onTapOutsideSheet
+                    onTapOutside = clearFocusAndKeyboard
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

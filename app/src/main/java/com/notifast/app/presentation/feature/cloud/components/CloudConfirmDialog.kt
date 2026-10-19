@@ -26,6 +26,10 @@ fun CloudConfirmDialog(
             R.string.cloud_confirm_restore_global_title,
             stringResource(R.string.cloud_confirm_restore_global_msg)
         )
+        is CloudConfirm.RestoreCovers -> Pair(
+            R.string.cloud_confirm_restore_covers_title,
+            stringResource(R.string.cloud_confirm_restore_covers_msg)
+        )
         is CloudConfirm.DeleteCloud -> Pair(
             R.string.cloud_confirm_delete_cloud_title,
             stringResource(R.string.cloud_confirm_delete_cloud_msg, confirm.item.name)

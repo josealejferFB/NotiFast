@@ -7,6 +7,15 @@ import com.notifast.app.presentation.feature.schedules.ScheduleTimelineItem
 import com.notifast.app.presentation.feature.schedules.WeeklyDayMetric
 import com.notifast.app.presentation.feature.schedules.WeeklyScheduleSummary
 import com.notifast.app.presentation.feature.schedules.WeeklySubjectMetric
+import java.util.Calendar
+import java.util.Locale
+
+data class NextClassTiming(
+    val dayName: String,
+    val timeRemaining: String,
+    val isOngoing: Boolean,
+    val totalMinutesRemaining: Int
+)
 
 object ScheduleCalculations {
 
@@ -69,7 +78,8 @@ object ScheduleCalculations {
                     isCurrent = isCurrent,
                     isConflicted = conflictIds.contains(current.id),
                     subjectIcon = subjectData?.icon ?: "📚",
-                    subjectColorHex = subjectData?.colorHex.orEmpty()
+                    subjectColorHex = subjectData?.colorHex.orEmpty(),
+                    subjectSection = subjectData?.section.orEmpty()
                 )
             )
 
@@ -146,5 +156,99 @@ object ScheduleCalculations {
             dayMetrics = dayMetrics,
             subjectMetrics = subjectMetrics
         )
+    }
+
+    fun calculateNextClassTiming(
+        schedule: Schedule,
+        nowCal: Calendar = Calendar.getInstance()
+    ): NextClassTiming {
+        val todayDayOfWeek = nowCal.get(Calendar.DAY_OF_WEEK) - 1
+        val nowMinutes = nowCal.get(Calendar.HOUR_OF_DAY) * 60 + nowCal.get(Calendar.MINUTE)
+        val startMin = timeToMinutes(schedule.startTime)
+        val endMin = timeToMinutes(schedule.endTime)
+
+        val rawDaysAhead = (schedule.dayOfWeek - todayDayOfWeek + 7) % 7
+        val isToday = rawDaysAhead == 0
+
+        return if (isToday) {
+            if (nowMinutes in startMin until endMin) {
+                val remaining = (endMin - nowMinutes).coerceAtLeast(0)
+                NextClassTiming(
+                    dayName = "Hoy, ${Schedule.DAY_NAMES.getOrElse(schedule.dayOfWeek) { "Hoy" }}",
+                    timeRemaining = formatOngoingRemaining(remaining),
+                    isOngoing = true,
+                    totalMinutesRemaining = remaining
+                )
+            } else if (nowMinutes < startMin) {
+                val startsIn = (startMin - nowMinutes).coerceAtLeast(0)
+                NextClassTiming(
+                    dayName = "Hoy, ${Schedule.DAY_NAMES.getOrElse(schedule.dayOfWeek) { "Hoy" }}",
+                    timeRemaining = formatStartsIn(startsIn),
+                    isOngoing = false,
+                    totalMinutesRemaining = startsIn
+                )
+            } else {
+                val daysOffset = 7
+                val totalStartsIn = daysOffset * 24 * 60 + startMin - nowMinutes
+                val targetCal = (nowCal.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, daysOffset) }
+                NextClassTiming(
+                    dayName = formatFutureDayName(targetCal, schedule.dayOfWeek, daysOffset),
+                    timeRemaining = formatStartsIn(totalStartsIn),
+                    isOngoing = false,
+                    totalMinutesRemaining = totalStartsIn
+                )
+            }
+        } else {
+            val totalStartsIn = rawDaysAhead * 24 * 60 + startMin - nowMinutes
+            val targetCal = (nowCal.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, rawDaysAhead) }
+            NextClassTiming(
+                dayName = formatFutureDayName(targetCal, schedule.dayOfWeek, rawDaysAhead),
+                timeRemaining = formatStartsIn(totalStartsIn),
+                isOngoing = false,
+                totalMinutesRemaining = totalStartsIn
+            )
+        }
+    }
+
+    private fun formatFutureDayName(targetCal: Calendar, dayOfWeek: Int, daysOffset: Int): String {
+        val rawDayName = Schedule.DAY_NAMES.getOrElse(dayOfWeek) { "" }
+        if (daysOffset == 1) {
+            return "Mañana, $rawDayName"
+        }
+        val dayNum = targetCal.get(Calendar.DAY_OF_MONTH)
+        val monthShort = targetCal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.forLanguageTag("es"))
+            ?.replace(".", "")
+            ?.lowercase(Locale.forLanguageTag("es"))
+            .orEmpty()
+        return if (monthShort.isNotBlank()) {
+            "$rawDayName, $dayNum $monthShort"
+        } else {
+            rawDayName
+        }
+    }
+
+    fun formatStartsIn(startsInMinutes: Int): String {
+        if (startsInMinutes <= 0) return "En breve"
+        if (startsInMinutes < 60) return "En $startsInMinutes min"
+        if (startsInMinutes < 1440) {
+            val hours = startsInMinutes / 60
+            val mins = startsInMinutes % 60
+            return if (mins == 0) "En $hours h" else "En $hours h $mins min"
+        }
+        val days = startsInMinutes / 1440
+        val hours = (startsInMinutes % 1440) / 60
+        return if (days == 1) {
+            if (hours == 0) "En 1 día" else "En 1 día y $hours h"
+        } else {
+            if (hours == 0) "En $days días" else "En $days días y $hours h"
+        }
+    }
+
+    fun formatOngoingRemaining(remainingMinutes: Int): String {
+        if (remainingMinutes <= 0) return "Termina ahora"
+        if (remainingMinutes < 60) return "Termina en $remainingMinutes min"
+        val hours = remainingMinutes / 60
+        val mins = remainingMinutes % 60
+        return if (mins == 0) "Termina en $hours h" else "Termina en $hours h $mins min"
     }
 }

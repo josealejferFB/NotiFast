@@ -71,20 +71,24 @@ class GoogleDocsExportRepositoryImpl @Inject constructor(
         intent: Intent?,
         draft: CoverDraft
     ): Result<GoogleDocsExportStep> = withContext(Dispatchers.IO) {
-        if (intent == null) {
-            return@withContext Result.failure(CloudAuthException(CloudAuthException.Reason.CANCELLED))
-        }
+        try {
+            if (intent == null) {
+                return@withContext Result.failure(CloudAuthException(CloudAuthException.Reason.CANCELLED))
+            }
 
-        when (val authResult = authDataSource.getAuthorizationResultFromIntent(intent)) {
-            is DriveAuthResult.Success -> {
-                uploadAndPersist(authResult.accessToken, draft)
+            when (val authResult = authDataSource.getAuthorizationResultFromIntent(intent)) {
+                is DriveAuthResult.Success -> {
+                    uploadAndPersist(authResult.accessToken, draft)
+                }
+                is DriveAuthResult.NeedsResolution -> {
+                    Result.success(GoogleDocsExportStep.NeedsResolution(authResult.pendingIntent))
+                }
+                is DriveAuthResult.Failure -> {
+                    Result.failure(authResult.throwable)
+                }
             }
-            is DriveAuthResult.NeedsResolution -> {
-                Result.success(GoogleDocsExportStep.NeedsResolution(authResult.pendingIntent))
-            }
-            is DriveAuthResult.Failure -> {
-                Result.failure(authResult.throwable)
-            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
@@ -92,34 +96,50 @@ class GoogleDocsExportRepositoryImpl @Inject constructor(
         token: String,
         draft: CoverDraft
     ): Result<GoogleDocsExportStep> {
-        val htmlContent = docxGenerator.generateSemanticHtml(draft)
-        val title = draft.workTitle.ifBlank { "Portada ${draft.templateType.name}" }
+        return try {
+            val title = draft.workTitle.ifBlank { "Portada ${draft.templateType.name}" }
 
-        val created = driveClient.createGoogleDocFromHtml(token, title, htmlContent)
-        val webViewUrl = created.webViewLink ?: "https://docs.google.com/document/d/${created.id}/edit"
+            val created = try {
+                val baos = java.io.ByteArrayOutputStream()
+                val genResult = docxGenerator.generateDocx(draft, baos)
+                if (genResult.isSuccess && baos.size() > 0) {
+                    driveClient.createGoogleDocFromDocx(token, title, baos.toByteArray())
+                } else {
+                    val htmlContent = docxGenerator.generateSemanticHtml(draft)
+                    driveClient.createGoogleDocFromHtml(token, title, htmlContent)
+                }
+            } catch (_: Exception) {
+                val htmlContent = docxGenerator.generateSemanticHtml(draft)
+                driveClient.createGoogleDocFromHtml(token, title, htmlContent)
+            }
 
-        val updatedDraft = draft.copy(
-            googleDocId = created.id,
-            googleWebViewLink = webViewUrl,
-            updatedAt = System.currentTimeMillis()
-        )
-        studyDocRepository.saveCoverDraft(updatedDraft)
+            val webViewUrl = created.webViewLink ?: "https://docs.google.com/document/d/${created.id}/edit"
 
-        if (draft.generatedLocalDocId != null) {
-            studyDocRepository.updateGoogleDocLink(
-                userId = draft.userId,
-                documentId = draft.generatedLocalDocId,
+            val updatedDraft = draft.copy(
                 googleDocId = created.id,
-                webViewLink = webViewUrl
+                googleWebViewLink = webViewUrl,
+                updatedAt = System.currentTimeMillis()
             )
+            studyDocRepository.saveCoverDraft(updatedDraft)
+
+            if (draft.generatedLocalDocId != null) {
+                studyDocRepository.updateGoogleDocLink(
+                    userId = draft.userId,
+                    documentId = draft.generatedLocalDocId,
+                    googleDocId = created.id,
+                    webViewLink = webViewUrl
+                )
+            }
+
+            Result.success(
+                GoogleDocsExportStep.Exported(
+                    googleDocId = created.id,
+                    webViewUrl = webViewUrl,
+                    updatedDraft = updatedDraft
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-
-        return Result.success(
-            GoogleDocsExportStep.Exported(
-                googleDocId = created.id,
-                webViewUrl = webViewUrl,
-                updatedDraft = updatedDraft
-            )
-        )
     }
 }

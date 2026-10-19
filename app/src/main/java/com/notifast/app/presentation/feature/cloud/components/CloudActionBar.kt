@@ -36,9 +36,28 @@ fun CloudActionBar(
     onToggleSelectAll: () -> Unit,
     onRestore: () -> Unit,
     onUpload: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subjectSelectedCount: Int = selectedCount,
+    isGlobalSelected: Boolean = false,
+    isCoversSelected: Boolean = false
 ) {
     val haptic = LocalHapticFeedback.current
+
+    val feedbackText = when {
+        subjectSelectedCount > 0 && isGlobalSelected && isCoversSelected ->
+            stringResource(R.string.cloud_selection_feedback_full, subjectSelectedCount)
+        subjectSelectedCount > 0 && isGlobalSelected ->
+            stringResource(R.string.cloud_selection_feedback_no_covers, subjectSelectedCount)
+        subjectSelectedCount > 0 && isCoversSelected ->
+            stringResource(R.string.cloud_selection_feedback_no_global, subjectSelectedCount)
+        subjectSelectedCount == 0 && isCoversSelected && !isGlobalSelected ->
+            stringResource(R.string.cloud_selection_feedback_covers_only)
+        subjectSelectedCount == 0 && isGlobalSelected && !isCoversSelected ->
+            stringResource(R.string.cloud_selection_feedback_global_only)
+        selectedCount > 0 ->
+            stringResource(R.string.cloud_selected_count, selectedCount)
+        else -> null
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -61,9 +80,9 @@ fun CloudActionBar(
                 )
             }
 
-            if (selectedCount > 0) {
+            if (!feedbackText.isNullOrBlank()) {
                 Text(
-                    text = stringResource(R.string.cloud_selected_count, selectedCount),
+                    text = feedbackText,
                     style = MaterialTheme.typography.monoAcademicBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

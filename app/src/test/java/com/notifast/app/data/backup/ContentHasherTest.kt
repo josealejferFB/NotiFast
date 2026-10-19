@@ -201,4 +201,44 @@ class ContentHasherTest {
 
         assertEquals(hasher.hash(snapA), hasher.hash(snapB))
     }
+
+    @Test
+    fun changing_subject_section_produces_different_hash() {
+        val snapA = SubjectSnapshot(
+            subject = SubjectData(id = "sub-1", name = "Cálculo", section = "1"),
+            schedules = emptyList(),
+            evaluations = emptyList(),
+            notes = emptyList(),
+            imageFiles = emptyMap()
+        )
+        val snapB = SubjectSnapshot(
+            subject = SubjectData(id = "sub-1", name = "Cálculo", section = "2"),
+            schedules = emptyList(),
+            evaluations = emptyList(),
+            notes = emptyList(),
+            imageFiles = emptyMap()
+        )
+
+        assertNotEquals(hasher.hash(snapA), hasher.hash(snapB))
+    }
+
+    @Test
+    fun subject_with_blank_section_produces_equal_hash_to_empty_section() {
+        val snapEmpty = SubjectSnapshot(
+            subject = SubjectData(id = "sub-1", name = "Cálculo", section = ""),
+            schedules = emptyList(),
+            evaluations = emptyList(),
+            notes = emptyList(),
+            imageFiles = emptyMap()
+        )
+        val snapBlank = SubjectSnapshot(
+            subject = SubjectData(id = "sub-1", name = "Cálculo", section = "   "),
+            schedules = emptyList(),
+            evaluations = emptyList(),
+            notes = emptyList(),
+            imageFiles = emptyMap()
+        )
+
+        assertEquals(hasher.hash(snapEmpty), hasher.hash(snapBlank))
+    }
 }

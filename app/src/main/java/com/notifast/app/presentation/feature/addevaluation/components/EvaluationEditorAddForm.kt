@@ -22,6 +22,8 @@ import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.atoms.NotiFastImagePickerField
 import com.notifast.app.presentation.atoms.NotiFastTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationEvent
 import com.notifast.app.presentation.feature.addevaluation.AddEvaluationUiState
 import java.util.Date
@@ -73,6 +75,8 @@ fun EvaluationEditorAddForm(
                     label = stringResource(R.string.evaluation_field_title),
                     placeholder = stringResource(R.string.evaluation_title_placeholder),
                     leadingIcon = Icons.Default.Title,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -92,6 +96,7 @@ fun EvaluationEditorAddForm(
                     label = stringResource(R.string.evaluation_field_description),
                     placeholder = stringResource(R.string.evaluation_desc_placeholder),
                     singleLine = false,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -101,6 +106,7 @@ fun EvaluationEditorAddForm(
                     label = stringResource(R.string.evaluation_field_quick_tips),
                     placeholder = stringResource(R.string.evaluation_quick_tips_placeholder),
                     singleLine = false,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     modifier = Modifier.fillMaxWidth()
                 )
 

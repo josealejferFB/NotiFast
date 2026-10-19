@@ -12,6 +12,9 @@ data class CloudFile(
     val deviceModel: String,
     val noteCount: Int,
     val evaluationCount: Int,
+    val coverCount: Int = 0,
+    val teacherCount: Int = 0,
+    val section: String? = null,
     val sizeBytes: Long,
     val schemaVersion: Int
 )

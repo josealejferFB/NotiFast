@@ -66,6 +66,20 @@ class StudyHubViewModel @Inject constructor(
             if (userId.isBlank()) return@launch
 
             launch {
+                authRepository.observeUserProfile(userId)
+                    .catch { emit(null) }
+                    .collect { user ->
+                        _uiState.update {
+                            it.copy(
+                                userFirstName = user?.firstName.orEmpty(),
+                                userEmail = user?.email.orEmpty(),
+                                userProfilePictureUrl = user?.profilePictureUrl
+                            )
+                        }
+                    }
+            }
+
+            launch {
                 noteRepository.getSubjects(userId)
                     .catch { emit(emptyList()) }
                     .collect { subjects ->
@@ -217,10 +231,10 @@ class StudyHubViewModel @Inject constructor(
             val userId = _uiState.value.userId
             assignDocumentSubjectUseCase(userId, event.documentId, event.subjectId, event.subjectName)
                 .onSuccess {
-                    _uiState.update { it.copy(snackbarMessage = "Materia asignada correctamente", isAssignSubjectDialogOpen = false) }
+                    _uiState.update { it.copy(snackbarMessage = "Materia asignada correctamente", isAssignSubjectDialogOpen = false, activeActionDocument = null) }
                 }
                 .onFailure { err ->
-                    _uiState.update { it.copy(errorMessage = err.message ?: "Error al asignar materia") }
+                    _uiState.update { it.copy(errorMessage = err.message ?: "Error al asignar materia", isAssignSubjectDialogOpen = false, activeActionDocument = null) }
                 }
         }
     }

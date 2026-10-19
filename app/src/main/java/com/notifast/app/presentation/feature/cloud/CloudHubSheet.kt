@@ -70,13 +70,11 @@ fun CloudHubSheet(
     LaunchedEffect(Unit) {
         viewModel.onEvent(CloudEvent.Refresh)
     }
-
     LaunchedEffect(uiState.pendingAuthIntent) {
         uiState.pendingAuthIntent?.let {
             authLauncher.launch(IntentSenderRequest.Builder(it).build())
         }
     }
-
     LaunchedEffect(uiState.summary) {
         val summary = uiState.summary
         if (summary != null && summary.failed.isEmpty()) {
@@ -84,7 +82,6 @@ fun CloudHubSheet(
             viewModel.onEvent(CloudEvent.DismissSummary)
         }
     }
-
     LaunchedEffect(uiState.error) {
         uiState.error?.let { err ->
             val errorMsg = when (err) {
@@ -210,9 +207,14 @@ fun CloudHubSheet(
                     showGlobalRow = currentFilter == CloudFilter.ALL,
                     isGlobalSelected = uiState.globalSelected,
                     hasGlobalCloudCopy = uiState.global != null,
+                    showCoversRow = currentFilter == CloudFilter.ALL,
+                    isCoversSelected = uiState.coversSelected,
+                    coversStatus = uiState.coversStatus,
+                    localCoverCount = uiState.localCoverCount,
                     selectedIds = uiState.selected,
                     failedIds = uiState.failedSubjectIds,
                     onToggleGlobal = { viewModel.onEvent(CloudEvent.ToggleGlobal) },
+                    onToggleCovers = { viewModel.onEvent(CloudEvent.ToggleCovers) },
                     onToggleSubject = { viewModel.onEvent(CloudEvent.Toggle(it)) },
                     onDeleteCloudSubject = { viewModel.onEvent(CloudEvent.DeleteFromCloud(it)) },
                     modifier = Modifier.weight(1f, fill = false)
@@ -220,12 +222,15 @@ fun CloudHubSheet(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val selectedCount = uiState.selected.size + (if (uiState.globalSelected) 1 else 0)
+                val selectedCount = uiState.selected.size + (if (uiState.globalSelected) 1 else 0) + (if (uiState.coversSelected) 1 else 0)
                 val allSelected = uiState.selected.size == uiState.items.size && uiState.items.isNotEmpty()
 
                 CloudActionBar(
                     allSelected = allSelected,
                     selectedCount = selectedCount,
+                    subjectSelectedCount = uiState.selected.size,
+                    isGlobalSelected = uiState.globalSelected,
+                    isCoversSelected = uiState.coversSelected,
                     canRestore = uiState.canRestore,
                     canUpload = uiState.canUpload,
                     isOffline = uiState.isOffline,

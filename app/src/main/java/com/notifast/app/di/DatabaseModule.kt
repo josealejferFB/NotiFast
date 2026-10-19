@@ -33,7 +33,10 @@ object DatabaseModule {
             NotiFastMigrations.MIGRATION_2_3,
             NotiFastMigrations.MIGRATION_3_4,
             NotiFastMigrations.MIGRATION_4_5,
-            NotiFastMigrations.MIGRATION_5_6
+            NotiFastMigrations.MIGRATION_5_6,
+            NotiFastMigrations.MIGRATION_6_7,
+            NotiFastMigrations.MIGRATION_7_8,
+            NotiFastMigrations.MIGRATION_8_9
         ).build()
     }
 

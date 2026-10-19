@@ -290,6 +290,15 @@
     <string name="topbar_back_cd">Regresar</string>
     <string name="topbar_active_semester">Semestre Activo</string>
     <string name="topbar_academic_hub">Hub Académico</string>
+    <string name="topbar_search_cd">Buscar</string>
+    <string name="topbar_agenda_title">Agenda Académica</string>
+    <string name="topbar_grades_title">Calificaciones</string>
+    <string name="topbar_study_title">Estudio &amp; Portadas</string>
+    <string name="topbar_settings_title">Configuración</string>
+    <string name="topbar_grades_average_badge">Promedio: %1$s</string>
+    <string name="topbar_grades_no_average">Sin notas</string>
+    <string name="topbar_study_inventory_badge">%1$d docs • %2$d borradores</string>
+    <string name="topbar_cloud_status_cd">Estado de Google Drive: %1$s</string>
     <string name="grades_title">Mis Calificaciones</string>
     <string name="settings_title">Configuración</string>
 
@@ -831,6 +840,9 @@
     <string name="subject_faculty_title">Cuerpo Docente</string>
     <string name="subject_faculty_empty">Sin profesores asignados a esta materia</string>
     <string name="subject_faculty_btn_add">Asignar Profesor</string>
+    <string name="notes_section_subjects_title">Tus Materias</string>
+    <string name="notes_section_teachers_add_compact">Añadir</string>
+    <string name="notes_teachers_carousel_empty">Sin docentes registrados. Pulsa aquí para añadir uno.</string>
 
     <!-- Global Sanitization & Audit Cleanups -->
     <string name="settings_about_feedback_error">No se encontró una aplicación de correo para enviar feedback</string>
@@ -929,6 +941,19 @@
     <string name="cloud_empty_filter_title">Sin materias en esta categoría</string>
     <string name="cloud_empty_filter_msg">No se encontraron materias que coincidan con el filtro seleccionado.</string>
     <string name="cloud_subject_empty_local">Sin contenido aún</string>
+    <string name="cloud_badge_teachers">%1$d doc.</string>
+    <string name="cloud_covers_item_title">Portadas de Estudio</string>
+    <string name="cloud_covers_item_desc">Plantillas APA 7, IEEE, UNERG y tesis institucional • Sin archivos pesados</string>
+    <string name="cloud_covers_item_count">%1$d portadas guardadas</string>
+    <string name="cloud_covers_item_count_single">1 portada guardada</string>
+    <string name="cloud_covers_item_count_none">Sin portadas guardadas</string>
+    <string name="cloud_confirm_restore_covers_title">¿Restaurar portadas de estudio?</string>
+    <string name="cloud_confirm_restore_covers_msg">Esto agregará o actualizará tus plantillas de portada con las guardadas en Google Drive.</string>
+    <string name="cloud_selection_feedback_full">%1$d materias, ajustes y portadas seleccionadas</string>
+    <string name="cloud_selection_feedback_no_covers">%1$d materias y ajustes seleccionados</string>
+    <string name="cloud_selection_feedback_no_global">%1$d materias y portadas seleccionadas</string>
+    <string name="cloud_selection_feedback_covers_only">Portadas de estudio seleccionadas</string>
+    <string name="cloud_selection_feedback_global_only">Perfil y preferencias seleccionados</string>
 
     <!-- Settings Google Account (Task 20) -->
     <string name="settings_section_cloud_account">Copia de Seguridad &amp; Nube</string>
@@ -1001,4 +1026,74 @@
     <string name="study_pdf_preview_loading">Cargando páginas del documento…</string>
     <string name="study_pdf_page_indicator">Página %1$d de %2$d</string>
     <string name="study_subject_section_title">Documentos de Estudio</string>
+
+    <!-- UNERG Degree Cover Template -->
+    <string name="study_template_unerg_title">Trabajo de Grado (UNERG)</string>
+    <string name="study_template_unerg_desc">Formato oficial UNERG / AIS para Proyectos y Trabajos Especiales de Grado con membrete editable y logos institucionales.</string>
+    <string name="study_template_unerg_badge">UNERG • AIS</string>
+    <string name="study_template_unerg_tag">UNERG TEG</string>
+    <string name="study_membrete_title">Membrete Institucional</string>
+    <string name="study_membrete_subtitle">6 líneas oficiales del encabezado universitario</string>
+    <string name="study_field_country">República / País</string>
+    <string name="study_field_ministry">Ministerio de Adscripción</string>
+    <string name="study_field_university">Universidad</string>
+    <string name="study_field_area">Área Universitaria</string>
+    <string name="study_field_program">Programa Académico</string>
+    <string name="study_field_curricular_unit">Unidad Curricular / Modalidad</string>
+    <string name="study_membrete_reset">Restablecer membrete oficial</string>
+    <string name="study_authors_section_title">Integrantes / Autores</string>
+    <string name="study_author_name_label">Nombre y Apellido</string>
+    <string name="study_author_ci_label">C.I.</string>
+    <string name="study_author_ci_hint">V-12.345.678</string>
+    <string name="study_author_add_btn">Añadir Integrante</string>
+    <string name="study_author_remove">Eliminar integrante</string>
+    <string name="study_tutor_academic_label">Tutor Académico</string>
+    <string name="study_title_uppercase_btn">TODO MAYÚSCULAS</string>
+    <string name="study_template_field_city">Ciudad</string>
+    <string name="study_typography_title">Tipografía Normas APA</string>
+    <string name="study_typography_subtitle">Fuentes y tamaños oficiales aprobados por la 7ma edición</string>
+    <string name="study_typography_badge">APA 7ma Edición</string>
+    <string name="study_template_field_docente">Docente (Asignatura)</string>
+    <string name="study_template_field_docente_hint">Docente que imparte la materia</string>
+    <string name="study_template_field_tutor">Tutor Académico</string>
+    <string name="study_template_field_tutor_hint">Tutor metodológico / académico</string>
+    <string name="study_docente_section_title">Docente y Tutor</string>
+    <string name="study_doc_no_subject">Sin materia asignada</string>
+    <string name="study_docs_count">%1$d documentos</string>
+    <string name="study_docs_count_single">1 documento</string>
+    <string name="study_docs_count_none">0 documentos</string>
+    <string name="study_tab_templates_full">Plantillas de Portada</string>
+    <string name="study_template_badge_unerg">UNERG Oficial</string>
+    <string name="study_template_badge_apa7">Normas APA 7ma</string>
+    <string name="study_template_badge_ieee">Estándar IEEE</string>
+    <string name="study_template_badge_institutional">Tesis / Institucional</string>
+    <string name="study_template_preview_tag">Vista Previa A4</string>
+    <string name="study_date_now">Ahora</string>
+    <string name="study_date_yesterday">Ayer</string>
+    <string name="study_clear_search">Limpiar búsqueda</string>
+    <string name="study_collapse_membrete">Colapsar membrete</string>
+    <string name="study_expand_membrete">Expandir membrete</string>
+
+    <!-- UNERG Schedule Import & Section -->
+    <string name="unerg_import_button_title">Importar Horario UNERG (PDF)</string>
+    <string name="unerg_import_button_desc">Carga tu comprobante oficial para generar materias y horarios automáticamente</string>
+    <string name="unerg_import_sheet_title">Importar Horario UNERG</string>
+    <string name="unerg_import_student_ci">C.I. Estudiante: %1$s</string>
+    <string name="unerg_import_period">Período: %1$s</string>
+    <string name="unerg_import_stats_summary">%1$d materias presenciales • %2$d horas/sem</string>
+    <string name="unerg_import_ignored_notice">Se ignoraron %1$d actividades no presenciales</string>
+    <string name="unerg_import_conflict_title">Materias existentes detectadas</string>
+    <string name="unerg_import_strategy_merge">Conservar horarios previos y agregar nuevos</string>
+    <string name="unerg_import_strategy_replace">Reemplazar horarios antiguos por los del PDF</string>
+    <string name="unerg_import_action_confirm">Importar %1$d materias seleccionadas</string>
+    <string name="unerg_import_success">Horario importado: %1$d materias y %2$d clases</string>
+    <string name="unerg_import_error">Error al procesar el horario: %1$s</string>
+    <string name="unerg_import_select_pdf_btn">Seleccionar Horario PDF</string>
+    <string name="unerg_import_empty_selection">Selecciona al menos una materia para importar</string>
+    <string name="unerg_import_select_all">Seleccionar todas</string>
+    <string name="unerg_import_deselect_all">Deseleccionar todas</string>
+    <string name="subject_section_label">Sección</string>
+    <string name="subject_section_chip">Sec. %1$s</string>
+    <string name="subject_section_placeholder">Ej. 1, 2, 19</string>
+    <string name="subject_section_info">Sección o grupo asignado</string>
 </resources>

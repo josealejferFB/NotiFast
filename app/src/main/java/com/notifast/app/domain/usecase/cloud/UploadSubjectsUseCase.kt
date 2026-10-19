@@ -77,12 +77,14 @@ class UploadSubjectsUseCase @Inject constructor(
                         "subjectName" to snapshot.subject.name,
                         "icon" to snapshot.subject.icon,
                         "colorHex" to snapshot.subject.colorHex,
+                        "section" to snapshot.subject.section.orEmpty(),
                         "schemaVersion" to "1",
                         "contentHash" to hash,
                         "uploadedAt" to System.currentTimeMillis().toString(),
                         "deviceModel" to android.os.Build.MODEL,
                         "noteCount" to snapshot.notes.size.toString(),
-                        "evaluationCount" to snapshot.evaluations.size.toString()
+                        "evaluationCount" to snapshot.evaluations.size.toString(),
+                        "teacherCount" to snapshot.teachers.size.toString()
                     )
 
                     val driveFileId = cloud.upload(

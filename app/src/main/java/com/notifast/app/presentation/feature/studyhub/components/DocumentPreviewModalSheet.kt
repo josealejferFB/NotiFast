@@ -1,5 +1,6 @@
 package com.notifast.app.presentation.feature.studyhub.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -108,19 +110,26 @@ fun DocumentPreviewModalSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color.White)
+            ) {
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
+                } else if (document.docType == StudyDocType.PDF) {
+                    PdfViewerContent(file = file)
+                } else {
+                    DocxViewerContent(blocks = docxBlocks)
                 }
-            } else if (document.docType == StudyDocType.PDF) {
-                PdfViewerContent(file = file)
-            } else {
-                DocxViewerContent(blocks = docxBlocks)
             }
         }
     }
@@ -129,8 +138,17 @@ fun DocumentPreviewModalSheet(
 @Composable
 private fun DocxViewerContent(blocks: List<DocxPreviewBlock>) {
     if (blocks.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.study_docx_preview_empty), style = MaterialTheme.typography.bodyMedium)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.study_docx_preview_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF475569)
+            )
         }
         return
     }
@@ -138,16 +156,22 @@ private fun DocxViewerContent(blocks: List<DocxPreviewBlock>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .background(Color.White)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(blocks) { block ->
             when (block) {
                 is DocxPreviewBlock.Heading -> {
                     Text(
                         text = block.text,
-                        style = if (block.level <= 1) MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                        else MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        style = if (block.level <= 1) MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF0F172A)
+                        ) else MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1E293B)
+                        ),
                         textAlign = if (block.isCentered) TextAlign.Center else TextAlign.Start,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -159,6 +183,7 @@ private fun DocxViewerContent(blocks: List<DocxPreviewBlock>) {
                             fontWeight = if (block.isBold) FontWeight.Bold else FontWeight.Normal,
                             fontStyle = if (block.isItalic) FontStyle.Italic else FontStyle.Normal
                         ),
+                        color = Color(0xFF1E293B),
                         textAlign = if (block.isCentered) TextAlign.Center else TextAlign.Start,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -168,14 +193,20 @@ private fun DocxViewerContent(blocks: List<DocxPreviewBlock>) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(6.dp))
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(6.dp))
+                            .background(Color(0xFFF8FAFC))
+                            .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(6.dp))
                             .padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         block.rows.forEach { row ->
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 row.forEach { cell ->
-                                    Text(text = cell, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = cell,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF1E293B),
+                                        modifier = Modifier.weight(1f)
+                                    )
                                 }
                             }
                         }

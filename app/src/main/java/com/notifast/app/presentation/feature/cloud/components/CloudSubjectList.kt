@@ -13,10 +13,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.domain.model.cloud.CloudSubjectItem
+import com.notifast.app.domain.model.cloud.CloudSubjectStatus
 import com.notifast.app.presentation.atoms.NotiFastEmptyState
 
 /**
- * 120 FPS LazyColumn list for subjects and global settings with spring item placement animations.
+ * 120 FPS LazyColumn list for subjects, global settings and cover templates with spring item placement animations.
  */
 @Composable
 fun CloudSubjectList(
@@ -25,9 +26,14 @@ fun CloudSubjectList(
     showGlobalRow: Boolean,
     isGlobalSelected: Boolean,
     hasGlobalCloudCopy: Boolean,
+    showCoversRow: Boolean,
+    isCoversSelected: Boolean,
+    coversStatus: CloudSubjectStatus,
+    localCoverCount: Int,
     selectedIds: Set<String>,
     failedIds: Set<String>,
     onToggleGlobal: () -> Unit,
+    onToggleCovers: () -> Unit,
     onToggleSubject: (String) -> Unit,
     onDeleteCloudSubject: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -42,6 +48,17 @@ fun CloudSubjectList(
                     isSelected = isGlobalSelected,
                     onToggle = onToggleGlobal,
                     hasCloudCopy = hasGlobalCloudCopy
+                )
+            }
+        }
+
+        if (showCoversRow) {
+            item(key = "cloud_cover_drafts") {
+                CoverDraftsRow(
+                    isSelected = isCoversSelected,
+                    onToggle = onToggleCovers,
+                    status = coversStatus,
+                    localCoverCount = localCoverCount
                 )
             }
         }

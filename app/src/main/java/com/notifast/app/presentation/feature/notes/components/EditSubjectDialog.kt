@@ -42,12 +42,13 @@ import com.notifast.app.presentation.feature.addsubject.components.SubjectLivePr
 fun EditSubjectDialog(
     subject: SubjectData,
     onDismiss: () -> Unit,
-    onSave: (newName: String, newColorHex: String, newIcon: String) -> Unit,
+    onSave: (newName: String, newColorHex: String, newIcon: String, newSection: String) -> Unit,
     isSaving: Boolean = false,
     errorMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
     var name by remember(subject) { mutableStateOf(subject.name) }
+    var section by remember(subject) { mutableStateOf(subject.section) }
     var selectedColor by remember(subject) { mutableStateOf(subject.colorHex.ifBlank { "#BF092F" }) }
     var selectedIcon by remember(subject) { mutableStateOf(subject.icon.ifBlank { "📚" }) }
 
@@ -79,13 +80,21 @@ fun EditSubjectDialog(
                 SubjectLivePreviewCard(
                     subjectName = name,
                     iconName = selectedIcon,
-                    hexColor = selectedColor
+                    hexColor = selectedColor,
+                    section = section
                 )
 
                 NotiFastFormField(
                     value = name,
                     onValueChange = { name = it },
                     label = stringResource(R.string.edit_subject_name_label)
+                )
+
+                NotiFastFormField(
+                    value = section,
+                    onValueChange = { section = it },
+                    label = stringResource(R.string.subject_section_label),
+                    placeholder = stringResource(R.string.subject_section_placeholder)
                 )
 
                 SubjectColorPickerBento(
@@ -120,7 +129,7 @@ fun EditSubjectDialog(
                     Spacer(Modifier.width(8.dp))
                     NotiFastButton(
                         text = stringResource(R.string.edit_subject_btn_save),
-                        onClick = { onSave(name.trim(), selectedColor, selectedIcon) },
+                        onClick = { onSave(name.trim(), selectedColor, selectedIcon, section.trim()) },
                         isLoading = isSaving,
                         enabled = name.isNotBlank() && !isSaving
                     )

@@ -84,6 +84,38 @@ class PrefillCoverDraftForSubjectUseCase @Inject constructor(
             SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
         }
 
+        val isUnerg = templateType == CoverTemplateType.UNERG_DEGREE
+        val effectiveInstitution = if (isUnerg) {
+            "UNIVERSIDAD NACIONAL EXPERIMENTAL DE LOS LLANOS CENTRALES RÓMULO GALLEGOS"
+        } else {
+            institutionName
+        }
+        val effectiveFaculty = if (isUnerg) {
+            "ÁREA DE INGENIERÍA DE SISTEMAS"
+        } else {
+            facultyOrDepartment
+        }
+        val effectiveCity = if (isUnerg && city.isBlank()) {
+            "San Juan de los Morros"
+        } else {
+            city
+        }
+        val effectiveDateStr = if (isUnerg) {
+            try {
+                val sdf = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("es"))
+                sdf.format(Date()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.forLanguageTag("es")) else it.toString() }
+            } catch (_: Exception) {
+                dateStr
+            }
+        } else {
+            dateStr
+        }
+        val effectiveCurricularUnit = if (isUnerg && subjectName.isNotBlank()) {
+            "UNIDAD CURRICULAR: ${subjectName.uppercase()}"
+        } else {
+            "UNIDAD CURRICULAR: PROYECTO DE GRADO I"
+        }
+
         return CoverDraft(
             id = UUID.randomUUID().toString(),
             userId = userId,
@@ -94,10 +126,14 @@ class PrefillCoverDraftForSubjectUseCase @Inject constructor(
             subtitle = "",
             authors = if (authorName.isNotBlank()) listOf(authorName) else emptyList(),
             teacherName = teacherName,
-            institutionName = institutionName,
-            facultyOrDepartment = facultyOrDepartment,
-            city = city,
-            formattedDate = dateStr
+            institutionName = effectiveInstitution,
+            facultyOrDepartment = effectiveFaculty,
+            city = effectiveCity,
+            formattedDate = effectiveDateStr,
+            countryLine = "REPÚBLICA BOLIVARIANA DE VENEZUELA",
+            ministryLine = "MINISTERIO DEL PODER POPULAR PARA LA EDUCACIÓN UNIVERSITARIA",
+            programLine = "PROGRAMA DE INGENIERÍA EN INFORMÁTICA",
+            curricularUnit = effectiveCurricularUnit
         )
     }
 }

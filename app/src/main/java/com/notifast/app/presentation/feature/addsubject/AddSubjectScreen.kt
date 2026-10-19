@@ -54,7 +54,7 @@ fun AddSubjectScreen(
         }
     }
 
-    val hasUnsavedChanges = uiState.subjectName.isNotBlank()
+    val hasUnsavedChanges = uiState.subjectName.isNotBlank() || uiState.section.isNotBlank()
     val handleBack = { if (hasUnsavedChanges) showDiscardDialog = true else onBackClick() }
 
     BackHandler(enabled = hasUnsavedChanges) { showDiscardDialog = true }
@@ -83,16 +83,19 @@ fun AddSubjectScreen(
                 SubjectLivePreviewCard(
                     subjectName = uiState.subjectName,
                     iconName = uiState.selectedIcon,
-                    hexColor = uiState.selectedColor
+                    hexColor = uiState.selectedColor,
+                    section = uiState.section
                 )
 
                 NotiFastCard(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         SubjectEditorFormFields(
                             subjectName = uiState.subjectName,
+                            section = uiState.section,
                             selectedColor = uiState.selectedColor,
                             selectedIcon = uiState.selectedIcon,
                             onNameChanged = { viewModel.onEvent(AddSubjectEvent.NameChanged(it)) },
+                            onSectionChanged = { viewModel.onEvent(AddSubjectEvent.SectionChanged(it)) },
                             onSuggestionSelected = { viewModel.onEvent(AddSubjectEvent.SuggestionSelected(it)) },
                             onColorSelected = { viewModel.onEvent(AddSubjectEvent.ColorSelected(it)) },
                             onIconSelected = { viewModel.onEvent(AddSubjectEvent.IconSelected(it)) }

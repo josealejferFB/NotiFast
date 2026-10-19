@@ -122,6 +122,34 @@ class NotesViewModelTest {
         val classActivity = state.nextActivity as NextActivity.ClassActivity
         assertEquals("Matemáticas", classActivity.schedule.subjectName)
         assertEquals("#3B9797", classActivity.colorHex)
+        assertTrue(classActivity.dayName.isNotBlank())
+        assertTrue(classActivity.timeRemaining.isNotBlank())
+    }
+
+    @Test
+    fun `when subject has section, nextActivity ClassActivity contains section and timing`() = runTest {
+        val today = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)
+        val todaySchedule = Schedule(
+            id = "s1",
+            subjectName = "Matemáticas",
+            dayOfWeek = today,
+            startTime = "23:00",
+            endTime = "23:59",
+            classroom = "Aula 101"
+        )
+        val subjectWithSection = SubjectData(name = "Matemáticas", colorHex = "#3B9797", icon = "📐", section = "Sec. 19")
+        coEvery { scheduleRepository.getSchedules("user_123") } returns flowOf(listOf(todaySchedule))
+        coEvery { noteRepository.getSubjects("user_123") } returns flowOf(listOf(subjectWithSection))
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.nextActivity is NextActivity.ClassActivity)
+        val classActivity = state.nextActivity as NextActivity.ClassActivity
+        assertEquals("Sec. 19", classActivity.section)
+        assertEquals("Hoy, ${Schedule.DAY_NAMES[today]}", classActivity.dayName)
+        assertTrue(classActivity.timeRemaining.isNotBlank())
     }
 
     @Test

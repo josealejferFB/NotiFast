@@ -107,7 +107,15 @@ class AddSubjectViewModelTest {
 
     @Test
     fun `when saving valid subject, calls repository and marks isSaved`() = runTest {
-        coEvery { noteRepository.addSubject("user_test_456", "Química General", "Science", "#047857") } returns Result.success("sub-1")
+        coEvery {
+            noteRepository.addSubject(
+                userId = "user_test_456",
+                subjectName = "Química General",
+                icon = "Science",
+                colorHex = "#047857",
+                section = ""
+            )
+        } returns Result.success("sub-1")
 
         val viewModel = AddSubjectViewModel(noteRepository, authRepository)
         advanceUntilIdle()
@@ -118,9 +126,54 @@ class AddSubjectViewModelTest {
         viewModel.onEvent(AddSubjectEvent.SaveClicked)
         advanceUntilIdle()
 
-        coVerify { noteRepository.addSubject("user_test_456", "Química General", "Science", "#047857") }
+        coVerify {
+            noteRepository.addSubject(
+                userId = "user_test_456",
+                subjectName = "Química General",
+                icon = "Science",
+                colorHex = "#047857",
+                section = ""
+            )
+        }
         assertTrue(viewModel.uiState.value.isSaved)
         assertEquals("Química General", viewModel.uiState.value.createdSubjectName)
+    }
+
+    @Test
+    fun `when SectionChanged event received and saved, updates section and passes to repository`() = runTest {
+        coEvery {
+            noteRepository.addSubject(
+                userId = "user_test_456",
+                subjectName = "Física II",
+                icon = "Calculate",
+                colorHex = "#0369A1",
+                section = "19"
+            )
+        } returns Result.success("sub-2")
+
+        val viewModel = AddSubjectViewModel(noteRepository, authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddSubjectEvent.NameChanged("Física II"))
+        viewModel.onEvent(AddSubjectEvent.SectionChanged("19"))
+        viewModel.onEvent(AddSubjectEvent.IconSelected("Calculate"))
+        viewModel.onEvent(AddSubjectEvent.ColorSelected("#0369A1"))
+
+        assertEquals("19", viewModel.uiState.value.section)
+
+        viewModel.onEvent(AddSubjectEvent.SaveClicked)
+        advanceUntilIdle()
+
+        coVerify {
+            noteRepository.addSubject(
+                userId = "user_test_456",
+                subjectName = "Física II",
+                icon = "Calculate",
+                colorHex = "#0369A1",
+                section = "19"
+            )
+        }
+        assertTrue(viewModel.uiState.value.isSaved)
     }
 
     @Test
@@ -129,9 +182,11 @@ class AddSubjectViewModelTest {
         advanceUntilIdle()
 
         viewModel.onEvent(AddSubjectEvent.NameChanged("Historia"))
+        viewModel.onEvent(AddSubjectEvent.SectionChanged("2"))
         viewModel.onEvent(AddSubjectEvent.ResetState)
 
         assertEquals("", viewModel.uiState.value.subjectName)
+        assertEquals("", viewModel.uiState.value.section)
         assertNull(viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isSaved)
     }

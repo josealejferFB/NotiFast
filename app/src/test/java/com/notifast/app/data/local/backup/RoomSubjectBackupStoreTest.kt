@@ -89,6 +89,7 @@ class RoomSubjectBackupStoreTest {
             icon = "math",
             colorHex = "#3B9797",
             cycle = "2026-1",
+            section = "3",
             createdAt = Date()
         )
         val schedule = ScheduleEntity(
@@ -128,6 +129,7 @@ class RoomSubjectBackupStoreTest {
         assertTrue(readResult.isSuccess)
         val snapshot = readResult.getOrThrow()
         assertEquals("sub-1", snapshot.subject.id)
+        assertEquals("3", snapshot.subject.section)
         assertEquals(1, snapshot.schedules.size)
         assertEquals(1, snapshot.evaluations.size)
         assertEquals(1, snapshot.notes.size)
@@ -141,6 +143,7 @@ class RoomSubjectBackupStoreTest {
         val user2Subject = db.subjectDao().getSubjectById("user2", "sub-1")
         assertNotNull(user2Subject)
         assertEquals("Álgebra Lineal", user2Subject!!.name)
+        assertEquals("3", user2Subject.section)
 
         val user2Schedules = db.scheduleDao().getSchedulesBySubjectId("user2", "sub-1").first()
         assertEquals(1, user2Schedules.size)

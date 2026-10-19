@@ -45,4 +45,14 @@ object AppModule {
     @Provides
     @Singleton
     fun provideGson(): com.google.gson.Gson = com.google.gson.Gson()
+
+    @Provides
+    @Singleton
+    fun provideOpenXmlDocxGenerator(@ApplicationContext context: Context): com.notifast.app.data.study.OpenXmlDocxGenerator =
+        com.notifast.app.data.study.OpenXmlDocxGenerator(context)
+
+    @Provides
+    @Singleton
+    fun provideUnergSchedulePdfParser(): com.notifast.app.domain.util.UnergSchedulePdfParser =
+        com.notifast.app.domain.util.UnergSchedulePdfParser()
 }

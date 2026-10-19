@@ -4,6 +4,7 @@ import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 import java.io.File
 
 data class SubjectSnapshot(
@@ -11,5 +12,6 @@ data class SubjectSnapshot(
     val schedules: List<Schedule> = emptyList(),
     val evaluations: List<Evaluation> = emptyList(),
     val notes: List<Note> = emptyList(),
+    val teachers: List<Teacher> = emptyList(),
     val imageFiles: Map<String, File> = emptyMap() // key = local path / URI as stored in model
 )

@@ -3,6 +3,7 @@ package com.notifast.app.presentation.feature.schedules.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.notifast.app.presentation.theme.isDark
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,9 +58,10 @@ fun ScheduleCard(
     onJoinMeeting: (String) -> Unit,
     modifier: Modifier = Modifier,
     subjectIcon: String = "📚",
-    subjectColorHex: String = ""
+    subjectColorHex: String = "",
+    subjectSection: String = ""
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.isDark
     val rawColor = if (schedule.color != 0L) {
         Color(schedule.color)
     } else if (subjectColorHex.isNotBlank()) {
@@ -99,12 +101,30 @@ fun ScheduleCard(
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = schedule.subjectName,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = schedule.subjectName,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        if (subjectSection.isNotBlank()) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            androidx.compose.material3.Surface(
+                                shape = RoundedCornerShape(4.dp),
+                                color = accessibleColor.copy(alpha = 0.12f)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.subject_section_chip, subjectSection),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = accessibleColor,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                )
+                            }
+                        }
+                    }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Schedule,

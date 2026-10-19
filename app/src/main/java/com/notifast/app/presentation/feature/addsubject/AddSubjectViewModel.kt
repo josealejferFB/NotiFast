@@ -31,6 +31,7 @@ class AddSubjectViewModel @Inject constructor(
     fun onEvent(event: AddSubjectEvent) {
         when (event) {
             is AddSubjectEvent.NameChanged -> _uiState.update { it.copy(subjectName = event.name, error = null) }
+            is AddSubjectEvent.SectionChanged -> _uiState.update { it.copy(section = event.section) }
             is AddSubjectEvent.SuggestionSelected -> _uiState.update { it.copy(subjectName = event.name, error = null) }
             is AddSubjectEvent.IconSelected -> _uiState.update { it.copy(selectedIcon = event.icon) }
             is AddSubjectEvent.ColorSelected -> _uiState.update { it.copy(selectedColor = event.colorHex) }
@@ -43,6 +44,7 @@ class AddSubjectViewModel @Inject constructor(
     private fun saveSubject() {
         val state = _uiState.value
         val cleanName = state.subjectName.trim()
+        val cleanSection = state.section.trim()
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             val userId = authRepository.getCurrentUserId()
@@ -74,7 +76,13 @@ class AddSubjectViewModel @Inject constructor(
                 is NameValidation.Valid -> Unit
             }
 
-            noteRepository.addSubject(userId, cleanName, state.selectedIcon, state.selectedColor).fold(
+            noteRepository.addSubject(
+                userId = userId,
+                subjectName = cleanName,
+                icon = state.selectedIcon,
+                colorHex = state.selectedColor,
+                section = cleanSection
+            ).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSaved = true, createdSubjectName = cleanName, subjectName = cleanName) } },
                 onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = ErrorSanitizer.sanitize(e, "Error al guardar la materia")) } }
             )

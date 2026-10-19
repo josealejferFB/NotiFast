@@ -7,6 +7,7 @@ import com.notifast.app.domain.model.cloud.BatchResult
 import com.notifast.app.domain.model.cloud.CloudAccount
 import com.notifast.app.domain.model.cloud.CloudFile
 import com.notifast.app.domain.model.cloud.CloudSubjectItem
+import com.notifast.app.domain.model.cloud.CloudSubjectStatus
 import com.notifast.app.domain.model.cloud.RestoreConflict
 import com.notifast.app.domain.model.cloud.RestoreDecision
 import com.notifast.app.domain.model.cloud.UploadProgress
@@ -17,6 +18,10 @@ data class CloudUiState(
     val isOffline: Boolean = false,
     val global: CloudFile? = null,
     val globalSelected: Boolean = false,
+    val covers: CloudFile? = null,
+    val coversSelected: Boolean = false,
+    val coversStatus: CloudSubjectStatus = CloudSubjectStatus.LOCAL_ONLY,
+    val localCoverCount: Int = 0,
     val items: List<CloudSubjectItem> = emptyList(),
     val selected: Set<String> = emptySet(),
     val canUpload: Boolean = false,
@@ -36,6 +41,7 @@ sealed interface CloudConfirm {
     data object CloudNewer : CloudConfirm
     data class MobileDataLarge(val bytes: Long) : CloudConfirm
     data object RestoreGlobal : CloudConfirm
+    data object RestoreCovers : CloudConfirm
     data class DeleteCloud(val item: CloudSubjectItem) : CloudConfirm
 }
 
@@ -44,6 +50,7 @@ sealed interface CloudEvent {
     data class AuthResult(val data: Intent?) : CloudEvent
     data class Toggle(val id: String) : CloudEvent
     data object ToggleGlobal : CloudEvent
+    data object ToggleCovers : CloudEvent
     data object SelectAll : CloudEvent
     data object Upload : CloudEvent
     data object Restore : CloudEvent

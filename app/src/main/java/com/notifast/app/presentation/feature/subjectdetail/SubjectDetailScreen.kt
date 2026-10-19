@@ -75,7 +75,8 @@ fun SubjectDetailScreen(
                     onAddEvaluationClick = { onAddEvaluationClick(uiState.subjectName) },
                     onAddScheduleClick = { onAddScheduleClick(uiState.subjectName) },
                     onShareClick = { showShareSheet = true },
-                    onEditClick = { showEditDialog = true }
+                    onEditClick = { showEditDialog = true },
+                    subjectSection = uiState.subjectSection
                 )
             }
         ) { padding ->
@@ -209,12 +210,13 @@ fun SubjectDetailScreen(
                 subject = com.notifast.app.data.model.SubjectData(
                     name = uiState.subjectName,
                     colorHex = uiState.subjectColorHex,
-                    icon = uiState.subjectIcon
+                    icon = uiState.subjectIcon,
+                    section = uiState.subjectSection
                 ),
                 isSaving = uiState.isRenaming,
                 onDismiss = { showEditDialog = false },
-                onSave = { newName, newColor, newIcon ->
-                    viewModel.onEvent(SubjectDetailEvent.UpdateSubjectData(newName, newColor, newIcon))
+                onSave = { newName, newColor, newIcon, newSection ->
+                    viewModel.onEvent(SubjectDetailEvent.UpdateSubjectData(newName, newColor, newIcon, newSection))
                     showEditDialog = false
                 }
             )

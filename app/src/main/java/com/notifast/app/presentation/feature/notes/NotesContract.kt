@@ -14,7 +14,11 @@ enum class NotesSubTab {
 sealed interface NextActivity {
     data class ClassActivity(
         val schedule: Schedule,
-        val colorHex: String = ""
+        val colorHex: String = "",
+        val dayName: String = "",
+        val timeRemaining: String = "",
+        val isOngoing: Boolean = false,
+        val section: String = ""
     ) : NextActivity
 
     data class EvaluationActivity(
@@ -34,7 +38,8 @@ data class SubjectInfo(
     val averageGrade: Double?,
     val completedEvalCount: Int,
     val pendingEvalCount: Int,
-    val upcomingEvaluations: List<Evaluation>
+    val upcomingEvaluations: List<Evaluation>,
+    val section: String = ""
 )
 
 data class DeleteTarget(
@@ -82,7 +87,7 @@ sealed interface NotesEvent {
     data class SelectTag(val tag: String?) : NotesEvent
     data class DeleteNote(val note: Note) : NotesEvent
     data class DeleteSubject(val subjectName: String) : NotesEvent
-    data class UpdateSubject(val oldName: String, val newName: String, val newColorHex: String, val newIcon: String) : NotesEvent
+    data class UpdateSubject(val oldName: String, val newName: String, val newColorHex: String, val newIcon: String, val section: String = "") : NotesEvent
     data class ToggleTaskCheck(val note: Note, val taskIndex: Int, val isChecked: Boolean) : NotesEvent
     data class SelectSubTab(val subTab: NotesSubTab) : NotesEvent
     data class SearchTeachers(val query: String) : NotesEvent

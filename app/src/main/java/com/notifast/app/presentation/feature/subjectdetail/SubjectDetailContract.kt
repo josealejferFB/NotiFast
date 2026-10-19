@@ -25,6 +25,7 @@ data class SubjectDetailUiState(
     val subjectName: String = "",
     val subjectIcon: String = "📚",
     val subjectColorHex: String = "",
+    val subjectSection: String = "",
     val selectedQuadrant: SubjectQuadrant = SubjectQuadrant.PANORAMA,
     val notes: List<Note> = emptyList(),
     val filteredNotes: List<Note> = emptyList(),
@@ -66,7 +67,7 @@ sealed interface SubjectDetailEvent {
     data class DeleteEvaluation(val evaluationId: String) : SubjectDetailEvent
     data class DeleteSchedule(val schedule: Schedule) : SubjectDetailEvent
     data class UpdateTargetGrade(val targetGrade: Double) : SubjectDetailEvent
-    data class UpdateSubjectData(val newName: String, val newColorHex: String, val newIcon: String) : SubjectDetailEvent
+    data class UpdateSubjectData(val newName: String, val newColorHex: String, val newIcon: String, val section: String = "") : SubjectDetailEvent
     data object ClearError : SubjectDetailEvent
 }
 

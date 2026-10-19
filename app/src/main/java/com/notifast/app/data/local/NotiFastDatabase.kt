@@ -35,7 +35,7 @@ import com.notifast.app.data.local.entity.UserEntity
         StudyDocumentEntity::class,
         CoverDraftEntity::class
     ],
-    version = 6,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(RoomConverters::class)

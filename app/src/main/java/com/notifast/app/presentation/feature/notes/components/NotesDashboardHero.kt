@@ -7,7 +7,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.domain.model.GradeScale
 import com.notifast.app.presentation.feature.notes.NextActivity
+import com.notifast.app.presentation.theme.isDark
 import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.color.ForestSage
 import com.notifast.app.presentation.theme.color.MutedCrimson
@@ -90,7 +90,7 @@ fun NotesDashboardHero(
 
 @Composable
 private fun NextActivityCard(nextActivity: NextActivity, onAddNoteClick: (String?) -> Unit) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -118,7 +118,13 @@ private fun NextActivityCard(nextActivity: NextActivity, onAddNoteClick: (String
                     val accentColor = remember(rawColor, isDark) { ThemeUtils.getAccessibleColor(rawColor, isDark) }
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Surface(shape = CircleShape, color = accentColor.copy(alpha = 0.14f), border = BorderStroke(1.dp, accentColor.copy(alpha = 0.35f))) {
-                            Text(stringResource(R.string.notes_hub_next_class_badge), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, color = accentColor, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                text = if (nextActivity.isOngoing) stringResource(R.string.schedules_beacon_active_title) else stringResource(R.string.notes_hub_next_class_badge),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = accentColor,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                         Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.clickable { onAddNoteClick(nextActivity.schedule.subjectName) }) {
                             Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -129,7 +135,65 @@ private fun NextActivityCard(nextActivity: NextActivity, onAddNoteClick: (String
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text(nextActivity.schedule.subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = nextActivity.schedule.subjectName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        if (nextActivity.section.isNotBlank()) {
+                            Spacer(Modifier.width(6.dp))
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.subject_section_chip, nextActivity.section),
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                    if (nextActivity.dayName.isNotBlank() || nextActivity.timeRemaining.isNotBlank()) {
+                        Spacer(Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (nextActivity.dayName.isNotBlank()) {
+                                Text(
+                                    text = nextActivity.dayName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            if (nextActivity.dayName.isNotBlank() && nextActivity.timeRemaining.isNotBlank()) {
+                                Text(
+                                    text = " • ",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (nextActivity.timeRemaining.isNotBlank()) {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = if (nextActivity.isOngoing) ForestSage.copy(alpha = 0.15f) else accentColor.copy(alpha = 0.12f)
+                                ) {
+                                    Text(
+                                        text = nextActivity.timeRemaining,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (nextActivity.isOngoing) ForestSage else accentColor,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
                     Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Schedule, null, Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -166,26 +230,6 @@ private fun NextActivityCard(nextActivity: NextActivity, onAddNoteClick: (String
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun MetricStatCard(modifier: Modifier, label: String, value: String, icon: ImageVector, accentColor: Color) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-    ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, Modifier.size(13.dp), tint = accentColor)
-                Spacer(Modifier.width(4.dp))
-                Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
-            }
-            Spacer(Modifier.height(4.dp))
-            Text(value, style = MaterialTheme.typography.monoAcademic, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

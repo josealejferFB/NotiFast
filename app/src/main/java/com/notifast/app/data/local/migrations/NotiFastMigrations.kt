@@ -248,5 +248,28 @@ object NotiFastMigrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_cover_drafts_subjectId` ON `cover_drafts` (`subjectId`)")
         }
     }
+
+    val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `countryLine` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `ministryLine` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `programLine` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `curricularUnit` TEXT NOT NULL DEFAULT ''")
+        }
+    }
+
+    val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `tutorName` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `fontName` TEXT NOT NULL DEFAULT 'Times New Roman'")
+            db.execSQL("ALTER TABLE `cover_drafts` ADD COLUMN `fontSizePt` INTEGER NOT NULL DEFAULT 12")
+        }
+    }
+
+    val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `subjects` ADD COLUMN `section` TEXT NOT NULL DEFAULT ''")
+        }
+    }
 }
 

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Assignment
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.School
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,7 +29,7 @@ import com.notifast.app.presentation.theme.type.monoAcademicSmall
 import java.util.Locale
 
 /**
- * Micro-badges row displaying counts for notes, evaluations, schedules and file size
+ * Micro-badges row displaying counts for notes, evaluations, schedules, teachers and file size
  * using high-contrast tabular monospace typography.
  */
 @Composable
@@ -37,7 +38,7 @@ fun DataBreakdownBadges(
     modifier: Modifier = Modifier
 ) {
     val sizeStr = formatSizeBytes(item.sizeBytes)
-    val hasAnyBadge = item.noteCount > 0 || item.evaluationCount > 0 || item.scheduleCount > 0 || sizeStr.isNotEmpty()
+    val hasAnyBadge = item.noteCount > 0 || item.evaluationCount > 0 || item.scheduleCount > 0 || item.teacherCount > 0 || sizeStr.isNotEmpty()
 
     if (hasAnyBadge) {
         Row(
@@ -61,6 +62,12 @@ fun DataBreakdownBadges(
                 MicroBadgePill(
                     icon = Icons.Rounded.CalendarMonth,
                     text = stringResource(R.string.cloud_badge_schedules, item.scheduleCount)
+                )
+            }
+            if (item.teacherCount > 0) {
+                MicroBadgePill(
+                    icon = Icons.Rounded.School,
+                    text = stringResource(R.string.cloud_badge_teachers, item.teacherCount)
                 )
             }
             if (sizeStr.isNotEmpty()) {

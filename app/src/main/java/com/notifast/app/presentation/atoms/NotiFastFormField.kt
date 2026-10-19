@@ -28,6 +28,7 @@ fun NotiFastFormField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    placeholder: String? = null,
     cursorColor: Color = MaterialTheme.colorScheme.primary,
     leadingIcon: ImageVector? = null,
     modifier: Modifier = Modifier,
@@ -45,6 +46,7 @@ fun NotiFastFormField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
+        placeholder = placeholder?.let { { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) } },
         leadingIcon = if (leadingIcon != null) {
             { Icon(leadingIcon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
         } else null,
@@ -82,6 +84,7 @@ fun NotiFastFormField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     label: String,
+    placeholder: String? = null,
     cursorColor: Color = MaterialTheme.colorScheme.primary,
     leadingIcon: ImageVector? = null,
     modifier: Modifier = Modifier,
@@ -99,6 +102,7 @@ fun NotiFastFormField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
+        placeholder = placeholder?.let { { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) } },
         leadingIcon = if (leadingIcon != null) {
             { Icon(leadingIcon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
         } else null,

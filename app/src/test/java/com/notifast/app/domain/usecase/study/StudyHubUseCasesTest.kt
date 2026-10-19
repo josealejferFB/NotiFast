@@ -76,4 +76,30 @@ class StudyHubUseCasesTest {
         assertEquals("Física Clásica", prefilled.subjectName)
         assertTrue(prefilled.formattedDate.isNotBlank())
     }
+
+    @Test
+    fun `PrefillCoverDraftForSubjectUseCase populates UNERG institutional defaults and letterhead`() = runTest {
+        coEvery { authRepository.getUserProfile("u1") } returns Result.success(User(uid = "u1", email = "test@unerg.edu", firstName = "José", lastName = "Fernandez"))
+        val teacher = Teacher(id = "t2", userId = "u1", firstName = "Miguel", lastName = "Padrón", subjectNames = listOf("Proyecto de Grado I"))
+        coEvery { teacherRepository.getTeachers("u1") } returns flowOf(listOf(teacher))
+        coEvery { studyDocRepository.getLatestCoverDraft("u1") } returns null
+
+        val prefilled = prefillUseCase(
+            userId = "u1",
+            templateType = CoverTemplateType.UNERG_DEGREE,
+            subjectId = "sub-1",
+            subjectName = "Proyecto de Grado I"
+        )
+
+        assertEquals(CoverTemplateType.UNERG_DEGREE, prefilled.templateType)
+        assertEquals("José Fernandez", prefilled.authors.firstOrNull())
+        assertEquals("Prof. Miguel Padrón", prefilled.teacherName)
+        assertEquals("UNIVERSIDAD NACIONAL EXPERIMENTAL DE LOS LLANOS CENTRALES RÓMULO GALLEGOS", prefilled.institutionName)
+        assertEquals("ÁREA DE INGENIERÍA DE SISTEMAS", prefilled.facultyOrDepartment)
+        assertEquals("San Juan de los Morros", prefilled.city)
+        assertEquals("REPÚBLICA BOLIVARIANA DE VENEZUELA", prefilled.countryLine)
+        assertEquals("MINISTERIO DEL PODER POPULAR PARA LA EDUCACIÓN UNIVERSITARIA", prefilled.ministryLine)
+        assertEquals("PROGRAMA DE INGENIERÍA EN INFORMÁTICA", prefilled.programLine)
+        assertEquals("UNIDAD CURRICULAR: PROYECTO DE GRADO I", prefilled.curricularUnit)
+    }
 }

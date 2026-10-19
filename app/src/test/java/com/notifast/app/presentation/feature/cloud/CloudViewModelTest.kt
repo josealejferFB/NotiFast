@@ -16,8 +16,10 @@ import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.usecase.ResolveSubjectNameUseCase
 import com.notifast.app.domain.usecase.cloud.BuildCloudOverviewUseCase
 import com.notifast.app.domain.usecase.cloud.DeleteCloudSubjectUseCase
+import com.notifast.app.domain.usecase.cloud.RestoreCoversUseCase
 import com.notifast.app.domain.usecase.cloud.RestoreGlobalDataUseCase
 import com.notifast.app.domain.usecase.cloud.RestoreSubjectsUseCase
+import com.notifast.app.domain.usecase.cloud.UploadCoversUseCase
 import com.notifast.app.domain.usecase.cloud.UploadGlobalDataUseCase
 import com.notifast.app.domain.usecase.cloud.UploadSubjectsUseCase
 import com.notifast.app.domain.util.NetworkMonitor
@@ -52,8 +54,10 @@ class CloudViewModelTest {
     private val buildCloudOverviewUseCase: BuildCloudOverviewUseCase = mockk(relaxed = true)
     private val uploadSubjectsUseCase: UploadSubjectsUseCase = mockk(relaxed = true)
     private val uploadGlobalDataUseCase: UploadGlobalDataUseCase = mockk(relaxed = true)
+    private val uploadCoversUseCase: UploadCoversUseCase = mockk(relaxed = true)
     private val restoreSubjectsUseCase: RestoreSubjectsUseCase = mockk(relaxed = true)
     private val restoreGlobalDataUseCase: RestoreGlobalDataUseCase = mockk(relaxed = true)
+    private val restoreCoversUseCase: RestoreCoversUseCase = mockk(relaxed = true)
     private val deleteCloudSubjectUseCase: DeleteCloudSubjectUseCase = mockk(relaxed = true)
     private val resolveSubjectNameUseCase: ResolveSubjectNameUseCase = ResolveSubjectNameUseCase()
     private val networkMonitor: NetworkMonitor = mockk(relaxed = true)
@@ -163,8 +167,10 @@ class CloudViewModelTest {
             buildCloudOverviewUseCase = buildCloudOverviewUseCase,
             uploadSubjectsUseCase = uploadSubjectsUseCase,
             uploadGlobalDataUseCase = uploadGlobalDataUseCase,
+            uploadCoversUseCase = uploadCoversUseCase,
             restoreSubjectsUseCase = restoreSubjectsUseCase,
             restoreGlobalDataUseCase = restoreGlobalDataUseCase,
+            restoreCoversUseCase = restoreCoversUseCase,
             deleteCloudSubjectUseCase = deleteCloudSubjectUseCase,
             resolveSubjectNameUseCase = resolveSubjectNameUseCase,
             networkMonitor = networkMonitor,

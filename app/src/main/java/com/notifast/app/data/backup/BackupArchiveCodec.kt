@@ -11,6 +11,7 @@ import com.google.gson.JsonSerializer
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.Teacher
 import com.notifast.app.data.model.package_data.SubjectPackage
+import com.notifast.app.domain.model.study.CoverDraft
 import com.notifast.app.domain.util.NoteBlockCodec
 import java.io.File
 import java.io.FileInputStream
@@ -35,6 +36,7 @@ class BackupArchiveCodec @Inject constructor(
         const val MANIFEST_FILE = "manifest.json"
         const val SUBJECT_FILE = "subject.json"
         const val GLOBAL_FILE = "global.json"
+        const val COVERS_FILE = "covers.json"
         const val AVATAR_FILE = "avatar.jpg"
         const val IMAGES_DIR = "images"
         private const val UTC_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
@@ -136,7 +138,8 @@ class BackupArchiveCodec @Inject constructor(
                 subject = snapshot.subject,
                 schedules = snapshot.schedules,
                 evaluations = rewrittenEvaluations,
-                notes = rewrittenNotes
+                notes = rewrittenNotes,
+                teachers = snapshot.teachers
             )
             File(stageDir, SUBJECT_FILE).writeText(gson.toJson(pkg), Charsets.UTF_8)
 
@@ -210,6 +213,7 @@ class BackupArchiveCodec @Inject constructor(
                     schedules = pkg.schedules,
                     evaluations = pkg.evaluations,
                     notes = pkg.notes,
+                    teachers = pkg.teachers,
                     imageFiles = imageFilesMap
                 )
             )
@@ -305,6 +309,71 @@ class BackupArchiveCodec @Inject constructor(
                     teachers = dto.teachers
                 )
             )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun writeCovers(drafts: List<CoverDraft>, out: File, workDir: File): Result<Unit> {
+        val stageDir = File(workDir, "stage_covers_${System.currentTimeMillis()}_${(0..99999).random()}")
+        return try {
+            stageDir.mkdirs()
+
+            File(stageDir, COVERS_FILE).writeText(gson.toJson(drafts), Charsets.UTF_8)
+
+            val manifest = BackupManifest(
+                format = FORMAT_NAME,
+                schemaVersion = BACKUP_SCHEMA_VERSION,
+                kind = "covers",
+                createdAt = System.currentTimeMillis()
+            )
+            File(stageDir, MANIFEST_FILE).writeText(gson.toJson(manifest), Charsets.UTF_8)
+
+            out.parentFile?.mkdirs()
+            zipDirectory(stageDir, out)
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        } finally {
+            stageDir.deleteRecursively()
+        }
+    }
+
+    fun readCovers(zip: File, extractDir: File): Result<List<CoverDraft>> {
+        return try {
+            if (!zip.exists() || !zip.isFile) {
+                return Result.failure(IllegalArgumentException("Zip file does not exist: ${zip.path}"))
+            }
+            extractDir.mkdirs()
+            unzip(zip, extractDir)
+
+            val manifestFile = File(extractDir, MANIFEST_FILE)
+            if (!manifestFile.exists()) {
+                return Result.failure(IllegalArgumentException("Archive missing $MANIFEST_FILE"))
+            }
+            val manifest = gson.fromJson(manifestFile.readText(Charsets.UTF_8), BackupManifest::class.java)
+                ?: return Result.failure(IllegalArgumentException("Corrupted $MANIFEST_FILE"))
+
+            if (manifest.format != FORMAT_NAME) {
+                return Result.failure(IllegalArgumentException("Invalid format: ${manifest.format}"))
+            }
+            if (manifest.schemaVersion > BACKUP_SCHEMA_VERSION) {
+                return Result.failure(UnsupportedBackupException(manifest.schemaVersion))
+            }
+            if (manifest.kind != "covers") {
+                return Result.failure(IllegalArgumentException("Expected covers backup, found: ${manifest.kind}"))
+            }
+
+            val coversFile = File(extractDir, COVERS_FILE)
+            if (!coversFile.exists()) {
+                return Result.failure(IllegalArgumentException("Archive missing $COVERS_FILE"))
+            }
+
+            val type = object : com.google.gson.reflect.TypeToken<List<CoverDraft>>() {}.type
+            val drafts: List<CoverDraft> = gson.fromJson(coversFile.readText(Charsets.UTF_8), type) ?: emptyList()
+
+            Result.success(drafts)
         } catch (e: Exception) {
             Result.failure(e)
         }

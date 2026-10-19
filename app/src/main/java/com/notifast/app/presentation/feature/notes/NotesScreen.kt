@@ -9,6 +9,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -49,9 +50,7 @@ import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.feature.notes.components.NoteDetailExpandable
 import com.notifast.app.presentation.feature.notes.components.NotesDialogs
 import com.notifast.app.presentation.feature.notes.components.NotesTabContent
-import com.notifast.app.presentation.feature.notes.components.ProfessorDirectoryContent
-import com.notifast.app.presentation.feature.notes.components.SubjectGridBento
-import com.notifast.app.presentation.feature.notes.components.SubjectsSubTabSegment
+import com.notifast.app.presentation.feature.notes.components.SubjectsTabContent
 
 @Composable
 fun NotesScreen(
@@ -89,19 +88,7 @@ fun NotesScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                NotiFastTopBar(
-                    type = TopBarType.Home(
-                        firstName = uiState.userFirstName,
-                        email = uiState.userEmail,
-                        profilePictureUrl = uiState.userProfilePictureUrl,
-                        syncSummary = uiState.syncSummary,
-                        onProfileClick = onEditProfile,
-                        onSearchClick = onSearchClick,
-                        onCloudClick = { viewModel.onEvent(NotesEvent.CloudClick) }
-                    )
-                )
-            },
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = {
                 NotiFastExpandableFab(
                     actions = listOf(
@@ -155,35 +142,23 @@ fun NotesScreen(
                             onAddSubjectClick = { showAddSubjectSheet = true }
                         )
                     } else {
-                        SubjectsSubTabSegment(
-                            selectedSubTab = uiState.selectedSubTab,
-                            onSelectSubTab = { viewModel.onEvent(NotesEvent.SelectSubTab(it)) }
+                        SubjectsTabContent(
+                            subjectInfos = uiState.subjectInfos,
+                            teachers = uiState.teachers,
+                            onSubjectClick = onSubjectClick,
+                            onEditSubject = { subjectToEdit = it },
+                            onAddNoteClick = { onAddNoteClick(it) },
+                            onAddEvaluationClick = onAddEvaluationClick,
+                            onDeleteSubject = { viewModel.onEvent(NotesEvent.RequestDeleteSubject(it)) },
+                            onAddSubjectClick = { showAddSubjectSheet = true },
+                            onTeacherClick = { viewModel.onEvent(NotesEvent.SelectTeacherForDetail(it)) },
+                            onAddTeacherClick = { viewModel.onEvent(NotesEvent.OpenAddEditTeacher(Teacher())) },
+                            onWhatsAppClick = { teacher ->
+                                viewModel.onEvent(NotesEvent.SelectTeacherForDetail(teacher))
+                            },
+                            displayScale = uiState.gradeScale,
+                            minPassingGrade = uiState.minPassingGrade
                         )
-
-                        if (uiState.selectedSubTab == NotesSubTab.SUBJECTS) {
-                            SubjectGridBento(
-                                subjectInfos = uiState.subjectInfos,
-                                onSubjectClick = onSubjectClick,
-                                onEditSubject = { subjectToEdit = it },
-                                onAddNoteClick = { onAddNoteClick(it) },
-                                onAddEvaluationClick = onAddEvaluationClick,
-                                onDeleteSubject = { viewModel.onEvent(NotesEvent.RequestDeleteSubject(it)) },
-                                onAddSubjectClick = { showAddSubjectSheet = true },
-                                displayScale = uiState.gradeScale,
-                                minPassingGrade = uiState.minPassingGrade
-                            )
-                        } else {
-                            ProfessorDirectoryContent(
-                                teachers = uiState.filteredTeachers,
-                                searchQuery = uiState.teacherSearchQuery,
-                                onSearchQueryChange = { viewModel.onEvent(NotesEvent.SearchTeachers(it)) },
-                                onTeacherClick = { viewModel.onEvent(NotesEvent.SelectTeacherForDetail(it)) },
-                                onAddTeacherClick = { viewModel.onEvent(NotesEvent.OpenAddEditTeacher(Teacher())) },
-                                onWhatsAppClick = { teacher ->
-                                    viewModel.onEvent(NotesEvent.SelectTeacherForDetail(teacher))
-                                }
-                            )
-                        }
                     }
                 }
             }

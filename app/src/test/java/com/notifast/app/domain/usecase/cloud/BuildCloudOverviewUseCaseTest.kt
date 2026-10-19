@@ -9,6 +9,7 @@ import com.notifast.app.domain.model.cloud.CloudAccount
 import com.notifast.app.domain.model.cloud.CloudFile
 import com.notifast.app.domain.model.cloud.CloudSubjectStatus
 import com.notifast.app.domain.repository.CloudBackupRepository
+import com.notifast.app.domain.repository.CoverBackupStore
 import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.repository.SubjectBackupStore
 import io.mockk.coEvery
@@ -30,12 +31,14 @@ class BuildCloudOverviewUseCaseTest {
     private val cloud: CloudBackupRepository = mockk()
     private val stateDao: SubjectCloudStateDao = mockk()
     private val accountRepository: GoogleAccountRepository = mockk()
+    private val coverStore: CoverBackupStore = mockk(relaxed = true)
 
     private lateinit var useCase: BuildCloudOverviewUseCase
 
     @Before
     fun setUp() {
-        useCase = BuildCloudOverviewUseCase(store, hasher, cloud, stateDao, accountRepository)
+        coEvery { coverStore.read(any()) } returns Result.success(emptyList())
+        useCase = BuildCloudOverviewUseCase(store, hasher, cloud, stateDao, accountRepository, coverStore)
     }
 
     private fun createCloudFile(

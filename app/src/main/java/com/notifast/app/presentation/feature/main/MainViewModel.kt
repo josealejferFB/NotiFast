@@ -2,19 +2,36 @@ package com.notifast.app.presentation.feature.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notifast.app.domain.model.cloud.LocalSyncSummary
 import com.notifast.app.domain.repository.AuthRepository
+import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.repository.UserPrefsRepository
+import com.notifast.app.domain.usecase.cloud.ObserveLocalSyncSummaryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class MainTopBarState(
+    val firstName: String = "",
+    val email: String = "",
+    val photoUrl: String? = null,
+    val syncSummary: LocalSyncSummary = LocalSyncSummary.NO_ACCOUNT
+)
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    authRepository: AuthRepository,
-    userPrefsRepository: UserPrefsRepository
+    private val authRepository: AuthRepository,
+    userPrefsRepository: UserPrefsRepository,
+    private val googleAccountRepository: GoogleAccountRepository,
+    private val observeLocalSyncSummaryUseCase: ObserveLocalSyncSummaryUseCase
 ) : ViewModel() {
     val authState: StateFlow<Boolean?> = authRepository.authState
 
@@ -54,8 +71,50 @@ class MainViewModel @Inject constructor(
         initialValue = null
     )
 
-    private val _pendingDeepLink = kotlinx.coroutines.flow.MutableStateFlow<NotificationDeepLink?>(null)
+    private val _pendingDeepLink = MutableStateFlow<NotificationDeepLink?>(null)
     val pendingDeepLink: StateFlow<NotificationDeepLink?> = _pendingDeepLink.asStateFlow()
+
+    private val _topBarState = MutableStateFlow(MainTopBarState())
+    val topBarState: StateFlow<MainTopBarState> = _topBarState.asStateFlow()
+
+    init {
+        observeUserProfileAndSync()
+    }
+
+    private fun observeUserProfileAndSync() {
+        viewModelScope.launch {
+            authRepository.authState.collectLatest { isAuthenticated ->
+                if (isAuthenticated == true) {
+                    val uid = authRepository.getCurrentUserId() ?: return@collectLatest
+                    launch {
+                        combine(
+                            authRepository.observeUserProfile(uid),
+                            googleAccountRepository.account
+                        ) { user, account ->
+                            user to account
+                        }.collect { (user, account) ->
+                            val firstName = user?.firstName?.takeIf { it.isNotBlank() }
+                                ?: account?.displayName?.split(" ")?.firstOrNull().orEmpty()
+                            val email = user?.email?.takeIf { !it.endsWith("@local.notifast") && it.isNotBlank() }
+                                ?: account?.email.orEmpty()
+                            val photo = user?.profilePictureUrl?.takeIf { it.isNotBlank() } ?: account?.photoUrl
+
+                            _topBarState.update { it.copy(
+                                firstName = firstName,
+                                email = email,
+                                photoUrl = photo
+                            ) }
+                        }
+                    }
+                    launch {
+                        observeLocalSyncSummaryUseCase(uid).collect { summary ->
+                            _topBarState.update { it.copy(syncSummary = summary) }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     fun handleNotificationIntent(intent: android.content.Intent?) {
         val destination = intent?.getStringExtra(com.notifast.app.MainActivity.EXTRA_DESTINATION) ?: return

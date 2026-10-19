@@ -20,6 +20,7 @@ data class SubjectEntity(
     val icon: String = "📚",
     val colorHex: String = "",
     val cycle: String = "",
+    val section: String = "",
     val createdAt: Date? = null
 ) {
     constructor(
@@ -35,6 +36,7 @@ data class SubjectEntity(
         icon = icon,
         colorHex = colorHex,
         cycle = "",
+        section = "",
         createdAt = createdAtTimestamp?.let { Date(it) }
     )
 }

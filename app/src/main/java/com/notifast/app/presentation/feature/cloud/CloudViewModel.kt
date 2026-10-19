@@ -20,8 +20,10 @@ import com.notifast.app.domain.repository.GoogleAccountRepository
 import com.notifast.app.domain.usecase.ResolveSubjectNameUseCase
 import com.notifast.app.domain.usecase.cloud.BuildCloudOverviewUseCase
 import com.notifast.app.domain.usecase.cloud.DeleteCloudSubjectUseCase
+import com.notifast.app.domain.usecase.cloud.RestoreCoversUseCase
 import com.notifast.app.domain.usecase.cloud.RestoreGlobalDataUseCase
 import com.notifast.app.domain.usecase.cloud.RestoreSubjectsUseCase
+import com.notifast.app.domain.usecase.cloud.UploadCoversUseCase
 import com.notifast.app.domain.usecase.cloud.UploadGlobalDataUseCase
 import com.notifast.app.domain.usecase.cloud.UploadSubjectsUseCase
 import com.notifast.app.domain.util.NameValidation
@@ -42,8 +44,10 @@ class CloudViewModel @Inject constructor(
     private val buildCloudOverviewUseCase: BuildCloudOverviewUseCase,
     private val uploadSubjectsUseCase: UploadSubjectsUseCase,
     private val uploadGlobalDataUseCase: UploadGlobalDataUseCase,
+    private val uploadCoversUseCase: UploadCoversUseCase,
     private val restoreSubjectsUseCase: RestoreSubjectsUseCase,
     private val restoreGlobalDataUseCase: RestoreGlobalDataUseCase,
+    private val restoreCoversUseCase: RestoreCoversUseCase,
     private val deleteCloudSubjectUseCase: DeleteCloudSubjectUseCase,
     private val resolveSubjectNameUseCase: ResolveSubjectNameUseCase,
     private val networkMonitor: NetworkMonitor,
@@ -63,6 +67,7 @@ class CloudViewModel @Inject constructor(
     private val currentDecisions = mutableMapOf<String, RestoreDecision>()
     private var pendingRestoreItems = listOf<CloudSubjectItem>()
     private var pendingRestoreGlobal = false
+    private var pendingRestoreCovers = false
 
     init {
         viewModelScope.launch {
@@ -83,6 +88,7 @@ class CloudViewModel @Inject constructor(
             is CloudEvent.AuthResult -> handleAuthResult(event.data)
             is CloudEvent.Toggle -> toggleSelection(event.id)
             is CloudEvent.ToggleGlobal -> toggleGlobal()
+            is CloudEvent.ToggleCovers -> toggleCovers()
             is CloudEvent.SelectAll -> selectAll()
             is CloudEvent.Upload -> handleUpload()
             is CloudEvent.Restore -> handleRestore()
@@ -109,13 +115,17 @@ class CloudViewModel @Inject constructor(
                     selected = emptySet(),
                     global = null,
                     globalSelected = false,
+                    covers = null,
+                    coversSelected = false,
+                    coversStatus = CloudSubjectStatus.LOCAL_ONLY,
+                    localCoverCount = 0,
                     canUpload = false,
                     canRestore = false,
                     cloudOnlyBanner = 0
                 )
             }
         } else {
-            _uiState.update { it.copy(account = account, selected = emptySet(), globalSelected = false) }
+            _uiState.update { it.copy(account = account, selected = emptySet(), globalSelected = false, coversSelected = false) }
             loadOverview()
         }
     }
@@ -135,10 +145,13 @@ class CloudViewModel @Inject constructor(
                             isLoading = false,
                             items = overview.subjects,
                             global = overview.global,
+                            covers = overview.covers,
+                            coversStatus = overview.coversStatus,
+                            localCoverCount = overview.localCoverCount,
                             selected = prunedSelected,
                             cloudOnlyBanner = cloudOnlyCount,
-                            canUpload = computeCanUpload(prunedSelected, current.globalSelected, overview.subjects),
-                            canRestore = computeCanRestore(prunedSelected, current.globalSelected, overview.global, overview.subjects)
+                            canUpload = computeCanUpload(prunedSelected, current.globalSelected, current.coversSelected, overview.coversStatus, overview.subjects),
+                            canRestore = computeCanRestore(prunedSelected, current.globalSelected, current.coversSelected, overview.global, overview.covers, overview.subjects)
                         )
                     }
                 },
@@ -150,8 +163,15 @@ class CloudViewModel @Inject constructor(
         }
     }
 
-    private fun computeCanUpload(selected: Set<String>, globalSelected: Boolean, items: List<CloudSubjectItem>): Boolean {
+    private fun computeCanUpload(
+        selected: Set<String>,
+        globalSelected: Boolean,
+        coversSelected: Boolean,
+        coversStatus: CloudSubjectStatus,
+        items: List<CloudSubjectItem>
+    ): Boolean {
         if (globalSelected) return true
+        if (coversSelected && coversStatus != CloudSubjectStatus.CLOUD_ONLY && coversStatus != CloudSubjectStatus.SYNCED) return true
         val selectedItems = items.filter { it.subjectId in selected }
         return selectedItems.any { it.status != CloudSubjectStatus.CLOUD_ONLY && it.status != CloudSubjectStatus.SYNCED }
     }
@@ -159,10 +179,13 @@ class CloudViewModel @Inject constructor(
     private fun computeCanRestore(
         selected: Set<String>,
         globalSelected: Boolean,
+        coversSelected: Boolean,
         global: CloudFile?,
+        covers: CloudFile?,
         items: List<CloudSubjectItem>
     ): Boolean {
         if (globalSelected && global != null) return true
+        if (coversSelected && covers != null) return true
         val selectedItems = items.filter { it.subjectId in selected }
         return selectedItems.any { it.cloudFile != null || it.status != CloudSubjectStatus.LOCAL_ONLY }
     }
@@ -174,8 +197,8 @@ class CloudViewModel @Inject constructor(
                 selected = newSelected,
                 failedSubjectIds = current.failedSubjectIds - id,
                 summary = null,
-                canUpload = computeCanUpload(newSelected, current.globalSelected, current.items),
-                canRestore = computeCanRestore(newSelected, current.globalSelected, current.global, current.items)
+                canUpload = computeCanUpload(newSelected, current.globalSelected, current.coversSelected, current.coversStatus, current.items),
+                canRestore = computeCanRestore(newSelected, current.globalSelected, current.coversSelected, current.global, current.covers, current.items)
             )
         }
     }
@@ -186,8 +209,20 @@ class CloudViewModel @Inject constructor(
             current.copy(
                 globalSelected = newGlobal,
                 summary = null,
-                canUpload = computeCanUpload(current.selected, newGlobal, current.items),
-                canRestore = computeCanRestore(current.selected, newGlobal, current.global, current.items)
+                canUpload = computeCanUpload(current.selected, newGlobal, current.coversSelected, current.coversStatus, current.items),
+                canRestore = computeCanRestore(current.selected, newGlobal, current.coversSelected, current.global, current.covers, current.items)
+            )
+        }
+    }
+
+    private fun toggleCovers() {
+        _uiState.update { current ->
+            val newCovers = !current.coversSelected
+            current.copy(
+                coversSelected = newCovers,
+                summary = null,
+                canUpload = computeCanUpload(current.selected, current.globalSelected, newCovers, current.coversStatus, current.items),
+                canRestore = computeCanRestore(current.selected, current.globalSelected, newCovers, current.global, current.covers, current.items)
             )
         }
     }
@@ -202,8 +237,8 @@ class CloudViewModel @Inject constructor(
             current.copy(
                 selected = newSelected,
                 summary = null,
-                canUpload = computeCanUpload(newSelected, current.globalSelected, current.items),
-                canRestore = computeCanRestore(newSelected, current.globalSelected, current.global, current.items)
+                canUpload = computeCanUpload(newSelected, current.globalSelected, current.coversSelected, current.coversStatus, current.items),
+                canRestore = computeCanRestore(newSelected, current.globalSelected, current.coversSelected, current.global, current.covers, current.items)
             )
         }
     }
@@ -218,7 +253,11 @@ class CloudViewModel @Inject constructor(
                     it.status != CloudSubjectStatus.CLOUD_ONLY &&
                     it.status != CloudSubjectStatus.SYNCED
         }
-        if (toUpload.isEmpty() && !_uiState.value.globalSelected) return
+        val uploadCovers = _uiState.value.coversSelected &&
+                _uiState.value.coversStatus != CloudSubjectStatus.CLOUD_ONLY &&
+                _uiState.value.coversStatus != CloudSubjectStatus.SYNCED
+
+        if (toUpload.isEmpty() && !_uiState.value.globalSelected && !uploadCovers) return
 
         val hasNewerOrUnlinked = toUpload.any {
             it.status == CloudSubjectStatus.CLOUD_NEWER || it.status == CloudSubjectStatus.BOTH_UNLINKED
@@ -227,10 +266,10 @@ class CloudViewModel @Inject constructor(
             _uiState.update { it.copy(pendingConfirm = CloudConfirm.CloudNewer) }
             return
         }
-        checkMeteredAndProceedUpload(toUpload)
+        checkMeteredAndProceedUpload(toUpload, uploadCovers)
     }
 
-    private fun checkMeteredAndProceedUpload(toUpload: List<CloudSubjectItem>) {
+    private fun checkMeteredAndProceedUpload(toUpload: List<CloudSubjectItem>, uploadCovers: Boolean) {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUserId() ?: return@launch
             if (networkMonitor.isMetered() && toUpload.isNotEmpty()) {
@@ -240,11 +279,15 @@ class CloudViewModel @Inject constructor(
                     return@launch
                 }
             }
-            executeUpload(toUpload, _uiState.value.globalSelected)
+            executeUpload(toUpload, _uiState.value.globalSelected, uploadCovers)
         }
     }
 
-    private fun executeUpload(toUpload: List<CloudSubjectItem>, uploadGlobal: Boolean) {
+    private fun executeUpload(
+        toUpload: List<CloudSubjectItem>,
+        uploadGlobal: Boolean,
+        uploadCovers: Boolean
+    ) {
         lastOperation = Operation.UPLOAD
         viewModelScope.launch {
             val uid = authRepository.getCurrentUserId() ?: return@launch
@@ -265,6 +308,14 @@ class CloudViewModel @Inject constructor(
                         outcomes.add(ItemOutcome(id = "global", name = "Perfil y ajustes", error = null))
                     } else {
                         outcomes.add(ItemOutcome(id = "global", name = "Perfil y ajustes", error = globalResult.exceptionOrNull()))
+                    }
+                }
+                if (uploadCovers) {
+                    val coversResult = uploadCoversUseCase(uid, _uiState.value.covers, context.cacheDir)
+                    if (coversResult.isSuccess) {
+                        outcomes.add(ItemOutcome(id = "covers", name = "Portadas de Estudio", error = null))
+                    } else {
+                        outcomes.add(ItemOutcome(id = "covers", name = "Portadas de Estudio", error = coversResult.exceptionOrNull()))
                     }
                 }
                 val failedIds = outcomes.filter { it.error != null }.map { it.id }.toSet()
@@ -292,27 +343,39 @@ class CloudViewModel @Inject constructor(
             it.subjectId in _uiState.value.selected &&
                     (it.cloudFile != null || it.status != CloudSubjectStatus.LOCAL_ONLY)
         }
-        if (toRestore.isEmpty() && (!_uiState.value.globalSelected || _uiState.value.global == null)) return
+        val restoreGlobal = _uiState.value.globalSelected && _uiState.value.global != null
+        val restoreCovers = _uiState.value.coversSelected && _uiState.value.covers != null
 
-        if (_uiState.value.globalSelected && _uiState.value.global != null) {
+        if (toRestore.isEmpty() && !restoreGlobal && !restoreCovers) return
+
+        if (restoreGlobal) {
             _uiState.update { it.copy(pendingConfirm = CloudConfirm.RestoreGlobal) }
             return
         }
-        checkConflictsAndRestore(toRestore, restoreGlobal = false)
+        if (restoreCovers && toRestore.isEmpty()) {
+            _uiState.update { it.copy(pendingConfirm = CloudConfirm.RestoreCovers) }
+            return
+        }
+        checkConflictsAndRestore(toRestore, restoreGlobal = false, restoreCovers = restoreCovers)
     }
 
-    private fun checkConflictsAndRestore(toRestore: List<CloudSubjectItem>, restoreGlobal: Boolean) {
+    private fun checkConflictsAndRestore(
+        toRestore: List<CloudSubjectItem>,
+        restoreGlobal: Boolean,
+        restoreCovers: Boolean
+    ) {
         viewModelScope.launch {
             val uid = authRepository.getCurrentUserId() ?: return@launch
             pendingRestoreItems = toRestore
             pendingRestoreGlobal = restoreGlobal
+            pendingRestoreCovers = restoreCovers
             currentDecisions.clear()
 
             val conflicts = restoreSubjectsUseCase.findConflicts(uid, toRestore)
             if (conflicts.isNotEmpty()) {
                 _uiState.update { it.copy(pendingConflicts = conflicts) }
             } else {
-                executeRestoreWithDecisions(toRestore, emptyMap(), restoreGlobal)
+                executeRestoreWithDecisions(toRestore, emptyMap(), restoreGlobal, restoreCovers)
             }
         }
     }
@@ -329,7 +392,10 @@ class CloudViewModel @Inject constructor(
                             it.status != CloudSubjectStatus.CLOUD_ONLY &&
                             it.status != CloudSubjectStatus.SYNCED
                 }
-                checkMeteredAndProceedUpload(toUpload)
+                val uploadCovers = _uiState.value.coversSelected &&
+                        _uiState.value.coversStatus != CloudSubjectStatus.CLOUD_ONLY &&
+                        _uiState.value.coversStatus != CloudSubjectStatus.SYNCED
+                checkMeteredAndProceedUpload(toUpload, uploadCovers)
             }
             is CloudConfirm.MobileDataLarge -> {
                 val toUpload = _uiState.value.items.filter {
@@ -337,14 +403,25 @@ class CloudViewModel @Inject constructor(
                             it.status != CloudSubjectStatus.CLOUD_ONLY &&
                             it.status != CloudSubjectStatus.SYNCED
                 }
-                executeUpload(toUpload, _uiState.value.globalSelected)
+                val uploadCovers = _uiState.value.coversSelected &&
+                        _uiState.value.coversStatus != CloudSubjectStatus.CLOUD_ONLY &&
+                        _uiState.value.coversStatus != CloudSubjectStatus.SYNCED
+                executeUpload(toUpload, _uiState.value.globalSelected, uploadCovers)
             }
             is CloudConfirm.RestoreGlobal -> {
                 val toRestore = _uiState.value.items.filter {
                     it.subjectId in _uiState.value.selected &&
                             (it.cloudFile != null || it.status != CloudSubjectStatus.LOCAL_ONLY)
                 }
-                checkConflictsAndRestore(toRestore, restoreGlobal = true)
+                val restoreCovers = _uiState.value.coversSelected && _uiState.value.covers != null
+                checkConflictsAndRestore(toRestore, restoreGlobal = true, restoreCovers = restoreCovers)
+            }
+            is CloudConfirm.RestoreCovers -> {
+                val toRestore = _uiState.value.items.filter {
+                    it.subjectId in _uiState.value.selected &&
+                            (it.cloudFile != null || it.status != CloudSubjectStatus.LOCAL_ONLY)
+                }
+                checkConflictsAndRestore(toRestore, restoreGlobal = false, restoreCovers = true)
             }
             is CloudConfirm.DeleteCloud -> {
                 executeDeleteFromCloud(confirm.item)
@@ -362,11 +439,11 @@ class CloudViewModel @Inject constructor(
                 currentDecisions[conflict.item.subjectId] = decision
             }
             _uiState.update { it.copy(pendingConflicts = emptyList(), conflictNameError = null) }
-            executeRestoreWithDecisions(pendingRestoreItems, currentDecisions, pendingRestoreGlobal)
+            executeRestoreWithDecisions(pendingRestoreItems, currentDecisions, pendingRestoreGlobal, pendingRestoreCovers)
         } else {
             if (remaining.isEmpty()) {
                 _uiState.update { it.copy(pendingConflicts = emptyList(), conflictNameError = null) }
-                executeRestoreWithDecisions(pendingRestoreItems, currentDecisions, pendingRestoreGlobal)
+                executeRestoreWithDecisions(pendingRestoreItems, currentDecisions, pendingRestoreGlobal, pendingRestoreCovers)
             } else {
                 _uiState.update { it.copy(pendingConflicts = remaining, conflictNameError = null) }
             }
@@ -376,7 +453,8 @@ class CloudViewModel @Inject constructor(
     private fun executeRestoreWithDecisions(
         toRestore: List<CloudSubjectItem>,
         decisions: Map<String, RestoreDecision>,
-        restoreGlobal: Boolean
+        restoreGlobal: Boolean,
+        restoreCovers: Boolean
     ) {
         lastOperation = Operation.RESTORE
         viewModelScope.launch {
@@ -398,6 +476,14 @@ class CloudViewModel @Inject constructor(
                         outcomes.add(ItemOutcome(id = "global", name = "Perfil y ajustes", error = null))
                     } else {
                         outcomes.add(ItemOutcome(id = "global", name = "Perfil y ajustes", error = globalResult.exceptionOrNull()))
+                    }
+                }
+                if (restoreCovers && _uiState.value.covers != null) {
+                    val coversResult = restoreCoversUseCase(uid, _uiState.value.covers!!, context.cacheDir)
+                    if (coversResult.isSuccess) {
+                        outcomes.add(ItemOutcome(id = "covers", name = "Portadas de Estudio", error = null))
+                    } else {
+                        outcomes.add(ItemOutcome(id = "covers", name = "Portadas de Estudio", error = coversResult.exceptionOrNull()))
                     }
                 }
                 val failedIds = outcomes.filter { it.error != null }.map { it.id }.toSet()
@@ -441,10 +527,19 @@ class CloudViewModel @Inject constructor(
         _uiState.update { it.copy(failedSubjectIds = it.failedSubjectIds - failedIds, summary = null) }
         if (lastOperation == Operation.UPLOAD) {
             val toUpload = _uiState.value.items.filter { it.subjectId in failedIds }
-            executeUpload(toUpload, uploadGlobal = failedIds.contains("global"))
+            executeUpload(
+                toUpload,
+                uploadGlobal = failedIds.contains("global"),
+                uploadCovers = failedIds.contains("covers")
+            )
         } else if (lastOperation == Operation.RESTORE) {
             val toRestore = _uiState.value.items.filter { it.subjectId in failedIds }
-            executeRestoreWithDecisions(toRestore, currentDecisions, restoreGlobal = failedIds.contains("global"))
+            executeRestoreWithDecisions(
+                toRestore,
+                currentDecisions,
+                restoreGlobal = failedIds.contains("global"),
+                restoreCovers = failedIds.contains("covers")
+            )
         }
     }
 

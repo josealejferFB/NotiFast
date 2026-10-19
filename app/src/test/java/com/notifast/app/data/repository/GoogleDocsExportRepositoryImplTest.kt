@@ -72,6 +72,11 @@ class GoogleDocsExportRepositoryImplTest {
         coEvery { accountRepository.account } returns flowOf(account)
 
         coEvery { authDataSource.authorizeDriveFile("test@gmail.com") } returns DriveAuthResult.Success("valid-file-token")
+        coEvery { driveClient.createGoogleDocFromDocx("valid-file-token", any(), any()) } returns CreatedGoogleDocDto(
+            id = "doc-12345",
+            name = "Portada APA",
+            webViewLink = "https://docs.google.com/document/d/doc-12345/edit"
+        )
         coEvery { driveClient.createGoogleDocFromHtml("valid-file-token", any(), any()) } returns CreatedGoogleDocDto(
             id = "doc-12345",
             name = "Portada APA",

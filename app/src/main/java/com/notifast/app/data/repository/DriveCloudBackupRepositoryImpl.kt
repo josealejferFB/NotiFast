@@ -24,7 +24,7 @@ class DriveCloudBackupRepositoryImpl @Inject constructor(
         for (dto in dtoList) {
             val props = dto.appProperties
             val kind = props["kind"]
-            if (kind != KIND_SUBJECT && kind != KIND_GLOBAL) {
+            if (kind != KIND_SUBJECT && kind != KIND_GLOBAL && kind != KIND_COVERS) {
                 Log.w(TAG, "Skipping Drive file ${dto.id} with unknown kind: $kind")
                 continue
             }
@@ -41,49 +41,78 @@ class DriveCloudBackupRepositoryImpl @Inject constructor(
             val deviceModel = props["deviceModel"].orEmpty()
             val sizeBytes = dto.size ?: 0L
 
-            if (kind == KIND_SUBJECT) {
-                val subjectId = props["subjectId"]
-                val subjectName = props["subjectName"]
-                val icon = props["icon"]
-                val colorHex = props["colorHex"]
-                val noteCount = props["noteCount"]?.toIntOrNull() ?: 0
-                val evaluationCount = props["evaluationCount"]?.toIntOrNull() ?: 0
+            when (kind) {
+                KIND_SUBJECT -> {
+                    val subjectId = props["subjectId"]
+                    val subjectName = props["subjectName"]
+                    val icon = props["icon"]
+                    val colorHex = props["colorHex"]
+                    val noteCount = props["noteCount"]?.toIntOrNull() ?: 0
+                    val evaluationCount = props["evaluationCount"]?.toIntOrNull() ?: 0
+                    val teacherCount = props["teacherCount"]?.toIntOrNull() ?: 0
+                    val section = props["section"]
 
-                cloudFiles.add(
-                    CloudFile(
-                        driveFileId = dto.id,
-                        kind = kind,
-                        subjectId = subjectId,
-                        subjectName = subjectName,
-                        icon = icon,
-                        colorHex = colorHex,
-                        contentHash = contentHash,
-                        uploadedAt = uploadedAt,
-                        deviceModel = deviceModel,
-                        noteCount = noteCount,
-                        evaluationCount = evaluationCount,
-                        sizeBytes = sizeBytes,
-                        schemaVersion = schemaVersion
+                    cloudFiles.add(
+                        CloudFile(
+                            driveFileId = dto.id,
+                            kind = kind,
+                            subjectId = subjectId,
+                            subjectName = subjectName,
+                            icon = icon,
+                            colorHex = colorHex,
+                            contentHash = contentHash,
+                            uploadedAt = uploadedAt,
+                            deviceModel = deviceModel,
+                            noteCount = noteCount,
+                            evaluationCount = evaluationCount,
+                            teacherCount = teacherCount,
+                            section = section,
+                            sizeBytes = sizeBytes,
+                            schemaVersion = schemaVersion
+                        )
                     )
-                )
-            } else {
-                cloudFiles.add(
-                    CloudFile(
-                        driveFileId = dto.id,
-                        kind = kind,
-                        subjectId = null,
-                        subjectName = null,
-                        icon = null,
-                        colorHex = null,
-                        contentHash = contentHash,
-                        uploadedAt = uploadedAt,
-                        deviceModel = deviceModel,
-                        noteCount = 0,
-                        evaluationCount = 0,
-                        sizeBytes = sizeBytes,
-                        schemaVersion = schemaVersion
+                }
+                KIND_COVERS -> {
+                    val coverCount = props["coverCount"]?.toIntOrNull() ?: 0
+                    cloudFiles.add(
+                        CloudFile(
+                            driveFileId = dto.id,
+                            kind = kind,
+                            subjectId = null,
+                            subjectName = "Portadas de Estudio",
+                            icon = "📄",
+                            colorHex = null,
+                            contentHash = contentHash,
+                            uploadedAt = uploadedAt,
+                            deviceModel = deviceModel,
+                            noteCount = 0,
+                            evaluationCount = 0,
+                            coverCount = coverCount,
+                            teacherCount = 0,
+                            sizeBytes = sizeBytes,
+                            schemaVersion = schemaVersion
+                        )
                     )
-                )
+                }
+                else -> {
+                    cloudFiles.add(
+                        CloudFile(
+                            driveFileId = dto.id,
+                            kind = kind,
+                            subjectId = null,
+                            subjectName = null,
+                            icon = null,
+                            colorHex = null,
+                            contentHash = contentHash,
+                            uploadedAt = uploadedAt,
+                            deviceModel = deviceModel,
+                            noteCount = 0,
+                            evaluationCount = 0,
+                            sizeBytes = sizeBytes,
+                            schemaVersion = schemaVersion
+                        )
+                    )
+                }
             }
         }
         cloudFiles
@@ -156,5 +185,6 @@ class DriveCloudBackupRepositoryImpl @Inject constructor(
         private const val TAG = "DriveCloudBackupRepo"
         const val KIND_SUBJECT = "subject"
         const val KIND_GLOBAL = "global"
+        const val KIND_COVERS = "covers"
     }
 }

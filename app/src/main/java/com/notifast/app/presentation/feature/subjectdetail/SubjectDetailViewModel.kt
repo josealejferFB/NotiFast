@@ -146,6 +146,7 @@ class SubjectDetailViewModel @Inject constructor(
                         subjectName = currentSubjectName,
                         subjectIcon = subjectData.icon,
                         subjectColorHex = subjectData.colorHex,
+                        subjectSection = subjectData.section,
                         selectedQuadrant = filter.quadrant,
                         notes = domain.notes,
                         filteredNotes = filteredNotes,
@@ -210,12 +211,12 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.DeleteEvaluation -> deleteEvaluation(event.evaluationId)
             is SubjectDetailEvent.DeleteSchedule -> deleteSchedule(event.schedule)
             is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGradeOverride = event.targetGrade) }
-            is SubjectDetailEvent.UpdateSubjectData -> updateSubjectData(event.newName, event.newColorHex, event.newIcon)
+            is SubjectDetailEvent.UpdateSubjectData -> updateSubjectData(event.newName, event.newColorHex, event.newIcon, event.section)
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
-    private fun updateSubjectData(newName: String, newColorHex: String, newIcon: String) {
+    private fun updateSubjectData(newName: String, newColorHex: String, newIcon: String, section: String = "") {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val oldName = currentSubjectName
@@ -223,12 +224,13 @@ class SubjectDetailViewModel @Inject constructor(
             val updatedSubject = SubjectData(
                 name = newName,
                 colorHex = newColorHex,
-                icon = newIcon
+                icon = newIcon,
+                section = section.trim()
             )
             noteRepository.updateSubject(userId, oldName, updatedSubject)
                 .onSuccess {
                     currentSubjectName = newName
-                    _uiState.update { it.copy(isRenaming = false, subjectName = newName, subjectIcon = newIcon, subjectColorHex = newColorHex) }
+                    _uiState.update { it.copy(isRenaming = false, subjectName = newName, subjectIcon = newIcon, subjectColorHex = newColorHex, subjectSection = section.trim()) }
                     loadData()
                 }
                 .onFailure { e ->

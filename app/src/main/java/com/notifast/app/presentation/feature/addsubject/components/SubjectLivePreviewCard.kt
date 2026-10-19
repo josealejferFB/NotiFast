@@ -36,15 +36,17 @@ import com.notifast.app.R
 import com.notifast.app.presentation.feature.notes.components.SubjectIconMapper
 import com.notifast.app.presentation.theme.ThemeUtils
 import com.notifast.app.presentation.theme.color.toSafeComposeColor
+import com.notifast.app.presentation.theme.isDark
 
 @Composable
 fun SubjectLivePreviewCard(
     subjectName: String,
     iconName: String,
     hexColor: String,
+    section: String = "",
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.isDark
     val rawColor = hexColor.toSafeComposeColor(MaterialTheme.colorScheme.primary)
     val accessibleColor = ThemeUtils.getAccessibleColor(rawColor, isDark)
 
@@ -91,14 +93,35 @@ fun SubjectLivePreviewCard(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = subjectName.ifBlank { "Nombre de la Materia" },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = if (subjectName.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = subjectName.ifBlank { "Nombre de la Materia" },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (subjectName.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (section.isNotBlank()) {
+                        Spacer(Modifier.width(6.dp))
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = animatedColor.copy(alpha = 0.14f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.subject_section_chip, section.trim()),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = animatedColor,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(

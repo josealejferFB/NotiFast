@@ -193,6 +193,7 @@ class NotesViewModel @Inject constructor(
         subjects: List<SubjectData>
     ): NextActivity {
         val subjectColorMap = subjects.associate { it.name to it.colorHex }
+        val subjectSectionMap = subjects.associate { it.name to it.section }
         val nowCal = java.util.Calendar.getInstance()
         val todayDayOfWeek = nowCal.get(java.util.Calendar.DAY_OF_WEEK) - 1
         val nowMinutes = nowCal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + nowCal.get(java.util.Calendar.MINUTE)
@@ -206,9 +207,14 @@ class NotesViewModel @Inject constructor(
             end > nowMinutes
         }
         if (ongoingOrNextToday != null) {
+            val timing = com.notifast.app.domain.util.ScheduleCalculations.calculateNextClassTiming(ongoingOrNextToday, nowCal)
             return NextActivity.ClassActivity(
                 schedule = ongoingOrNextToday,
-                colorHex = subjectColorMap[ongoingOrNextToday.subjectName].orEmpty()
+                colorHex = subjectColorMap[ongoingOrNextToday.subjectName].orEmpty(),
+                dayName = timing.dayName,
+                timeRemaining = timing.timeRemaining,
+                isOngoing = timing.isOngoing,
+                section = subjectSectionMap[ongoingOrNextToday.subjectName].orEmpty()
             )
         }
 
@@ -226,7 +232,8 @@ class NotesViewModel @Inject constructor(
         val nextClassTime = nextClass?.let {
             val day = it.dayOfWeek
             val daysAhead = (day - todayDayOfWeek + 7) % 7
-            daysAhead * 24 * 60 + (com.notifast.app.domain.util.TimeParser.toMinutes(it.startTime) ?: 0)
+            val daysOffset = if (daysAhead == 0) 7 else daysAhead
+            daysOffset * 24 * 60 + (com.notifast.app.domain.util.TimeParser.toMinutes(it.startTime) ?: 0) - nowMinutes
         } ?: Int.MAX_VALUE
         val evalTime = upcomingEval?.date?.time ?: Long.MAX_VALUE
 
@@ -236,11 +243,17 @@ class NotesViewModel @Inject constructor(
                     evaluation = upcomingEval,
                     colorHex = subjectColorMap[upcomingEval.subjectName].orEmpty()
                 )
-            nextClass != null ->
+            nextClass != null -> {
+                val timing = com.notifast.app.domain.util.ScheduleCalculations.calculateNextClassTiming(nextClass, nowCal)
                 NextActivity.ClassActivity(
                     schedule = nextClass,
-                    colorHex = subjectColorMap[nextClass.subjectName].orEmpty()
+                    colorHex = subjectColorMap[nextClass.subjectName].orEmpty(),
+                    dayName = timing.dayName,
+                    timeRemaining = timing.timeRemaining,
+                    isOngoing = timing.isOngoing,
+                    section = subjectSectionMap[nextClass.subjectName].orEmpty()
                 )
+            }
             else -> NextActivity.FreeDay
         }
     }
@@ -269,7 +282,8 @@ class NotesViewModel @Inject constructor(
                 averageGrade = avg?.let { scale.roundGrade(it) },
                 completedEvalCount = subjectEvals.count { it.isPresented },
                 pendingEvalCount = subjectEvals.count { !it.isPresented },
-                upcomingEvaluations = upcoming
+                upcomingEvaluations = upcoming,
+                section = subject.section
             )
         }
     }
@@ -299,7 +313,7 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.SelectTag -> _selectedTag.value = event.tag
             is NotesEvent.DeleteNote -> deleteNote(event.note)
             is NotesEvent.DeleteSubject -> deleteSubject(event.subjectName)
-            is NotesEvent.UpdateSubject -> updateSubject(event.oldName, event.newName, event.newColorHex, event.newIcon)
+            is NotesEvent.UpdateSubject -> updateSubject(event.oldName, event.newName, event.newColorHex, event.newIcon, event.section)
             is NotesEvent.ToggleTaskCheck -> toggleTaskCheck(event.note, event.taskIndex, event.isChecked)
             is NotesEvent.SelectSubTab -> _uiState.update { it.copy(selectedSubTab = event.subTab) }
             is NotesEvent.SearchTeachers -> _teacherSearchQuery.value = event.query
@@ -432,13 +446,14 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun updateSubject(oldName: String, newName: String, newColorHex: String, newIcon: String) {
+    private fun updateSubject(oldName: String, newName: String, newColorHex: String, newIcon: String, section: String = "") {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId() ?: return@launch
             val updatedSubject = SubjectData(
                 name = newName,
                 colorHex = newColorHex,
-                icon = newIcon
+                icon = newIcon,
+                section = section
             )
             noteRepository.updateSubject(userId, oldName, updatedSubject).fold(
                 onSuccess = { _uiState.update { it.copy(error = null) } },

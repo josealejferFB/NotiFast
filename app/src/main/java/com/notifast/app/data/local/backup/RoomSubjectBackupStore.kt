@@ -10,15 +10,18 @@ import com.notifast.app.data.local.dao.NoteDao
 import com.notifast.app.data.local.dao.ScheduleDao
 import com.notifast.app.data.local.dao.SubjectCloudStateDao
 import com.notifast.app.data.local.dao.SubjectDao
+import com.notifast.app.data.local.dao.TeacherDao
 import com.notifast.app.data.local.entity.EvaluationEntity
 import com.notifast.app.data.local.entity.NoteEntity
 import com.notifast.app.data.local.entity.ScheduleEntity
 import com.notifast.app.data.local.entity.SubjectEntity
+import com.notifast.app.data.local.entity.TeacherEntity
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Note
 import com.notifast.app.data.model.NoteBlock
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
+import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.repository.SubjectBackupStore
 import com.notifast.app.domain.util.NoteBlockCodec
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,7 +40,8 @@ class RoomSubjectBackupStore @Inject constructor(
     private val scheduleDao: ScheduleDao,
     private val evaluationDao: EvaluationDao,
     private val noteDao: NoteDao,
-    private val subjectCloudStateDao: SubjectCloudStateDao
+    private val subjectCloudStateDao: SubjectCloudStateDao,
+    private val teacherDao: TeacherDao = db.teacherDao()
 ) : SubjectBackupStore {
 
     override suspend fun readSnapshot(userId: String, subjectId: String): Result<SubjectSnapshot> {
@@ -76,12 +80,22 @@ class RoomSubjectBackupStore @Inject constructor(
                 }
             }
 
+            val allTeachers = teacherDao.getTeachers(userId).first().map { it.toDomain() }
+            val cleanSubjectName = subject.name.trim()
+            val scheduleTeacherNames = schedules.mapNotNull { s -> s.teacher.trim().takeIf { it.isNotEmpty() } }.toSet()
+
+            val relevantTeachers = allTeachers.filter { t ->
+                t.subjectNames.any { it.equals(cleanSubjectName, ignoreCase = true) } ||
+                    scheduleTeacherNames.any { it.equals(t.fullName, ignoreCase = true) }
+            }
+
             Result.success(
                 SubjectSnapshot(
                     subject = subject.toDomain(),
                     schedules = schedules,
                     evaluations = evaluations,
                     notes = notes,
+                    teachers = relevantTeachers,
                     imageFiles = imageFiles
                 )
             )
@@ -177,7 +191,8 @@ class RoomSubjectBackupStore @Inject constructor(
                     name = finalSubjectName,
                     icon = snapshot.subject.icon,
                     colorHex = snapshot.subject.colorHex,
-                    cycle = snapshot.subject.cycle,
+                    cycle = snapshot.subject.cycle.orEmpty(),
+                    section = snapshot.subject.section.orEmpty(),
                     createdAt = Date()
                 )
                 subjectDao.insertSubject(subjectEntity)
@@ -190,6 +205,9 @@ class RoomSubjectBackupStore @Inject constructor(
                 }
                 if (rewrittenNotes.isNotEmpty()) {
                     noteDao.insertNotes(rewrittenNotes.map { it.toEntity(userId) })
+                }
+                if (snapshot.teachers.isNotEmpty()) {
+                    mergeTeachers(userId, snapshot.teachers, finalSubjectName)
                 }
             }
 
@@ -302,7 +320,8 @@ class RoomSubjectBackupStore @Inject constructor(
                     name = finalSubjectName,
                     icon = snapshot.subject.icon,
                     colorHex = snapshot.subject.colorHex,
-                    cycle = snapshot.subject.cycle,
+                    cycle = snapshot.subject.cycle.orEmpty(),
+                    section = snapshot.subject.section.orEmpty(),
                     createdAt = Date()
                 )
                 subjectDao.insertSubject(subjectEntity)
@@ -315,6 +334,9 @@ class RoomSubjectBackupStore @Inject constructor(
                 }
                 if (rewrittenNotes.isNotEmpty()) {
                     noteDao.insertNotes(rewrittenNotes.map { it.toEntity(userId) })
+                }
+                if (snapshot.teachers.isNotEmpty()) {
+                    mergeTeachers(userId, snapshot.teachers, finalSubjectName)
                 }
             }
 
@@ -339,7 +361,8 @@ class RoomSubjectBackupStore @Inject constructor(
         name = name,
         icon = icon,
         colorHex = colorHex,
-        cycle = cycle
+        cycle = cycle,
+        section = section
     )
 
     private fun ScheduleEntity.toDomain() = Schedule(
@@ -450,5 +473,95 @@ class RoomSubjectBackupStore @Inject constructor(
             blocksJson = NoteBlockCodec.toJson(blocks),
             schemaVersion = 2
         )
+    }
+
+    private suspend fun mergeTeachers(
+        userId: String,
+        remoteTeachers: List<Teacher>,
+        subjectName: String
+    ) {
+        val localEntities = teacherDao.getTeachers(userId).first()
+        val localByKey = localEntities.associateBy { teacherKey(it.toDomain()) }
+
+        for (remote in remoteTeachers) {
+            val key = teacherKey(remote)
+            val existing = localByKey[key]
+            if (existing == null) {
+                val newSubjectNames = (remote.subjectNames + subjectName)
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .distinct()
+
+                val newEntity = TeacherEntity(
+                    userId = userId,
+                    id = if (remote.id.isNotBlank()) remote.id else UUID.randomUUID().toString(),
+                    firstName = remote.firstName.trim(),
+                    lastName = remote.lastName.trim(),
+                    phoneNumber = remote.phoneNumber.trim(),
+                    email = remote.email.trim(),
+                    subjectNamesJson = subjectsToJson(newSubjectNames),
+                    notes = remote.notes.trim(),
+                    createdAt = remote.createdAt ?: Date(),
+                    updatedAt = Date()
+                )
+                teacherDao.insertTeacher(newEntity)
+            } else {
+                val existingSubjects = jsonToSubjects(existing.subjectNamesJson)
+                val mergedSubjects = mutableListOf<String>()
+                val seen = mutableSetOf<String>()
+                for (name in existingSubjects + remote.subjectNames + subjectName) {
+                    val trimmed = name.trim()
+                    val lower = trimmed.lowercase()
+                    if (lower.isNotBlank() && seen.add(lower)) {
+                        mergedSubjects.add(trimmed)
+                    }
+                }
+                val updated = existing.copy(
+                    subjectNamesJson = subjectsToJson(mergedSubjects),
+                    updatedAt = Date()
+                )
+                teacherDao.updateTeacher(updated)
+            }
+        }
+    }
+
+    private fun teacherKey(t: Teacher): String {
+        val first = t.firstName.trim().lowercase()
+        val last = t.lastName.trim().lowercase()
+        val phone = t.formattedPhoneNumber
+        val email = t.email.trim().lowercase()
+        return if (phone.isNotBlank()) "phone:$phone"
+        else if (email.isNotBlank()) "email:$email"
+        else "name:$first $last"
+    }
+
+    private fun TeacherEntity.toDomain(): Teacher {
+        return Teacher(
+            id = id,
+            userId = userId,
+            firstName = firstName,
+            lastName = lastName,
+            phoneNumber = phoneNumber,
+            email = email,
+            subjectNames = jsonToSubjects(subjectNamesJson),
+            notes = notes,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
+    }
+
+    private fun subjectsToJson(subjects: List<String>): String {
+        val clean = subjects.map { it.trim() }.filter { it.isNotEmpty() }
+        val escaped = clean.map { "\"${it.replace("\"", "\\\"")}\"" }
+        return "[${escaped.joinToString(",")}]"
+    }
+
+    private fun jsonToSubjects(json: String): List<String> {
+        if (json.isBlank() || json == "[]") return emptyList()
+        val trimmed = json.trim().removePrefix("[").removeSuffix("]").trim()
+        if (trimmed.isEmpty()) return emptyList()
+        return trimmed.split(",").map {
+            it.trim().removePrefix("\"").removeSuffix("\"").replace("\\\"", "\"")
+        }
     }
 }

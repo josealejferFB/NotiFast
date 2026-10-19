@@ -6,22 +6,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.notifast.app.presentation.atoms.NotiFastChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -34,13 +34,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Teacher
 import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastChip
+import com.notifast.app.presentation.atoms.NotiFastCreationBottomSheet
 import com.notifast.app.presentation.atoms.NotiFastFormField
+import com.notifast.app.presentation.atoms.clearFocusOnTapOutside
 
+/**
+ * NotiFast 3.2 Add / Edit Teacher Modal BottomSheet.
+ * Standardized using [NotiFastCreationBottomSheet] and [clearFocusOnTapOutside].
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTeacherBottomSheet(
@@ -59,28 +67,50 @@ fun AddEditTeacherBottomSheet(
     var notes by remember(teacher) { mutableStateOf(teacher?.notes.orEmpty()) }
     var selectedSubjects by remember(teacher) { mutableStateOf(teacher?.subjectNames.orEmpty().toSet()) }
 
-    ModalBottomSheet(
+    val hasUnsavedChanges = remember(teacher, firstName, lastName, phoneNumber, email, notes, selectedSubjects) {
+        firstName != teacher?.firstName.orEmpty() ||
+            lastName != teacher?.lastName.orEmpty() ||
+            phoneNumber != teacher?.phoneNumber.orEmpty() ||
+            email != teacher?.email.orEmpty() ||
+            notes != teacher?.notes.orEmpty() ||
+            selectedSubjects != teacher?.subjectNames.orEmpty().toSet()
+    }
+
+    NotiFastCreationBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = MaterialTheme.colorScheme.surface,
+        hasUnsavedChanges = hasUnsavedChanges,
         modifier = modifier
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .clearFocusOnTapOutside()
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp)
-                .imePadding()
-                .verticalScroll(rememberScrollState()),
+                .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = if (teacher == null) stringResource(R.string.teachers_btn_add) else stringResource(R.string.btn_edit),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (teacher == null) stringResource(R.string.teachers_btn_add) else stringResource(R.string.btn_edit),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                IconButton(onClick = { requestDismiss() }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.btn_close),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NotiFastFormField(
@@ -88,12 +118,14 @@ fun AddEditTeacherBottomSheet(
                     onValueChange = { firstName = it },
                     label = "${stringResource(R.string.teacher_first_name_label)} *",
                     leadingIcon = Icons.Default.Person,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.weight(1f)
                 )
                 NotiFastFormField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = stringResource(R.string.teacher_last_name_label),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -103,7 +135,10 @@ fun AddEditTeacherBottomSheet(
                 onValueChange = { phoneNumber = it },
                 label = stringResource(R.string.teacher_phone_label),
                 leadingIcon = Icons.Default.Phone,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                )
             )
 
             NotiFastFormField(
@@ -111,7 +146,10 @@ fun AddEditTeacherBottomSheet(
                 onValueChange = { email = it },
                 label = stringResource(R.string.teacher_email_label),
                 leadingIcon = Icons.Default.Email,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                )
             )
 
             if (availableSubjects.isNotEmpty()) {
@@ -152,7 +190,8 @@ fun AddEditTeacherBottomSheet(
                 label = stringResource(R.string.teacher_notes_label),
                 leadingIcon = Icons.AutoMirrored.Filled.Notes,
                 singleLine = false,
-                maxLines = 3
+                maxLines = 3,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
 
             Row(
@@ -160,7 +199,7 @@ fun AddEditTeacherBottomSheet(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = { requestDismiss() }) {
                     Text(stringResource(R.string.btn_cancel))
                 }
                 Spacer(Modifier.width(8.dp))
@@ -176,7 +215,7 @@ fun AddEditTeacherBottomSheet(
                             subjectNames = selectedSubjects.toList()
                         )
                         onSave(updated)
-                        onDismiss()
+                        dismiss()
                     },
                     enabled = firstName.isNotBlank()
                 )

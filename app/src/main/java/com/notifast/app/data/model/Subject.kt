@@ -9,5 +9,6 @@ data class SubjectData(
     val name: String,
     val icon: String = "📚",
     val colorHex: String = "",
-    val cycle: String = ""
+    val cycle: String = "",
+    val section: String = ""
 )

@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import com.notifast.app.presentation.atoms.AlertSeverity
 import com.notifast.app.presentation.atoms.rememberNotiFastAlert
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,26 +13,23 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,18 +37,14 @@ import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.presentation.atoms.NotiFastCardSkeleton
-import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastExpandableFab
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
-import com.notifast.app.presentation.atoms.NotiFastTopBar
-import com.notifast.app.presentation.atoms.TopBarType
-import com.notifast.app.presentation.feature.schedules.components.AgendaEvaluationBottomSheet
 import com.notifast.app.presentation.feature.schedules.components.AgendaMonthCalendarView
 import com.notifast.app.presentation.feature.schedules.components.ScheduleDaySelector
 import com.notifast.app.presentation.feature.schedules.components.ScheduleLiveStatusCard
 import com.notifast.app.presentation.feature.schedules.components.ScheduleTimelineView
 import com.notifast.app.presentation.feature.schedules.components.ScheduleWeekBentoSummary
-import kotlinx.coroutines.launch
+import com.notifast.app.presentation.feature.schedules.components.SchedulesDialogsHost
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,13 +63,21 @@ fun SchedulesScreen(
     var scheduleToDelete by remember { mutableStateOf<Schedule?>(null) }
     var evalToDelete by remember { mutableStateOf<Evaluation?>(null) }
     var selectedEvaluation by remember { mutableStateOf<Evaluation?>(null) }
-    val evalSheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-
-
-
     val showAlert = rememberNotiFastAlert()
+
+    val pdfPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.onEvent(SchedulesEvent.ParseUnergPdf(it, context)) }
+    }
+
+    LaunchedEffect(uiState.importSuccessMessage) {
+        uiState.importSuccessMessage?.let { msg ->
+            showAlert(msg, AlertSeverity.SUCCESS)
+            viewModel.onEvent(SchedulesEvent.ClearImportSuccess)
+        }
+    }
 
     val openMeeting: (String) -> Unit = { url ->
         try {
@@ -89,18 +92,7 @@ fun SchedulesScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                NotiFastTopBar(
-                    type = TopBarType.Home(
-                        firstName = uiState.userFirstName,
-                        email = uiState.userEmail,
-                        profilePictureUrl = uiState.userProfilePictureUrl,
-                        contextText = stringResource(R.string.agenda_title),
-                        onProfileClick = onEditProfile,
-                        onSearchClick = onSearchClick
-                    )
-                )
-            },
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = {
                 NotiFastExpandableFab(
                     actions = buildSchedulesFabActions(
@@ -109,7 +101,10 @@ fun SchedulesScreen(
                         scheduleColor = MaterialTheme.colorScheme.primary,
                         evaluationColor = MaterialTheme.colorScheme.error,
                         onAddScheduleClick = onAddScheduleClick,
-                        onAddEvaluationClick = onAddEvaluationClick
+                        onAddEvaluationClick = onAddEvaluationClick,
+                        unergImportLabel = stringResource(R.string.unerg_import_button_title),
+                        unergImportColor = MaterialTheme.colorScheme.tertiary,
+                        onUnergImportClick = { pdfPickerLauncher.launch("application/pdf") }
                     ),
                     modifier = Modifier.padding(bottom = 72.dp)
                 )
@@ -200,47 +195,17 @@ fun SchedulesScreen(
             }
         }
 
-        if (selectedEvaluation != null) {
-            ModalBottomSheet(
-                onDismissRequest = { selectedEvaluation = null },
-                sheetState = evalSheetState,
-                containerColor = MaterialTheme.colorScheme.surface
-            ) {
-                selectedEvaluation?.let { eval ->
-                    AgendaEvaluationBottomSheet(
-                        eval = eval,
-                        displayScale = uiState.gradeScale,
-                        onEdit = { scope.launch { evalSheetState.hide() }.invokeOnCompletion { selectedEvaluation = null; onEditEvaluationClick(eval) } },
-                        onDelete = { evalToDelete = eval; selectedEvaluation = null }
-                    )
-                }
-            }
-        }
-
-        scheduleToDelete?.let { schedule ->
-            NotiFastDialog(
-                title = stringResource(R.string.schedules_delete_title),
-                message = stringResource(R.string.schedules_delete_message, schedule.subjectName, schedule.startTime, schedule.endTime),
-                confirmText = stringResource(R.string.btn_delete),
-                dismissText = stringResource(R.string.btn_cancel),
-                confirmColor = MaterialTheme.colorScheme.error,
-                confirmWeight = FontWeight.Bold,
-                onConfirm = { viewModel.onEvent(SchedulesEvent.DeleteSchedule(schedule)); scheduleToDelete = null },
-                onDismiss = { scheduleToDelete = null }
-            )
-        }
-
-        evalToDelete?.let { eval ->
-            NotiFastDialog(
-                title = stringResource(R.string.agenda_delete_eval_title),
-                message = stringResource(R.string.agenda_delete_eval_message, eval.title),
-                confirmText = stringResource(R.string.btn_delete),
-                dismissText = stringResource(R.string.btn_cancel),
-                confirmColor = MaterialTheme.colorScheme.error,
-                confirmWeight = FontWeight.Bold,
-                onConfirm = { viewModel.onEvent(SchedulesEvent.DeleteEvaluation(eval)); evalToDelete = null },
-                onDismiss = { evalToDelete = null }
-            )
-        }
+        SchedulesDialogsHost(
+            uiState = uiState,
+            selectedEvaluation = selectedEvaluation,
+            scheduleToDelete = scheduleToDelete,
+            evalToDelete = evalToDelete,
+            onDismissEvaluationSheet = { selectedEvaluation = null },
+            onEditEvaluationClick = onEditEvaluationClick,
+            onDeleteEvaluationRequest = { evalToDelete = it },
+            onDismissDeleteSchedule = { scheduleToDelete = null },
+            onDismissDeleteEvaluation = { evalToDelete = null },
+            onEvent = viewModel::onEvent
+        )
     }
 }

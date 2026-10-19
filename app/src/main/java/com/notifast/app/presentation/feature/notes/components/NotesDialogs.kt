@@ -49,11 +49,12 @@ fun NotesDialogs(
             subject = SubjectData(
                 name = info.name,
                 colorHex = info.colorHex,
-                icon = info.icon
+                icon = info.icon,
+                section = info.section
             ),
             onDismiss = onDismissEditSubject,
-            onSave = { newName, newColor, newIcon ->
-                viewModel.onEvent(NotesEvent.UpdateSubject(info.name, newName, newColor, newIcon))
+            onSave = { newName, newColor, newIcon, newSection ->
+                viewModel.onEvent(NotesEvent.UpdateSubject(info.name, newName, newColor, newIcon, newSection))
                 onDismissEditSubject()
             }
         )

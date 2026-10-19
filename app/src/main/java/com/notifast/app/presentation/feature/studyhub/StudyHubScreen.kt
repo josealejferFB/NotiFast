@@ -6,72 +6,76 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.NoteAdd
+import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.R
-import com.notifast.app.presentation.atoms.NotiFastDialog
+import com.notifast.app.domain.model.study.CoverTemplateType
+import com.notifast.app.presentation.atoms.FabAction
+import com.notifast.app.presentation.atoms.NotiFastExpandableFab
 import com.notifast.app.presentation.atoms.NotiFastSnackbarHost
+import com.notifast.app.presentation.atoms.NotiFastStudyBackground
 import com.notifast.app.presentation.atoms.NotiFastTopBar
 import com.notifast.app.presentation.atoms.TopBarType
-import com.notifast.app.presentation.feature.studyhub.components.AssignSubjectDialog
 import com.notifast.app.presentation.feature.studyhub.components.CoverTemplateEditorSheet
 import com.notifast.app.presentation.feature.studyhub.components.CoverTemplatesSection
 import com.notifast.app.presentation.feature.studyhub.components.DocumentPreviewModalSheet
 import com.notifast.app.presentation.feature.studyhub.components.StudyDocumentActionSheet
 import com.notifast.app.presentation.feature.studyhub.components.StudyDocumentsSection
+import com.notifast.app.presentation.feature.studyhub.components.StudyHubSegmentedTabs
+
+private val STUDY_MIME_TYPES = arrayOf("application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 @Composable
 fun StudyHubScreen(
     onSearchClick: () -> Unit = {},
+    onEditProfile: () -> Unit = {},
     viewModel: StudyHubViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val docPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            viewModel.onEvent(StudyHubEvent.ImportDocument(uri))
-        }
+    val docPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) viewModel.onEvent(StudyHubEvent.ImportDocument(uri))
     }
-
-    val authResolutionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        val isOk = result.resultCode == Activity.RESULT_OK
-        viewModel.onEvent(StudyHubEvent.CompleteAuthResolution(isOk, result.data))
+    val authResolution = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { res ->
+        viewModel.onEvent(StudyHubEvent.CompleteAuthResolution(res.resultCode == Activity.RESULT_OK, res.data))
     }
 
     LaunchedEffect(uiState.pendingAuthIntent) {
         val pending = uiState.pendingAuthIntent ?: return@LaunchedEffect
         try {
-            val req = IntentSenderRequest.Builder(pending.intentSender).build()
-            authResolutionLauncher.launch(req)
+            authResolution.launch(IntentSenderRequest.Builder(pending.intentSender).build())
         } catch (_: Exception) {
             viewModel.onEvent(StudyHubEvent.CompleteAuthResolution(false))
         }
@@ -80,10 +84,7 @@ fun StudyHubScreen(
     LaunchedEffect(uiState.pendingOpenUrl) {
         val url = uiState.pendingOpenUrl ?: return@LaunchedEffect
         try {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(browserIntent)
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
         } catch (_: Exception) {
         } finally {
             viewModel.onEvent(StudyHubEvent.ClearPendingOpenUrl)
@@ -99,72 +100,70 @@ fun StudyHubScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            NotiFastTopBar(
-                type = TopBarType.Simple(
-                    title = stringResource(R.string.study_hub_title),
-                    actions = {
-                        IconButton(onClick = {
-                            docPickerLauncher.launch(arrayOf("application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-                        }) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.study_btn_import_doc))
-                        }
-                        IconButton(onClick = onSearchClick) {
-                            Icon(imageVector = Icons.Default.Search, contentDescription = stringResource(R.string.notes_search_placeholder))
-                        }
-                    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        NotiFastStudyBackground()
+        Scaffold(
+            containerColor = Color.Transparent,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            floatingActionButton = {
+                NotiFastExpandableFab(
+                    actions = listOf(
+                        FabAction(stringResource(R.string.study_btn_new_template), Icons.Outlined.AutoStories, { viewModel.onEvent(StudyHubEvent.OpenNewTemplateEditor(CoverTemplateType.UNERG_DEGREE)) }, stringResource(R.string.study_btn_new_template), MaterialTheme.colorScheme.secondary),
+                        FabAction(stringResource(R.string.study_btn_import_doc), Icons.AutoMirrored.Filled.NoteAdd, { docPicker.launch(STUDY_MIME_TYPES) }, stringResource(R.string.study_btn_import_doc), MaterialTheme.colorScheme.primary)
+                    ),
+                    modifier = Modifier.padding(bottom = 72.dp)
                 )
-            )
-        },
-        snackbarHost = { NotiFastSnackbarHost(hostState = snackbarHostState) }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            TabRow(
-                selectedTabIndex = uiState.selectedTab.ordinal,
-                modifier = Modifier.fillMaxWidth()
+            },
+            snackbarHost = { NotiFastSnackbarHost(hostState = snackbarHostState) }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) }
             ) {
-                Tab(
-                    selected = uiState.selectedTab == StudyHubTab.DOCUMENTS,
-                    onClick = { viewModel.onEvent(StudyHubEvent.SelectTab(StudyHubTab.DOCUMENTS)) },
-                    text = { Text(stringResource(R.string.study_tab_documents)) }
+                StudyHubSegmentedTabs(
+                    selectedTab = uiState.selectedTab,
+                    onTabSelected = { tab -> viewModel.onEvent(StudyHubEvent.SelectTab(tab)) }
                 )
-                Tab(
-                    selected = uiState.selectedTab == StudyHubTab.TEMPLATES,
-                    onClick = { viewModel.onEvent(StudyHubEvent.SelectTab(StudyHubTab.TEMPLATES)) },
-                    text = { Text(stringResource(R.string.study_tab_templates)) }
-                )
-            }
 
-            Box(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-                when (uiState.selectedTab) {
-                    StudyHubTab.DOCUMENTS -> {
-                        StudyDocumentsSection(
-                            documents = uiState.filteredDocuments,
-                            subjects = uiState.subjects,
-                            selectedSubject = uiState.selectedSubjectFilter,
-                            selectedDocType = uiState.selectedDocTypeFilter,
-                            searchQuery = uiState.searchQuery,
-                            onSelectSubject = { s -> viewModel.onEvent(StudyHubEvent.SelectSubjectFilter(s)) },
-                            onSelectDocType = { t -> viewModel.onEvent(StudyHubEvent.SelectDocTypeFilter(t)) },
-                            onDocumentClick = { doc -> viewModel.onEvent(StudyHubEvent.OpenPreview(doc)) },
-                            onDocumentMoreClick = { doc -> viewModel.onEvent(StudyHubEvent.SetActiveActionDocument(doc)) },
-                            onImportClick = {
-                                docPickerLauncher.launch(arrayOf("application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                Box(modifier = Modifier.fillMaxSize().padding(top = 2.dp)) {
+                    AnimatedContent(
+                        targetState = uiState.selectedTab,
+                        transitionSpec = {
+                            if (targetState == StudyHubTab.TEMPLATES) {
+                                (slideInHorizontally { it / 3 } + fadeIn()).togetherWith(slideOutHorizontally { -it / 3 } + fadeOut())
+                            } else {
+                                (slideInHorizontally { -it / 3 } + fadeIn()).togetherWith(slideOutHorizontally { it / 3 } + fadeOut())
                             }
-                        )
-                    }
-                    StudyHubTab.TEMPLATES -> {
-                        CoverTemplatesSection(
-                            drafts = uiState.coverDrafts,
-                            onSelectTemplate = { type -> viewModel.onEvent(StudyHubEvent.OpenNewTemplateEditor(type)) },
-                            onEditDraft = { draft -> viewModel.onEvent(StudyHubEvent.EditExistingDraft(draft)) },
-                            onDeleteDraft = { id -> viewModel.onEvent(StudyHubEvent.DeleteDraft(id)) }
-                        )
+                        },
+                        label = "StudyHubTabContentTransition"
+                    ) { tab ->
+                        when (tab) {
+                            StudyHubTab.DOCUMENTS -> {
+                                StudyDocumentsSection(
+                                    documents = uiState.filteredDocuments,
+                                    subjects = uiState.subjects,
+                                    selectedSubject = uiState.selectedSubjectFilter,
+                                    selectedDocType = uiState.selectedDocTypeFilter,
+                                    searchQuery = uiState.searchQuery,
+                                    onSearchQueryChange = { q -> viewModel.onEvent(StudyHubEvent.UpdateSearchQuery(q)) },
+                                    onSelectSubject = { s -> viewModel.onEvent(StudyHubEvent.SelectSubjectFilter(s)) },
+                                    onSelectDocType = { t -> viewModel.onEvent(StudyHubEvent.SelectDocTypeFilter(t)) },
+                                    onDocumentClick = { doc -> viewModel.onEvent(StudyHubEvent.OpenPreview(doc)) },
+                                    onDocumentMoreClick = { doc -> viewModel.onEvent(StudyHubEvent.SetActiveActionDocument(doc)) },
+                                    onImportClick = { docPicker.launch(STUDY_MIME_TYPES) }
+                                )
+                            }
+                            StudyHubTab.TEMPLATES -> {
+                                CoverTemplatesSection(
+                                    drafts = uiState.coverDrafts,
+                                    onSelectTemplate = { type -> viewModel.onEvent(StudyHubEvent.OpenNewTemplateEditor(type)) },
+                                    onEditDraft = { draft -> viewModel.onEvent(StudyHubEvent.EditExistingDraft(draft)) },
+                                    onDeleteDraft = { id -> viewModel.onEvent(StudyHubEvent.DeleteDraft(id)) }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -174,35 +173,16 @@ fun StudyHubScreen(
     uiState.activeActionDocument?.let { doc ->
         StudyDocumentActionSheet(
             document = doc,
+            subjects = uiState.subjects,
             onDismiss = { viewModel.onEvent(StudyHubEvent.SetActiveActionDocument(null)) },
             onPreview = { viewModel.onEvent(StudyHubEvent.OpenPreview(doc)) },
             onOpenExternal = { StudyHubDocIntents.openExternalDoc(context, doc.fileName) },
             onDuplicate = { viewModel.onEvent(StudyHubEvent.DuplicateDocument(doc.id)) },
-            onRequestAssignSubject = { viewModel.onEvent(StudyHubEvent.SetAssignSubjectDialogOpen(true)) },
+            onAssignSubject = { subjectId, subjectName ->
+                viewModel.onEvent(StudyHubEvent.AssignSubject(doc.id, subjectId, subjectName))
+            },
             onShare = { StudyHubDocIntents.shareDoc(context, doc.fileName, doc.title) },
-            onRequestDelete = { viewModel.onEvent(StudyHubEvent.SetDeleteDocumentDialogOpen(true)) }
-        )
-    }
-
-    if (uiState.isAssignSubjectDialogOpen && uiState.activeActionDocument != null) {
-        val currentDoc = uiState.activeActionDocument!!
-        AssignSubjectDialog(
-            subjects = uiState.subjects,
-            currentSubjectName = currentDoc.subjectName,
-            onDismiss = { viewModel.onEvent(StudyHubEvent.SetAssignSubjectDialogOpen(false)) },
-            onSelectSubject = { subj ->
-                viewModel.onEvent(StudyHubEvent.AssignSubject(currentDoc.id, subj?.id.orEmpty(), subj?.name.orEmpty()))
-            }
-        )
-    }
-
-    if (uiState.isDeleteDocumentDialogOpen && uiState.activeActionDocument != null) {
-        NotiFastDialog(
-            title = stringResource(R.string.study_doc_delete_title),
-            message = stringResource(R.string.study_doc_delete_msg),
-            confirmText = stringResource(R.string.study_doc_action_delete),
-            onConfirm = { viewModel.onEvent(StudyHubEvent.DeleteDocument(uiState.activeActionDocument!!.id)) },
-            onDismiss = { viewModel.onEvent(StudyHubEvent.SetDeleteDocumentDialogOpen(false)) }
+            onDelete = { viewModel.onEvent(StudyHubEvent.DeleteDocument(doc.id)) }
         )
     }
 

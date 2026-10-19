@@ -6,6 +6,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.notifast.app.data.model.NoteBlock
+import com.notifast.app.domain.model.study.CoverDraft
 import com.notifast.app.domain.util.NoteBlockCodec
 import java.io.File
 import java.io.FileInputStream
@@ -39,6 +40,9 @@ class ContentHasher @Inject constructor() {
             addProperty("icon", snapshot.subject.icon)
             addProperty("colorHex", snapshot.subject.colorHex)
             addProperty("cycle", snapshot.subject.cycle)
+            if (!snapshot.subject.section.isNullOrBlank()) {
+                addProperty("section", snapshot.subject.section.trim())
+            }
         }
         root.add("subject", subjectJson)
 
@@ -116,6 +120,20 @@ class ContentHasher @Inject constructor() {
         }
         root.add("notes", notesArray)
 
+        // 5. Teachers (sorted by id)
+        val teachersArray = JsonArray()
+        snapshot.teachers.sortedBy { it.id }.forEach { t ->
+            val obj = JsonObject().apply {
+                addProperty("id", t.id)
+                addProperty("firstName", t.firstName.trim().lowercase())
+                addProperty("lastName", t.lastName.trim().lowercase())
+                addProperty("email", t.email.trim().lowercase())
+                addProperty("phoneNumber", t.phoneNumber.trim())
+            }
+            teachersArray.add(obj)
+        }
+        root.add("teachers", teachersArray)
+
         val canonicalString = sortJsonKeys(root).toString()
         val sha256 = MessageDigest.getInstance("SHA-256")
         val digest = sha256.digest(canonicalString.toByteArray(Charsets.UTF_8))
@@ -141,6 +159,40 @@ class ContentHasher @Inject constructor() {
             add("teachers", teachersArr)
             val avatarHash = snapshot.avatar?.let { sha1(it) } ?: "none"
             addProperty("avatarSha1", avatarHash)
+        }
+        val canonicalString = sortJsonKeys(root).toString()
+        val sha256 = MessageDigest.getInstance("SHA-256")
+        val digest = sha256.digest(canonicalString.toByteArray(Charsets.UTF_8))
+        return digest.joinToString("") { "%02x".format(it) }
+    }
+
+    fun hashCovers(drafts: List<CoverDraft>): String {
+        val root = JsonArray()
+        drafts.sortedBy { it.id }.forEach { d ->
+            val obj = JsonObject().apply {
+                addProperty("id", d.id)
+                addProperty("templateType", d.templateType.id)
+                addProperty("subjectId", d.subjectId)
+                addProperty("subjectName", d.subjectName.trim().lowercase())
+                addProperty("workTitle", d.workTitle.trim())
+                addProperty("subtitle", d.subtitle.trim())
+                add("authors", gson.toJsonTree(d.authors.sorted()))
+                addProperty("teacherName", d.teacherName.trim())
+                addProperty("tutorName", d.tutorName.trim())
+                addProperty("fontName", d.fontName.trim())
+                addProperty("fontSizePt", d.fontSizePt)
+                addProperty("institutionName", d.institutionName.trim())
+                addProperty("facultyOrDepartment", d.facultyOrDepartment.trim())
+                addProperty("city", d.city.trim())
+                addProperty("formattedDate", d.formattedDate.trim())
+                addProperty("abstractText", d.abstractText.trim())
+                addProperty("keywordsText", d.keywordsText.trim())
+                addProperty("countryLine", d.countryLine.trim())
+                addProperty("ministryLine", d.ministryLine.trim())
+                addProperty("programLine", d.programLine.trim())
+                addProperty("curricularUnit", d.curricularUnit.trim())
+            }
+            root.add(obj)
         }
         val canonicalString = sortJsonKeys(root).toString()
         val sha256 = MessageDigest.getInstance("SHA-256")

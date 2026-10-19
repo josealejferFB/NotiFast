@@ -55,7 +55,8 @@ class ImportSubjectPackageUseCase @Inject constructor(
                 subjectName = targetName,
                 icon = pkg.subject.icon.ifBlank { "📚" },
                 colorHex = pkg.subject.colorHex,
-                cycle = pkg.subject.cycle
+                cycle = pkg.subject.cycle,
+                section = pkg.subject.section.orEmpty()
             ).getOrElse { return Result.failure(it) }
 
             pkg.schedules.forEach { s ->

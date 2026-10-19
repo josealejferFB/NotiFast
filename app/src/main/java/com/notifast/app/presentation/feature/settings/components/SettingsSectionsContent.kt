@@ -50,7 +50,7 @@ fun SettingsSectionsContent(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         SettingsProfileHeroCard(
             firstName = uiState.displayFirstName,
             lastName = uiState.displayLastName,

@@ -29,7 +29,8 @@ interface NoteRepository {
         subjectName: String,
         icon: String = "📚",
         colorHex: String = "",
-        cycle: String = ""
+        cycle: String = "",
+        section: String = ""
     ): Result<String>
     suspend fun updateSubject(userId: String, subject: SubjectData): Result<Unit> =
         updateSubject(userId, subject.name, subject)

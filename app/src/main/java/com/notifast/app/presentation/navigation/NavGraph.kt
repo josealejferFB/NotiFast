@@ -2,12 +2,21 @@ package com.notifast.app.presentation.navigation
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoStories
+import androidx.compose.material.icons.filled.Equalizer
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.res.stringResource
+import com.notifast.app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -110,6 +119,16 @@ fun MainContent() {
         }
     }
 
+    val topBarState by mainViewModel.topBarState.collectAsStateWithLifecycle()
+    var showCloudHubSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(autoOpenCloudHubOnNotes) {
+        if (autoOpenCloudHubOnNotes) {
+            showCloudHubSheet = true
+            autoOpenCloudHubOnNotes = false
+        }
+    }
+
     val bottomNavRoutes = Screen.bottomNavItems.map { it.route }
     val currentRoute = currentDestination?.route
     val showBottomBar = bottomNavRoutes.any { tabRoute ->
@@ -121,30 +140,63 @@ fun MainContent() {
     CompositionLocalProvider(LocalNotiFastSnackbarHostState provides snackbarHostState) {
         Scaffold(
             containerColor = Color.Transparent,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             snackbarHost = { NotiFastSnackbarHost(snackbarHostState) },
-            bottomBar = {
-            if (showBottomBar) {
-                NotiFastBottomNav(
-                    items = Screen.bottomNavItems,
-                    currentRoute = currentRoute,
-                    onItemClick = { screen ->
-                        navController.navigate(screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+            topBar = {
+                if (showBottomBar) {
+                    val (contextText, contextIcon) = when (currentRoute) {
+                        Screen.Notes.route -> Pair(null, null)
+                        Screen.Schedules.route -> Pair(stringResource(R.string.agenda_title), Icons.Default.Today)
+                        Screen.Grades.route -> Pair(stringResource(R.string.grades_title), Icons.Default.Equalizer)
+                        Screen.StudyHub.route -> Pair(stringResource(R.string.study_hub_title), Icons.Default.AutoStories)
+                        Screen.Settings.route -> Pair(stringResource(R.string.settings_title), Icons.Default.Settings)
+                        else -> Pair(null, null)
                     }
-                )
+                    com.notifast.app.presentation.atoms.NotiFastTopBar(
+                        type = com.notifast.app.presentation.atoms.TopBarType.Home(
+                            firstName = topBarState.firstName,
+                            email = topBarState.email,
+                            profilePictureUrl = topBarState.photoUrl,
+                            syncSummary = topBarState.syncSummary,
+                            contextText = contextText,
+                            contextIcon = contextIcon,
+                            onProfileClick = { navController.navigate(Screen.EditProfile.route) },
+                            onSearchClick = { showGlobalSearchSheet = true },
+                            onCloudClick = { showCloudHubSheet = true }
+                        )
+                    )
+                }
+            },
+            bottomBar = {
+                if (showBottomBar) {
+                    NotiFastBottomNav(
+                        items = Screen.bottomNavItems,
+                        currentRoute = currentRoute,
+                        onItemClick = { screen ->
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
             }
-        }
-    ) { _ ->
-        NavHost(navController = navController, startDestination = startDestination) {
-            composable(Screen.Onboarding.route) {
-                OnboardingScreen(onOnboardingComplete = { autoOpenCloud ->
-                    autoOpenCloudHubOnNotes = autoOpenCloud
-                    navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
-                })
-            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding())
+            ) {
+                NavHost(navController = navController, startDestination = startDestination) {
+                    composable(Screen.Onboarding.route) {
+                        OnboardingScreen(onOnboardingComplete = { autoOpenCloud ->
+                            if (autoOpenCloud) {
+                                showCloudHubSheet = true
+                            }
+                            navController.navigate(Screen.Notes.route) { popUpTo(0) { inclusive = true } }
+                        })
+                    }
             composable(Screen.Notes.route) {
                 NotesScreen(
                     initialOpenCloudHub = autoOpenCloudHubOnNotes,
@@ -193,7 +245,8 @@ fun MainContent() {
             }
             composable(Screen.StudyHub.route) {
                 StudyHubScreen(
-                    onSearchClick = { showGlobalSearchSheet = true }
+                    onSearchClick = { showGlobalSearchSheet = true },
+                    onEditProfile = { navController.navigate(Screen.EditProfile.route) }
                 )
             }
             composable(Screen.Grades.route) {
@@ -215,6 +268,13 @@ fun MainContent() {
                     onLogout = { navController.navigate(Screen.Onboarding.route) { popUpTo(0) { inclusive = true } } }
                 )
             }
+        }
+    }
+
+        if (showCloudHubSheet) {
+            com.notifast.app.presentation.feature.cloud.CloudHubSheet(
+                onDismiss = { showCloudHubSheet = false }
+            )
         }
 
         if (showGlobalSearchSheet) {

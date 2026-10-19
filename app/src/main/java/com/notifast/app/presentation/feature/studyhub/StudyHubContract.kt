@@ -24,6 +24,9 @@ enum class DocTypeFilter {
 
 data class StudyHubUiState(
     val userId: String = "",
+    val userFirstName: String = "",
+    val userEmail: String = "",
+    val userProfilePictureUrl: String? = null,
     val allDocuments: List<StudyDocument> = emptyList(),
     val filteredDocuments: List<StudyDocument> = emptyList(),
     val subjects: List<SubjectData> = emptyList(),

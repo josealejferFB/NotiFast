@@ -37,7 +37,8 @@ sealed interface ScheduleTimelineItem {
         val isCurrent: Boolean = false,
         val isConflicted: Boolean = false,
         val subjectIcon: String = "📚",
-        val subjectColorHex: String = ""
+        val subjectColorHex: String = "",
+        val subjectSection: String = ""
     ) : ScheduleTimelineItem
 
     data class GapItem(
@@ -92,7 +93,13 @@ data class SchedulesUiState(
     val error: String? = null,
     val userFirstName: String = "",
     val userEmail: String = "",
-    val userProfilePictureUrl: String? = null
+    val userProfilePictureUrl: String? = null,
+    val isUnergImportSheetVisible: Boolean = false,
+    val unergImportPreview: com.notifast.app.domain.model.schedule.UnergImportPreviewData? = null,
+    val isParsingPdf: Boolean = false,
+    val isImportingPdf: Boolean = false,
+    val unergImportStrategy: com.notifast.app.domain.model.schedule.UnergImportConflictStrategy = com.notifast.app.domain.model.schedule.UnergImportConflictStrategy.MERGE_SMART,
+    val importSuccessMessage: String? = null
 )
 
 sealed interface SchedulesEvent {
@@ -106,4 +113,11 @@ sealed interface SchedulesEvent {
     data class DeleteSchedule(val schedule: Schedule) : SchedulesEvent
     data class DeleteEvaluation(val evaluation: Evaluation) : SchedulesEvent
     data object ClearError : SchedulesEvent
+    data class ParseUnergPdf(val uri: android.net.Uri, val context: android.content.Context) : SchedulesEvent
+    data object DismissUnergImportSheet : SchedulesEvent
+    data class ToggleUnergSubjectSelected(val subjectName: String) : SchedulesEvent
+    data class SetUnergSelectAll(val selectAll: Boolean) : SchedulesEvent
+    data class SetUnergConflictStrategy(val strategy: com.notifast.app.domain.model.schedule.UnergImportConflictStrategy) : SchedulesEvent
+    data object ConfirmUnergImport : SchedulesEvent
+    data object ClearImportSuccess : SchedulesEvent
 }

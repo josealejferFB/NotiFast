@@ -136,6 +136,41 @@ class DriveRestClient internal constructor(
         gson.fromJson(bodyString, CreatedGoogleDocDto::class.java)
     }
 
+    suspend fun createGoogleDocFromDocx(
+        token: String,
+        title: String,
+        docxBytes: ByteArray
+    ): CreatedGoogleDocDto = withContext(ioDispatcher) {
+        val url = baseUrl.newBuilder()
+            .addPathSegments("upload/drive/v3/files")
+            .addQueryParameter("uploadType", "multipart")
+            .addQueryParameter("fields", "id,name,webViewLink")
+            .build()
+
+        val metadata = mapOf(
+            "name" to title,
+            "mimeType" to "application/vnd.google-apps.document"
+        )
+        val metadataJson = gson.toJson(metadata)
+        val docxMediaType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document".toMediaType()
+
+        val multipartBody = MultipartBody.Builder()
+            .setType(MULTIPART_RELATED)
+            .addPart(metadataJson.toRequestBody(MEDIA_TYPE_JSON))
+            .addPart(docxBytes.toRequestBody(docxMediaType))
+            .build()
+
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", "Bearer $token")
+            .post(multipartBody)
+            .build()
+
+        val response = executeRequest(request)
+        val bodyString = response.body?.string().orEmpty()
+        gson.fromJson(bodyString, CreatedGoogleDocDto::class.java)
+    }
+
     suspend fun update(
         token: String,
         fileId: String,

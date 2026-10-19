@@ -53,7 +53,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     name = it.name,
                     icon = it.icon,
                     colorHex = it.colorHex,
-                    cycle = it.cycle
+                    cycle = it.cycle,
+                    section = it.section
                 )
             }
         }
@@ -145,7 +146,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
         subjectName: String,
         icon: String,
         colorHex: String,
-        cycle: String
+        cycle: String,
+        section: String
     ): Result<String> {
         return try {
             val existing = subjectDao.getSubjectByName(userId, subjectName)
@@ -161,6 +163,7 @@ class LocalNoteRepositoryImpl @Inject constructor(
                     icon = icon,
                     colorHex = colorHex,
                     cycle = cycle,
+                    section = section,
                     createdAt = Date()
                 )
             )
@@ -203,7 +206,8 @@ class LocalNoteRepositoryImpl @Inject constructor(
                         name = newSubject.name,
                         icon = newSubject.icon,
                         colorHex = newSubject.colorHex,
-                        cycle = newSubject.cycle
+                        cycle = newSubject.cycle.ifBlank { existing.cycle },
+                        section = newSubject.section.ifBlank { existing.section }
                     )
                 )
 

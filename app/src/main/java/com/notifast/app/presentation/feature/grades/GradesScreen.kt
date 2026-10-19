@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,18 +47,7 @@ fun GradesScreen(
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                NotiFastTopBar(
-                    type = TopBarType.Home(
-                        firstName = uiState.userFirstName,
-                        email = uiState.userEmail,
-                        profilePictureUrl = uiState.userProfilePictureUrl,
-                        contextText = stringResource(R.string.grades_title),
-                        onProfileClick = onEditProfile,
-                        onSearchClick = onSearchClick
-                    )
-                )
-            }
+            contentWindowInsets = WindowInsets(0, 0, 0, 0)
         ) { innerPadding ->
             Box(
                 modifier = Modifier
@@ -81,7 +71,7 @@ fun GradesScreen(
                         .fillMaxSize()
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 88.dp)
+                    contentPadding = PaddingValues(top = 12.dp, bottom = 88.dp)
                 ) {
                     if (!uiState.error.isNullOrBlank()) {
                         item {

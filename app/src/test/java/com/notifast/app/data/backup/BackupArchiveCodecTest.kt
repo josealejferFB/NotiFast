@@ -68,7 +68,8 @@ class BackupArchiveCodecTest {
                 id = "sub-1",
                 name = "Física Clásica",
                 icon = "atom",
-                colorHex = "#3B9797"
+                colorHex = "#3B9797",
+                section = "19"
             ),
             schedules = listOf(
                 Schedule(id = "sch-1", subjectId = "sub-1", dayOfWeek = 1, startTime = "08:00", endTime = "10:00")
@@ -103,6 +104,7 @@ class BackupArchiveCodecTest {
         val restored = readResult.getOrThrow()
         assertEquals("sub-1", restored.subject.id)
         assertEquals("Física Clásica", restored.subject.name)
+        assertEquals("19", restored.subject.section)
         assertEquals(1, restored.schedules.size)
         assertEquals(1, restored.evaluations.size)
         assertEquals(1, restored.notes.size)
@@ -216,5 +218,47 @@ class BackupArchiveCodecTest {
         assertEquals("Marie", restored.teachers[0].firstName)
         assertNotNull(restored.avatar)
         assertTrue(restored.avatar!!.exists())
+    }
+
+    @Test
+    fun legacy_archive_without_section_deserializes_safely_with_empty_section() {
+        val zipFile = tempFolder.newFile("legacy_subject.nfbak")
+        val manifest = BackupManifest(format = "notifast-backup", schemaVersion = 1, kind = "subject")
+        val legacySubjectJson = """
+            {
+              "schemaVersion": 1,
+              "exportTimestamp": 123456789,
+              "subject": {
+                "id": "legacy-sub-1",
+                "name": "Historia Antigua",
+                "icon": "School",
+                "colorHex": "#3B9797",
+                "cycle": "2025-1"
+              },
+              "schedules": [],
+              "evaluations": [],
+              "notes": [],
+              "teachers": []
+            }
+        """.trimIndent()
+
+        ZipOutputStream(FileOutputStream(zipFile)).use { zos ->
+            zos.putNextEntry(ZipEntry("manifest.json"))
+            zos.write(Gson().toJson(manifest).toByteArray(Charsets.UTF_8))
+            zos.closeEntry()
+
+            zos.putNextEntry(ZipEntry("subject.json"))
+            zos.write(legacySubjectJson.toByteArray(Charsets.UTF_8))
+            zos.closeEntry()
+        }
+
+        val extractDir = tempFolder.newFolder("extract_legacy")
+        val result = codec.readSubject(zipFile, extractDir)
+        assertTrue(result.isSuccess)
+
+        val restored = result.getOrThrow()
+        assertEquals("legacy-sub-1", restored.subject.id)
+        assertEquals("Historia Antigua", restored.subject.name)
+        assertEquals("", restored.subject.section.orEmpty())
     }
 }

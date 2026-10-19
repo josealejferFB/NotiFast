@@ -153,4 +153,110 @@ class OpenXmlDocxEngineTest {
         assertTrue(instHtml.contains("ESCUELA DE COMPUTACIÓN"))
         assertTrue(instHtml.contains("PROPUESTA DE TESIS DE GRADO"))
     }
+
+    @Test
+    fun `generateDocx and parse roundtrip preserves UNERG_DEGREE membrete, title, author with CI, and tutor`() {
+        val unergDraft = CoverDraft(
+            id = "d-unerg-1",
+            userId = "u1",
+            templateType = CoverTemplateType.UNERG_DEGREE,
+            subjectId = "sub-1",
+            subjectName = "Proyecto de Grado I",
+            workTitle = "Desarrollo Móvil de un Hub Educativo con Arquitectura Asíncrona",
+            subtitle = "",
+            authors = listOf("José Fernandez (C.I.: V-27.665.738)", "María Gómez (C.I.: V-28.123.456)"),
+            teacherName = "Prof. Miguel Padrón",
+            institutionName = "UNIVERSIDAD NACIONAL EXPERIMENTAL DE LOS LLANOS CENTRALES RÓMULO GALLEGOS",
+            facultyOrDepartment = "ÁREA DE INGENIERÍA DE SISTEMAS",
+            city = "San Juan de los Morros",
+            formattedDate = "Mayo 2026",
+            countryLine = "REPÚBLICA BOLIVARIANA DE VENEZUELA",
+            ministryLine = "MINISTERIO DEL PODER POPULAR PARA LA EDUCACIÓN UNIVERSITARIA",
+            programLine = "PROGRAMA DE INGENIERÍA EN INFORMÁTICA",
+            curricularUnit = "UNIDAD CURRICULAR: PROYECTO DE GRADO I"
+        )
+
+        val baos = ByteArrayOutputStream()
+        val genResult = generator.generateDocx(unergDraft, baos)
+        assertTrue(genResult.isSuccess)
+
+        // Verify media images in zip
+        val zipBytes = baos.toByteArray()
+        val zipIn = java.util.zip.ZipInputStream(ByteArrayInputStream(zipBytes))
+        val entryNames = mutableListOf<String>()
+        var entry = zipIn.nextEntry
+        while (entry != null) {
+            entryNames.add(entry.name)
+            entry = zipIn.nextEntry
+        }
+        assertTrue(entryNames.contains("word/media/image1.png"))
+        assertTrue(entryNames.contains("word/media/image2.png"))
+
+        // Verify parsed blocks
+        val parseResult = parser.parse(ByteArrayInputStream(zipBytes))
+        assertTrue(parseResult.isSuccess)
+        val blocks = parseResult.getOrThrow()
+
+        assertTrue(blocks.any { it is DocxPreviewBlock.Paragraph && it.text.contains("REPÚBLICA BOLIVARIANA DE VENEZUELA") })
+        assertTrue(blocks.any { it is DocxPreviewBlock.Paragraph && it.text.contains("MINISTERIO DEL PODER POPULAR") })
+        assertTrue(blocks.any { it is DocxPreviewBlock.Paragraph && it.text.contains("ÁREA DE INGENIERÍA DE SISTEMAS") })
+        assertTrue(blocks.any { it is DocxPreviewBlock.Heading && it.text.contains("DESARROLLO MÓVIL DE UN HUB EDUCATIVO") })
+
+        val containsText = { query: String ->
+            blocks.any { block ->
+                when (block) {
+                    is DocxPreviewBlock.Paragraph -> block.text.contains(query)
+                    is DocxPreviewBlock.Table -> block.rows.any { row -> row.any { cell -> cell.contains(query) } }
+                    else -> false
+                }
+            }
+        }
+
+        assertTrue(containsText("José Fernandez"))
+        assertTrue(containsText("V-27.665.738"))
+        assertTrue(containsText("Prof. Miguel Padrón"))
+        assertTrue(blocks.any { it is DocxPreviewBlock.Paragraph && it.text.contains("San Juan de los Morros - Mayo 2026") })
+    }
+
+    @Test
+    fun `generateSemanticHtml formats UNERG_DEGREE with logos, membrete, title and authors`() {
+        val draft = CoverDraft(
+            id = "d-unerg-2",
+            userId = "u1",
+            templateType = CoverTemplateType.UNERG_DEGREE,
+            subjectId = "sub-1",
+            subjectName = "Proyecto de Grado I",
+            workTitle = "Sistema de Gestión Académica",
+            authors = listOf("José Fernandez (C.I.: V-27.665.738)"),
+            teacherName = "Prof. Miguel Padrón",
+            institutionName = "UNIVERSIDAD NACIONAL EXPERIMENTAL RÓMULO GALLEGOS",
+            facultyOrDepartment = "ÁREA DE INGENIERÍA DE SISTEMAS",
+            city = "San Juan de los Morros",
+            formattedDate = "Mayo 2026"
+        )
+
+        val html = generator.generateSemanticHtml(draft)
+        assertTrue(html.contains("REPÚBLICA BOLIVARIANA DE VENEZUELA"))
+        assertTrue(html.contains("ÁREA DE INGENIERÍA DE SISTEMAS"))
+        assertTrue(html.contains("Sistema de Gestión Académica"))
+        assertTrue(html.contains("José Fernandez"))
+        assertTrue(html.contains("V-27.665.738"))
+        assertTrue(html.contains("Prof. Miguel Padrón"))
+        assertTrue(html.contains("San Juan de los Morros - Mayo 2026"))
+    }
+
+    @Test
+    fun `parseAuthor extracts name and CI correctly across formats`() {
+        val (name1, ci1) = OpenXmlDocxGenerator.parseAuthor("José Fernandez (C.I.: V-27.665.738)")
+        assertEquals("José Fernandez", name1)
+        assertEquals("V-27.665.738", ci1)
+
+        val (name2, ci2) = OpenXmlDocxGenerator.parseAuthor("Carlos Pérez (V-12345678)")
+        assertEquals("Carlos Pérez", name2)
+        assertEquals("V-12345678", ci2)
+
+        val (name3, ci3) = OpenXmlDocxGenerator.parseAuthor("Ana Gómez")
+        assertEquals("Ana Gómez", name3)
+        assertEquals("", ci3)
+    }
 }

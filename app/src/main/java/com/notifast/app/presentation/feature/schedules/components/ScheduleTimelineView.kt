@@ -94,6 +94,7 @@ fun ScheduleTimelineView(
                         isConflicted = timelineItem.isConflicted,
                         subjectIcon = timelineItem.subjectIcon,
                         subjectColorHex = timelineItem.subjectColorHex,
+                        subjectSection = timelineItem.subjectSection,
                         onTakeNote = { onTakeNote(timelineItem.schedule.subjectName) },
                         onEdit = { onEditSchedule(timelineItem.schedule.id) },
                         onDelete = { onDeleteSchedule(timelineItem.schedule) },

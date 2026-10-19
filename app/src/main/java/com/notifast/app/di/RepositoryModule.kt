@@ -91,4 +91,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindGoogleDocsExportRepository(impl: com.notifast.app.data.repository.GoogleDocsExportRepositoryImpl): com.notifast.app.domain.repository.GoogleDocsExportRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCoverBackupStore(impl: com.notifast.app.data.local.backup.RoomCoverBackupStore): com.notifast.app.domain.repository.CoverBackupStore
 }

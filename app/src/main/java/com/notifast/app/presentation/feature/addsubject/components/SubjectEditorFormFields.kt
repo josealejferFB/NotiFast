@@ -21,6 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import com.notifast.app.presentation.atoms.NotiFastFormField
 
 val SUBJECT_SUGGESTIONS = listOf(
@@ -31,9 +33,11 @@ val SUBJECT_SUGGESTIONS = listOf(
 @Composable
 fun SubjectEditorFormFields(
     subjectName: String,
+    section: String = "",
     selectedColor: String,
     selectedIcon: String,
     onNameChanged: (String) -> Unit,
+    onSectionChanged: (String) -> Unit = {},
     onSuggestionSelected: (String) -> Unit,
     onColorSelected: (String) -> Unit,
     onIconSelected: (String) -> Unit,
@@ -84,7 +88,18 @@ fun SubjectEditorFormFields(
         NotiFastFormField(
             value = subjectName,
             onValueChange = onNameChanged,
-            label = stringResource(R.string.add_subject_name_label)
+            label = stringResource(R.string.add_subject_name_label),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+        )
+
+        NotiFastFormField(
+            value = section,
+            onValueChange = onSectionChanged,
+            label = stringResource(R.string.subject_section_label),
+            placeholder = stringResource(R.string.subject_section_placeholder),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
         )
 
         SubjectColorPickerBento(

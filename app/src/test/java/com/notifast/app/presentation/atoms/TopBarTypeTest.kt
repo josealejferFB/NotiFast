@@ -57,6 +57,7 @@ class TopBarTypeTest {
             onProfileClick = {}
         )
         assertEquals(LocalSyncSummary.NO_ACCOUNT, defaultHome.syncSummary)
+        assertNull(defaultHome.contextIcon)
 
         val syncedHome = defaultHome.copy(syncSummary = LocalSyncSummary.ALL_SYNCED)
         assertEquals(LocalSyncSummary.ALL_SYNCED, syncedHome.syncSummary)
@@ -89,4 +90,75 @@ class TopBarTypeTest {
         assertEquals("Mis Horarios", simple.title)
         assertNull(simple.subtitle)
     }
+
+    @Test
+    fun `agenda top bar contract preserves dateText and search action`() {
+        var searchClicked = false
+        val agenda = TopBarType.Agenda(
+            title = "Agenda Académica",
+            dateText = "Hoy, Lunes",
+            onSearchClick = { searchClicked = true }
+        )
+
+        assertEquals("Agenda Académica", agenda.title)
+        assertEquals("Hoy, Lunes", agenda.dateText)
+        agenda.onSearchClick?.invoke()
+        assertTrue(searchClicked)
+    }
+
+    @Test
+    fun `grades top bar contract preserves averageGrade and gradeScale`() {
+        var searchClicked = false
+        val grades = TopBarType.Grades(
+            title = "Calificaciones",
+            averageGrade = 9.25,
+            gradeScale = com.notifast.app.domain.model.GradeScale.SCALE_0_10,
+            onSearchClick = { searchClicked = true }
+        )
+
+        assertEquals("Calificaciones", grades.title)
+        assertEquals(9.25, grades.averageGrade ?: 0.0, 0.001)
+        assertEquals(com.notifast.app.domain.model.GradeScale.SCALE_0_10, grades.gradeScale)
+        grades.onSearchClick?.invoke()
+        assertTrue(searchClicked)
+    }
+
+    @Test
+    fun `study top bar contract preserves documentCount and draftCount`() {
+        var searchClicked = false
+        val study = TopBarType.Study(
+            title = "Estudio & Portadas",
+            documentCount = 14,
+            draftCount = 3,
+            onSearchClick = { searchClicked = true }
+        )
+
+        assertEquals("Estudio & Portadas", study.title)
+        assertEquals(14, study.documentCount)
+        assertEquals(3, study.draftCount)
+        study.onSearchClick?.invoke()
+        assertTrue(searchClicked)
+    }
+
+    @Test
+    fun `settings top bar contract preserves syncSummary and cloud action`() {
+        var cloudClicked = false
+        var searchClicked = false
+        val settings = TopBarType.Settings(
+            title = "Configuración",
+            syncSummary = LocalSyncSummary.ALL_SYNCED,
+            accountEmail = "estudiante@universidad.edu",
+            onCloudClick = { cloudClicked = true },
+            onSearchClick = { searchClicked = true }
+        )
+
+        assertEquals("Configuración", settings.title)
+        assertEquals(LocalSyncSummary.ALL_SYNCED, settings.syncSummary)
+        assertEquals("estudiante@universidad.edu", settings.accountEmail)
+        settings.onCloudClick?.invoke()
+        assertTrue(cloudClicked)
+        settings.onSearchClick?.invoke()
+        assertTrue(searchClicked)
+    }
 }
+

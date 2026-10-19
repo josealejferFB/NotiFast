@@ -36,7 +36,9 @@ class SchedulesViewModel @Inject constructor(
     private val userPrefsRepository: UserPrefsRepository? = null,
     private val cancelAlertUseCase: CancelAlertUseCase? = null,
     private val noteRepository: NoteRepository? = null,
-    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository? = null
+    private val googleAccountRepository: com.notifast.app.domain.repository.GoogleAccountRepository? = null,
+    private val parseUnergSchedulePdfUseCase: com.notifast.app.domain.usecase.schedule.ParseUnergSchedulePdfUseCase? = null,
+    private val importUnergScheduleUseCase: com.notifast.app.domain.usecase.schedule.ImportUnergScheduleUseCase? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SchedulesUiState())
@@ -57,7 +59,7 @@ class SchedulesViewModel @Inject constructor(
         evaluationRepository: EvaluationRepository,
         authRepository: AuthRepository,
         timeProvider: () -> Pair<Int, String>
-    ) : this(scheduleRepository, evaluationRepository, authRepository, null, null, null, null) {
+    ) : this(scheduleRepository, evaluationRepository, authRepository, null, null, null, null, null, null) {
         this.currentTimeProvider = timeProvider
         if (_uiState.value.schedules.isNotEmpty() || _uiState.value.evaluations.isNotEmpty()) {
             updateState(
@@ -140,6 +142,110 @@ class SchedulesViewModel @Inject constructor(
             is SchedulesEvent.DeleteSchedule -> deleteSchedule(event.schedule)
             is SchedulesEvent.DeleteEvaluation -> deleteEvaluation(event.evaluation)
             is SchedulesEvent.ClearError -> _uiState.update { it.copy(error = null) }
+            is SchedulesEvent.ParseUnergPdf -> parseUnergPdf(event.uri, event.context)
+            is SchedulesEvent.DismissUnergImportSheet -> _uiState.update { it.copy(isUnergImportSheetVisible = false) }
+            is SchedulesEvent.ToggleUnergSubjectSelected -> toggleUnergSubjectSelected(event.subjectName)
+            is SchedulesEvent.SetUnergSelectAll -> setUnergSelectAll(event.selectAll)
+            is SchedulesEvent.SetUnergConflictStrategy -> _uiState.update { it.copy(unergImportStrategy = event.strategy) }
+            is SchedulesEvent.ConfirmUnergImport -> confirmUnergImport()
+            is SchedulesEvent.ClearImportSuccess -> _uiState.update { it.copy(importSuccessMessage = null) }
+        }
+    }
+
+    private fun parseUnergPdf(uri: android.net.Uri, context: android.content.Context) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val parserUseCase = parseUnergSchedulePdfUseCase ?: return@launch
+            _uiState.update { it.copy(isParsingPdf = true, error = null) }
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                    ?: throw java.lang.IllegalArgumentException("No se pudo abrir el archivo PDF.")
+                val result = inputStream.use { stream ->
+                    parserUseCase(userId, stream)
+                }
+                result.fold(
+                    onSuccess = { previewData ->
+                        _uiState.update {
+                            it.copy(
+                                isParsingPdf = false,
+                                unergImportPreview = previewData,
+                                isUnergImportSheetVisible = true
+                            )
+                        }
+                    },
+                    onFailure = { e ->
+                        _uiState.update {
+                            it.copy(
+                                isParsingPdf = false,
+                                error = ErrorSanitizer.sanitize(e, "Error al procesar el horario UNERG")
+                            )
+                        }
+                    }
+                )
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isParsingPdf = false,
+                        error = ErrorSanitizer.sanitize(e, "Error al abrir el archivo PDF")
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleUnergSubjectSelected(subjectName: String) {
+        _uiState.update { state ->
+            val preview = state.unergImportPreview ?: return@update state
+            val updatedSubjects = preview.subjects.map {
+                if (it.subjectName.equals(subjectName, ignoreCase = true)) {
+                    it.copy(selected = !it.selected)
+                } else it
+            }
+            state.copy(unergImportPreview = preview.copy(subjects = updatedSubjects))
+        }
+    }
+
+    private fun setUnergSelectAll(selectAll: Boolean) {
+        _uiState.update { state ->
+            val preview = state.unergImportPreview ?: return@update state
+            val updatedSubjects = preview.subjects.map { it.copy(selected = selectAll) }
+            state.copy(unergImportPreview = preview.copy(subjects = updatedSubjects))
+        }
+    }
+
+    private fun confirmUnergImport() {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val importerUseCase = importUnergScheduleUseCase ?: return@launch
+            val preview = _uiState.value.unergImportPreview ?: return@launch
+            val selected = preview.subjects.filter { it.selected }
+            if (selected.isEmpty()) {
+                _uiState.update { it.copy(error = "Selecciona al menos una materia para importar") }
+                return@launch
+            }
+
+            _uiState.update { it.copy(isImportingPdf = true, error = null) }
+            importerUseCase(userId, selected, _uiState.value.unergImportStrategy).fold(
+                onSuccess = { result ->
+                    _uiState.update {
+                        it.copy(
+                            isImportingPdf = false,
+                            isUnergImportSheetVisible = false,
+                            unergImportPreview = null,
+                            importSuccessMessage = "Horario importado: ${result.createdSubjectsCount + result.reusedSubjectsCount} materias y ${result.createdSchedulesCount} clases"
+                        )
+                    }
+                    loadData()
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            isImportingPdf = false,
+                            error = ErrorSanitizer.sanitize(e, "Error al importar el horario")
+                        )
+                    }
+                }
+            )
         }
     }
 
