@@ -83,4 +83,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindExactAlarmScheduler(impl: com.notifast.app.data.notification.ExactAlarmSchedulerImpl): com.notifast.app.domain.notification.ExactAlarmScheduler
+
+    @Binds
+    @Singleton
+    abstract fun bindStudyDocumentRepository(impl: com.notifast.app.data.repository.LocalStudyDocumentRepositoryImpl): com.notifast.app.domain.repository.StudyDocumentRepository
 }

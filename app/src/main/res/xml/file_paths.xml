@@ -2,5 +2,6 @@
 <paths>
     <files-path name="note_images" path="images/notes/" />
     <files-path name="internal_images" path="images/" />
+    <files-path name="study_docs" path="study_docs/" />
     <cache-path name="exports" path="exports/" />
 </paths>
