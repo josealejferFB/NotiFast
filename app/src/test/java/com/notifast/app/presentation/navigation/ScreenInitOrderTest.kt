@@ -10,6 +10,6 @@ class ScreenInitOrderTest {
         val routes = Screen.bottomNavItems.map { it.route }
         println("bottomNavItems routes = $routes")
         println("bottomNavItems = ${Screen.bottomNavItems}")
-        assertEquals(listOf("notes", "agenda", "calificaciones", "settings"), routes)
+        assertEquals(listOf("notes", "agenda", "estudio", "calificaciones", "settings"), routes)
     }
 }

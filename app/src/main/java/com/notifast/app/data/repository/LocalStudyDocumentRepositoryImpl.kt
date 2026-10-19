@@ -28,14 +28,23 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LocalStudyDocumentRepositoryImpl @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+class LocalStudyDocumentRepositoryImpl(
+    private val context: Context,
     private val studyDocDao: StudyDocumentDao,
     private val coverDraftDao: CoverDraftDao,
     private val docxParser: OpenXmlDocxParser,
     private val docxGenerator: OpenXmlDocxGenerator,
-    docsDirOverride: File? = null
+    docsDirOverride: File?
 ) : StudyDocumentRepository {
+
+    @Inject
+    constructor(
+        @ApplicationContext context: Context,
+        studyDocDao: StudyDocumentDao,
+        coverDraftDao: CoverDraftDao,
+        docxParser: OpenXmlDocxParser,
+        docxGenerator: OpenXmlDocxGenerator
+    ) : this(context, studyDocDao, coverDraftDao, docxParser, docxGenerator, null)
 
     private val studyDocsDir: File = docsDirOverride ?: File(context.filesDir, "study_docs").apply {
         if (!exists()) mkdirs()

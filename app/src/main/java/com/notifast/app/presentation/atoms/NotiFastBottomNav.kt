@@ -68,9 +68,10 @@ fun NotiFastBottomNav(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             shadowElevation = 0.dp
         ) {
+            val isCompact = items.size >= 5
             Row(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(horizontal = if (isCompact) 6.dp else 10.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 items.forEach { screen ->
@@ -94,7 +95,7 @@ fun NotiFastBottomNav(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) { onItemClick(screen) }
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                            .padding(horizontal = if (isCompact) 11.dp else 14.dp, vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         screen.icon?.let {

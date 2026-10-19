@@ -3,6 +3,7 @@ package com.notifast.app.presentation.navigation
 import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
@@ -20,6 +21,7 @@ sealed class Screen(
     data object AddSubject : Screen("add_subject")
 
     data object Schedules : Screen("agenda", "Agenda", Icons.Default.Schedule)
+    data object StudyHub : Screen("estudio", "Estudio", Icons.Default.Description)
     data object Grades : Screen("calificaciones", "Calificaciones", Icons.Default.Grade)
     data object Settings : Screen("settings", "Ajustes", Icons.Default.Settings)
 
@@ -49,6 +51,6 @@ sealed class Screen(
          * their init finishes (empty routes / null icons). A `get()` defers lookup.
          */
         val bottomNavItems: List<Screen>
-            get() = listOf(Notes, Schedules, Grades, Settings)
+            get() = listOf(Notes, Schedules, StudyHub, Grades, Settings)
     }
 }

@@ -13,9 +13,10 @@ class ScreenTest {
 
     @Test
     fun `bottom navigation items contain core screens`() {
-        assertEquals(4, Screen.bottomNavItems.size)
+        assertEquals(5, Screen.bottomNavItems.size)
         assertTrue(Screen.bottomNavItems.contains(Screen.Notes))
         assertTrue(Screen.bottomNavItems.contains(Screen.Schedules))
+        assertTrue(Screen.bottomNavItems.contains(Screen.StudyHub))
         assertTrue(Screen.bottomNavItems.contains(Screen.Grades))
         assertTrue(Screen.bottomNavItems.contains(Screen.Settings))
     }

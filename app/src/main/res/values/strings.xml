@@ -942,4 +942,63 @@
     <string name="settings_cloud_unlink_dialog_message">Se eliminará la vinculación con Google Drive en este teléfono. Tus materias locales y tus copias en la nube se mantendrán intactas.</string>
     <string name="settings_cloud_unlink_dialog_confirm">Desvincular</string>
     <string name="settings_cloud_unlink_success">Cuenta desvinculada correctamente</string>
+
+    <!-- Study Hub (Área de Estudio) -->
+    <string name="nav_study_hub">Estudio</string>
+    <string name="study_hub_title">Área de Estudio</string>
+    <string name="study_tab_documents">Mis Documentos</string>
+    <string name="study_tab_templates">Plantillas</string>
+    <string name="study_filter_all">Todos</string>
+    <string name="study_filter_pdf">PDF</string>
+    <string name="study_filter_docx">DOCX</string>
+    <string name="study_search_hint">Buscar documentos o plantillas…</string>
+    <string name="study_empty_docs_title">Sin documentos</string>
+    <string name="study_empty_docs_msg">Importa tus guías, lecturas y trabajos en PDF o DOCX para tenerlos a mano.</string>
+    <string name="study_empty_filter_docs_msg">No se encontraron documentos para los filtros seleccionados.</string>
+    <string name="study_btn_import_doc">Importar documento</string>
+    <string name="study_btn_new_template">Nueva portada</string>
+    <string name="study_doc_action_preview">Vista previa</string>
+    <string name="study_doc_action_open_external">Abrir con otra app</string>
+    <string name="study_doc_action_duplicate">Crear una copia</string>
+    <string name="study_doc_action_assign_subject">Vincular a materia</string>
+    <string name="study_doc_action_share">Compartir archivo</string>
+    <string name="study_doc_action_delete">Eliminar</string>
+    <string name="study_doc_delete_title">¿Eliminar documento?</string>
+    <string name="study_doc_delete_msg">Se eliminará el archivo del almacenamiento local de NotiFast.</string>
+    <string name="study_doc_duplicated_success">Copia creada: %1$s</string>
+    <string name="study_doc_deleted_success">Documento eliminado</string>
+    <string name="study_doc_assigned_success">Materia asignada correctamente</string>
+    <string name="study_doc_imported_success">Documento importado: %1$s</string>
+    <string name="study_doc_open_gdocs">Abrir en Google Docs</string>
+
+    <!-- Cover Templates -->
+    <string name="study_templates_catalog_title">Catálogo de Portadas</string>
+    <string name="study_templates_recent_title">Borradores Recientes</string>
+    <string name="study_template_apa7_title">Normas APA 7ma Edición</string>
+    <string name="study_template_apa7_desc">Formato estándar estudiantil con título centrado, autor, afiliación, materia, docente y fecha.</string>
+    <string name="study_template_ieee_title">Formato Conferencia IEEE</string>
+    <string name="study_template_ieee_desc">Diseño para artículos técnicos, ingeniería y computación.</string>
+    <string name="study_template_institutional_title">Tesis / Trabajo Institucional</string>
+    <string name="study_template_institutional_desc">Estructura académica formal con membrete institucional superior y pie de imprenta.</string>
+    <string name="study_template_editor_title">Editor de Portada</string>
+    <string name="study_template_field_work_title">Título del trabajo</string>
+    <string name="study_template_field_subtitle">Subtítulo (opcional)</string>
+    <string name="study_template_field_authors">Autor(es) (separados por coma)</string>
+    <string name="study_template_field_institution">Institución educativa</string>
+    <string name="study_template_field_department">Facultad / Departamento</string>
+    <string name="study_template_field_subject">Materia vinculada</string>
+    <string name="study_template_field_teacher">Profesor(a)</string>
+    <string name="study_template_field_date">Fecha de entrega</string>
+    <string name="study_template_field_city_country">Ciudad y País</string>
+    <string name="study_template_btn_save_docx">Guardar .DOCX Local</string>
+    <string name="study_template_btn_export_gdocs">Abrir en Google Docs</string>
+    <string name="study_template_save_success">Borrador y .DOCX guardados</string>
+    <string name="study_template_exporting">Creando documento en Google Docs…</string>
+    <string name="study_template_export_success">¡Documento creado en Google Docs!</string>
+    <string name="study_template_delete_draft_title">¿Eliminar borrador?</string>
+    <string name="study_template_delete_draft_msg">Se eliminará este borrador de portada.</string>
+    <string name="study_docx_preview_empty">No se pudo extraer contenido legible del archivo Word.</string>
+    <string name="study_pdf_preview_loading">Cargando páginas del documento…</string>
+    <string name="study_pdf_page_indicator">Página %1$d de %2$d</string>
+    <string name="study_subject_section_title">Documentos de Estudio</string>
 </resources>
