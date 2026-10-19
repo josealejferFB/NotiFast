@@ -114,6 +114,7 @@ fun SubjectDetailScreen(
                                     teacher = uiState.teacher,
                                     modality = uiState.modality,
                                     teachers = uiState.teachers,
+                                    studyDocuments = uiState.studyDocuments,
                                     onTeacherClick = { selectedTeacher = it },
                                     onWhatsAppClick = { selectedTeacher = it }
                                 )

@@ -53,6 +53,7 @@ data class SubjectDetailUiState(
     val modality: String = Schedule.MODALITY_PRESENCIAL,
     val meetingUrl: String? = null,
     val isRenaming: Boolean = false,
+    val studyDocuments: List<com.notifast.app.domain.model.study.StudyDocument> = emptyList(),
     val error: String? = null
 )
 

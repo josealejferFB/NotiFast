@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.2
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.2**  
-> **Última actualización:** 17 de Octubre, 2026  
+> **Última actualización:** 19 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md)
 
 ---
@@ -29,13 +29,41 @@ Grades Hub & Analíticas AAA       [██████████████�
 Sistema de Temas Dinámicos AAA    [████████████████] 100% (15/15 tareas) ✅
 Motor Notificaciones Locales AAA  [████████████████] 100% (8/8 tareas) ✅
 Landing Page 3.2 & Docs Sync      [████████████████] 100% (6/6 bloques) ✅
+Área de Estudio (Study Hub)       [████████████████] 100% (6/6 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████]  99% (191/197 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    684 tests pasando (0 fallos, 0 ignorados) ✅
-MÉTRICAS DE CÓDIGO:               360 archivos Kotlin (~44,260 LOC) + 92 suites test ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████]  99% (197/203 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    706 tests pasando (0 fallos, 0 ignorados) ✅
+MÉTRICAS DE CÓDIGO:               374 archivos Kotlin (~47,150 LOC) + 98 suites test ✅
 ```
+
+---
+
+## 📚 Área de Estudio (Study Hub) — 100% Completado
+
+**Objetivo:** Proporcionar al estudiante un centro integral de gestión documental y generación de trabajos académicos dentro de NotiFast, 100% Offline-First con integración directa a Google Docs.
+
+### Pilares Implementados (100% ✅)
+1. **Gestor de Documentos Académicos:**
+   - Almacenamiento seguro en sandbox `filesDir/study_docs/`, desvinculado de URIs efímeras de SAF.
+   - Vinculación reactiva con materias (`SubjectData`) y filtros dinámicos por tipo (`ALL`, `PDF`, `DOCX`) y búsqueda instantánea.
+   - Acciones táctiles: Vista previa in-app, abrir en app externa / Google Docs, duplicación instantánea con sufijo `(Copia)`, vinculación a materia, compartir archivo y eliminación segura de disco y DB.
+2. **Visualizadores In-App Zero-Bloat:**
+   - **PDF:** Motor nativo con `PdfRenderer` protegido con `Mutex` sobre `Dispatchers.IO` para garantizar concurrencia libre de crashes, renderizando páginas con alta fidelidad.
+   - **DOCX:** Parser nativo OpenXML DOM (`OpenXmlDocxParser`) con límites defensivos (300 bloques / 10MB) contra bombas zip, renderizando títulos, párrafos y tablas sin librerías pesadas externas.
+3. **Diseñador y Catálogo de Portadas:**
+   - Catálogo integrado: Normas APA 7ma Edición, Formato Conferencia IEEE y Formato Institucional / Tesis.
+   - Prefill automático inteligente (`PrefillCoverDraftForSubjectUseCase`): extrae el autor del perfil del usuario, docente asignado a la materia, institución del último borrador y fecha actual en español.
+   - Editor nativo con previsualización en vivo en miniatura y guardado de borradores en Room v6.
+4. **Exportación Dual (Local + Google Docs):**
+   - **Local:** Generador ECMA-376 OpenXML (`OpenXmlDocxGenerator`) empaqueta un archivo `.docx` válido e integrable en la biblioteca de estudio.
+   - **Google Docs:** Integración con Google Drive REST API v3 multipart upload (`application/vnd.google-apps.document`) y autorización incremental OAuth con scope `drive.file`. Al autorizar, sube el HTML semántico, genera el documento en Google Drive y lo abre directamente en Google Docs.
+5. **Navegación Ergonómica de 5 Tabs:**
+   - Navegación inferior con 5 tabs (`Notes`, `Schedules`, `StudyHub`, `Grades`, `Settings`) adaptada a pantallas de `360dp`.
+   - Sección integrada de documentos de estudio dentro del panorama de `SubjectDetailScreen`.
+6. **Batería de Pruebas Unitarias:**
+   - 22 nuevas pruebas automatizadas que cubren migraciones de Room 5➔6, parsing DOM defensivo, generación zip ECMA-376, casos de uso, repositorio Drive, MVI y navegación.
 
 ---
 

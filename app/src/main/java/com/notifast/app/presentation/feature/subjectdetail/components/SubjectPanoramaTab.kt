@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -24,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import com.notifast.app.R
 import com.notifast.app.data.model.Teacher
 import com.notifast.app.domain.model.GradeScale
+import com.notifast.app.domain.model.study.StudyDocType
+import com.notifast.app.domain.model.study.StudyDocument
 import com.notifast.app.domain.usecase.RequiredGradeResult
 import com.notifast.app.presentation.atoms.NotiFastCard
 import com.notifast.app.presentation.feature.grades.components.GradeSimulatorCard
@@ -51,6 +56,8 @@ fun SubjectPanoramaTab(
     teacher: String,
     modality: String,
     teachers: List<Teacher> = emptyList(),
+    studyDocuments: List<StudyDocument> = emptyList(),
+    onDocumentClick: ((StudyDocument) -> Unit)? = null,
     onTeacherClick: (Teacher) -> Unit = {},
     onWhatsAppClick: ((Teacher) -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -95,6 +102,36 @@ fun SubjectPanoramaTab(
             onTeacherClick = onTeacherClick,
             onWhatsAppClick = onWhatsAppClick
         )
+
+        if (studyDocuments.isNotEmpty()) {
+            Text(
+                text = stringResource(R.string.study_subject_section_title),
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            studyDocuments.forEach { doc ->
+                NotiFastCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = 12.dp,
+                    onClick = { onDocumentClick?.invoke(doc) }
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val isPdf = doc.docType == StudyDocType.PDF
+                        val icon = if (isPdf) Icons.Default.PictureAsPdf else Icons.Default.Description
+                        val tint = if (isPdf) Color(0xFFD32F2F) else Color(0xFF1976D2)
+                        Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
+                        Spacer(Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = doc.title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
+                            Text(text = doc.fileName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -45,6 +45,7 @@ import com.notifast.app.presentation.feature.onboarding.OnboardingScreen
 import com.notifast.app.presentation.feature.schedules.SchedulesScreen
 import com.notifast.app.presentation.feature.search.GlobalSearchBottomSheet
 import com.notifast.app.presentation.feature.settings.SettingsScreen
+import com.notifast.app.presentation.feature.studyhub.StudyHubScreen
 import com.notifast.app.presentation.feature.subjectdetail.SubjectDetailScreen
 
 
@@ -187,6 +188,11 @@ fun MainContent() {
                     onEditScheduleClick = { scheduleId -> activeScheduleEditorArgs = Pair(scheduleId, null) },
                     onEditEvaluationClick = { eval -> activeEvaluationEditorArgs = Pair(eval.id, null) },
                     onEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                    onSearchClick = { showGlobalSearchSheet = true }
+                )
+            }
+            composable(Screen.StudyHub.route) {
+                StudyHubScreen(
                     onSearchClick = { showGlobalSearchSheet = true }
                 )
             }

@@ -43,7 +43,8 @@ class SubjectDetailViewModel @Inject constructor(
     private val calculateWeightedAverageUseCase: CalculateWeightedAverageUseCase,
     private val calculateRequiredGradeUseCase: CalculateRequiredGradeUseCase,
     val exportSubjectPackageUseCase: ExportSubjectPackageUseCase,
-    private val cancelAlertUseCase: CancelAlertUseCase? = null
+    private val cancelAlertUseCase: CancelAlertUseCase? = null,
+    private val observeStudyDocumentsBySubjectUseCase: com.notifast.app.domain.usecase.study.ObserveStudyDocumentsBySubjectUseCase? = null
 ) : ViewModel() {
 
     private var currentSubjectName: String = checkNotNull(savedStateHandle["subjectName"])
@@ -75,6 +76,16 @@ class SubjectDetailViewModel @Inject constructor(
                 return@launch
             }
             _uiState.update { it.copy(userId = userId, isLoading = true) }
+
+            if (observeStudyDocumentsBySubjectUseCase != null) {
+                launch {
+                    observeStudyDocumentsBySubjectUseCase(userId, currentSubjectName)
+                        .catch { emit(emptyList()) }
+                        .collect { docs ->
+                            _uiState.update { it.copy(studyDocuments = docs) }
+                        }
+                }
+            }
 
             val gradePrefs = combine(
                 userPrefsRepository.defaultGradeScaleFlow,
