@@ -30,9 +30,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
 
-  <link rel="stylesheet" href="css/tokens.css?v=3.4.0">
-  <link rel="stylesheet" href="css/styles.css?v=3.4.0">
-  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.4.0">
+  <link rel="stylesheet" href="css/tokens.css?v=3.5.0">
+  <link rel="stylesheet" href="css/styles.css?v=3.5.0">
+  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.5.0">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -262,6 +262,7 @@
         <a href="#notificaciones">Notificaciones</a>
         <a href="#analiticas">Analíticas</a>
         <a href="#compartir">Pack P2P</a>
+        <a href="#docentes">Docentes</a>
       </nav>
       <div class="nav-actions">
         <button type="button" class="nav-theme-quick-btn" id="btn-nav-theme-mode" title="Alternar Modo Claro / Oscuro en vivo" aria-label="Alternar Modo Claro u Oscuro">
@@ -318,6 +319,10 @@
         <a href="#compartir" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-qr"></use></svg>
           <span>Pack P2P &amp; Drive</span>
+        </a>
+        <a href="#docentes" class="mobile-nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+          <span>Directorio Docente</span>
         </a>
       </div>
       <div class="mobile-nav-footer">
@@ -628,29 +633,29 @@
       </div>
     </section>
 
-    <!-- 4. MÓDULO 3: CREACIÓN DE APUNTES & EDITOR MARKDOWN (NoteEditorBottomSheet fiel a la app) -->
+    <!-- 4. MÓDULO 3: APUNTES POR BLOQUES, MARKDOWN & FOTOS ANOTADAS (NoteEditorBottomSheet.kt fiel a la app) -->
     <section class="dynamic-feature-row section-notes-flow" id="apuntes">
       <div class="feature-info">
         <h2 class="feature-title">
-          Tus notas en Markdown,<br>con fórmulas y etiquetas.
+          Tus apuntes por bloques,<br><span class="accent-ruby">con fórmulas y fotos de pizarra.</span>
         </h2>
         <p class="feature-desc">
-          Escribe a la velocidad de la clase. Formatea texto en segundos, inserta fórmulas matemáticas y organiza todo por materia y etiquetas.
+          Combina títulos, listas, tareas, citas y fórmulas LaTeX en un solo apunte. Anota fotos de la pizarra con el dedo y organiza todo por materia y etiquetas.
         </p>
         <ul class="feature-bullets">
           <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Barra de accesos rápidos para títulos, negritas, fórmulas y fotos de pizarra.</span>
+            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Bloques de títulos, listas, tareas, citas, fórmulas y separadores en un mismo apunte.</span>
           </li>
           <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Etiquetas (#calculo, #derivadas) para encontrar cualquier apunte en segundos.</span>
+            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Fotos de la pizarra con dibujo a mano y etiquetas como #examen para buscar al instante.</span>
           </li>
         </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Simulador del Editor de Texto de la App (NoteEditorBottomSheet.kt) -->
+        <!-- Simulador del Editor por Bloques de la App (NoteEditorBottomSheet.kt) -->
         <div class="note-editor-simulator">
           <!-- Cabecera del Editor -->
           <div class="editor-sheet-header">
@@ -700,7 +705,7 @@
           <div class="rich-editor-sheet">
             <div class="rendered-markdown-content">
               <h4># Teorema de Lagrange</h4>
-              <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto <em>c</em> tal que:</p>
+              <p>Sea una función <span class="md-highlight">continua en [a, b]</span> y diferenciable en (a, b). Existe un punto <em>c</em> tal que:</p>
               
               <div class="math-latex-card">
                 <code>f'(c) = [f(b) - f(a)] / (b - a)</code>
@@ -721,9 +726,30 @@
                 </label>
               </div>
 
+              <!-- Foto de Pizarra Anotada (PhotoAnnotatorScreen.kt) -->
+              <div class="board-photo-block">
+                <div class="board-photo-frame" aria-hidden="true">
+                  <svg class="board-photo-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-camera"></use></svg>
+                  <svg class="board-photo-scribble" viewBox="0 0 120 48" fill="none" aria-hidden="true">
+                    <path d="M8 32 C 28 8, 44 40, 62 18 S 96 10, 112 26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M20 40 L 48 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+                  </svg>
+                </div>
+                <div class="board-photo-meta">
+                  <span class="board-photo-label">Pizarra anotada</span>
+                  <span class="board-photo-caption">Curva de la recta secante · trazos a mano</span>
+                </div>
+              </div>
+
               <blockquote class="editor-quote-card">
                 "La recta secante es paralela a la recta tangente en el punto c."
               </blockquote>
+
+              <div class="editor-note-footer">
+                <span>248 palabras</span>
+                <span>·</span>
+                <span>1 min de lectura</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1561,15 +1587,27 @@
       </div>
     </section>
 
-    <!-- 12. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper) -->
+    <!-- 12. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper & SubjectColorPickerBento) -->
     <section class="subjects-gallery-section subjects-gallery" id="materias">
       <div class="subjects-gallery-header">
         <h2 class="section-title" style="font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 800;">
-          Cada materia con su color, icono y docente.
+          Cada materia con su color, icono y sección.
         </h2>
         <p class="section-desc" style="color: var(--text-secondary); margin-top: 8px;">
-          Elige colores e iconos para distinguir cada asignatura y guarda los datos de contacto de tus profesores.
+          Paleta de 10 colores de estudio y 12 iconos temáticos. Muestra sección, promedio y docente sin abrir la materia.
         </p>
+        <div class="subject-palette-strip" aria-label="Paleta cromática de estudio de NotiFast">
+          <span class="palette-swatch" style="background: #BF092F;" title="Ruby Crimson"></span>
+          <span class="palette-swatch" style="background: #3B9797;" title="Aqua Green"></span>
+          <span class="palette-swatch" style="background: #4338CA;" title="Studio Indigo"></span>
+          <span class="palette-swatch" style="background: #C2410C;" title="Terracotta"></span>
+          <span class="palette-swatch" style="background: #15803D;" title="Forest Sage"></span>
+          <span class="palette-swatch" style="background: #7E22CE;" title="Deep Purple"></span>
+          <span class="palette-swatch" style="background: #B45309;" title="Amber Gold"></span>
+          <span class="palette-swatch" style="background: #0369A1;" title="Slate Blue"></span>
+          <span class="palette-swatch" style="background: #047857;" title="Emerald"></span>
+          <span class="palette-swatch" style="background: #0F172A;" title="Dark Slate"></span>
+        </div>
       </div>
 
       <div class="subjects-grid">
@@ -1585,11 +1623,18 @@
             </div>
           </div>
           <div class="subject-card-body">
-            <h3 class="subject-title">Cálculo Diferencial</h3>
+            <div class="subject-title-row">
+              <h3 class="subject-title">Cálculo Diferencial</h3>
+              <span class="subject-section-chip">Sec. 2</span>
+            </div>
             <span class="subject-meta-stats">12 Apuntes • 3 Evaluaciones</span>
             <p class="subject-description-text">
               Límites, derivadas, integrales y optimización con fórmulas LaTeX en vivo.
             </p>
+            <div class="subject-teacher-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+              <span>Prof. Ana Rodríguez</span>
+            </div>
           </div>
           <div class="subject-progress-block">
             <div class="subject-progress-header">
@@ -1619,11 +1664,18 @@
             </div>
           </div>
           <div class="subject-card-body">
-            <h3 class="subject-title">Física Mecánica</h3>
+            <div class="subject-title-row">
+              <h3 class="subject-title">Física Mecánica</h3>
+              <span class="subject-section-chip">Sec. 19</span>
+            </div>
             <span class="subject-meta-stats">8 Apuntes • 4 Evaluaciones</span>
             <p class="subject-description-text">
               Cinemática, leyes de Newton, energía y rotación con reportes de laboratorio.
             </p>
+            <div class="subject-teacher-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+              <span>Prof. Luis Márquez</span>
+            </div>
           </div>
           <div class="subject-progress-block">
             <div class="subject-progress-header">
@@ -1653,11 +1705,18 @@
             </div>
           </div>
           <div class="subject-card-body">
-            <h3 class="subject-title">Literatura Universal</h3>
+            <div class="subject-title-row">
+              <h3 class="subject-title">Literatura Universal</h3>
+              <span class="subject-section-chip">Sec. 1</span>
+            </div>
             <span class="subject-meta-stats">5 Apuntes • 2 Ensayos</span>
             <p class="subject-description-text">
               Análisis de textos, corrientes narrativas y síntesis críticas organizadas.
             </p>
+            <div class="subject-teacher-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+              <span>Prof. Carmen Díaz</span>
+            </div>
           </div>
           <div class="subject-progress-block">
             <div class="subject-progress-header">
@@ -1687,11 +1746,18 @@
             </div>
           </div>
           <div class="subject-card-body">
-            <h3 class="subject-title">Química Orgánica</h3>
+            <div class="subject-title-row">
+              <h3 class="subject-title">Química Orgánica</h3>
+              <span class="subject-section-chip">Sec. 2</span>
+            </div>
             <span class="subject-meta-stats">7 Apuntes • 3 Exámenes</span>
             <p class="subject-description-text">
               Estequiometría, síntesis molecular y equilibrios con fichas de consulta rápida.
             </p>
+            <div class="subject-teacher-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+              <span>Prof. Ana Rodríguez</span>
+            </div>
           </div>
           <div class="subject-progress-block">
             <div class="subject-progress-header">
@@ -1711,7 +1777,126 @@
       </div>
     </section>
 
-    <!-- 13. Bento Grid Section: Superpoderes Académicos Reales de la App -->
+    <!-- 13. MÓDULO NUEVO: DIRECTORIO DE DOCENTES & CONTACTO DIRECTO (ProfessorDirectoryContent.kt & TeacherContactSection.kt) -->
+    <section class="dynamic-feature-row row-reverse section-teachers-directory" id="docentes">
+      <div class="feature-info">
+        <h2 class="feature-title">
+          Tu directorio de docentes,<br><span class="accent-aqua">con WhatsApp listo para escribir.</span>
+        </h2>
+        <p class="feature-desc">
+          Guarda a tus profesores con teléfono, correo y las materias que imparten. Un toque abre WhatsApp con el saludo académico ya redactado.
+        </p>
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Contacto directo: WhatsApp con saludo prellenado, llamada, SMS o correo.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Ficha con cubículo o notas, vinculada a las materias de cada docente.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Directorio de Profesores & Ficha de Contacto (TeachersSubTab) -->
+        <div class="teachers-directory-card">
+          <div class="teachers-card-header">
+            <div class="teachers-header-left">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
+              <span>Profesores</span>
+            </div>
+            <span class="teachers-search-pill">Buscar por nombre o materia…</span>
+          </div>
+
+          <!-- Carrusel de Mini-Fichas (ProfessorMiniCard.kt) -->
+          <div class="teachers-mini-carousel" role="list" aria-label="Docentes guardados">
+            <div class="teacher-mini-card active" role="listitem">
+              <div class="teacher-mini-top">
+                <div class="teacher-avatar" style="background: #FDE8EB; color: #9E1B32;">AR</div>
+                <span class="teacher-wa-dot" title="WhatsApp disponible" aria-label="WhatsApp disponible">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+                </span>
+              </div>
+              <strong class="teacher-mini-name">Ana Rodríguez</strong>
+              <span class="teacher-mini-sub">Cálculo Diferencial</span>
+            </div>
+
+            <div class="teacher-mini-card" role="listitem">
+              <div class="teacher-mini-top">
+                <div class="teacher-avatar" style="background: #D6F2F0; color: #1B5E5E;">LM</div>
+                <span class="teacher-wa-dot" title="WhatsApp disponible" aria-label="WhatsApp disponible">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+                </span>
+              </div>
+              <strong class="teacher-mini-name">Luis Márquez</strong>
+              <span class="teacher-mini-sub">Física Mecánica</span>
+            </div>
+
+            <div class="teacher-mini-card" role="listitem">
+              <div class="teacher-mini-top">
+                <div class="teacher-avatar" style="background: #FEF3C7; color: #92400E;">CD</div>
+                <span class="teacher-wa-dot" title="WhatsApp disponible" aria-label="WhatsApp disponible">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+                </span>
+              </div>
+              <strong class="teacher-mini-name">Carmen Díaz</strong>
+              <span class="teacher-mini-sub">Literatura Universal</span>
+            </div>
+          </div>
+
+          <!-- Ficha del Docente (TeacherDetailBottomSheet.kt) -->
+          <div class="teacher-detail-sheet">
+            <div class="teacher-detail-top">
+              <div class="teacher-detail-avatar" aria-hidden="true">AR</div>
+              <div class="teacher-detail-text">
+                <strong>Ana Rodríguez</strong>
+                <div class="teacher-subject-chips">
+                  <span class="teacher-subject-chip">Cálculo</span>
+                  <span class="teacher-subject-chip">Química</span>
+                  <span class="teacher-subject-chip more">+1</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="teacher-contact-row" role="group" aria-label="Acciones de contacto">
+              <button type="button" class="teacher-action-btn wa">
+                <span class="teacher-action-circle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
+                </span>
+                <span>WhatsApp</span>
+              </button>
+              <button type="button" class="teacher-action-btn call">
+                <span class="teacher-action-circle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-smartphone"></use></svg>
+                </span>
+                <span>Llamar</span>
+              </button>
+              <button type="button" class="teacher-action-btn sms">
+                <span class="teacher-action-circle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
+                </span>
+                <span>SMS</span>
+              </button>
+              <button type="button" class="teacher-action-btn email">
+                <span class="teacher-action-circle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-assignment"></use></svg>
+                </span>
+                <span>Correo</span>
+              </button>
+            </div>
+
+            <!-- Saludo de WhatsApp Prellenado (TeacherFormatters.buildWhatsAppMessage) -->
+            <div class="wa-greeting-bubble">
+              <div class="wa-greeting-label">Saludo automático en WhatsApp</div>
+              <p class="wa-greeting-text">Hola Profesor/a Ana Rodríguez, le escribo con respecto a la materia Cálculo Diferencial.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. Bento Grid Section: Superpoderes Académicos Reales de la App -->
     <section class="bento-section">
       <div class="bento-header">
         <h2 class="section-title">Herramientas prácticas para tu vida académica.</h2>
@@ -1855,6 +2040,10 @@
         <a href="#compartir" class="radar-chip" data-target="#compartir" title="Compartir P2P & Backup Drive">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
           <span>P2P</span>
+        </a>
+        <a href="#docentes" class="radar-chip" data-target="#docentes" title="Directorio de Docentes & Contacto">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+          <span>Docentes</span>
         </a>
       </div>
     </nav>

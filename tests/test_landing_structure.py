@@ -330,6 +330,64 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".cover-creator-card", css)
         self.assertIn(".cover-page-preview", css)
 
+    def test_notes_blocks_section_matches_app_features(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="apuntes"', html)
+        self.assertIn("apuntes por bloques", html.lower())
+        self.assertIn("board-photo-block", html)
+        self.assertIn("md-highlight", html)
+        self.assertIn("Pizarra anotada", html)
+        self.assertIn("math-latex-card", html)
+        self.assertIn("interactive-todo-list", html)
+
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".board-photo-block", css)
+        self.assertIn(".md-highlight", css)
+
+    def test_subjects_gallery_shows_color_section_and_teacher(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="materias"', html)
+        self.assertIn("subject-palette-strip", html)
+        self.assertIn("subject-section-chip", html)
+        self.assertIn("subject-teacher-chip", html)
+        self.assertIn("Sec. 2", html)
+        self.assertIn("Paleta de 10 colores", html)
+
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".subject-palette-strip", css)
+        self.assertIn(".subject-section-chip", css)
+        self.assertIn(".subject-teacher-chip", css)
+
+    def test_teachers_directory_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="docentes"', html)
+        self.assertIn("section-teachers-directory", html)
+        self.assertIn("teachers-directory-card", html)
+        self.assertIn("Profesores", html)
+        self.assertIn("teacher-mini-card", html)
+        self.assertIn("teacher-contact-row", html)
+        self.assertIn("WhatsApp", html)
+        self.assertIn("Llamar", html)
+        self.assertIn("SMS", html)
+        self.assertIn("Correo", html)
+        self.assertIn("wa-greeting-bubble", html)
+        self.assertIn("le escribo con respecto a la materia", html)
+
+        # Navegación y radar
+        self.assertIn('href="#docentes"', html)
+        self.assertIn('data-target="#docentes"', html)
+
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".teachers-directory-card", css)
+        self.assertIn(".teacher-mini-card", css)
+        self.assertIn(".wa-greeting-bubble", css)
+
     def test_cloudflare_pages_metadata(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()

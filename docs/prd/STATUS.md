@@ -1102,6 +1102,22 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
+## 🌐 Showcase Landing: Apuntes por Bloques, Materias y Directorio de Docentes — 100% Completado (20 Oct 2026)
+
+**Objetivo:** Alinear tres secciones de la landing con la realidad de la app (bloques `NoteBlock`, paleta `ACCESSIBLE_STUDY_PALETTE`, `TeacherContactSection`) y añadir el Directorio de Docentes debajo de la galería de materias, manteniendo el lettering Impeccable (máx. 2 viñetas).
+
+### Entregables Implementados:
+1. **Apuntes (`#apuntes`) fieles al editor por bloques:**
+   - Título *«Tus apuntes por bloques, con fórmulas y fotos de pizarra.»* y mockup enriquecido con realce de texto (`.md-highlight`), bloque de **foto de pizarra anotada** (`PhotoAnnotatorScreen`) y pie de palabras/tiempo de lectura.
+2. **Materias (`#materias`) con personalización real:**
+   - Tira de **10 colores** de `ACCESSIBLE_STUDY_PALETTE`, chips de **sección** (`Sec. 2`) y chip de **docente** en las 4 tarjetas bento.
+3. **Directorio de Docentes (`#docentes`, `.section-teachers-directory`):**
+   - Mockup `teachers-directory-card` con carrusel `ProfessorMiniCard`, ficha de contacto (WhatsApp / Llamar / SMS / Correo) y **saludo prellenado** de `TeacherFormatters.buildWhatsAppMessage`.
+   - Integración en nav desktop, drawer móvil y radar flotante.
+4. **Verificación (27/27 tests de landing):** `test_notes_blocks_section_matches_app_features`, `test_subjects_gallery_shows_color_section_and_teacher`, `test_teachers_directory_section_exists`. CSS cache-busting `v=3.5.0`.
+
+---
+
 ### ⚪ Fase 4: Pulido, Experiencia, Accesibilidad y Rendimiento (Siguiente Fase)
 *Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), transiciones de pantalla con View Transitions en Compose, auditoría de rendimiento y depuración de memoria.*  
 *Guía de Arranque:* [`docs/prd/KICKOFF_FASE_4.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/KICKOFF_FASE_4.md)
