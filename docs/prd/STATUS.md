@@ -1135,6 +1135,22 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
+## 🌐 Showcase Landing: Radar Inferior Premium & Hub de Descarga APK — 100% Completado (20 Oct 2026)
+
+**Objetivo:** Elevar la barra flotante inferior y la sección final de descarga a un cierre visual memorable, manteniendo el sistema Tactile Papercraft.
+
+### Entregables Implementados:
+1. **Radar inferior (`#hub-floating-radar`):**
+   - Dock glassmorphic con resaltado interior, chips táctiles con estado activo elevado y CTA **APK** en gradiente ruby.
+   - Barra de **progreso de scroll** (`radar-progress-fill`) sincronizada con la página.
+   - Spy de secciones ampliado (`#importador`, `#estudio`, `#docentes`) y chips auto-ocultables de etiqueta `≤1100px`.
+2. **Hub de Descarga (`#descargar`):**
+   - Card con gradientes ruby/aqua, glows difusos, retícula sutil y badge del logo.
+   - Eyebrow *APK oficial v1.0 RC*, CTA primario con badge de versión, CTA GitHub y fila de confianza (Gratis / Sin anuncios / Offline / Android 8.0+).
+3. **Verificación:** 28/28 tests de landing. CSS `v=3.7.0`.
+
+---
+
 ### ⚪ Fase 4: Pulido, Experiencia, Accesibilidad y Rendimiento (Siguiente Fase)
 *Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), transiciones de pantalla con View Transitions en Compose, auditoría de rendimiento y depuración de memoria.*  
 *Guía de Arranque:* [`docs/prd/KICKOFF_FASE_4.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/KICKOFF_FASE_4.md)

@@ -105,9 +105,10 @@
   function setupFloatingRadarDock() {
     const radar = document.getElementById('hub-floating-radar');
     const chips = document.querySelectorAll('.radar-chip');
+    const progressFill = document.getElementById('radar-progress-fill');
     if (!radar) return;
 
-    // Show/hide radar dock on scroll
+    // Show/hide radar dock on scroll + scroll progress
     function handleScroll() {
       const scrollY = window.scrollY || window.pageYOffset;
       const docHeight = document.documentElement.scrollHeight;
@@ -121,6 +122,12 @@
         radar.classList.add('visible');
       } else {
         radar.classList.remove('visible');
+      }
+
+      if (progressFill) {
+        const maxScroll = Math.max(docHeight - winHeight, 1);
+        const ratio = Math.min(Math.max(scrollY / maxScroll, 0), 1);
+        progressFill.style.width = (ratio * 100).toFixed(2) + '%';
       }
     }
 
@@ -151,7 +158,11 @@
     });
 
     // Active Section Spy using IntersectionObserver
-    const sectionIds = ['#agenda', '#apuntes', '#calificaciones', '#evaluaciones', '#analiticas', '#temas', '#notificaciones', '#compartir', '#materias'];
+    const sectionIds = [
+      '#agenda', '#importador', '#apuntes', '#estudio', '#calificaciones',
+      '#evaluaciones', '#analiticas', '#temas', '#notificaciones', '#compartir',
+      '#materias', '#docentes'
+    ];
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {

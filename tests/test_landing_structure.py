@@ -128,6 +128,38 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("download-toast", html)
         self.assertIn("Descargar APK", html)
 
+        # Hub de descarga final enriquecido
+        self.assertIn("cta-logo-badge", html)
+        self.assertIn("cta-eyebrow", html)
+        self.assertIn("cta-actions", html)
+        self.assertIn("btn-cta-hero", html)
+        self.assertIn("btn-cta-github", html)
+        self.assertIn("cta-trust-row", html)
+        self.assertIn("cta-glow-ruby", html)
+        self.assertIn("cta-glow-aqua", html)
+
+        # Radar inferior mejorado
+        self.assertIn("radar-progress-fill", html)
+        self.assertIn("radar-cta-chip", html)
+        self.assertIn('data-target="#importador"', html)
+        self.assertIn('data-target="#estudio"', html)
+        self.assertIn('data-target="#docentes"', html)
+
+        with open("landing/css/styles.css", "r", encoding="utf-8") as f:
+            styles = f.read()
+        self.assertIn(".btn-cta-hero", styles)
+        self.assertIn(".cta-trust-row", styles)
+
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".radar-progress-fill", css)
+        self.assertIn(".radar-cta-chip", css)
+
+        with open("landing/js/interactive-showcase.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("radar-progress-fill", js)
+        self.assertIn("#docentes", js)
+
     def test_evaluations_calendar_section_exists(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()

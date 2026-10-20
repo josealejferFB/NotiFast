@@ -24,29 +24,52 @@
 /* Barra Flotante de Radar Scrollytelling (Sincronizada con el scroll) */
 .hub-floating-radar {
   position: fixed;
-  bottom: 24px;
+  bottom: 22px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
+  transform: translateX(-50%) translateY(110px);
   opacity: 0;
   pointer-events: none;
   z-index: 990;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  padding: 8px 12px 8px 10px;
+  background: var(--header-glass);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
   border: 1.5px solid var(--border-hairline);
-  border-radius: var(--radius-pill);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  border-radius: 22px;
+  box-shadow:
+    0 18px 48px rgba(24, 26, 31, 0.14),
+    0 4px 12px rgba(24, 26, 31, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  max-width: min(1120px, calc(100vw - 28px));
 }
 
 .hub-floating-radar.visible {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
   pointer-events: auto;
+}
+
+.radar-progress-track {
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 2.5px;
+  border-radius: 0 0 4px 4px;
+  background: rgba(24, 26, 31, 0.06);
+  overflow: hidden;
+}
+
+.radar-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary-canonical, var(--brand-secondary)));
+  transition: width 0.15s linear;
 }
 
 .radar-brand-mini {
@@ -56,52 +79,101 @@
   padding-right: 8px;
   border-right: 1px solid var(--border-hairline);
   text-decoration: none;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s var(--ease-spring);
+  flex-shrink: 0;
 }
 
 .radar-brand-mini:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .radar-mini-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(24, 26, 31, 0.12);
 }
 
 .radar-links {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+  padding: 2px 0;
+}
+
+.radar-links::-webkit-scrollbar {
+  display: none;
 }
 
 .radar-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 10px;
-  border-radius: var(--radius-pill);
+  gap: 6px;
+  padding: 8px 11px;
+  border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s var(--ease-spring), box-shadow 0.2s ease;
 }
 
 .radar-chip svg {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  opacity: 0.9;
 }
 
 .radar-chip:hover {
   color: var(--brand-primary);
   background: var(--brand-primary-light);
+  transform: translateY(-1px);
 }
 
 .radar-chip.active {
   background: var(--brand-primary);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(24, 26, 31, 0.08);
+  box-shadow: 0 6px 16px rgba(158, 27, 50, 0.28);
+  transform: translateY(-1px);
+}
+
+.radar-chip.active svg {
+  opacity: 1;
+}
+
+.radar-cta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+  padding: 8px 13px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover));
+  color: var(--brand-on-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(158, 27, 50, 0.25);
+  transition: transform 0.22s var(--ease-spring), box-shadow 0.22s ease;
+}
+
+.radar-cta-chip:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 22px rgba(158, 27, 50, 0.32);
+}
+
+.radar-cta-chip svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* Spotlight Highlight when navigated from hub card */
@@ -2097,6 +2169,25 @@
   }
   .row-reverse .feature-visual {
     order: 0;
+  }
+}
+
+@media (max-width: 1100px) {
+  .radar-chip span {
+    display: none;
+  }
+
+  .radar-chip {
+    padding: 9px 10px;
+    border-radius: 12px;
+  }
+
+  .radar-cta-chip span {
+    display: none;
+  }
+
+  .radar-cta-chip {
+    padding: 9px 11px;
   }
 }
 
