@@ -77,10 +77,11 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("8.70", html)
         self.assertIn("¡Excelente rendimiento!", html)
 
-        # 4. Compartir materia sin conexión (Nearby / QR)
+        # 4. Compartir materia sin conexión (QR Offline / Pack .notifast / Drive)
         self.assertIn("section-nearby-share", html)
-        self.assertIn("Android Nearby", html)
+        self.assertIn("Código QR Offline", html)
         self.assertIn(".notifast", html)
+        self.assertNotIn("Android Nearby", html)
 
         # 5. Materias con iconos oficiales de SubjectIconMapper
         self.assertIn("Cálculo", html)
@@ -167,15 +168,17 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("sim-presets-strip", html)
         self.assertIn("Meta: 8.5 pts", html)
 
-        # 2. Simulador y Dashboard interactivo fiel a GradeSimulatorCard y AcademicAnalyticsContent
+        # 2. Simulador y Dashboard predictivo fiel a GradeSimulatorCard y AcademicAnalyticsContent
         self.assertIn("analytics-dashboard-container", html)
         self.assertIn("analytics-hero-banner", html)
         self.assertIn("TASA DE ÉXITO PROYECTADA", html)
         self.assertIn("interactive-grade-simulator", html)
-        self.assertIn("Simulador de Nota Requerida", html)
+        self.assertIn("Simulador de Calificaciones", html)
+        self.assertIn("Nota Requerida en pendientes", html)
         self.assertIn("sim-target-slider", html)
-        self.assertIn("histogram-preview-card", html)
-        self.assertIn("Distribución por Rangos de Desempeño", html)
+        self.assertIn("analytics-status-list", html)
+        self.assertIn("Alertas de Diagnóstico Temprano", html)
+        self.assertIn("Recomendaciones Tácticas", html)
 
         # 3. Integración en navegación y radar
         self.assertIn('href="#analiticas"', html)
@@ -187,6 +190,38 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("setupAnalyticsDashboard", js)
         self.assertIn("calculateRequiredGrade", js)
         self.assertIn("#analiticas", js)
+
+    def test_share_pack_and_drive_backup_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="compartir"', html)
+        self.assertIn("share-cloud-stack", html)
+        self.assertIn("share-pack-card", html)
+        self.assertIn("Pack QR de Asignatura", html)
+        self.assertIn("Exportar Pack .notifast", html)
+        self.assertIn("Código QR Offline", html)
+        self.assertIn("Copiar Resumen Markdown", html)
+        self.assertIn("Incluir mis apuntes personales", html)
+        self.assertIn("qr-preview-stage", html)
+
+        self.assertIn("cloud-backup-card", html)
+        self.assertIn("Copia de Seguridad", html)
+        self.assertIn("Google Drive (Privado)", html)
+        self.assertIn("Sincronizada", html)
+        self.assertIn("Solo en el teléfono", html)
+        self.assertIn("Cambios sin subir", html)
+        self.assertIn("Subir a la nube", html)
+        self.assertIn("Restaurar al teléfono", html)
+
+        # Sin claims de Nearby / radio P2P
+        self.assertNotIn("Android Nearby", html)
+        self.assertNotIn("p2p-simulation-stage", html)
+
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".share-cloud-stack", css)
+        self.assertIn(".cloud-backup-card", css)
+        self.assertIn(".qr-preview-stage", css)
 
     def test_subjects_gallery_bento_alignment(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:

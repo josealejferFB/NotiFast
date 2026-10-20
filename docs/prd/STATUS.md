@@ -1118,6 +1118,23 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
 
 ---
 
+## 🌐 Showcase Landing: Analíticas Fieles & Share/Drive Reales — 100% Completado (20 Oct 2026)
+
+**Objetivo:** Alinear la landing con la pestaña Analytics en vivo y el flujo real de compartir/respaldo, eliminando overclaims (histograma no montado, Android Nearby).
+
+### Entregables Implementados:
+1. **Editor de Apuntes:** se retiró la equis de cierre del mockup *Nuevo Apunte*.
+2. **Analíticas (`#analiticas`) fieles a `AcademicAnalyticsContent`:**
+   - Etiquetas reales (*Simulador de Calificaciones*, *Nota Requerida en pendientes*, *Ponderación restante*), bloque **Estado por Materia** (Aprobada / Al día / En riesgo / Crítico), **Alertas de Diagnóstico Temprano** y **Recomendaciones Tácticas**.
+   - Se eliminó el histograma (no está montado en la pestaña Analytics de la app).
+3. **Compartir & Drive (`#compartir`) reescrito:**
+   - `share-pack-card`: Pack QR de Asignatura, opciones reales (*Exportar Pack .notifast*, *Código QR Offline*, *Copiar Resumen Markdown*), toggle *Incluir mis apuntes personales*.
+   - `cloud-backup-card`: *Google Drive (Privado)*, estados *Sincronizada / Solo en el teléfono / Cambios sin subir*, acciones *Subir a la nube / Restaurar al teléfono*.
+   - Cero claims de Android Nearby (el flujo real es QR + archivo/texto + Drive `appDataFolder`).
+4. **Verificación:** 28/28 tests de landing (1 nuevo: `test_share_pack_and_drive_backup_section_exists`). CSS `v=3.6.0`.
+
+---
+
 ### ⚪ Fase 4: Pulido, Experiencia, Accesibilidad y Rendimiento (Siguiente Fase)
 *Meta: Micro-interacciones avanzadas, accesibilidad total (a11y), transiciones de pantalla con View Transitions en Compose, auditoría de rendimiento y depuración de memoria.*  
 *Guía de Arranque:* [`docs/prd/KICKOFF_FASE_4.md`](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/KICKOFF_FASE_4.md)

@@ -30,9 +30,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
 
-  <link rel="stylesheet" href="css/tokens.css?v=3.5.0">
-  <link rel="stylesheet" href="css/styles.css?v=3.5.0">
-  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.5.0">
+  <link rel="stylesheet" href="css/tokens.css?v=3.6.0">
+  <link rel="stylesheet" href="css/styles.css?v=3.6.0">
+  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.6.0">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -120,7 +120,7 @@
         <path fill="currentColor" d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a.996.996 0 0 0-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"/>
       </symbol>
 
-      <!-- Android Nearby / P2P Share -->
+      <!-- Chat / Mensajería (TeacherContactSection WhatsApp) -->
       <symbol id="icon-nearby" viewBox="0 0 24 24">
         <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
       </symbol>
@@ -659,7 +659,6 @@
         <div class="note-editor-simulator">
           <!-- Cabecera del Editor -->
           <div class="editor-sheet-header">
-            <button class="editor-icon-btn" aria-label="Cerrar editor">✕</button>
             <span class="editor-header-title">Nuevo Apunte</span>
             <div class="editor-header-actions">
               <button class="editor-pill-btn active" id="btn-toggle-editor-view">Vista previa</button>
@@ -1095,7 +1094,7 @@
           Dashboard Predictivo &amp; Proyecciones,<br><span class="accent-aqua">simula tu nota antes de rendir.</span>
         </h2>
         <p class="feature-desc">
-          Anticípate al cierre del semestre. Conoce exactamente qué calificación necesitas sacar en tu próximo examen para alcanzar tu meta académica.
+          Tasa de éxito proyectada, alertas tempranas y simulador de nota requerida en la escala de tu institución: 0 - 10, 0 - 20, 100% o letras.
         </p>
 
         <!-- Presets del Simulador de Nota Requerida -->
@@ -1117,11 +1116,11 @@
         <ul class="feature-bullets">
           <li>
             <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Simulador interactivo que calcula tu nota mínima requerida al mover el deslizador.</span>
+            <span>Simulador que calcula la nota mínima en pendientes según tu meta y la ponderación restante.</span>
           </li>
           <li>
             <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Balance visual de materias aprobadas y alertas para las que necesitan más atención.</span>
+            <span>Estado por materia con alertas de diagnóstico temprano: al día, en riesgo o crítico.</span>
           </li>
         </ul>
       </div>
@@ -1134,51 +1133,95 @@
             <div class="hero-diag-top">
               <div>
                 <span class="hero-diag-label">TASA DE ÉXITO PROYECTADA</span>
-                <p class="hero-diag-desc" id="diag-passing-desc">4 de 4 materias en camino a aprobar</p>
+                <p class="hero-diag-desc" id="diag-passing-desc">2 de 4 materias en camino a aprobar</p>
               </div>
-              <div class="hero-diag-stat" id="diag-stat-percent">94%</div>
+              <div class="hero-diag-stat" id="diag-stat-percent">50%</div>
             </div>
-            <div class="diag-progress-bar" role="progressbar" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100">
-              <div class="diag-progress-fill" id="diag-progress-fill" style="width: 94%;"></div>
+            <div class="diag-progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+              <div class="diag-progress-fill" id="diag-progress-fill" style="width: 50%;"></div>
             </div>
           </div>
 
-          <!-- 2. Simulador Interactivo de Calificación Requerida (GradeSimulatorCard) -->
+          <!-- 2. Estado por Materia (AnalyticsSubjectsStatus) -->
+          <div class="analytics-status-list" role="list" aria-label="Estado proyectado por materia">
+            <div class="analytics-status-row" role="listitem">
+              <div class="status-row-main">
+                <span class="status-subject-name">Cálculo Diferencial</span>
+                <span class="status-chip chip-on-track">Al día</span>
+              </div>
+              <div class="status-row-track">
+                <div class="status-row-fill" style="width: 72%; background: #2563EB;"></div>
+              </div>
+              <span class="status-row-meta">5.7 pts • Falta 35%</span>
+            </div>
+            <div class="analytics-status-row" role="listitem">
+              <div class="status-row-main">
+                <span class="status-subject-name">Física General</span>
+                <span class="status-chip chip-approved">Aprobada</span>
+              </div>
+              <div class="status-row-track">
+                <div class="status-row-fill" style="width: 100%; background: var(--brand-success);"></div>
+              </div>
+              <span class="status-row-meta">8.5 pts • Meta alcanzada</span>
+            </div>
+            <div class="analytics-status-row" role="listitem">
+              <div class="status-row-main">
+                <span class="status-subject-name">Química Orgánica</span>
+                <span class="status-chip chip-at-risk">En riesgo</span>
+              </div>
+              <div class="status-row-track">
+                <div class="status-row-fill" style="width: 38%; background: var(--brand-warning);"></div>
+              </div>
+              <span class="status-row-meta">3.1 pts • Falta 42%</span>
+            </div>
+            <div class="analytics-status-row" role="listitem">
+              <div class="status-row-main">
+                <span class="status-subject-name">Literatura Universal</span>
+                <span class="status-chip chip-critical">Crítico</span>
+              </div>
+              <div class="status-row-track">
+                <div class="status-row-fill" style="width: 22%; background: var(--brand-error);"></div>
+              </div>
+              <span class="status-row-meta">1.8 pts • Falta 55%</span>
+            </div>
+          </div>
+
+          <!-- 3. Simulador Interactivo de Calificación Requerida (GradeSimulatorCard) -->
           <div class="grade-simulator-card" id="interactive-grade-simulator">
             <div class="simulator-header">
               <div class="sim-icon-box">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
               </div>
               <div class="sim-header-text">
-                <h3 class="sim-title">Simulador de Nota Requerida</h3>
-                <p class="sim-subject-name">Cálculo Diferencial • Parcial II (35% restante)</p>
+                <h3 class="sim-title">Simulador de Calificaciones</h3>
+                <p class="sim-subject-name">¿Cuánto necesito para aprobar? • Cálculo Diferencial</p>
               </div>
             </div>
 
             <!-- Banner de Estado Táctil (SimulatorStatus) -->
             <div class="sim-status-banner status-achievable" id="sim-status-banner">
               <svg class="sim-status-icon" id="sim-status-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-check"></use></svg>
-              <span class="sim-status-text" id="sim-status-text">Meta alcanzable • Necesitas 7.2 en lo restante</span>
+              <span class="sim-status-text" id="sim-status-text">Meta Alcanzable • Necesitas 7.2 en lo restante</span>
             </div>
 
             <!-- Fila de Estadísticas (Acumulado vs Requerido) -->
             <div class="sim-stats-row">
               <div class="sim-stat-box">
-                <span class="sim-stat-label">Puntos Acumulados</span>
+                <span class="sim-stat-label">Acumulado</span>
                 <span class="sim-stat-val" id="sim-stat-accumulated">5.70 <small>/ 10</small></span>
                 <span class="sim-stat-sub">65% ya calificado</span>
               </div>
               <div class="sim-stat-box stat-highlight">
-                <span class="sim-stat-label">Nota Mínima Requerida</span>
+                <span class="sim-stat-label">Nota Requerida en pendientes</span>
                 <span class="sim-stat-val val-required" id="sim-stat-required">7.20 <small>/ 10</small></span>
-                <span class="sim-stat-sub" id="sim-stat-weight-sub">En el 35% restante</span>
+                <span class="sim-stat-sub" id="sim-stat-weight-sub">Ponderación restante: 35%</span>
               </div>
             </div>
 
             <!-- Slider Interactivo de Meta Deseada -->
             <div class="sim-slider-container">
               <div class="sim-slider-header">
-                <label for="sim-target-slider" class="sim-slider-label">Ajustar Nota Meta Deseada:</label>
+                <label for="sim-target-slider" class="sim-slider-label">Nota Objetivo</label>
                 <span class="sim-slider-badge" id="sim-slider-badge">8.5 pts</span>
               </div>
               <input type="range" class="sim-range-input" id="sim-target-slider" min="6.0" max="10.0" step="0.1" value="8.5" aria-label="Ajustar calificación meta">
@@ -1191,42 +1234,39 @@
             </div>
           </div>
 
-          <!-- 3. Histograma de Distribución de Notas (GradeDistributionHistogram) -->
-          <div class="histogram-preview-card">
-            <div class="hist-header">
-              <span class="hist-title">Distribución por Rangos de Desempeño</span>
-              <span class="hist-meta">9 Evaluaciones en el Semestre</span>
+          <!-- 4. Alertas de Diagnóstico Temprano (AnalyticsEarlyWarnings) -->
+          <div class="analytics-alerts-card">
+            <div class="alerts-header">
+              <span class="alerts-title">Alertas de Diagnóstico Temprano</span>
+              <span class="alerts-count-badge">2</span>
             </div>
-            <div class="hist-bars-row">
-              <div class="hist-bar-col">
-                <div class="hist-bar-wrapper">
-                  <div class="hist-bar-fill bar-excellent" style="height: 85%;" title="5 evaluaciones sobresalientes"></div>
+            <div class="alerts-list">
+              <div class="alert-row">
+                <span class="alert-tag tag-critical">Crítico</span>
+                <div class="alert-body">
+                  <strong>Literatura Universal</strong>
+                  <span>Faltan 4.2 pts (55% restante)</span>
                 </div>
-                <span class="hist-bar-count">5</span>
-                <span class="hist-bar-label">Sobresaliente<br><small>(9 - 10)</small></span>
               </div>
-              <div class="hist-bar-col">
-                <div class="hist-bar-wrapper">
-                  <div class="hist-bar-fill bar-good" style="height: 52%;" title="3 evaluaciones notables"></div>
+              <div class="alert-row">
+                <span class="alert-tag tag-risk">En Riesgo</span>
+                <div class="alert-body">
+                  <strong>Química Orgánica</strong>
+                  <span>Faltan 3.1 pts (42% restante)</span>
                 </div>
-                <span class="hist-bar-count">3</span>
-                <span class="hist-bar-label">Notable<br><small>(7 - 8.9)</small></span>
-              </div>
-              <div class="hist-bar-col">
-                <div class="hist-bar-wrapper">
-                  <div class="hist-bar-fill bar-regular" style="height: 20%;" title="1 evaluación regular"></div>
-                </div>
-                <span class="hist-bar-count">1</span>
-                <span class="hist-bar-label">Regular<br><small>(5 - 6.9)</small></span>
-              </div>
-              <div class="hist-bar-col">
-                <div class="hist-bar-wrapper">
-                  <div class="hist-bar-fill bar-risk" style="height: 4%;" title="0 evaluaciones en riesgo"></div>
-                </div>
-                <span class="hist-bar-count">0</span>
-                <span class="hist-bar-label">En Riesgo<br><small>(&lt; 5.0)</small></span>
               </div>
             </div>
+          </div>
+
+          <!-- 5. Recomendaciones Tácticas (AnalyticsRecommendations) -->
+          <div class="analytics-tips-card">
+            <div class="tips-header">
+              <span class="tips-title">Recomendaciones Tácticas</span>
+            </div>
+            <ul class="tips-list">
+              <li>En Química necesitas promediar 7.4 en el 42% restante para aprobar.</li>
+              <li>En Literatura la meta mínima ya no es alcanzable. Consulta opciones de recuperación.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1517,70 +1557,165 @@
       </div>
     </section>
 
-    <!-- 11. MÓDULO 9: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (Pack .notifast, QR Offline & Google Drive) -->
+    <!-- 11. MÓDULO 9: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (SubjectPackageCodec, QrCodeGenerator & CloudHubSheet) -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
         <h2 class="feature-title">
           Comparte materias por QR,<br><span class="accent-ruby">y respalda en tu Google Drive.</span>
         </h2>
         <p class="feature-desc">
-          ¿Un compañero faltó a clase o cambiaste de teléfono? Comparte cualquier asignatura por <strong>Código QR Offline</strong> o en un paquete <code>.notifast</code>. Además, mantén tus datos seguros en tu propio <strong>Google Drive</strong>.
+          Exporta una materia completa en un pack <code>.notifast</code> o muéstralo en un <strong>Código QR Offline</strong> en el aula. Y si cambias de teléfono, tu copia privada en <strong>Google Drive</strong> la restaura en segundos.
         </p>
         <ul class="feature-bullets">
           <li>
             <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Código QR para compartir horarios, notas y fechas de examen sin usar internet.</span>
+            <span>Pack con horarios, evaluaciones y apuntes: compártelo por WhatsApp, Bluetooth o QR.</span>
           </li>
           <li>
             <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Copia de seguridad en tu propia cuenta de Google Drive para no perder nada.</span>
+            <span>Copia privada en Drive con estados claros: sincronizada, solo en el teléfono o con cambios.</span>
           </li>
         </ul>
       </div>
 
       <div class="feature-visual">
-        <div class="nearby-transfer-card">
-          <div class="transfer-card-header">
-            <div class="offline-beacon">
-              <span class="offline-dot"></span>
-              <span>QR Offline</span>
-            </div>
-            <span class="pack-badge">Pack .notifast</span>
-          </div>
-
-          <!-- Simulación de Transferencia P2P en el Aula -->
-          <div class="p2p-simulation-stage">
-            <div class="device-node device-sender">
-              <div class="device-avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
-              <span class="device-name">Tu Teléfono</span>
-              <span class="device-status">Generando QR / Pack</span>
-            </div>
-
-            <div class="transfer-waves">
-              <div class="nearby-signal-pulse">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+        <!-- Stack: Pack P2P + Cloud Hub (ShareSubjectSheet.kt & CloudHubSheet.kt) -->
+        <div class="share-cloud-stack nearby-transfer-card">
+          <!-- 1. Compartir Materia: Pack .notifast & Código QR Offline -->
+          <div class="share-pack-card">
+            <div class="share-card-header">
+              <div class="share-header-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-qr"></use></svg>
+                <span>Compartir Materia</span>
               </div>
-              <span class="transfer-speed">QR Directo &bull; Drive Sync</span>
+              <span class="pack-badge">Pack QR de Asignatura</span>
             </div>
 
-            <div class="device-node device-receiver">
-              <div class="device-avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg></div>
-              <span class="device-name">Compañero</span>
-              <span class="device-status-success">¡Materia Importada!</span>
+            <div class="share-subject-row">
+              <div class="share-subject-icon" style="background: #EFF6FF; color: #2563EB;" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+              </div>
+              <div class="share-subject-text">
+                <strong>Cálculo Diferencial</strong>
+                <span>2 clases/sem • 3 evaluaciones</span>
+              </div>
+              <span class="pack-badge">.notifast</span>
+            </div>
+
+            <!-- Código QR Offline (QrCodeGenerator / ZXing) -->
+            <div class="qr-preview-stage">
+              <div class="qr-code-frame" aria-hidden="true">
+                <div class="qr-fake-code">
+                  <span class="qr-corner tl"></span>
+                  <span class="qr-corner tr"></span>
+                  <span class="qr-corner bl"></span>
+                  <span class="qr-dot"></span><span class="qr-dot"></span><span class="qr-dot"></span>
+                  <span class="qr-dot"></span><span class="qr-dot"></span><span class="qr-dot"></span>
+                  <span class="qr-dot"></span><span class="qr-dot"></span><span class="qr-dot"></span>
+                </div>
+              </div>
+              <div class="qr-preview-copy">
+                <span class="qr-preview-label">Código QR Offline</span>
+                <p class="qr-preview-desc">Pide a tu compañero que escanee este código desde NotiFast</p>
+              </div>
+            </div>
+
+            <!-- Opciones de Exportación Reales -->
+            <div class="share-options-list" role="list" aria-label="Opciones para compartir la materia">
+              <div class="share-option-row" role="listitem">
+                <div class="share-option-icon file">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-description"></use></svg>
+                </div>
+                <div class="share-option-text">
+                  <strong>Exportar Pack .notifast</strong>
+                  <span>WhatsApp, Drive o Bluetooth</span>
+                </div>
+              </div>
+              <div class="share-option-row" role="listitem">
+                <div class="share-option-icon qr">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+                </div>
+                <div class="share-option-text">
+                  <strong>Código QR Offline</strong>
+                  <span>Escaneo instantáneo en el aula</span>
+                </div>
+              </div>
+              <div class="share-option-row" role="listitem">
+                <div class="share-option-icon md">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
+                </div>
+                <div class="share-option-text">
+                  <strong>Copiar Resumen Markdown</strong>
+                  <span>Horarios y syllabus al portapapeles</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="share-notes-toggle">
+              <span class="notif-switch-pill" aria-hidden="true"></span>
+              <span>Incluir mis apuntes personales</span>
             </div>
           </div>
 
-          <!-- Resumen del Pack Importado -->
-          <div class="pack-contents-box">
-            <div class="pack-subject-title">
-              <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
-              <span>Cálculo Diferencial.notifast</span>
+          <!-- 2. Cloud Hub: Copia de Seguridad en Google Drive (Privado) -->
+          <div class="cloud-backup-card">
+            <div class="share-card-header">
+              <div class="share-header-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-cloud-drive"></use></svg>
+                <span>Copia de Seguridad</span>
+              </div>
+              <span class="cloud-private-badge">Google Drive (Privado)</span>
             </div>
-            <div class="pack-meta-grid">
-              <span>✓ 12 Apuntes por bloques</span>
-              <span>✓ 2 Horarios semanales</span>
-              <span>✓ 3 Fechas de parciales</span>
-              <span>✓ Ponderación &amp; Docente</span>
+
+            <div class="cloud-last-backup">
+              <span class="cloud-sync-dot" aria-hidden="true"></span>
+              <span>Última copia: hoy, 10:42 AM</span>
+            </div>
+
+            <!-- Estados por Materia (CloudStatusChip.kt) -->
+            <div class="cloud-status-list" role="list" aria-label="Estado de sincronización por materia">
+              <div class="cloud-status-row" role="listitem">
+                <div class="cloud-row-main">
+                  <strong>Cálculo Diferencial</strong>
+                  <div class="cloud-row-badges">
+                    <span class="cloud-mini-badge">12 ap.</span>
+                    <span class="cloud-mini-badge">2 hor.</span>
+                    <span class="cloud-mini-badge">3 eval.</span>
+                  </div>
+                </div>
+                <span class="cloud-status-chip chip-synced">Sincronizada</span>
+              </div>
+              <div class="cloud-status-row" role="listitem">
+                <div class="cloud-row-main">
+                  <strong>Física General</strong>
+                  <div class="cloud-row-badges">
+                    <span class="cloud-mini-badge">8 ap.</span>
+                    <span class="cloud-mini-badge">2 hor.</span>
+                  </div>
+                </div>
+                <span class="cloud-status-chip chip-local">Solo en el teléfono</span>
+              </div>
+              <div class="cloud-status-row" role="listitem">
+                <div class="cloud-row-main">
+                  <strong>Química Orgánica</strong>
+                  <div class="cloud-row-badges">
+                    <span class="cloud-mini-badge">7 ap.</span>
+                    <span class="cloud-mini-badge">3 eval.</span>
+                  </div>
+                </div>
+                <span class="cloud-status-chip chip-pending">Cambios sin subir</span>
+              </div>
+            </div>
+
+            <div class="cloud-actions-row">
+              <button type="button" class="cloud-action-btn primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
+                <span>Subir a la nube</span>
+              </button>
+              <button type="button" class="cloud-action-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-upload"></use></svg>
+                <span>Restaurar al teléfono</span>
+              </button>
             </div>
           </div>
         </div>
