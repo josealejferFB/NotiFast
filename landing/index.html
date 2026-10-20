@@ -30,9 +30,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
 
-  <link rel="stylesheet" href="css/tokens.css?v=3.3.0">
-  <link rel="stylesheet" href="css/styles.css?v=3.3.0">
-  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.3.0">
+  <link rel="stylesheet" href="css/tokens.css?v=3.4.0">
+  <link rel="stylesheet" href="css/styles.css?v=3.4.0">
+  <link rel="stylesheet" href="css/dynamic-showcase.css?v=3.4.0">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -229,6 +229,16 @@
       <symbol id="icon-close" viewBox="0 0 24 24">
         <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
       </symbol>
+
+      <!-- Description / Documento (StudyHubDocumentsSheet) -->
+      <symbol id="icon-description" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+      </symbol>
+
+      <!-- Upload / Importar PDF (DaceSchedulePdfImporter) -->
+      <symbol id="icon-upload" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -244,7 +254,9 @@
       </a>
       <nav class="nav-links" aria-label="Navegación principal">
         <a href="#agenda">Agenda</a>
+        <a href="#importador">Importar</a>
         <a href="#apuntes">Apuntes</a>
+        <a href="#estudio">Estudio</a>
         <a href="#calificaciones">Calificaciones</a>
         <a href="#temas">Temas</a>
         <a href="#notificaciones">Notificaciones</a>
@@ -271,9 +283,17 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
           <span>Agenda Activa</span>
         </a>
+        <a href="#importador" class="mobile-nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-upload"></use></svg>
+          <span>Importar Horario PDF</span>
+        </a>
         <a href="#apuntes" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
           <span>Apuntes &amp; LaTeX</span>
+        </a>
+        <a href="#estudio" class="mobile-nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-description"></use></svg>
+          <span>Docs &amp; Portadas</span>
         </a>
         <a href="#calificaciones" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
@@ -493,8 +513,123 @@
       </div>
     </section>
 
-    <!-- 3. MÓDULO 2: CREACIÓN DE APUNTES & EDITOR MARKDOWN (NoteEditorBottomSheet fiel a la app) -->
-    <section class="dynamic-feature-row row-reverse section-notes-flow" id="apuntes">
+    <!-- 3. MÓDULO NUEVO: IMPORTADOR AUTOMÁTICO DE HORARIOS DACE PDF (SchedulePdfImportSheet.kt & DaceScheduleParser.kt) -->
+    <section class="dynamic-feature-row row-reverse section-dace-import" id="importador">
+      <div class="feature-info">
+        <h2 class="feature-title">
+          Tu comprobante de DACE,<br><span class="accent-ruby">convertido en agenda viva.</span>
+        </h2>
+        <p class="feature-desc">
+          Sube el PDF de tu inscripción en la <strong>UNERG</strong> y NotiFast extrae materias, secciones, aulas y horarios en menos de un segundo. Todo ocurre en tu teléfono: tus datos nunca salen de él.
+        </p>
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Extrae materias, secciones y aulas del PDF, descartando clases no presenciales.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Vista previa con interruptores por materia y estrategia: combinar o reemplazar.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Hoja de Vista Previa de Importación DACE (DaceScheduleImportPreviewSheet.kt) -->
+        <div class="dace-import-card">
+          <div class="dace-card-header">
+            <div class="dace-file-beacon">
+              <span class="dace-file-dot" aria-hidden="true"></span>
+              <span>comprobante_dace_2026-01.pdf</span>
+            </div>
+            <span class="dace-parser-badge">100% Offline</span>
+          </div>
+
+          <!-- Datos del Estudiante Extraídos del PDF -->
+          <div class="dace-student-strip">
+            <div class="dace-student-row">
+              <div class="dace-student-avatar" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
+              </div>
+              <div class="dace-student-text">
+                <strong>María Fernanda Pérez</strong>
+                <span>V-25.123.456 • Ingeniería Informática</span>
+              </div>
+            </div>
+            <span class="dace-period-chip">Período 2026-01</span>
+          </div>
+
+          <div class="dace-preview-label">VISTA PREVIA DE IMPORTACIÓN</div>
+
+          <!-- Materias Detectadas con Interruptores -->
+          <div class="dace-subjects-list" role="list" aria-label="Materias detectadas en el PDF">
+            <div class="dace-subject-row active" role="listitem">
+              <div class="dace-subject-icon" style="background: #EFF6FF; color: #2563EB;" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
+              </div>
+              <div class="dace-subject-info">
+                <span class="dace-subject-name">Cálculo Diferencial</span>
+                <span class="dace-subject-meta">MAT-201 • Sec. 2 • Aula 204</span>
+              </div>
+              <div class="dace-schedule-chips">
+                <span>Lun 08:00</span>
+                <span>Mié 08:00</span>
+              </div>
+              <span class="notif-switch-pill" aria-hidden="true"></span>
+            </div>
+
+            <div class="dace-subject-row active" role="listitem">
+              <div class="dace-subject-icon" style="background: #F0FDFA; color: #0F766E;" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
+              </div>
+              <div class="dace-subject-info">
+                <span class="dace-subject-name">Física General</span>
+                <span class="dace-subject-meta">FIS-110 • Sec. 19 • Lab 3</span>
+              </div>
+              <div class="dace-schedule-chips">
+                <span>Mar 10:00</span>
+                <span>Jue 10:00</span>
+              </div>
+              <span class="notif-switch-pill" aria-hidden="true"></span>
+            </div>
+
+            <div class="dace-subject-row" role="listitem">
+              <div class="dace-subject-icon" style="background: var(--bg-surface-container); color: var(--text-muted);" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
+              </div>
+              <div class="dace-subject-info">
+                <span class="dace-subject-name muted">Inglés Instrumental</span>
+                <span class="dace-subject-meta">IDI-101 • Sec. 1 • NO PRESENCIAL</span>
+              </div>
+              <div class="dace-schedule-chips muted">
+                <span>A distancia</span>
+              </div>
+              <span class="notif-switch-pill dace-switch-off" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <!-- Estrategia de Importación (Merge vs Reemplazo) -->
+          <div class="dace-strategy-box">
+            <span class="dace-strategy-label">Estrategia de importación</span>
+            <div class="dace-strategy-chips" role="radiogroup" aria-label="Estrategia de importación de horario">
+              <button type="button" class="dace-strategy-chip active" role="radio" aria-checked="true">Combinación inteligente</button>
+              <button type="button" class="dace-strategy-chip" role="radio" aria-checked="false">Reemplazo total</button>
+            </div>
+          </div>
+
+          <div class="dace-import-footer">
+            <span class="dace-import-hint">2 materias • 4 bloques • 0 conflictos</span>
+            <button type="button" class="btn-trigger-notif dace-import-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-upload"></use></svg>
+              <span>Importar horario</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. MÓDULO 3: CREACIÓN DE APUNTES & EDITOR MARKDOWN (NoteEditorBottomSheet fiel a la app) -->
+    <section class="dynamic-feature-row section-notes-flow" id="apuntes">
       <div class="feature-info">
         <h2 class="feature-title">
           Tus notas en Markdown,<br>con fórmulas y etiquetas.
@@ -595,7 +730,140 @@
       </div>
     </section>
 
-    <!-- 4. MÓDULO 3: CALIFICACIONES (MainAverageDashboard fiel a la app) -->
+    <!-- 5. MÓDULO NUEVO: ÁREA DE ESTUDIO — DOCUMENTOS POR MATERIA & CREADOR DE PORTADAS (StudyDocumentsSheet.kt & AcademicCoverCreatorSheet.kt) -->
+    <section class="dynamic-feature-row row-reverse section-study-hub" id="estudio">
+      <div class="feature-info">
+        <h2 class="feature-title">
+          Documentos por materia<br><span class="accent-aqua">y portadas listas para entregar.</span>
+        </h2>
+        <p class="feature-desc">
+          Centraliza tus PDF y DOCX junto a cada asignatura y genera portadas académicas con normas APA, IEEE o institucionales. Autocompletado inteligente, vista previa en vivo y salida a <code>.docx</code> o Google Docs.
+        </p>
+        <ul class="feature-bullets">
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Organiza PDF y DOCX por materia, con visores integrados y almacenamiento privado.</span>
+          </li>
+          <li>
+            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <span>Portadas APA, IEEE o de Tesis con autocompletado y salida a Word o Google Docs.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-visual">
+        <!-- Panel Doble: Documentos por Materia + Creador de Portadas (StudyHubContent.kt) -->
+        <div class="study-hub-stack">
+          <!-- 1. Repositorio de Documentos Vinculados a Materias -->
+          <div class="study-docs-card">
+            <div class="study-card-header">
+              <div class="study-header-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-description"></use></svg>
+                <span>Documentos por Materia</span>
+              </div>
+              <div class="study-filter-chips" role="tablist" aria-label="Filtrar documentos por materia">
+                <button type="button" class="study-filter-chip active" role="tab" aria-selected="true">Cálculo</button>
+                <button type="button" class="study-filter-chip" role="tab" aria-selected="false">Física</button>
+                <button type="button" class="study-filter-chip" role="tab" aria-selected="false">Todos</button>
+              </div>
+            </div>
+
+            <div class="study-docs-list" role="list" aria-label="Documentos importados">
+              <div class="study-doc-row" role="listitem">
+                <div class="study-doc-icon doc-pdf" aria-hidden="true"><span>PDF</span></div>
+                <div class="study-doc-info">
+                  <span class="study-doc-name">Guía de Laboratorio 3.pdf</span>
+                  <span class="study-doc-meta">1.2 MB • 12 páginas • Cálculo</span>
+                </div>
+                <div class="study-doc-actions" aria-hidden="true">
+                  <span class="study-doc-action-dot"></span>
+                  <span class="study-doc-action-dot"></span>
+                  <span class="study-doc-action-dot"></span>
+                </div>
+              </div>
+
+              <div class="study-doc-row" role="listitem">
+                <div class="study-doc-icon doc-docx" aria-hidden="true"><span>DOC</span></div>
+                <div class="study-doc-info">
+                  <span class="study-doc-name">Rúbrica de Proyecto Final.docx</span>
+                  <span class="study-doc-meta">340 KB • 4 páginas • Cálculo</span>
+                </div>
+                <div class="study-doc-actions" aria-hidden="true">
+                  <span class="study-doc-action-dot"></span>
+                  <span class="study-doc-action-dot"></span>
+                  <span class="study-doc-action-dot"></span>
+                </div>
+              </div>
+
+              <div class="study-doc-row" role="listitem">
+                <div class="study-doc-icon doc-pdf" aria-hidden="true"><span>PDF</span></div>
+                <div class="study-doc-info">
+                  <span class="study-doc-name">Enunciado Parcial II.pdf</span>
+                  <span class="study-doc-meta">890 KB • 6 páginas • Cálculo</span>
+                </div>
+                <div class="study-doc-actions" aria-hidden="true">
+                  <span class="study-doc-action-dot"></span>
+                  <span class="study-doc-action-dot"></span>
+                  <span class="study-doc-action-dot"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="study-docs-footer">
+              <span>✓ Zoom táctil en PDF</span>
+              <span>✓ Visor DOCX incluido</span>
+              <span>✓ Almacenamiento privado</span>
+            </div>
+          </div>
+
+          <!-- 2. Creador Inteligente de Portadas Académicas -->
+          <div class="cover-creator-card">
+            <div class="study-card-header">
+              <div class="study-header-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-autoawesome"></use></svg>
+                <span>Creador de Portadas</span>
+              </div>
+              <div class="cover-template-chips" role="tablist" aria-label="Plantilla de portada académica">
+                <button type="button" class="cover-template-chip active" role="tab" aria-selected="true">APA 7.ª</button>
+                <button type="button" class="cover-template-chip" role="tab" aria-selected="false">IEEE</button>
+                <button type="button" class="cover-template-chip" role="tab" aria-selected="false">Tesis</button>
+              </div>
+            </div>
+
+            <!-- Live Preview de la Portada -->
+            <div class="cover-preview-stage">
+              <div class="cover-page-preview" aria-label="Vista previa de la portada académica">
+                <div class="cover-uni-line">Universidad Nacional Experimental Rómulo Gallegos</div>
+                <div class="cover-rule-line" aria-hidden="true"></div>
+                <div class="cover-title-block">
+                  <strong>TEOREMA DEL VALOR MEDIO</strong>
+                  <span>Trabajo especial de Cálculo Diferencial</span>
+                </div>
+                <div class="cover-meta-block">
+                  <span>Asignatura: Cálculo Diferencial</span>
+                  <span>Prof. Ana Rodríguez</span>
+                  <span>María F. Pérez • V-25.123.456</span>
+                </div>
+              </div>
+              <span class="cover-live-badge">Vista previa en vivo</span>
+            </div>
+
+            <div class="cover-output-row">
+              <button type="button" class="cover-out-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-description"></use></svg>
+                <span>Generar .docx</span>
+              </button>
+              <button type="button" class="cover-out-btn primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-cloud-drive"></use></svg>
+                <span>Abrir en Google Docs</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MÓDULO 4: CALIFICACIONES (MainAverageDashboard fiel a la app) -->
     <section class="dynamic-feature-row section-grades-lab" id="calificaciones">
       <div class="feature-info">
         <h2 class="feature-title">
@@ -694,7 +962,7 @@
       </div>
     </section>
 
-    <!-- 5. MÓDULO 4: CALENDARIO DE EVALUACIONES (AgendaMonthCalendarView.kt & AgendaEvaluationCard.kt) -->
+    <!-- 7. MÓDULO 5: CALENDARIO DE EVALUACIONES (AgendaMonthCalendarView.kt & AgendaEvaluationCard.kt) -->
     <section class="dynamic-feature-row row-reverse section-evaluations-calendar" id="evaluaciones">
       <div class="feature-info">
         <h2 class="feature-title">
@@ -794,7 +1062,7 @@
       </div>
     </section>
 
-    <!-- 6. MÓDULO 5: ANALÍTICAS Y PROYECCIONES PREDICTIVAS (AcademicAnalyticsContent.kt & GradeSimulatorCard.kt) -->
+    <!-- 8. MÓDULO 6: ANALÍTICAS Y PROYECCIONES PREDICTIVAS (AcademicAnalyticsContent.kt & GradeSimulatorCard.kt) -->
     <section class="dynamic-feature-row section-analytics-dashboard" id="analiticas">
       <div class="feature-info">
         <h2 class="feature-title">
@@ -938,7 +1206,7 @@
       </div>
     </section>
 
-    <!-- 7. MÓDULO: PERSONALIZACIÓN & DESCANSO VISUAL (ThemePreset.kt & BackgroundPreset.kt) -->
+    <!-- 9. MÓDULO 7: PERSONALIZACIÓN & DESCANSO VISUAL (ThemePreset.kt & BackgroundPreset.kt) -->
     <section class="dynamic-feature-row row-reverse section-theme-studio" id="temas">
       <div class="feature-info">
         <h2 class="feature-title">
@@ -1098,7 +1366,7 @@
       </div>
     </section>
 
-    <!-- 8. MÓDULO NUEVO: MOTOR DE NOTIFICACIONES PROACTIVAS (SettingsNotificationsSection.kt & NotificationSender.kt) -->
+    <!-- 10. MÓDULO 8: MOTOR DE NOTIFICACIONES PROACTIVAS (SettingsNotificationsSection.kt & NotificationSender.kt) -->
     <section class="dynamic-feature-row section-notifications-engine" id="notificaciones">
       <div class="feature-info">
         <h2 class="feature-title">
@@ -1223,7 +1491,7 @@
       </div>
     </section>
 
-    <!-- 9. MÓDULO 6: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (Pack .notifast, QR Offline & Google Drive) -->
+    <!-- 11. MÓDULO 9: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (Pack .notifast, QR Offline & Google Drive) -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
         <h2 class="feature-title">
@@ -1293,7 +1561,7 @@
       </div>
     </section>
 
-    <!-- 10. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper) -->
+    <!-- 12. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper) -->
     <section class="subjects-gallery-section subjects-gallery" id="materias">
       <div class="subjects-gallery-header">
         <h2 class="section-title" style="font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 800;">
@@ -1443,7 +1711,7 @@
       </div>
     </section>
 
-    <!-- 11. Bento Grid Section: Superpoderes Académicos Reales de la App -->
+    <!-- 13. Bento Grid Section: Superpoderes Académicos Reales de la App -->
     <section class="bento-section">
       <div class="bento-header">
         <h2 class="section-title">Herramientas prácticas para tu vida académica.</h2>
@@ -1552,9 +1820,17 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
           <span>Agenda</span>
         </a>
+        <a href="#importador" class="radar-chip" data-target="#importador" title="Importador de Horarios DACE PDF">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-upload"></use></svg>
+          <span>Importar</span>
+        </a>
         <a href="#apuntes" class="radar-chip" data-target="#apuntes" title="Apuntes Markdown">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
           <span>Apuntes</span>
+        </a>
+        <a href="#estudio" class="radar-chip" data-target="#estudio" title="Área de Estudio: Documentos y Portadas">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-description"></use></svg>
+          <span>Estudio</span>
         </a>
         <a href="#calificaciones" class="radar-chip" data-target="#calificaciones" title="Calificaciones Multiescala">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-emojievents"></use></svg>

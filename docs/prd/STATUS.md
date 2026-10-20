@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.2
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.2**  
-> **Última actualización:** 19 de Octubre, 2026  
+> **Última actualización:** 20 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md)
 
 ---
@@ -1074,6 +1074,31 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
    - **Simplificación del Estudio de Temas:** Remoción total de la barra de selección hexadecimal y matiz HSL, conservando exclusivamente la selección limpia y curada de 6 paletas de acento, 6 lienzos de papel suave y el conmutador de modo claro/oscuro.
    - **Lettering Conciso & Directo al Estudiante:** Reducción del texto denso en todas las secciones de características a 1-2 oraciones claras y viñetas simplificadas a un máximo de 2 puntos concisos orientados a beneficios reales.
    - **Higiene de Código & Verificación:** Eliminación de CSS y funciones JS huérfanas (`hslToHex`, `.hex-controls-row`, `.hex-input-wrap`, animaciones del hub orbital descartado). Verificación completa con 22/22 pruebas unitarias pasando y 0 errores en el detector Impeccable.
+
+---
+
+## 🌐 Showcase Landing: Área de Estudio & Importador DACE PDF — 100% Completado (20 Oct 2026)
+
+**Objetivo:** Incorporar a la landing page dos nuevas secciones dinámicas (`dynamic-feature-row`) que muestren 1:1 las features nativas *Área de Estudio (Documentos por Materia + Creador de Portadas)* y *Importador Automático de Horarios desde PDF de DACE (UNERG)*, respetando el zig-zag visual, los design tokens 3.2 y la destilación de lettering Impeccable (máx. 2 viñetas, copy orientado al beneficio estudiantil).
+
+### Entregables Implementados:
+1. **Sección Importador DACE PDF (`#importador`, `.section-dace-import`):**
+   - Título *«Tu comprobante de DACE, convertido en agenda viva.»* con acento ruby y 2 viñetas de beneficio.
+   - Mockup `dace-import-card` fiel a la hoja de vista previa: cabecera de archivo PDF, datos del estudiante extraídos (nombre, cédula, carrera, período), lista de materias con interruptores (incl. fila *NO PRESENCIAL* descartada), chips de bloques horarios, estrategia de importación (*Combinación inteligente / Reemplazo total*) y CTA *Importar horario*.
+   - Zig-zag `row-reverse` insertado tras Agenda para continuidad narrativa (horario → importación).
+2. **Sección Área de Estudio (`#estudio`, `.section-study-hub`):**
+   - Título *«Documentos por materia y portadas listas para entregar.»* con acento aqua y 2 viñetas de beneficio.
+   - Mockup doble `study-hub-stack`: (a) `study-docs-card` con chips de filtro por materia, filas PDF/DOCX con metadatos y footer de garantías (zoom táctil, visor DOCX, sandbox privado); (b) `cover-creator-card` con plantillas *APA 7.ª / IEEE / Tesis*, live preview de portada académica y doble salida (*Generar .docx* / *Abrir en Google Docs*).
+   - Zig-zag `row-reverse` insertado tras Apuntes (apuntes → documentos y portadas).
+3. **Navegación Unificada:**
+   - Enlaces *Importar* y *Estudio* en nav desktop, drawer móvil (*Importar Horario PDF*, *Docs & Portadas*) y radar flotante (chips `data-target` sincronizados con scroll).
+   - Nuevos símbolos SVG zero-CORS: `icon-description`, `icon-upload`.
+4. **Sistema de Estilos (sección 13 en `dynamic-showcase.css`):**
+   - Tarjetas con tokens (`--bg-surface`, `--radius-*`, `--shadow-*`, `--font-mono` para badges), estados hover con elevación táctil, chips de estrategia/plantilla/filtro, switch OFF dedicado (`.dace-switch-off`) y adaptación responsive `≤640px`.
+   - Inclusión de las nuevas tarjetas en el bloque de Dark Mode (`[data-theme-mode="dark"]`) y bump de cache-busting CSS `v=3.4.0`.
+5. **Verificación (24/24 tests de landing pasando):**
+   - 2 nuevos tests estructurales: `test_dace_schedule_importer_section_exists` y `test_study_hub_documents_and_covers_section_exists` (IDs, mockups, navegación, zig-zag y CSS).
+   - Suite Python CI/CD ampliada de 22 → 24 pruebas sin regresiones.
 
 ---
 

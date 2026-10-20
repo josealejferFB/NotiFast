@@ -270,6 +270,66 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("setupNotificationsSimulator", js)
         self.assertIn("setupHeroLogoMotion", js)
 
+    def test_dace_schedule_importer_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="importador"', html)
+        self.assertIn("section-dace-import", html)
+        self.assertIn("dace-import-card", html)
+        self.assertIn("comprobante_dace_2026-01.pdf", html)
+        self.assertIn("VISTA PREVIA DE IMPORTACIÓN", html)
+        self.assertIn("NO PRESENCIAL", html)
+        self.assertIn("Combinación inteligente", html)
+        self.assertIn("Reemplazo total", html)
+        self.assertIn("dace-strategy-chip", html)
+        self.assertIn("icon-upload", html)
+
+        # Integración en navegación y radar
+        self.assertIn('href="#importador"', html)
+        self.assertIn('data-target="#importador"', html)
+
+        # Zig-zag: fila row-reverse como el resto del showcase
+        self.assertIn('class="dynamic-feature-row row-reverse section-dace-import"', html)
+
+        # Estilos del mockup en dynamic-showcase.css
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".dace-import-card", css)
+        self.assertIn(".dace-subject-row", css)
+        self.assertIn(".dace-strategy-box", css)
+
+    def test_study_hub_documents_and_covers_section_exists(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="estudio"', html)
+        self.assertIn("section-study-hub", html)
+        self.assertIn("study-docs-card", html)
+        self.assertIn("cover-creator-card", html)
+        self.assertIn("Documentos por Materia", html)
+        self.assertIn("Creador de Portadas", html)
+        self.assertIn("APA 7.ª", html)
+        self.assertIn("IEEE", html)
+        self.assertIn("Tesis", html)
+        self.assertIn("Vista previa en vivo", html)
+        self.assertIn("Generar .docx", html)
+        self.assertIn("Abrir en Google Docs", html)
+        self.assertIn("icon-description", html)
+
+        # Integración en navegación y radar
+        self.assertIn('href="#estudio"', html)
+        self.assertIn('data-target="#estudio"', html)
+
+        # Zig-zag: fila row-reverse como el resto del showcase
+        self.assertIn('class="dynamic-feature-row row-reverse section-study-hub"', html)
+
+        # Estilos del mockup en dynamic-showcase.css
+        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".study-hub-stack", css)
+        self.assertIn(".study-docs-card", css)
+        self.assertIn(".cover-creator-card", css)
+        self.assertIn(".cover-page-preview", css)
+
     def test_cloudflare_pages_metadata(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()

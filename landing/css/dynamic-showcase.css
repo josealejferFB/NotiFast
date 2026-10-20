@@ -3265,8 +3265,674 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   13. IMPORTADOR DACE PDF & ÁREA DE ESTUDIO (DaceScheduleParser / StudyHub)
+   -------------------------------------------------------------------------- */
+
+/* --- Importador Automático de Horarios desde PDF de DACE (UNERG) --- */
+
+.dace-import-card {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-smooth);
+}
+
+.dace-import-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.08);
+}
+
+.dace-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dace-file-beacon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+  background: var(--brand-primary-light);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  min-width: 0;
+}
+
+.dace-file-beacon span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dace-file-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.dace-parser-badge {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-surface-container);
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.dace-student-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-surface-container);
+  border-radius: 14px;
+  border: 1px solid var(--border-hairline);
+}
+
+.dace-student-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dace-student-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dace-student-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dace-student-text strong {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dace-student-text span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dace-period-chip {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--brand-primary);
+  background: var(--brand-primary-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dace-preview-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dace-subjects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dace-subject-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 14px;
+  transition: border-color var(--duration-fast) var(--ease-smooth);
+}
+
+.dace-subject-row.active {
+  border-color: rgba(158, 27, 50, 0.28);
+}
+
+.dace-subject-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dace-subject-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dace-subject-name {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dace-subject-name.muted {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+
+.dace-subject-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dace-schedule-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dace-schedule-chips span {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--brand-secondary);
+  background: var(--brand-secondary-light);
+  padding: 3px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.dace-schedule-chips.muted span {
+  color: var(--text-muted);
+  background: var(--bg-surface-container);
+}
+
+.dace-switch-off {
+  background-color: var(--bg-surface-container-high);
+}
+
+.dace-switch-off::after {
+  right: auto;
+  left: 3px;
+  background-color: var(--text-muted);
+}
+
+.dace-strategy-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--bg-surface-container);
+  border-radius: 14px;
+  border: 1px dashed var(--border-hairline);
+}
+
+.dace-strategy-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dace-strategy-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dace-strategy-chip {
+  flex: 1;
+  min-width: 140px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-hairline);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.dace-strategy-chip:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.dace-strategy-chip.active {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--brand-on-primary);
+}
+
+.dace-import-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dace-import-hint {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.dace-import-btn {
+  flex-shrink: 0;
+}
+
+/* --- Área de Estudio: Documentos por Materia & Creador de Portadas --- */
+
+.study-hub-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.study-docs-card,
+.cover-creator-card {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 24px;
+  padding: 20px 22px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-smooth);
+}
+
+.study-docs-card:hover,
+.cover-creator-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.08);
+}
+
+.study-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.study-header-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.study-header-left svg {
+  color: var(--brand-secondary);
+}
+
+.study-filter-chips,
+.cover-template-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.study-filter-chip,
+.cover-template-chip {
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-hairline);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.study-filter-chip:hover,
+.cover-template-chip:hover {
+  border-color: var(--brand-secondary);
+  color: var(--brand-secondary);
+}
+
+.study-filter-chip.active,
+.cover-template-chip.active {
+  background: var(--brand-secondary);
+  border-color: var(--brand-secondary);
+  color: var(--brand-on-secondary);
+}
+
+.study-docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.study-doc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+  transition: border-color var(--duration-fast) var(--ease-smooth);
+}
+
+.study-doc-row:hover {
+  border-color: rgba(27, 94, 94, 0.35);
+}
+
+.study-doc-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.study-doc-icon.doc-pdf {
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
+}
+
+.study-doc-icon.doc-docx {
+  background: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+}
+
+.study-doc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.study-doc-name {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.study-doc-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.study-doc-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  padding: 6px 4px;
+}
+
+.study-doc-action-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.study-docs-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--brand-secondary);
+}
+
+.cover-preview-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  background: var(--bg-surface-container);
+  border: 1px dashed var(--border-hairline);
+  border-radius: 16px;
+}
+
+.cover-page-preview {
+  width: 100%;
+  max-width: 280px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  box-shadow: var(--shadow-tactile);
+}
+
+.cover-uni-line {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cover-rule-line {
+  width: 48px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--brand-primary);
+}
+
+.cover-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cover-title-block strong {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.cover-title-block span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.cover-meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.cover-live-badge {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--brand-secondary);
+  background: var(--brand-secondary-light);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+
+.cover-output-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cover-out-btn {
+  flex: 1;
+  min-width: 140px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-hairline);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.cover-out-btn:hover {
+  border-color: var(--brand-secondary);
+  color: var(--brand-secondary);
+  transform: translateY(-1px);
+}
+
+.cover-out-btn.primary {
+  background: var(--brand-secondary);
+  border-color: var(--brand-secondary);
+  color: var(--brand-on-secondary);
+}
+
+.cover-out-btn.primary:hover {
+  background: var(--brand-secondary-hover);
+  border-color: var(--brand-secondary-hover);
+  color: var(--brand-on-secondary);
+}
+
+/* Responsive adjustments for new showcase cards */
+@media (max-width: 640px) {
+  .dace-card-header,
+  .dace-student-strip,
+  .dace-import-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dace-parser-badge,
+  .dace-period-chip {
+    align-self: flex-start;
+  }
+
+  .dace-subject-row {
+    flex-wrap: wrap;
+  }
+
+  .dace-schedule-chips {
+    width: 100%;
+    padding-left: 46px;
+  }
+
+  .dace-strategy-chip {
+    min-width: 100%;
+  }
+
+  .study-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cover-output-row {
+    flex-direction: column;
+  }
+
+  .cover-out-btn {
+    width: 100%;
+  }
+}
+
 /* ==========================================================================
-   13. DARK MODE & DYNAMIC THEME ADAPTATION FOR ALL SHOWCASE CARDS
+   14. DARK MODE & DYNAMIC THEME ADAPTATION FOR ALL SHOWCASE CARDS
    ========================================================================== */
 
 .popout-item,
@@ -3286,6 +3952,13 @@
 .nearby-transfer-card,
 .pack-contents-box,
 .subject-feature-card,
+.dace-import-card,
+.dace-subject-row,
+.study-docs-card,
+.cover-creator-card,
+.study-doc-row,
+.cover-page-preview,
+.cover-out-btn,
 .footer-back-to-top {
   background-color: var(--bg-surface);
   color: var(--text-primary);
