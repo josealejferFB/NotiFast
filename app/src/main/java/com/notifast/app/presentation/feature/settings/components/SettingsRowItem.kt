@@ -21,9 +21,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import com.notifast.app.presentation.atoms.NotiFastSwitch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -172,18 +171,9 @@ fun SettingsRowItem(
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                             }
-                            Switch(
+                            NotiFastSwitch(
                                 checked = trailing.checked,
-                                onCheckedChange = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    trailing.onCheckedChange(it)
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                                    checkedTrackColor = MaterialTheme.colorScheme.primary,
-                                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
+                                onCheckedChange = trailing.onCheckedChange
                             )
                         }
                     }

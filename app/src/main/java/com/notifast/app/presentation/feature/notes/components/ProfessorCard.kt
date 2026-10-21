@@ -1,12 +1,5 @@
 package com.notifast.app.presentation.feature.notes.components
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,26 +17,26 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Teacher
-import com.notifast.app.presentation.theme.color.ForestSage
+import com.notifast.app.presentation.atoms.NotiFastCard
 
+/**
+ * NotiFast 3.2 Reactive Professor Card.
+ * Uses NotiFastCard atom with tactile physics, theme-reactive surface/container tokens,
+ * and WCAG AAA compliant typography and icons.
+ */
 @Composable
 fun ProfessorCard(
     teacher: Teacher,
@@ -51,27 +44,13 @@ fun ProfessorCard(
     onWhatsAppClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.98f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        ),
-        label = "prof_card_scale"
-    )
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .graphicsLayer { scaleX = scale; scaleY = scale }
-            .clickable(interactionSource = interactionSource, indication = null) { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+    NotiFastCard(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        onClick = onClick,
+        contentPadding = 16.dp
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -107,6 +86,7 @@ fun ProfessorCard(
                         text = teacher.fullName.ifBlank { stringResource(R.string.teachers_tab_title) },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -152,7 +132,7 @@ fun ProfessorCard(
                     Spacer(Modifier.width(8.dp))
                     Surface(
                         shape = CircleShape,
-                        color = ForestSage.copy(alpha = 0.12f),
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
                         onClick = onWhatsAppClick,
                         modifier = Modifier.size(44.dp)
                     ) {
@@ -160,7 +140,7 @@ fun ProfessorCard(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Chat,
                                 contentDescription = stringResource(R.string.teacher_action_whatsapp),
-                                tint = ForestSage,
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -187,7 +167,7 @@ fun ProfessorCard(
                     visibleSubjects.forEach { subjectName ->
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f)
+                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
                         ) {
                             Text(
                                 text = subjectName,

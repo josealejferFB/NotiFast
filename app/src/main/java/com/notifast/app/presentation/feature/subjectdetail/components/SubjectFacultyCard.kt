@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.notifast.app.R
 import com.notifast.app.data.model.Teacher
 import com.notifast.app.presentation.atoms.NotiFastCard
-import com.notifast.app.presentation.theme.color.ForestSage
 
 @Composable
 fun SubjectFacultyCard(
@@ -155,7 +154,7 @@ fun SubjectFacultyCard(
                         if (teacher.hasPhoneNumber && onWhatsAppClick != null) {
                             Surface(
                                 shape = CircleShape,
-                                color = ForestSage.copy(alpha = 0.12f),
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
                                 onClick = { onWhatsAppClick(teacher) },
                                 modifier = Modifier.size(40.dp)
                             ) {
@@ -163,7 +162,7 @@ fun SubjectFacultyCard(
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.Chat,
                                         contentDescription = stringResource(R.string.teacher_action_whatsapp),
-                                        tint = ForestSage,
+                                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }

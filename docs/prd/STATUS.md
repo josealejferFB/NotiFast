@@ -34,13 +34,44 @@ Cloud Sync Portadas & Docentes    [███████████████
 Rediseño Header Impeccable AAA    [████████████████] 100% (6/6 tareas) ✅
 Estandarización Sheets & Inputs   [████████████████] 100% (5/5 tareas) ✅
 Importación Horarios UNERG (PDF)   [████████████████] 100% (5/5 tareas) ✅
+Pulido Tokens & Clases UI/UX Max   [████████████████] 100% (3/3 tareas) ✅
 Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████] 99.8% (222/222 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    762 tests pasando (0 fallos, 0 ignorados) ✅
-MÉTRICAS DE CÓDIGO:               427 archivos Kotlin (~54,100 LOC) + 116 suites test ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████] 99.9% (225/225 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    765 tests pasando (0 fallos, 0 ignorados) ✅
+MÉTRICAS DE CÓDIGO:               430 archivos Kotlin (~54,600 LOC) + 117 suites test ✅
 ```
+
+---
+
+## 🎨 Normalización de Tokens Reactivos (Cards de Docente & Toggles QR) y Rediseño UI/UX Pro Max en Clases de Materia — 100% Completado
+
+**Objetivo:** Aplicar con rigor quirúrgico los tokens reactivos del sistema de diseño NotiFast 3.2 en las tarjetas de profesores (`ProfessorCard.kt`, `ProfessorMiniCard.kt`, `SubjectFacultyCard.kt`), unificar el comportamiento y tokens del switch/toggle en la vista de compartir QR (`ShareSubjectBottomSheet.kt`) mediante el nuevo átomo `NotiFastSwitch`, y rediseñar por completo la pestaña de clases en el detalle de materia (`SubjectSchedulesTab.kt`) aplicando las mejores prácticas UI/UX Pro Max (Bento Summary con carga semanal y horas totales, orden cronológico de días, chips de modalidad/salón/docente, indicador "Hoy" y CTA táctil para aula virtual).
+
+### Pilares Implementados (100% ✅)
+1. **Tokens Reactivos en Tarjetas de Profesor (`ProfessorCard.kt` & `ProfessorMiniCard.kt`):**
+   - Migración de `Card` estándar a `NotiFastCard` atómica con físicas elásticas `spring(dampingRatio = LowBouncy)`.
+   - Reemplazo del contenedor fijo `surfaceContainerLow` por los tokens reactivos `surface` y `outlineVariant` de NotiFast 3.2.
+   - Eliminación de colores fijos como `ForestSage`; adopción de `MaterialTheme.colorScheme.tertiaryContainer` y `onTertiaryContainer` para acciones de WhatsApp.
+   - Tipografía contrastada con `onSurface` y `onSurfaceVariant` garantizando WCAG AAA en los 6 temas y lienzos.
+2. **Átomo `NotiFastSwitch` & Normalización del Toggle en Compartir QR (`ShareSubjectBottomSheet.kt`):**
+   - Creación del componente atómico `NotiFastSwitch.kt` en `presentation/atoms/`, con feedback háptico (`TextHandleMove`) y tokens semánticos completos (`onPrimary`, `primary`, `outline`, `surfaceVariant`, `outlineVariant`).
+   - Aplicación en `ShareSubjectBottomSheet.kt` con contenedor `surfaceVariant` orlado por `outlineVariant.copy(alpha = 0.5f)`.
+   - Corrección de `isSystemInDarkTheme()` a `MaterialTheme.colorScheme.isDark`.
+   - Propagación preventiva de `NotiFastSwitch` en `EditEvaluationGradeFields.kt`, `SubjectGradeQuickDialog.kt` y `SettingsRowItem.kt`.
+3. **Rediseño UI/UX Pro Max de Clases en Detalle de Materia (`SubjectSchedulesTab.kt`):**
+   - **Bento Summary Card (`SubjectSchedulesSummaryCard.kt`):** Muestra el total de sesiones semanales, total de horas estimadas (`X.X hrs`) y desglose de modalidad con botón de acceso rápido "+ Clase".
+   - **Card Táctil de Clase (`SubjectScheduleCard.kt`):**
+     - Pill de día destacado en `primaryContainer` + Tag contextual de "Hoy" en `tertiaryContainer` cuando coincide con el día lectivo actual.
+     - Chip de modalidad (`Presencial` con icono `School` / `Virtual` con icono `Videocam`).
+     - Horario en `monoAcademicBold` con pill de duración (`Xh Ym`).
+     - Chips de ubicación ("Salón Aula 302") y docente asignado ("Prof. Nombre").
+     - Botón ergonómico tonal de un solo toque para acceder directamente a la videoclase virtual (`subject_detail_join_virtual`).
+   - **Ordenación Cronológica Semanal:** Lógica matemática de ordenamiento que ubica Lunes (1) hasta Sábado (6) y Domingo (0) al final, ordenados por hora de inicio.
+4. **Verificación y Cobertura (765 tests unitarios en verde + Build limpia):**
+   - Suite `SubjectSchedulesFormatTest.kt` validando ordenamiento semanal, cálculo de minutos acumulados y formateo de duración.
+   - `./gradlew testDebugUnitTest` y `./gradlew assembleDebug` ejecutados con éxito.
 
 ---
 

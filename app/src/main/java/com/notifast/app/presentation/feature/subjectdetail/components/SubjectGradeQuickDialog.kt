@@ -11,9 +11,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import com.notifast.app.presentation.atoms.NotiFastSwitch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -127,7 +127,7 @@ fun SubjectGradeQuickDialog(
                         text = stringResource(R.string.subject_detail_quick_grade_presented),
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    Switch(
+                    NotiFastSwitch(
                         checked = isPresented,
                         onCheckedChange = { isPresented = it }
                     )

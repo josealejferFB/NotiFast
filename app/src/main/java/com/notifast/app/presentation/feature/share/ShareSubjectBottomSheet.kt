@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,10 +29,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import com.notifast.app.presentation.atoms.NotiFastSwitch
+import com.notifast.app.presentation.theme.isDark
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -78,7 +79,7 @@ fun ShareSubjectBottomSheet(
     var generatedPayload by remember { mutableStateOf<String?>(null) }
     var showQrDialog by remember { mutableStateOf(false) }
 
-    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.isDark
     val subjectColor = remember(subjectColorHex, isDark) {
         ThemeUtils.getAccessibleColor(subjectColorHex, isDark)
     }
@@ -146,6 +147,7 @@ fun ShareSubjectBottomSheet(
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -169,10 +171,9 @@ fun ShareSubjectBottomSheet(
                         )
                     }
 
-                    Switch(
+                    NotiFastSwitch(
                         checked = includeNotes,
-                        onCheckedChange = { includeNotes = it },
-                        colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary)
+                        onCheckedChange = { includeNotes = it }
                     )
                 }
             }
