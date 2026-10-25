@@ -295,8 +295,8 @@
    -------------------------------------------------------------------------- */
 
 .schedule-live-card {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(24, 26, 31, 0.08);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
   padding: 24px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
@@ -328,22 +328,22 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: #BF092F;
-  box-shadow: 0 0 0 0 rgba(24, 26, 31, 0.08);
+  background-color: var(--brand-primary);
+  box-shadow: 0 0 0 0 rgba(var(--brand-primary-rgb), 0.4);
   /* static status dot */
 }
 
 @keyframes beaconPulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(24, 26, 31, 0.08); opacity: 1; }
-  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(191, 9, 47, 0); opacity: 0.8; }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(191, 9, 47, 0); opacity: 1; }
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(var(--brand-primary-rgb), 0.6); opacity: 1; }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(var(--brand-primary-rgb), 0); opacity: 0.8; }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(var(--brand-primary-rgb), 0); opacity: 1; }
 }
 
 .beacon-text {
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 1.2px;
-  color: #BF092F;
+  color: var(--brand-primary);
 }
 
 .beacon-remaining {
@@ -438,7 +438,7 @@
    -------------------------------------------------------------------------- */
 
 .note-editor-simulator {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
@@ -458,7 +458,7 @@
   justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-hairline);
-  background: #FAFAF9;
+  background: var(--bg-surface-container);
 }
 
 .editor-icon-btn {
@@ -529,8 +529,8 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  background: #EFF6FF;
-  color: #1D4ED8;
+  background: var(--brand-secondary-light);
+  color: var(--brand-secondary);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -563,7 +563,7 @@
 /* Docked Accessory Toolbar (52dp Compose Surface) */
 .markdown-toolbar {
   height: 48px;
-  background: #F4F4F5;
+  background: var(--bg-surface-container-high);
   border-top: 1px solid var(--border-hairline);
   border-bottom: 1px solid var(--border-hairline);
   display: flex;
@@ -591,7 +591,7 @@
 }
 
 .tb-btn:hover {
-  background: #E4E4E7;
+  background: var(--bg-surface-container-high);
 }
 
 .tb-badge {
@@ -603,18 +603,18 @@
 .tb-divider {
   width: 1px;
   height: 20px;
-  background-color: #D4D4D8;
+  background-color: var(--border-hairline);
   margin: 0 4px;
 }
 
 .tb-fx {
-  color: #0F766E;
+  color: var(--brand-secondary);
 }
 
 /* Rich Editor Sheet Content */
 .rich-editor-sheet {
   padding: 16px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   max-height: 280px;
   overflow-y: auto;
 }
@@ -635,15 +635,14 @@
 }
 
 .math-latex-card {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--bg-surface-container);
   border: 1px solid var(--border-hairline);
   border-radius: 8px;
   padding: 8px 12px;
   margin-bottom: 12px;
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  color: #134E4A;
+  color: var(--brand-secondary);
   font-weight: 600;
 }
 
@@ -671,11 +670,11 @@
 .editor-quote-card {
   
   padding: 6px 12px;
-  background: #FFF1F2;
+  background: var(--brand-primary-light);
   border-radius: 4px;
   font-size: 0.8125rem;
   font-style: italic;
-  color: #881337;
+  color: var(--brand-primary);
   margin: 0;
 }
 
@@ -699,7 +698,7 @@
   gap: 3px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   cursor: pointer;
   text-align: left;
@@ -709,13 +708,13 @@
 
 .scale-chip:hover {
   border-color: var(--brand-secondary);
-  background: #F0FDF4;
+  background: var(--brand-secondary-light);
   transform: translateY(-2px);
 }
 
 .scale-chip.active {
   border-color: var(--brand-success);
-  background: #F0FDF4;
+  background: var(--brand-success-light);
   box-shadow: 0 4px 12px rgba(24, 26, 31, 0.08);
 }
 
@@ -785,7 +784,7 @@
 }
 
 .main-average-card {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
   padding: 28px 24px;
@@ -853,7 +852,7 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: 16px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 }
@@ -921,7 +920,7 @@
   gap: 6px;
   padding: 6px 14px;
   border-radius: var(--radius-pill);
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   font-size: 0.8125rem;
   font-weight: 700;
@@ -964,7 +963,7 @@
 
 /* Tarjeta Contenedora del Calendario */
 .evaluations-calendar-container {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
   padding: 24px;
@@ -1139,7 +1138,7 @@
 }
 
 .dot-amber-eval {
-  background-color: #92400E;
+  background-color: var(--brand-warning);
 }
 
 /* Día Seleccionado Activo */
@@ -1222,7 +1221,7 @@
 }
 
 .agenda-eval-card {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: 16px;
   padding: 12px 14px;
@@ -1326,7 +1325,7 @@
   padding: 24px 16px;
   border-radius: 16px;
   border: 1px dashed var(--border-hairline);
-  background: #FAFAF9;
+  background: var(--bg-surface-container);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -1376,7 +1375,7 @@
   gap: 2px;
   padding: 8px 14px;
   border-radius: 14px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   cursor: pointer;
   transition: all 0.2s var(--ease-smooth);
@@ -1386,13 +1385,13 @@
 
 .sim-preset-chip:hover {
   border-color: var(--brand-secondary);
-  background: #F0FDFA;
+  background: var(--brand-secondary-light);
   transform: translateY(-2px);
 }
 
 .sim-preset-chip.active {
   border-color: var(--brand-secondary);
-  background: #F0FDFA;
+  background: var(--brand-secondary-light);
   box-shadow: 0 4px 12px rgba(24, 26, 31, 0.08);
 }
 
@@ -1427,8 +1426,8 @@
 
 /* 1. Hero de Diagnóstico Predictivo (AnalyticsHeroCard.kt) */
 .analytics-hero-banner {
-  background: #F0FDFA;
-  border: 1px solid rgba(24, 26, 31, 0.08);
+  background: var(--brand-secondary-light);
+  border: 1px solid var(--border-hairline);
   border-radius: 18px;
   padding: 16px 20px;
   display: flex;
@@ -1484,7 +1483,7 @@
 
 /* 2. Simulador Interactivo de Calificación Requerida (GradeSimulatorCard.kt) */
 .grade-simulator-card {
-  background: #FAFAF9;
+  background: var(--bg-surface-container);
   border: 1px solid var(--border-hairline);
   border-radius: 18px;
   padding: 18px;
@@ -1543,21 +1542,21 @@
 }
 
 .sim-status-banner.status-achievable {
-  background: #ECFDF5;
-  color: #047857;
-  border: 1px solid rgba(5, 150, 105, 0.2);
+  background: var(--brand-success-light);
+  color: var(--brand-success);
+  border: 1px solid rgba(52, 211, 153, 0.25);
 }
 
 .sim-status-banner.status-at-risk {
-  background: #FFFBEB;
-  color: #92400E;
-  border: 1px solid rgba(217, 119, 6, 0.2);
+  background: var(--brand-warning-light);
+  color: var(--brand-warning);
+  border: 1px solid rgba(251, 191, 36, 0.25);
 }
 
 .sim-status-banner.status-impossible {
-  background: #FFF1F2;
-  color: #9E1B32;
-  border: 1px solid rgba(24, 26, 31, 0.08);
+  background: var(--brand-error-light);
+  color: var(--brand-error);
+  border: 1px solid rgba(248, 113, 113, 0.25);
 }
 
 .sim-status-icon {
@@ -1579,7 +1578,7 @@
 }
 
 .sim-stat-box {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: 12px;
   padding: 10px 12px;
@@ -1590,8 +1589,8 @@
 }
 
 .sim-stat-box.stat-highlight {
-  border-color: rgba(24, 26, 31, 0.08);
-  background: #F0FDFA;
+  border-color: var(--brand-secondary);
+  background: var(--brand-secondary-light);
 }
 
 .sim-stat-label {
@@ -1698,7 +1697,7 @@
 
 /* 3. Histograma de Distribución de Notas (GradeDistributionHistogram.kt) */
 .histogram-preview-card {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: 16px;
   padding: 14px 16px;
@@ -1759,19 +1758,19 @@
 }
 
 .bar-excellent {
-  background: #3B9797;
+  background: var(--brand-secondary);
 }
 
 .bar-good {
-  background: #2563EB;
+  background: var(--brand-success);
 }
 
 .bar-regular {
-  background: #92400E;
+  background: var(--brand-warning);
 }
 
 .bar-risk {
-  background: #BF092F;
+  background: var(--brand-primary);
 }
 
 .hist-bar-count {
@@ -1799,8 +1798,8 @@
 
 .nearby-transfer-card,
 .nearby-transfer-panel {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(24, 26, 31, 0.08);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
   padding: 24px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
@@ -1821,8 +1820,8 @@
   gap: 6px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #0369A1;
-  background: #E0F2FE;
+  color: var(--brand-secondary);
+  background: var(--brand-secondary-light);
   padding: 4px 10px;
   border-radius: var(--radius-pill);
 }
@@ -1831,7 +1830,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #0369A1;
+  background-color: var(--brand-secondary);
 }
 
 .pack-badge {
@@ -1849,9 +1848,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #F0F9FF;
+  background: var(--bg-surface-container);
   border-radius: 16px;
-  border: 1px dashed #BAE6FD;
+  border: 1px dashed var(--border-hairline);
 }
 
 .device-node {
@@ -1866,8 +1865,8 @@
   height: 44px;
   border-radius: 14px;
   background: var(--bg-surface);
-  border: 1px solid rgba(24, 26, 31, 0.08);
-  color: #0369A1;
+  border: 1px solid var(--border-hairline);
+  color: var(--brand-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1887,7 +1886,7 @@
 .device-status {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #0369A1;
+  color: var(--brand-secondary);
 }
 
 .device-status-success {
@@ -1907,8 +1906,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #0369A1;
-  color: #FFFFFF;
+  background: var(--brand-secondary);
+  color: var(--brand-on-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1930,11 +1929,11 @@
   font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 600;
-  color: #0369A1;
+  color: var(--brand-secondary);
 }
 
 .pack-contents-box {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: 14px;
   padding: 12px 14px;
@@ -1996,7 +1995,7 @@
 }
 
 .subject-feature-card {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   border-radius: 22px;
   padding: 24px 20px;
@@ -2392,7 +2391,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #10B981;
+  background-color: var(--brand-success);
 }
 
 /* 4 Satellite Pillar Nodes */
@@ -5199,4 +5198,142 @@
   background: var(--header-glass);
 }
 
+/* ==========================================================================
+   DARK MODE ADAPTATIONS — DYNAMIC SHOWCASE & IMMERSIVE CARDS
+   ========================================================================== */
 
+[data-theme-mode="dark"] .dace-subject-icon[style*="#EFF6FF"] {
+  background: rgba(96, 165, 250, 0.16) !important;
+  color: var(--subject-calculus) !important;
+}
+
+[data-theme-mode="dark"] .dace-subject-icon[style*="#F0FDFA"] {
+  background: rgba(45, 212, 191, 0.16) !important;
+  color: var(--subject-physics) !important;
+}
+
+[data-theme-mode="dark"] .s-icon[style*="#EFF6FF"] {
+  background: rgba(96, 165, 250, 0.16) !important;
+  color: var(--subject-calculus) !important;
+}
+
+[data-theme-mode="dark"] .s-icon[style*="#F0FDFA"] {
+  background: rgba(45, 212, 191, 0.16) !important;
+  color: var(--subject-physics) !important;
+}
+
+[data-theme-mode="dark"] .s-icon[style*="#FFFBEB"] {
+  background: rgba(251, 191, 36, 0.16) !important;
+  color: var(--subject-literature) !important;
+}
+
+[data-theme-mode="dark"] .share-subject-icon[style*="#EFF6FF"] {
+  background: rgba(96, 165, 250, 0.16) !important;
+  color: var(--subject-calculus) !important;
+}
+
+/* Subject Bento Cards & Grade Pills in Dark Mode */
+[data-theme-mode="dark"] .card-calculus-detail .subject-hero-icon,
+[data-theme-mode="dark"] .card-calculus-detail .subject-grade-pill {
+  background: rgba(96, 165, 250, 0.16) !important;
+  color: var(--subject-calculus) !important;
+}
+[data-theme-mode="dark"] .card-calculus-detail .subj-progress-fill {
+  background: var(--subject-calculus) !important;
+}
+[data-theme-mode="dark"] .subject-feature-card.card-calculus-detail {
+  border-color: rgba(96, 165, 250, 0.25);
+}
+[data-theme-mode="dark"] .subject-feature-card.card-calculus-detail:hover {
+  border-color: var(--subject-calculus);
+}
+
+[data-theme-mode="dark"] .card-physics-detail .subject-hero-icon,
+[data-theme-mode="dark"] .card-physics-detail .subject-grade-pill {
+  background: rgba(45, 212, 191, 0.16) !important;
+  color: var(--subject-physics) !important;
+}
+[data-theme-mode="dark"] .card-physics-detail .subj-progress-fill {
+  background: var(--subject-physics) !important;
+}
+[data-theme-mode="dark"] .subject-feature-card.card-physics-detail {
+  border-color: rgba(45, 212, 191, 0.25);
+}
+[data-theme-mode="dark"] .subject-feature-card.card-physics-detail:hover {
+  border-color: var(--subject-physics);
+}
+
+[data-theme-mode="dark"] .card-literature-detail .subject-hero-icon,
+[data-theme-mode="dark"] .card-literature-detail .subject-grade-pill {
+  background: rgba(251, 191, 36, 0.16) !important;
+  color: var(--subject-literature) !important;
+}
+[data-theme-mode="dark"] .card-literature-detail .subj-progress-fill {
+  background: var(--subject-literature) !important;
+}
+[data-theme-mode="dark"] .subject-feature-card.card-literature-detail {
+  border-color: rgba(251, 191, 36, 0.25);
+}
+[data-theme-mode="dark"] .subject-feature-card.card-literature-detail:hover {
+  border-color: var(--subject-literature);
+}
+
+[data-theme-mode="dark"] .card-chemistry-detail .subject-hero-icon,
+[data-theme-mode="dark"] .card-chemistry-detail .subject-grade-pill {
+  background: rgba(52, 211, 153, 0.16) !important;
+  color: var(--subject-chemistry) !important;
+}
+[data-theme-mode="dark"] .card-chemistry-detail .subj-progress-fill {
+  background: var(--subject-chemistry) !important;
+}
+[data-theme-mode="dark"] .subject-feature-card.card-chemistry-detail {
+  border-color: rgba(52, 211, 153, 0.25);
+}
+[data-theme-mode="dark"] .subject-feature-card.card-chemistry-detail:hover {
+  border-color: var(--subject-chemistry);
+}
+
+/* Teachers Directory Avatars */
+[data-theme-mode="dark"] .teacher-avatar[style*="#FDE8EB"] {
+  background: rgba(224, 90, 110, 0.22) !important;
+  color: #F2788A !important;
+}
+[data-theme-mode="dark"] .teacher-avatar[style*="#D6F2F0"] {
+  background: rgba(56, 178, 172, 0.22) !important;
+  color: #4FD1C5 !important;
+}
+[data-theme-mode="dark"] .teacher-avatar[style*="#FEF3C7"] {
+  background: rgba(251, 191, 36, 0.22) !important;
+  color: #FBBF24 !important;
+}
+[data-theme-mode="dark"] .teacher-detail-avatar {
+  background: rgba(224, 90, 110, 0.22) !important;
+  color: var(--brand-primary) !important;
+}
+
+/* Highlighting in Dark Mode */
+[data-theme-mode="dark"] .md-highlight {
+  background: rgba(251, 191, 36, 0.25);
+  color: #FDE68A;
+}
+
+/* QR Code Frame Authentic Look */
+[data-theme-mode="dark"] .qr-code-frame {
+  background: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme-mode="dark"] .qr-corner {
+  border-color: #0E131F !important;
+}
+[data-theme-mode="dark"] .qr-dot {
+  background: #0E131F !important;
+}
+
+/* Theme Studio Canvas Chips & Palette Swatches */
+[data-theme-mode="dark"] .canvas-chip-preview {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme-mode="dark"] .palette-swatch {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}

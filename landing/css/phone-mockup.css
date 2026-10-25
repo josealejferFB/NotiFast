@@ -460,3 +460,30 @@
     gap: 8px;
   }
 }
+
+/* ==========================================================================
+   DARK MODE ADAPTATIONS — HERO PHONE MOCKUP
+   ========================================================================== */
+
+[data-theme-mode="dark"] .device-frame {
+  border-color: #0B0E14;
+  box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.7),
+              0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+[data-theme-mode="dark"] .device-camera-hole {
+  background-color: #05070B;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-theme-mode="dark"] .app-searchbox {
+  background-color: var(--bg-surface-container);
+  border-color: var(--border-hairline);
+  color: var(--text-primary);
+}
+
+[data-theme-mode="dark"] .agenda-conflict-card {
+  background-color: rgba(251, 191, 36, 0.16);
+  border-color: rgba(251, 191, 36, 0.35);
+  color: #FBBF24;
+}

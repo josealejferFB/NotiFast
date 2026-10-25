@@ -1416,10 +1416,10 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--bg-surface-container);
   padding: 3px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-hairline);
 }
 
 .footer-subtext {
@@ -1491,7 +1491,7 @@ body {
   text-decoration: none;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   transition: all var(--duration-fast);
 }
@@ -1552,4 +1552,41 @@ body {
   .cta-trust-row li {
     font-size: 0.875rem;
   }
+}
+
+/* ==========================================================================
+   DARK MODE ADAPTATIONS — STYLES & ACCENTS
+   ========================================================================== */
+
+[data-theme-mode="dark"] .bullet-icon {
+  background: rgba(56, 178, 172, 0.18) !important;
+  color: var(--brand-secondary) !important;
+}
+
+[data-theme-mode="dark"] .bullet-icon[style*="brand-primary"] {
+  background: rgba(224, 90, 110, 0.18) !important;
+  color: var(--brand-primary) !important;
+}
+
+[data-theme-mode="dark"] .bullet-icon[style*="brand-success"] {
+  background: rgba(52, 211, 153, 0.18) !important;
+  color: var(--brand-success) !important;
+}
+
+[data-theme-mode="dark"] .study-sticker {
+  opacity: 0.065;
+}
+
+[data-theme-mode="dark"] .final-cta-card {
+  background:
+    linear-gradient(165deg, rgba(224, 90, 110, 0.12) 0%, transparent 42%),
+    linear-gradient(345deg, rgba(56, 178, 172, 0.12) 0%, transparent 46%),
+    var(--bg-surface);
+  box-shadow: 0 26px 60px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+[data-theme-mode="dark"] .cta-grid-lines {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
