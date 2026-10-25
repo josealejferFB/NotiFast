@@ -1294,6 +1294,12 @@ Durante esta iteración mayor de UI/UX y Sistema de Diseño se transformó integ
    - **Impeccable Detect:** 0 advertencias no asesoras (`0 warnings`) en HTML y CSS.
    - **Suite Python CI/CD:** 28/28 pruebas unitarias pasando al 100% en verde (`Ran 28 tests in 0.67s, OK`).
    - **Servidor HTTP Local:** Carga limpia con código de estado HTTP 200 en todos los assets estáticos.
+5. **Perfeccionamiento Integral de Modo Oscuro (WCAG AAA & Theme Tokens):**
+   - Adición del bloque completo de tokens de tema oscuro calibrados desde `DESIGN.md` en `tokens.css`: `--brand-primary: #E05A6E` (Ruby Luminoso), `--brand-secondary: #38B2AC` (Aqua Luminoso), estados semánticos y paleta de materias (`--subject-*`).
+   - Normalización de componentes y tarjetas dinámicas en `dynamic-showcase.css` (`.schedule-live-card`, `.note-editor-simulator`, `.rich-editor-sheet`, `.scale-chip`, `.main-average-card`, `.subject-grade-row`, `.eval-filter-chip`, `.evaluations-calendar-container`, `.agenda-eval-card`, `.eval-empty-card`, `.sim-preset-chip`, `.grade-simulator-card`, `.sim-stat-box`, `.histogram-preview-card`, `.nearby-transfer-card`, `.pack-contents-box`, `.subject-feature-card`), sustituyendo `#FFFFFF` y `#FAFAF9` por variables reactivas `var(--bg-surface)` y `var(--bg-surface-container)`.
+   - Adaptación de tarjetas Bento de materias, pills de nota, barras de avance, avatares del directorio docente y realce de texto (`.md-highlight`) bajo `[data-theme-mode="dark"]`, eliminando destellos de fondos pastel sobre lienzos oscuros.
+   - Preservación auténtica del marco de Código QR (`.qr-code-frame`) con alto contraste para legibilidad y estética de código táctil.
+   - Refuerzo de marcos, cámara, buscador y tarjetas de conflicto en el mockup del Hero (`phone-mockup.css`) bajo `[data-theme-mode="dark"]`.
 
 ---
 
