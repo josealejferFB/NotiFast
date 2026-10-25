@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
     private val authRepository: AuthRepository,
     private val imageRepository: ImageRepository,
@@ -36,12 +36,16 @@ class NoteEditorViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val noteId: String? = savedStateHandle.get<String>("noteId")?.let { if (it.isBlank()) null else it }
-    private val initialSubject: String = savedStateHandle.get<String>("subject") ?: ""
+    private val initialSubject: String = savedStateHandle.get<String>(KEY_DRAFT_SUBJECT)
+        ?.takeIf { it.isNotBlank() }
+        ?: savedStateHandle.get<String>("subject").orEmpty()
 
     private val _uiState = MutableStateFlow(
         NoteEditorUiState(
             noteId = noteId,
-            subject = initialSubject
+            subject = initialSubject,
+            title = savedStateHandle.get<String>(KEY_DRAFT_TITLE).orEmpty(),
+            content = savedStateHandle.get<String>(KEY_DRAFT_CONTENT).orEmpty()
         )
     )
     val uiState: StateFlow<NoteEditorUiState> = _uiState.asStateFlow()
@@ -101,17 +105,28 @@ class NoteEditorViewModel @Inject constructor(
             }
 
             _uiState.update { current ->
-                val currentTitle = current.title
-                val currentContent = current.content
-                val hasDraft = currentTitle.isNotBlank() || currentContent.isNotBlank()
-                val words = if (hasDraft) calculateWordCount(currentContent) else 0
+                val draftTitle = savedStateHandle.get<String>(KEY_DRAFT_TITLE).orEmpty()
+                val draftContent = savedStateHandle.get<String>(KEY_DRAFT_CONTENT).orEmpty()
+                val draftSubject = savedStateHandle.get<String>(KEY_DRAFT_SUBJECT).orEmpty()
+
+                val resolvedTitle = current.title.ifBlank { draftTitle }
+                val resolvedContent = current.content.ifBlank { draftContent }
+                val resolvedSubject = when {
+                    draftSubject.isNotBlank() -> draftSubject
+                    targetSubject.isNotBlank() -> targetSubject
+                    current.subject.isNotBlank() -> current.subject
+                    else -> ""
+                }
+
+                val hasDraft = resolvedTitle.isNotBlank() || resolvedContent.isNotBlank()
+                val words = if (hasDraft) calculateWordCount(resolvedContent) else 0
                 current.copy(
                     isLoading = false,
                     noteId = null,
                     subjects = subjects,
-                    subject = if (targetSubject.isNotBlank()) targetSubject else current.subject,
-                    title = if (hasDraft) currentTitle else "",
-                    content = if (hasDraft) currentContent else "",
+                    subject = resolvedSubject,
+                    title = resolvedTitle,
+                    content = resolvedContent,
                     tags = if (hasDraft) current.tags else emptyList(),
                     imageUrl = if (hasDraft) current.imageUrl else null,
                     imageUri = if (hasDraft) current.imageUri else null,
@@ -131,9 +146,11 @@ class NoteEditorViewModel @Inject constructor(
                 loadInitial(event.noteId, event.subject ?: "")
             }
             is NoteEditorEvent.TitleChanged -> {
+                savedStateHandle[KEY_DRAFT_TITLE] = event.title
                 _uiState.update { it.copy(title = event.title) }
             }
             is NoteEditorEvent.ContentChanged -> {
+                savedStateHandle[KEY_DRAFT_CONTENT] = event.content
                 val words = calculateWordCount(event.content)
                 _uiState.update {
                     it.copy(
@@ -144,6 +161,7 @@ class NoteEditorViewModel @Inject constructor(
                 }
             }
             is NoteEditorEvent.SubjectChanged -> {
+                savedStateHandle[KEY_DRAFT_SUBJECT] = event.subject
                 _uiState.update { it.copy(subject = event.subject) }
             }
             is NoteEditorEvent.TagToggled -> toggleTag(event.tag)
@@ -176,6 +194,7 @@ class NoteEditorViewModel @Inject constructor(
                 _uiState.update { it.copy(error = null) }
             }
             is NoteEditorEvent.ResetState -> {
+                clearDraft()
                 _uiState.update { NoteEditorUiState() }
             }
         }
@@ -235,6 +254,7 @@ class NoteEditorViewModel @Inject constructor(
 
     private fun saveNote() {
         val state = _uiState.value
+        if (state.isLoading || state.isSaved) return
         if (state.subject.isBlank()) {
             _uiState.update { it.copy(error = context.getString(R.string.note_error_select_subject)) }
             return
@@ -244,13 +264,14 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
 
+        _uiState.update { it.copy(isLoading = true, syncStatus = context.getString(R.string.sync_saving), error = null) }
+
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId()
             if (userId == null) {
-                _uiState.update { it.copy(error = context.getString(R.string.note_error_unauthenticated)) }
+                _uiState.update { it.copy(isLoading = false, syncStatus = null, error = context.getString(R.string.note_error_unauthenticated)) }
                 return@launch
             }
-            _uiState.update { it.copy(isLoading = true, syncStatus = context.getString(R.string.sync_saving), error = null) }
 
             if (state.noteId == null) {
                 val result = noteRepository.addNote(
@@ -263,6 +284,7 @@ class NoteEditorViewModel @Inject constructor(
                 )
                 result.fold(
                     onSuccess = { id ->
+                        clearDraft()
                         _uiState.update {
                             it.copy(
                                 noteId = id,
@@ -306,6 +328,7 @@ class NoteEditorViewModel @Inject constructor(
                 )
                 result.fold(
                     onSuccess = {
+                        clearDraft()
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
@@ -328,6 +351,12 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
+    private fun clearDraft() {
+        savedStateHandle.remove<String>(KEY_DRAFT_TITLE)
+        savedStateHandle.remove<String>(KEY_DRAFT_CONTENT)
+        savedStateHandle.remove<String>(KEY_DRAFT_SUBJECT)
+    }
+
     private fun calculateWordCount(text: String): Int {
         if (text.isBlank()) return 0
         return text.trim().split(Regex("\\s+")).filter { it.isNotBlank() }.size
@@ -336,5 +365,11 @@ class NoteEditorViewModel @Inject constructor(
     private fun calculateReadingTime(wordCount: Int): Int {
         if (wordCount <= 0) return 0
         return maxOf(1, (wordCount / 200))
+    }
+
+    companion object {
+        const val KEY_DRAFT_TITLE = "draft_title"
+        const val KEY_DRAFT_CONTENT = "draft_content"
+        const val KEY_DRAFT_SUBJECT = "draft_subject"
     }
 }

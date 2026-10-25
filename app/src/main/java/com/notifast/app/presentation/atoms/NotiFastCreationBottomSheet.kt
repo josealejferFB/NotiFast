@@ -11,7 +11,9 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,7 +53,8 @@ class CreationSheetScope(
  *
  * Encapsulates the institutional 28dp top curvature, semantic surface color,
  * standardized drag handle, statusBars insets, tactile tap-outside keyboard dismiss,
- * and unified BackHandler flow (IME dismiss -> discard confirmation -> sheet dismissal).
+ * physical swipe-to-dismiss shield, scrim tap discard protection, and unified
+ * three-tier BackHandler flow (IME dismiss -> discard confirmation -> sheet dismissal).
  */
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -61,7 +64,7 @@ class CreationSheetScope(
 fun NotiFastCreationBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    sheetState: SheetState? = null,
     hasUnsavedChanges: Boolean = false,
     discardTitle: String = stringResource(R.string.schedules_discard_title),
     discardMessage: String = stringResource(R.string.schedules_discard_message),
@@ -78,9 +81,21 @@ fun NotiFastCreationBottomSheet(
 
     var showDiscardDialog by remember { mutableStateOf(false) }
 
+    val effectiveSheetState = sheetState ?: rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { newState ->
+            if (hasUnsavedChanges && newState == SheetValue.Hidden) {
+                showDiscardDialog = true
+                false
+            } else {
+                true
+            }
+        }
+    )
+
     fun dismissSheet(action: (() -> Unit)? = null) {
         scope.launch {
-            runCatching { sheetState.hide() }
+            runCatching { effectiveSheetState.hide() }
             if (action != null) action() else onDismissRequest()
         }
     }
@@ -126,14 +141,17 @@ fun NotiFastCreationBottomSheet(
         onDismissRequest = {
             requestDismiss()
         },
-        sheetState = sheetState,
+        properties = ModalBottomSheetProperties(
+            shouldDismissOnBackPress = false
+        ),
+        sheetState = effectiveSheetState,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = dragHandle,
         contentWindowInsets = contentWindowInsets,
         modifier = modifier
     ) {
-        val sheetScope = remember(scope, sheetState) {
+        val sheetScope = remember(scope, effectiveSheetState) {
             CreationSheetScope(
                 onDismissInternal = { action -> dismissSheet(action) },
                 onRequestDismissInternal = { requestDismiss() }

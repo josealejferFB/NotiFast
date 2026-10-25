@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">NotiFast</string>
     
+    <!-- Splash Screen (Fase 1 & Fase 2 Impeccable AAA) -->
+    <string name="splash_app_name">NotiFast</string>
+    <string name="splash_subtitle">Cuaderno Académico Inteligente</string>
+    <string name="splash_badge_offline">100% Offline-First</string>
+    <string name="splash_logo_content_description">Emblema oficial de NotiFast</string>
+    
     <!-- Login & Auth -->
     <string name="login_title">NotiFast</string>
     <string name="login_subtitle">Tu aprendizaje, a la velocidad de tus ideas.</string>
@@ -172,6 +178,8 @@
     
     <string name="notes_filter_all_tags">Todas</string>
     <string name="notes_export_markdown">Exportar Markdown</string>
+    <string name="notes_share">Compartir</string>
+    <string name="notes_share_cd">Compartir apunte</string>
 
     <!-- General -->
     <string name="general_error">Ocurrió un error</string>
@@ -522,6 +530,11 @@
     <string name="subject_detail_notes_empty_desc">Crea resúmenes, fórmulas y adjunta fotos de clase con Markdown.</string>
     <string name="subject_detail_notes_add_btn">Tomar Apunte Rápido</string>
     <string name="subject_detail_notes_search_placeholder">Buscar en apuntes de %1$s…</string>
+    <string name="subject_detail_notes_filter_empty_title">Sin resultados de búsqueda</string>
+    <string name="subject_detail_notes_filter_empty_desc">No encontramos apuntes que coincidan con los filtros aplicados.</string>
+    <string name="subject_detail_notes_clear_filters">Limpiar filtros</string>
+    <string name="notes_tasks_completed">%1$d/%2$d tareas</string>
+    <string name="notes_has_images">Con imágenes</string>
     <string name="subject_detail_schedules_empty_title">Sin horarios de clase</string>
     <string name="subject_detail_schedules_empty_desc">Registra los bloques semanales y salones de tu asignatura.</string>
     <string name="subject_detail_schedules_add_btn">Añadir Horario</string>
@@ -1096,4 +1109,8 @@
     <string name="subject_section_chip">Sec. %1$s</string>
     <string name="subject_section_placeholder">Ej. 1, 2, 19</string>
     <string name="subject_section_info">Sección o grupo asignado</string>
+
+    <!-- Edit Profile Discard Dialog -->
+    <string name="edit_profile_discard_title">¿Descartar cambios?</string>
+    <string name="edit_profile_discard_message">Tienes cambios sin guardar en tu perfil. ¿Estás seguro de que deseas salir?</string>
 </resources>

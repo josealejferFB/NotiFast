@@ -68,6 +68,7 @@ sealed interface SubjectDetailEvent {
     data class DeleteSchedule(val schedule: Schedule) : SubjectDetailEvent
     data class UpdateTargetGrade(val targetGrade: Double) : SubjectDetailEvent
     data class UpdateSubjectData(val newName: String, val newColorHex: String, val newIcon: String, val section: String = "") : SubjectDetailEvent
+    data class ToggleTaskCheck(val note: Note, val taskIndex: Int, val isChecked: Boolean) : SubjectDetailEvent
     data object ClearError : SubjectDetailEvent
 }
 

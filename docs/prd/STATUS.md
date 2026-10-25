@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.2
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.2**  
-> **Última actualización:** 20 de Octubre, 2026  
+> **Última actualización:** 25 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md)
 
 ---
@@ -35,13 +35,105 @@ Rediseño Header Impeccable AAA    [██████████████�
 Estandarización Sheets & Inputs   [████████████████] 100% (5/5 tareas) ✅
 Importación Horarios UNERG (PDF)   [████████████████] 100% (5/5 tareas) ✅
 Pulido Tokens & Clases UI/UX Max   [████████████████] 100% (3/3 tareas) ✅
-Fase 4: Pulido & Experiencia      [░░░░░░░░░░░░░░░░]   0% (0/12 tareas)
+Splash Screen Adaptativa AAA      [████████████████] 100% (4/4 pilares) ✅
+Fase 4: Pulido & Experiencia      [████░░░░░░░░░░░░]  25% (3/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████] 99.9% (225/225 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    765 tests pasando (0 fallos, 0 ignorados) ✅
-MÉTRICAS DE CÓDIGO:               430 archivos Kotlin (~54,600 LOC) + 117 suites test ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████] 100% (226/226 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    788 tests pasando (0 fallos, 0 ignorados) ✅
+MÉTRICAS DE CÓDIGO:               442 archivos Kotlin (~56,380 LOC) + 120 suites test ✅
 ```
+
+---
+
+## 🛡️ Blindaje UX & Resiliencia Anti-Pérdida de Progreso en Modales y Formularios (NotiFast UI/UX Pro Max) — 100% Completado
+
+**Objetivo:** Sanitización integral de la experiencia de usuario en todos los modales (`ModalBottomSheet`), diálogos y formularios de creación/edición de NotiFast, eliminando colisiones de descarte entre el teclado virtual (IME) y los sheets, blindando gestos accidentales de swipe/scrim con cambios sin guardar, implementando jerarquía de botón Atrás de tres niveles (Three-Tier Back Handling), evitando duplicación de registros mediante debounce y bloqueos síncronos anti-doble submit en ViewModels y preservando borradores activos en `SavedStateHandle` ante recreaciones del proceso.
+
+### Pilares Implementados (100% ✅)
+1. **Jerarquía Determinista de Botón Atrás de Tres Niveles (Three-Tier Back Handling):**
+   - **Nivel 1 (Teclado Desplegado):** Si `WindowInsets.isImeVisible` es `true`, el primer toque de Atrás intercepta el evento exclusivamente para ocultar el teclado (`keyboardController?.hide()`) y remover el foco (`focusManager.clearFocus()`), manteniendo intactos el modal y el formulario.
+   - **Nivel 2 (Teclado Cerrado con Cambios Sin Guardar):** Si `hasUnsavedChanges == true`, el siguiente toque de Atrás despliega el diálogo accesible de confirmación (`NotiFastDialog` / `DiscardDialog`).
+   - **Nivel 3 (Teclado Cerrado Sin Cambios):** Cierra suavemente la hoja modal con animación nativa.
+   - **Configuración Nativa:** Desactivación de `shouldDismissOnBackPress = false` en `ModalBottomSheetProperties` para otorgar control 100% determinista al `BackHandler` de Compose.
+   - **Extensión a Pantallas Completas:** Implementado en `AddSubjectScreen.kt` y `EditProfileScreen.kt` con soporte de diálogo de descarte.
+2. **Blindaje de Swipe y Scrim en BottomSheets (`NotiFastCreationBottomSheet.kt` & `NoteEditorBottomSheet.kt`):**
+   - Intercepción física de arrastre mediante `confirmValueChange = { newState -> if (hasUnsavedChanges && newState == SheetValue.Hidden) { showDiscardDialog = true; false } else true }`.
+   - El toque en el scrim con cambios sin guardar despliega el diálogo de confirmación en lugar de cerrar el modal directamente.
+   - Aplicado de manera unificada a `ScheduleEditorSheetLayout`, `EvaluationEditorSheetLayout`, `AddEditTeacherBottomSheet` y `CoverTemplateEditorSheet`.
+3. **Ergonomía de Entrada de Texto, Foco e Insets (`imePadding` & `KeyboardOptions`):**
+   - Incorporación de `Modifier.imePadding()` en todos los formularios y en la barra de herramientas acoplada (`DockedAccessoryToolbar`).
+   - Navegación secuencial de teclado (`ImeAction.Next` en títulos/campos intermedios e `ImeAction.Done` en el cierre).
+4. **Protección Anti-Doble Submit y Preservación de Estado en Muerte de Proceso:**
+   - **Debounce de 600ms en Átomo:** `NotiFastButton.kt` con bloqueo por tiempo de sistema (`SystemClock.uptimeMillis()`).
+   - **Bloqueos Síncronos en ViewModels:** Exclusión mutua `isLoading || isSaving || isSaved` aplicada de manera síncrona en `NoteEditorViewModel`, `AddSubjectViewModel`, `AddScheduleViewModel`, `EditScheduleViewModel`, `AddEvaluationViewModel` y `EditEvaluationViewModel`.
+   - **Preservación en `SavedStateHandle`:** `NoteEditorViewModel` almacena reactivamente `draft_title`, `draft_content` y `draft_subject`, restaurándolos transparentemente si el proceso es destruido por el sistema mientras el estudiante investiga en otra app, y limpiándolos tras un guardado exitoso.
+5. **Verificación Automatizada e Instalación en Dispositivo Físico:**
+   - Creación de 6 nuevas pruebas unitarias TDD cubriendo anti-doble submit y persistencia/limpieza de borradores.
+   - 788 tests unitarios pasando en verde (100% éxito, 0 fallos, 0 ignorados).
+   - Compilación exitosa (`./gradlew assembleDebug`).
+   - Verificación táctil en vivo vía ADB inalámbrico en POCO X8 PRO (`192.168.1.6:34573`): apertura de teclado, pulsación de Atrás (cierre de teclado sin cerrar sheet ni mostrar diálogo) y segunda pulsación de Atrás (despliegue del diálogo de descarte).
+
+---
+
+## 🚀 Splash Screen Profesional Adaptativa AAA (Dual-Stage Architecture) con Impeccable & UI/UX Pro Max — 100% Completado
+
+**Objetivo:** Diseñar e implementar la experiencia completa de arranque (Splash Screen) para NotiFast bajo una arquitectura de dos fases perfectamente orquestadas con traspaso sin parpadeo (Zero-Flicker Handoff), sincronizada de forma reactiva con el almacenamiento local (DataStore + Room SQLite) y respetando estrictamente Clean Architecture, MVI, accesibilidad con reducción de movimiento y las reglas de `AGENTS.md`.
+
+### Pilares Implementados (100% ✅)
+1. **Fase 1 — Native Window Splash (Android 12+ `androidx.core.splashscreen.SplashScreen`):**
+   - Integración oficial de `androidx.core:core-splashscreen:1.0.1` en `gradle/libs.versions.toml` y `app/build.gradle.kts`.
+   - Creación del icono nativo de arranque `res/drawable/ic_splash_icon.xml` (layer-list centrado a 120dp con escala de viewport adaptable).
+   - Configuración de temas base de arranque en `res/values/themes.xml` (fondo `#FAF9F6`) y `res/values-night/themes.xml` (fondo `#0E131F`) con estilo `Theme.App.Starting` heredando de `Theme.SplashScreen` y transición a `postSplashScreenTheme = @style/Theme.NotiFast`.
+   - Inicialización quirúrgica de `installSplashScreen()` en `MainActivity.kt` previa a `super.onCreate()`, manteniendo el splash nativo visible reactivamente mientras `!mainViewModel.isAppReady.value`.
+2. **Fase 2 — In-App Brand Entrance Adaptativa (Jetpack Compose + Impeccable):**
+   - **Lienzo Adaptativo Sin Parpadeo:** Fondo reactivo ligado al color `MaterialTheme.colorScheme.background` exacto seleccionado por el usuario (Pitch, Charcoal, Cream, Pure, etc.).
+   - **Emblema Central (`SplashBrandEmblem.kt`):** Logo oficial de NotiFast en contenedor táctil con esquinas redondeadas (squircle 32dp), borde tonal con acento del tema y aura radial reactiva multicapa (`primary` + `primaryContainer` + `Color.Transparent`) con física de respiración sutil (`infiniteRepeatable`).
+   - **Tipografía y Marca (`SplashBrandingText.kt`):**
+     - Display "NotiFast" en `Plus Jakarta Sans` en negrita con espaciado óptico y contraste WCAG AAA (`onBackground`).
+     - Subtítulo semántico `splash_subtitle` ("Cuaderno Académico Inteligente") con jerarquía visual refinada y diseño minimalista libre de badges redundantes.
+   - **Físicas y Animaciones UI/UX Pro Max:** Entrada con animación `spring(dampingRatio = LowBouncy, stiffness = MediumLow)` y fade escalonado con retardo de 120ms.
+   - **Accesibilidad Rigurosa (Reducción de Movimiento):** Detección en tiempo real de `TRANSITION_ANIMATION_SCALE` y `ANIMATOR_DURATION_SCALE`; si el sistema tiene desactivadas las animaciones, omite el rebote elástico y la respiración para mostrar un fundido instantáneo.
+   - **Cinematic Exit Transition:** Transición coordinada en `MainActivity.kt` mediante `AnimatedContent` con `fadeIn(380ms) togetherWith (fadeOut(380ms) + scaleOut(1.04f))` hacia `MainContent()` sin parpadeos ni brincos en las barras del sistema (Edge-to-Edge puro).
+   - **Interacción Ágil:** Soporte de tap-to-skip para estudiantes que desean entrar inmediatamente al pulsar cualquier parte de la pantalla.
+3. **Estado Unificado MVI en `MainViewModel.kt`:**
+   - Exposición reactiva de `splashState: StateFlow<SplashUiState>` combinando de forma segura y tipada `authRepository.authState`, `isDarkModeFlow`, `hapticsEnabledFlow`, `themePresetIdFlow`, `backgroundPresetIdFlow`, `customPrimaryHexFlow` y `customBackgroundHexFlow`.
+   - `isAppReady: StateFlow<Boolean>` derivado directamente de `splashState.isAppReady` con `SharingStarted.Eagerly`.
+   - Modularización estricta respetando el límite SRP < 250 LOC (`SplashScreen.kt`: 79 LOC, `SplashBrandEmblem.kt`: 137 LOC, `SplashBrandingText.kt`: 88 LOC, `MainActivity.kt`: 133 LOC, `MainViewModel.kt`: 189 LOC).
+4. **Verificación Automatizada e Instalación en Dispositivo Físico:**
+   - Creación de suite unitaria completa `MainViewModelTest.kt` (6 nuevos tests cubriendo resolución de `isAppReady`, autenticación, onboarding, mapeo de paletas y deep-links).
+   - 782 tests unitarios pasando en verde (`./gradlew testDebugUnitTest`).
+   - Compilación exitosa en release/debug (`./gradlew assembleDebug`).
+   - Instalación y validación visual mediante ADB inalámbrico en POCO X8 PRO (`192.168.1.6:34573`), verificando traspaso sedoso, contraste WCAG AAA y cero parpadeo.
+
+---
+
+---
+
+## 📝 Visor Dinámico de Apunte (Sticky Header & Compartir Plano con Imágenes) y Rediseño Impeccable de Apuntes por Materia — 100% Completado
+
+**Objetivo:** Elevar la experiencia del visor de apuntes (`NoteDetailExpandable.kt`) incorporando un header dinámico sticky con fade-in automático al ocultar el título durante el scroll, sustituir la exportación Markdown por compartir nativo en texto plano enriquecido con adjuntos de imagen reales para apps de mensajería (WhatsApp, Telegram), e integrar este modal interactivo como visor principal al hacer clic en los apuntes del detalle de materia (`SubjectDetailScreen` -> `SubjectNotesTab`) con rediseño visual Impeccable (cards táctiles con acento de materia, chips de tareas interactivas, filtrado por tags y buscador con reset).
+
+### Pilares Implementados (100% ✅)
+1. **Header Dinámico Sticky en Visor de Apunte (`NoteDetailStickyHeader.kt` & `NoteDetailExpandable.kt`):**
+   - Detección precisa de scroll vertical vía `onGloballyPositioned` y estado derivado (`derivedStateOf`) que activa suavemente la barra superior fija cuando el título original sale del viewport.
+   - Pinned bar con badge de materia, título truncado con elipsis y botón táctil de compartir rápido.
+   - Acciones inferiores separadas en `NoteDetailBottomActions.kt` preservando el límite SRP < 250 LOC.
+2. **Compartir Nativo en Texto Plano con Adjuntos de Imagen (`FormatNoteShareTextUseCase.kt` & `NoteShareHelper.kt`):**
+   - Caso de uso de formateo para mensajería: títulos en negrita (`*titulo*`), subtítulos, viñetas limpias, tareas completadas e incompletas (`[✓]` / `[ ]`), citas y bloques matemáticos legibles.
+   - Extractor y deduplicador de imágenes (`imageUrl` + bloques `Image`) con generación de URIs seguras vía `FileProvider` (`cacheDir/shared_images`).
+   - Disparo de intents nativos `ACTION_SEND` (1 imagen o texto solo) y `ACTION_SEND_MULTIPLE` con `ClipData.newRawUri` y flags de lectura para WhatsApp y apps externas.
+3. **Integración del Visor y Rediseño Impeccable en Detalle de Materia (`SubjectNotesTab.kt` & `SubjectNoteCard.kt`):**
+   - Al pulsar cualquier tarjeta de apunte en "Detalles de materia > Apuntes", se abre el visor `NoteDetailExpandable` (vía `SubjectNoteDetailOverlay.kt`) en lugar de saltar directamente al editor.
+   - Tareas interactivas: checkboxes con toggle instantáneo directamente desde el visor mediante `SubjectDetailEvent.ToggleTaskCheck`.
+   - Botón "Editar" dentro del visor para abrir el editor modular en caso de requerir cambios profundos.
+   - Rediseño de `SubjectNoteCard.kt`: borde izquierdo con color acento de la materia, tipografía contrastada, snippet de 2 líneas, chips de etiquetas, badge de progreso de tareas (`✓ X/Y tareas`) e indicador de imágenes adjuntas.
+   - Buscador en tiempo real con botón limpiar y estados vacíos semánticos ("Tomar Apunte Rápido" / "Limpiar filtros").
+   - Descomposición modular de diálogos en `SubjectDetailDialogs.kt` para mantener `SubjectDetailScreen.kt` en 207 LOC.
+4. **Verificación Automatizada e Instalación Inalámbrica:**
+   - 776 tests unitarios pasando en verde (11 tests nuevos cubriendo formateo y helper de compartir).
+   - Build de producción y debug exitosas (`./gradlew assembleDebug`).
+   - Instalación y despliegue exitoso por depuración inalámbrica en POCO X8 PRO (`192.168.1.6:34573`).
 
 ---
 

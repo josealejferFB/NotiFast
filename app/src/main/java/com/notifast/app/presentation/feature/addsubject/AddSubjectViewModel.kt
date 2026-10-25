@@ -43,10 +43,11 @@ class AddSubjectViewModel @Inject constructor(
 
     private fun saveSubject() {
         val state = _uiState.value
+        if (state.isLoading || state.isSaved) return
         val cleanName = state.subjectName.trim()
         val cleanSection = state.section.trim()
+        _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
             val userId = authRepository.getCurrentUserId()
             if (userId == null) {
                 _uiState.update { it.copy(isLoading = false, error = "Usuario no autenticado") }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -128,5 +129,23 @@ class AddEvaluationViewModelTest {
         assertEquals("Parcial 1", state.title)
         assertEquals("Temas 1-3", state.description)
         assertEquals("25", state.weight)
+    }
+
+    @Test
+    fun `double click on Save executes repository addEvaluation exactly once`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddEvaluationEvent.SelectSubject("Matemáticas"))
+        viewModel.onEvent(AddEvaluationEvent.UpdateTitle("Examen Final"))
+
+        viewModel.onEvent(AddEvaluationEvent.Save(Date(), null))
+        viewModel.onEvent(AddEvaluationEvent.Save(Date(), null))
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            evaluationRepository.addEvaluation(eq("user_123"), any(), any())
+        }
+        assertTrue(viewModel.uiState.value.isSaved)
     }
 }

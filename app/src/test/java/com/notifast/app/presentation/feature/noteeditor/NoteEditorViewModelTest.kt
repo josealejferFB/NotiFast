@@ -272,5 +272,94 @@ class NoteEditorViewModelTest {
         assertEquals(listOf("siglo_xix"), state.tags)
         assertFalse(state.isSaved)
     }
+
+    @Test
+    fun `double click on save executes repository addNote exactly once`() = runTest(testDispatcher) {
+        coEvery {
+            noteRepository.addNote(
+                userId = "u1",
+                subject = "Física",
+                title = "Termodinámica",
+                content = "Leyes",
+                imageUri = null,
+                tags = emptyList()
+            )
+        } returns Result.success("new_note_1")
+
+        val vm = createViewModel(subject = "Física")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        vm.onEvent(NoteEditorEvent.TitleChanged("Termodinámica"))
+        vm.onEvent(NoteEditorEvent.ContentChanged("Leyes"))
+
+        // First click
+        vm.onEvent(NoteEditorEvent.SaveClicked)
+        // Immediate second click (before coroutine settles or while saving)
+        vm.onEvent(NoteEditorEvent.SaveClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            noteRepository.addNote(
+                userId = "u1",
+                subject = "Física",
+                title = "Termodinámica",
+                content = "Leyes",
+                imageUri = any(),
+                tags = any()
+            )
+        }
+        assertTrue(vm.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `draft is preserved in SavedStateHandle and restored across process recreation`() = runTest(testDispatcher) {
+        val handle = SavedStateHandle().apply {
+            set("subject", "Física")
+        }
+        val vm1 = NoteEditorViewModel(handle, noteRepository, authRepository, imageRepository, context = context)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        vm1.onEvent(NoteEditorEvent.TitleChanged("Borrador Recuperado"))
+        vm1.onEvent(NoteEditorEvent.ContentChanged("Contenido rescatado de la muerte de proceso"))
+        vm1.onEvent(NoteEditorEvent.SubjectChanged("Química"))
+
+        assertEquals("Borrador Recuperado", handle.get<String>("draft_title"))
+        assertEquals("Contenido rescatado de la muerte de proceso", handle.get<String>("draft_content"))
+        assertEquals("Química", handle.get<String>("draft_subject"))
+
+        // Recreate ViewModel with the same handle (process recreation)
+        val vm2 = NoteEditorViewModel(handle, noteRepository, authRepository, imageRepository, context = context)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val restoredState = vm2.uiState.value
+        assertEquals("Borrador Recuperado", restoredState.title)
+        assertEquals("Contenido rescatado de la muerte de proceso", restoredState.content)
+        assertEquals("Química", restoredState.subject)
+    }
+
+    @Test
+    fun `saving note successfully cleans draft from SavedStateHandle`() = runTest(testDispatcher) {
+        coEvery {
+            noteRepository.addNote(any(), any(), any(), any(), any(), any())
+        } returns Result.success("saved_id")
+
+        val handle = SavedStateHandle().apply {
+            set("subject", "Física")
+        }
+        val vm = NoteEditorViewModel(handle, noteRepository, authRepository, imageRepository, context = context)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        vm.onEvent(NoteEditorEvent.TitleChanged("Título"))
+        vm.onEvent(NoteEditorEvent.ContentChanged("Contenido"))
+        assertEquals("Título", handle.get<String>("draft_title"))
+
+        vm.onEvent(NoteEditorEvent.SaveClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.isSaved)
+        assertNull(handle.get<String>("draft_title"))
+        assertNull(handle.get<String>("draft_content"))
+        assertNull(handle.get<String>("draft_subject"))
+    }
 }
 

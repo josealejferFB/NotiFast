@@ -139,9 +139,15 @@ class EditEvaluationViewModel @Inject constructor(
     }
 
     private fun save(date: java.util.Date, imageUri: android.net.Uri?) {
+        val currentState = _uiState.value
+        if (currentState.isSaving || currentState.isSaved) return
+        _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(isSaving = true) }
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isSaving = false) }
+                return@launch
+            }
             val state = _uiState.value
             val cleanTitle = state.title.trim()
             val currentEvalId = evalId ?: state.evalId

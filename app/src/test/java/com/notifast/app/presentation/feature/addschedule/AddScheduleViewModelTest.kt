@@ -299,4 +299,27 @@ class AddScheduleViewModelTest {
         assertEquals("Albert Einstein", viewModel.uiState.value.allTeachers[0].fullName)
         assertEquals("Isaac Newton", viewModel.uiState.value.allTeachers[1].fullName)
     }
+
+    @Test
+    fun `double click on SaveSchedule executes repository addSchedule exactly once`() = runTest {
+        coEvery { scheduleRepository.addSchedule(any(), any()) } returns Result.success("sch-1")
+        coEvery { teacherRepository.getTeachers("user_123") } returns flowOf(emptyList())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddScheduleEvent.UpdateSubjectName("Matemáticas"))
+        viewModel.onEvent(AddScheduleEvent.UpdateDayOfWeek(1))
+        viewModel.onEvent(AddScheduleEvent.UpdateStartTime("10:00"))
+        viewModel.onEvent(AddScheduleEvent.UpdateEndTime("12:00"))
+
+        viewModel.onEvent(AddScheduleEvent.SaveSchedule)
+        viewModel.onEvent(AddScheduleEvent.SaveSchedule)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            scheduleRepository.addSchedule(eq("user_123"), any())
+        }
+        assertTrue(viewModel.uiState.value.isSaved)
+    }
 }

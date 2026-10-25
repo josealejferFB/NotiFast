@@ -58,12 +58,12 @@ fun CoverTemplateEditorSheet(
     onExportToGoogleDocs: (CoverDraft) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val focusManager = LocalFocusManager.current
+    val hasUnsavedChanges = draft.workTitle.isNotBlank() || draft.authors.isNotEmpty() || draft.subjectName.isNotBlank()
 
     NotiFastCreationBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        hasUnsavedChanges = hasUnsavedChanges
     ) {
         Column(
             modifier = Modifier

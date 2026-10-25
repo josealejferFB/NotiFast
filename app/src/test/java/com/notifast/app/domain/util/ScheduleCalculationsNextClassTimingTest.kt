@@ -10,11 +10,11 @@ import java.util.Calendar
 class ScheduleCalculationsNextClassTimingTest {
 
     private fun fixedCalendar(dayOfWeek: Int, hour: Int, minute: Int, dayOfMonth: Int = 19, month: Int = Calendar.OCTOBER): Calendar {
-        return Calendar.getInstance().apply {
+        return Calendar.getInstance(java.util.Locale.forLanguageTag("es")).apply {
+            clear()
             set(Calendar.YEAR, 2026)
             set(Calendar.MONTH, month)
             set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            set(Calendar.DAY_OF_WEEK, dayOfWeek + 1) // Calendar.SUNDAY is 1
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)

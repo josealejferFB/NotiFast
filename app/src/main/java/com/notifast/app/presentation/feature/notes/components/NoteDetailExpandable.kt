@@ -1,6 +1,11 @@
 package com.notifast.app.presentation.feature.notes.components
 
-import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -30,10 +32,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,9 +53,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.notifast.app.R
 import com.notifast.app.data.model.Note
-import com.notifast.app.domain.usecase.ExportNoteMarkdownUseCase
-import com.notifast.app.presentation.atoms.NotiFastButton
 import com.notifast.app.presentation.atoms.NotiFastMarkdown
+import com.notifast.app.presentation.feature.notes.util.NoteShareHelper
 
 @Composable
 fun NoteDetailExpandable(
@@ -54,186 +64,166 @@ fun NoteDetailExpandable(
     onTaskCheckedChange: ((taskIndex: Int, isChecked: Boolean) -> Unit)? = null
 ) {
     val context = LocalContext.current
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
-    val exportLabel = stringResource(R.string.notes_export_markdown)
+    val scrollState = rememberScrollState()
+    var boxCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    var titleBottomInScrollableContent by remember { mutableIntStateOf(0) }
 
-    val exportPdf = {
-        scope.launch {
-            val useCase = com.notifast.app.domain.usecase.ExportNotePdfUseCase(context)
-            useCase(note).onSuccess { file ->
-                val uri = androidx.core.content.FileProvider.getUriForFile(
-                    context, "${context.packageName}.fileprovider", file
-                )
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "application/pdf"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    putExtra(Intent.EXTRA_SUBJECT, note.title)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-                context.startActivity(Intent.createChooser(shareIntent, exportLabel))
-            }
+    val showStickyHeader by remember {
+        derivedStateOf {
+            titleBottomInScrollableContent > 0 && scrollState.value >= titleBottomInScrollableContent
         }
-        Unit
     }
+
+    val onShareNote = {
+        NoteShareHelper.shareNote(context, note)
+    }
+
+    val cardShape = RoundedCornerShape(24.dp)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(max = 600.dp),
-        shape = RoundedCornerShape(24.dp),
+            .heightIn(max = 600.dp)
+            .clip(cardShape),
+        shape = cardShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .onGloballyPositioned { boxCoordinates = it }
         ) {
-            if (note.imageUrl != null) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    SubcomposeAsyncImage(
-                        model = note.imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth
-                    )
-                }
-            }
-
-            Column(modifier = Modifier.padding(20.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = note.subject.uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        onClick = exportPdf
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = stringResource(R.string.notes_export_markdown),
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = exportLabel,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+            ) {
+                if (note.imageUrl != null) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        SubcomposeAsyncImage(
+                            model = note.imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = note.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                // Tags list
-                if (note.tags.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        note.tags.forEach { tag ->
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = note.subject.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainer,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            onClick = onShareNote
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                             ) {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = stringResource(R.string.notes_share_cd),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "#$tag",
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 11.sp,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    text = stringResource(R.string.notes_share),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(12.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                if (note.content.isNotBlank()) {
-                    NotiFastMarkdown(content = note.content, onTaskCheckedChange = onTaskCheckedChange)
-                } else if (note.blocks.isNotEmpty()) {
-                    note.blocks.forEach { block ->
-                        BlockReadOnlyRenderer(block = block)
+                    Text(
+                        text = note.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.onGloballyPositioned { titleCoords ->
+                            val box = boxCoordinates
+                            if (box != null && box.isAttached && titleCoords.isAttached) {
+                                val titleBottomInBox = box.localPositionOf(titleCoords, Offset.Zero).y + titleCoords.size.height
+                                titleBottomInScrollableContent = (titleBottomInBox + scrollState.value).toInt()
+                            }
+                        }
+                    )
+
+                    if (note.tags.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            note.tags.forEach { tag ->
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer
+                                ) {
+                                    Text(
+                                        text = "#$tag",
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 11.sp,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
-                } else {
-                    NotiFastMarkdown(content = "_Sin contenido escrito aún..._")
-                }
 
-                Spacer(modifier = Modifier.height(28.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = onClose,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    ) {
-                        Text(
-                            stringResource(R.string.btn_close),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp
-                        )
+                    if (note.content.isNotBlank()) {
+                        NotiFastMarkdown(content = note.content, onTaskCheckedChange = onTaskCheckedChange)
+                    } else if (note.blocks.isNotEmpty()) {
+                        note.blocks.forEach { block ->
+                            BlockReadOnlyRenderer(block = block)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    } else {
+                        NotiFastMarkdown(content = "_Sin contenido escrito aún..._")
                     }
-                    Button(
-                        onClick = onEdit,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            stringResource(R.string.btn_edit),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp
-                        )
-                    }
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    NoteDetailBottomActions(
+                        onClose = onClose,
+                        onEdit = onEdit
+                    )
                 }
+            }
+
+            // Dynamic sticky header: appears smoothly when title is scrolled out of view
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showStickyHeader,
+                enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(250)) { -it / 2 },
+                exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(200)) { -it / 2 },
+                modifier = Modifier.align(Alignment.TopCenter)
+            ) {
+                NoteDetailStickyHeader(
+                    title = note.title,
+                    subject = note.subject,
+                    onShare = onShareNote
+                )
             }
         }
     }

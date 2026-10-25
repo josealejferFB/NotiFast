@@ -17,7 +17,26 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+
+data class SplashUiState(
+    val isAppReady: Boolean = false,
+    val isDarkMode: Boolean? = null,
+    val hapticsEnabled: Boolean = true,
+    val themePresetId: String = "classic",
+    val backgroundPresetId: String = "classic",
+    val customPrimaryHex: String? = null,
+    val customBackgroundHex: String? = null,
+    val authState: Boolean? = null
+)
+
+private data class ThemePreferencesState(
+    val themePresetId: String,
+    val backgroundPresetId: String,
+    val customPrimaryHex: String?,
+    val customBackgroundHex: String?
+)
 
 data class MainTopBarState(
     val firstName: String = "",
@@ -35,41 +54,70 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     val authState: StateFlow<Boolean?> = authRepository.authState
 
-    val isDarkMode: StateFlow<Boolean?> = userPrefsRepository.isDarkModeFlow.stateIn(
+    val splashState: StateFlow<SplashUiState> = combine(
+        combine(
+            authRepository.authState,
+            userPrefsRepository.isDarkModeFlow,
+            userPrefsRepository.hapticsEnabledFlow
+        ) { auth, isDark, haptics ->
+            Triple(auth, isDark, haptics)
+        },
+        combine(
+            userPrefsRepository.themePresetIdFlow,
+            userPrefsRepository.backgroundPresetIdFlow,
+            userPrefsRepository.customPrimaryHexFlow,
+            userPrefsRepository.customBackgroundHexFlow
+        ) { theme, bg, primaryHex, bgHex ->
+            ThemePreferencesState(theme, bg, primaryHex, bgHex)
+        }
+    ) { (auth, isDark, haptics), themePrefs ->
+        SplashUiState(
+            isAppReady = auth != null,
+            isDarkMode = isDark,
+            hapticsEnabled = haptics,
+            themePresetId = themePrefs.themePresetId,
+            backgroundPresetId = themePrefs.backgroundPresetId,
+            customPrimaryHex = themePrefs.customPrimaryHex,
+            customBackgroundHex = themePrefs.customBackgroundHex,
+            authState = auth
+        )
+    }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
+        started = SharingStarted.Eagerly,
+        initialValue = SplashUiState()
     )
 
-    val hapticsEnabled: StateFlow<Boolean> = userPrefsRepository.hapticsEnabledFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = true
-    )
+    val isAppReady: StateFlow<Boolean> = splashState
+        .map { it.isAppReady }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
 
-    val themePresetId: StateFlow<String> = userPrefsRepository.themePresetIdFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = "classic"
-    )
+    val isDarkMode: StateFlow<Boolean?> = splashState
+        .map { it.isDarkMode }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val backgroundPresetId: StateFlow<String> = userPrefsRepository.backgroundPresetIdFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = "classic"
-    )
+    val hapticsEnabled: StateFlow<Boolean> = splashState
+        .map { it.hapticsEnabled }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
-    val customPrimaryHex: StateFlow<String?> = userPrefsRepository.customPrimaryHexFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    val themePresetId: StateFlow<String> = splashState
+        .map { it.themePresetId }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "classic")
 
-    val customBackgroundHex: StateFlow<String?> = userPrefsRepository.customBackgroundHexFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    val backgroundPresetId: StateFlow<String> = splashState
+        .map { it.backgroundPresetId }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "classic")
+
+    val customPrimaryHex: StateFlow<String?> = splashState
+        .map { it.customPrimaryHex }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    val customBackgroundHex: StateFlow<String?> = splashState
+        .map { it.customBackgroundHex }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val _pendingDeepLink = MutableStateFlow<NotificationDeepLink?>(null)
     val pendingDeepLink: StateFlow<NotificationDeepLink?> = _pendingDeepLink.asStateFlow()

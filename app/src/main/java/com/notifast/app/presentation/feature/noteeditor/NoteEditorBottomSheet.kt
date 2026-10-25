@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -27,6 +29,8 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,7 +72,20 @@ fun NoteEditorBottomSheet(
     val keyboardController = LocalSoftwareKeyboardController.current
     val isImeVisible = WindowInsets.isImeVisible
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val hasUnsavedChanges = uiState.title.isNotBlank() || uiState.content.isNotBlank() || uiState.imageUri != null
+    var showDiscardDialog by remember { mutableStateOf(false) }
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { newState ->
+            if (hasUnsavedChanges && newState == SheetValue.Hidden) {
+                showDiscardDialog = true
+                false
+            } else {
+                true
+            }
+        }
+    )
 
     LaunchedEffect(noteId, subject) {
         viewModel.onEvent(NoteEditorEvent.Init(noteId, subject))
@@ -91,9 +108,6 @@ fun NoteEditorBottomSheet(
     val activeStyles = remember(contentFieldValue) {
         SmartMarkdownFormatter.detectActiveStyles(contentFieldValue)
     }
-
-    var showDiscardDialog by remember { mutableStateOf(false) }
-    val hasUnsavedChanges = uiState.title.isNotBlank() || uiState.content.isNotBlank() || uiState.imageUri != null
 
     fun dismissSheet(action: (() -> Unit)? = null) {
         scope.launch {
@@ -141,8 +155,11 @@ fun NoteEditorBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = {
-            if (hasUnsavedChanges) showDiscardDialog = true else onDismiss()
+            if (hasUnsavedChanges) showDiscardDialog = true else dismissSheet()
         },
+        properties = ModalBottomSheetProperties(
+            shouldDismissOnBackPress = false
+        ),
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -220,10 +237,11 @@ fun NoteEditorBottomSheet(
                     onAttachPhotoClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
+                        .navigationBarsPadding()
+                        .imePadding()
                 )
             } else {
-                Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)))
+                Spacer(modifier = Modifier.navigationBarsPadding())
             }
         }
     }

@@ -4,8 +4,10 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,7 +41,10 @@ import com.notifast.app.presentation.feature.addsubject.components.SubjectEditor
 import com.notifast.app.presentation.feature.addsubject.components.SubjectLivePreviewCard
 import com.notifast.app.presentation.theme.color.Ruby
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.layout.ExperimentalLayoutApi::class
+)
 @Composable
 fun AddSubjectScreen(
     viewModel: AddSubjectViewModel = hiltViewModel(),
@@ -45,6 +52,9 @@ fun AddSubjectScreen(
     onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val isImeVisible = WindowInsets.isImeVisible
     var showDiscardDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSaved) {
@@ -55,9 +65,22 @@ fun AddSubjectScreen(
     }
 
     val hasUnsavedChanges = uiState.subjectName.isNotBlank() || uiState.section.isNotBlank()
-    val handleBack = { if (hasUnsavedChanges) showDiscardDialog = true else onBackClick() }
+    val handleBack = {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+        if (hasUnsavedChanges) showDiscardDialog = true else onBackClick()
+    }
 
-    BackHandler(enabled = hasUnsavedChanges) { showDiscardDialog = true }
+    BackHandler(enabled = isImeVisible || hasUnsavedChanges) {
+        when {
+            isImeVisible -> {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }
+            hasUnsavedChanges -> showDiscardDialog = true
+            else -> onBackClick()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()

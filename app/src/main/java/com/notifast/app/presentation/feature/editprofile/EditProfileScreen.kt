@@ -1,6 +1,7 @@
 package com.notifast.app.presentation.feature.editprofile
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -8,9 +9,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -18,8 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,19 +39,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import com.notifast.app.R
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.notifast.app.R
+import com.notifast.app.presentation.atoms.NotiFastButton
+import com.notifast.app.presentation.atoms.NotiFastDialog
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.atoms.NotiFastTopBar
+import com.notifast.app.presentation.atoms.TopBarType
 import com.notifast.app.presentation.theme.color.Aqua
 import com.notifast.app.presentation.theme.color.Ruby
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.layout.ExperimentalLayoutApi::class
+)
 @Composable
 fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
@@ -58,8 +68,12 @@ fun EditProfileScreen(
     onLogout: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val isImeVisible = WindowInsets.isImeVisible
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var showDiscardDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onBack()
@@ -69,102 +83,156 @@ fun EditProfileScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? -> selectedImageUri = uri }
 
+    val hasUnsavedChanges = (uiState.userProfile != null) && (
+        uiState.firstName != uiState.userProfile?.firstName.orEmpty() ||
+        uiState.lastName != uiState.userProfile?.lastName.orEmpty() ||
+        selectedImageUri != null
+    )
+
+    val handleBack = {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+        if (hasUnsavedChanges) showDiscardDialog = true else onBack()
+    }
+
+    BackHandler(enabled = isImeVisible || hasUnsavedChanges) {
+        when {
+            isImeVisible -> {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }
+            hasUnsavedChanges -> showDiscardDialog = true
+            else -> onBack()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         NotiFastStudyBackground()
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                com.notifast.app.presentation.atoms.NotiFastTopBar(
-                    type = com.notifast.app.presentation.atoms.TopBarType.Detail(
+                NotiFastTopBar(
+                    type = TopBarType.Detail(
                         title = stringResource(R.string.edit_profile_title),
-                        onBackClick = onBack
+                        onBackClick = handleBack
                     )
                 )
             }
         ) { padding ->
-        if (uiState.isLoading || uiState.userProfile == null) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Ruby)
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .clickable { galleryLauncher.launch("image/*") },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (selectedImageUri != null) {
-                        AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                    } else if (uiState.userProfile?.profilePictureUrl != null) {
-                        AsyncImage(model = uiState.userProfile?.profilePictureUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                    } else {
-                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
-                    }
+            if (uiState.isLoading || uiState.userProfile == null) {
+                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Ruby)
                 }
-
-                Spacer(modifier = Modifier.height(40.dp))
-
-                OutlinedTextField(
-                    value = uiState.firstName,
-                    onValueChange = { viewModel.onEvent(EditProfileEvent.UpdateFirstName(it)) },
-                    label = { Text(stringResource(R.string.edit_profile_first_name_label)) },
-                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                    shape = RoundedCornerShape(28.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Aqua,
-                        focusedLabelColor = Aqua,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = uiState.lastName,
-                    onValueChange = { viewModel.onEvent(EditProfileEvent.UpdateLastName(it)) },
-                    label = { Text(stringResource(R.string.edit_profile_last_name_label)) },
-                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                    shape = RoundedCornerShape(28.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Aqua,
-                        focusedLabelColor = Aqua,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Button(
-                    onClick = { viewModel.onEvent(EditProfileEvent.SaveProfile(selectedImageUri)) },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Ruby),
-                    enabled = uiState.firstName.isNotBlank() && !uiState.isSaving
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (uiState.isSaving) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                    } else {
-                        Text(stringResource(R.string.edit_profile_btn_update), fontWeight = FontWeight.Bold, color = Color.White)
+                    Box(
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .clickable { galleryLauncher.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (selectedImageUri != null) {
+                            AsyncImage(
+                                model = selectedImageUri,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else if (uiState.userProfile?.profilePictureUrl != null) {
+                            AsyncImage(
+                                model = uiState.userProfile?.profilePictureUrl,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.3f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
+                        }
                     }
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    OutlinedTextField(
+                        value = uiState.firstName,
+                        onValueChange = { viewModel.onEvent(EditProfileEvent.UpdateFirstName(it)) },
+                        label = { Text(stringResource(R.string.edit_profile_first_name_label)) },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        shape = RoundedCornerShape(28.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Aqua,
+                            focusedLabelColor = Aqua,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = uiState.lastName,
+                        onValueChange = { viewModel.onEvent(EditProfileEvent.UpdateLastName(it)) },
+                        label = { Text(stringResource(R.string.edit_profile_last_name_label)) },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        shape = RoundedCornerShape(28.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Aqua,
+                            focusedLabelColor = Aqua,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(48.dp))
+
+                    NotiFastButton(
+                        text = stringResource(R.string.edit_profile_btn_update),
+                        onClick = { viewModel.onEvent(EditProfileEvent.SaveProfile(selectedImageUri)) },
+                        isLoading = uiState.isSaving,
+                        backgroundColor = Ruby,
+                        enabled = uiState.firstName.isNotBlank() && !uiState.isSaving,
+                        modifier = Modifier.fillMaxWidth().height(56.dp)
+                    )
                 }
             }
         }
+
+        if (showDiscardDialog) {
+            NotiFastDialog(
+                title = stringResource(R.string.edit_profile_discard_title),
+                message = stringResource(R.string.edit_profile_discard_message),
+                confirmText = stringResource(R.string.schedules_discard_confirm),
+                dismissText = stringResource(R.string.schedules_discard_cancel),
+                confirmColor = Ruby,
+                confirmWeight = FontWeight.Bold,
+                onConfirm = {
+                    showDiscardDialog = false
+                    onBack()
+                },
+                onDismiss = { showDiscardDialog = false }
+            )
+        }
     }
-}
 }

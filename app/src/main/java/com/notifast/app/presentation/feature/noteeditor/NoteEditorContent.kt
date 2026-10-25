@@ -31,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -103,7 +105,8 @@ fun NoteEditorContent(
                 NotiFastFormField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
-                    label = stringResource(R.string.add_note_title_label)
+                    label = stringResource(R.string.add_note_title_label),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                 )
 
                 // 3. Contenido Markdown (Content)

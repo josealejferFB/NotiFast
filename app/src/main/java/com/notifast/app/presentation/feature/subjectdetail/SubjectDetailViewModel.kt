@@ -212,7 +212,31 @@ class SubjectDetailViewModel @Inject constructor(
             is SubjectDetailEvent.DeleteSchedule -> deleteSchedule(event.schedule)
             is SubjectDetailEvent.UpdateTargetGrade -> filterInputs.update { it.copy(targetGradeOverride = event.targetGrade) }
             is SubjectDetailEvent.UpdateSubjectData -> updateSubjectData(event.newName, event.newColorHex, event.newIcon, event.section)
+            is SubjectDetailEvent.ToggleTaskCheck -> toggleTaskCheck(event.note, event.taskIndex, event.isChecked)
             is SubjectDetailEvent.ClearError -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun toggleTaskCheck(currentNote: Note, taskIndex: Int, isChecked: Boolean) {
+        viewModelScope.launch {
+            val userId = authRepository.getCurrentUserId() ?: return@launch
+            val updatedContent = com.notifast.app.presentation.atoms.MarkdownParser.toggleTaskCheckbox(currentNote.content, taskIndex, isChecked)
+            val updatedNote = currentNote.copy(
+                content = updatedContent,
+                updatedAt = java.util.Date(),
+                blocks = com.notifast.app.domain.util.MarkdownToBlocksParser.parse(updatedContent, currentNote.imageUrl)
+            )
+            _uiState.update { prev ->
+                val newNotes = prev.notes.map { if (it.id == updatedNote.id) updatedNote else it }
+                val newFiltered = prev.filteredNotes.map { if (it.id == updatedNote.id) updatedNote else it }
+                prev.copy(notes = newNotes, filteredNotes = newFiltered)
+            }
+            noteRepository.updateNote(userId, updatedNote, null).fold(
+                onSuccess = { _uiState.update { it.copy(error = null) } },
+                onFailure = { e ->
+                    _uiState.update { it.copy(error = ErrorSanitizer.sanitize(e, "Error al actualizar nota")) }
+                }
+            )
         }
     }
 

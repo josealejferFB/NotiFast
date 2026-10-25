@@ -190,4 +190,39 @@ class AddSubjectViewModelTest {
         assertNull(viewModel.uiState.value.error)
         assertFalse(viewModel.uiState.value.isSaved)
     }
+
+    @Test
+    fun `double click on save executes repository addSubject exactly once`() = runTest {
+        coEvery {
+            noteRepository.addSubject(
+                userId = "user_test_456",
+                subjectName = "Álgebra Lineal",
+                icon = "School",
+                colorHex = "#3B9797",
+                section = ""
+            )
+        } returns Result.success("sub-2")
+
+        val viewModel = AddSubjectViewModel(noteRepository, authRepository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AddSubjectEvent.NameChanged("Álgebra Lineal"))
+
+        // First click
+        viewModel.onEvent(AddSubjectEvent.SaveClicked)
+        // Immediate second click
+        viewModel.onEvent(AddSubjectEvent.SaveClicked)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            noteRepository.addSubject(
+                userId = "user_test_456",
+                subjectName = "Álgebra Lineal",
+                icon = any(),
+                colorHex = any(),
+                section = any()
+            )
+        }
+        assertTrue(viewModel.uiState.value.isSaved)
+    }
 }

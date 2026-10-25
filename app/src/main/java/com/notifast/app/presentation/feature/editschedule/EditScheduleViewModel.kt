@@ -252,12 +252,13 @@ class EditScheduleViewModel @Inject constructor(
     }
 
     private fun saveSchedule() {
+        val state = _uiState.value
+        if (state.isSaving || state.isSaved) return
         val currentId = scheduleId
         if (currentId == null) {
             _uiState.update { it.copy(error = ErrorSanitizer.MSG_SCHEDULE_NOT_FOUND) }
             return
         }
-        val state = _uiState.value
         if (state.subjectName.isBlank()) {
             _uiState.update { it.copy(error = "El nombre de la materia es requerido.") }
             return
@@ -267,9 +268,14 @@ class EditScheduleViewModel @Inject constructor(
             return
         }
 
+        _uiState.update { it.copy(isSaving = true, error = null) }
+
         viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId() ?: return@launch
-            _uiState.update { it.copy(isSaving = true, error = null) }
+            val userId = authRepository.getCurrentUserId()
+            if (userId == null) {
+                _uiState.update { it.copy(isSaving = false) }
+                return@launch
+            }
 
             val matchedSubject = state.subjects.find { it.name.equals(state.subjectName, ignoreCase = true) }
             val subjectColorHex = matchedSubject?.colorHex

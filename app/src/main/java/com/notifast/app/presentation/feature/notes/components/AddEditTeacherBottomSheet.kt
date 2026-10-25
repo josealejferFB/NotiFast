@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,7 +25,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,8 +58,6 @@ fun AddEditTeacherBottomSheet(
     onSave: (Teacher) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
     var firstName by remember(teacher) { mutableStateOf(teacher?.firstName.orEmpty()) }
     var lastName by remember(teacher) { mutableStateOf(teacher?.lastName.orEmpty()) }
     var phoneNumber by remember(teacher) { mutableStateOf(teacher?.phoneNumber.orEmpty()) }
@@ -78,7 +76,6 @@ fun AddEditTeacherBottomSheet(
 
     NotiFastCreationBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
         hasUnsavedChanges = hasUnsavedChanges,
         modifier = modifier
     ) {
@@ -86,6 +83,7 @@ fun AddEditTeacherBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .clearFocusOnTapOutside()
                 .padding(horizontal = 24.dp)
