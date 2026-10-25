@@ -21,11 +21,15 @@
 
     takeNotesBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      editorSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      editorSection.scrollIntoView({
+        behavior: isReducedMotion ? 'auto' : 'smooth',
+        block: 'center'
+      });
 
-      if (editorSimulator) {
+      if (editorSimulator && !isReducedMotion) {
         editorSimulator.style.transition = 'box-shadow 0.4s, transform 0.4s';
-        editorSimulator.style.boxShadow = '0 0 0 4px rgba(158, 27, 50, 0.4), 0 20px 40px rgba(0,0,0,0.12)';
+        editorSimulator.style.boxShadow = '0 0 0 2.5px var(--brand-primary), 0 20px 40px rgba(0,0,0,0.12)';
         editorSimulator.style.transform = 'scale(1.02)';
 
         setTimeout(() => {
@@ -142,13 +146,17 @@
         const targetSection = targetSelector ? document.querySelector(targetSelector) : null;
         if (!targetSection) return;
 
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        targetSection.scrollIntoView({
+          behavior: isReducedMotion ? 'auto' : 'smooth',
+          block: 'center'
+        });
 
         // Highlight target feature card
         const spotlightTarget = targetSection.querySelector(
-          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .theme-studio-workbench, .notifications-simulator-card, .nearby-transfer-card, .subjects-grid'
+          '.schedule-live-card, .note-editor-simulator, #main-average-hero-card, .evaluations-calendar-container, .analytics-dashboard-container, .theme-studio-workbench, .notifications-simulator-card, .nearby-transfer-card, .nearby-transfer-panel, .subjects-grid'
         );
-        if (spotlightTarget) {
+        if (spotlightTarget && !isReducedMotion) {
           spotlightTarget.classList.remove('section-spotlight-active');
           void spotlightTarget.offsetWidth;
           spotlightTarget.classList.add('section-spotlight-active');
@@ -1154,7 +1162,9 @@
         const lead = chip.getAttribute('data-lead');
 
         document.querySelectorAll(`.timing-chip[data-channel="${ch}"]`).forEach(c => {
-          c.classList.toggle('active', c === chip);
+          const isActive = c === chip;
+          c.classList.toggle('active', isActive);
+          c.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
 
         if (ch === 'class') classLead = lead;

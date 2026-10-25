@@ -43,6 +43,10 @@
     });
   }
 
+  function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   // Setup mobile button listeners
   function setupMobileTabs() {
     const mobileTabs = document.querySelectorAll('.mobile-tab-btn');
@@ -51,10 +55,13 @@
         const screenName = tab.getAttribute('data-screen');
         switchPhoneScreen(screenName);
 
-        // Scroll to corresponding article
+        // Scroll to corresponding article respecting motion preferences
         const targetStep = document.getElementById(screenName);
         if (targetStep) {
-          targetStep.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          targetStep.scrollIntoView({
+            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+            block: 'nearest'
+          });
         }
       });
     });
@@ -84,6 +91,11 @@
 
   // GSAP ScrollTrigger Integration
   function initGSAPScrollytelling() {
+    if (prefersReducedMotion()) {
+      setupNativeObserver();
+      return;
+    }
+
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
       console.warn('GSAP or ScrollTrigger not found, using native fallback.');
       setupNativeObserver();

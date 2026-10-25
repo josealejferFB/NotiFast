@@ -63,8 +63,9 @@
         const targetEl = document.querySelector(targetId);
         if (targetEl) {
           e.preventDefault();
+          const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           targetEl.scrollIntoView({
-            behavior: 'smooth',
+            behavior: isReducedMotion ? 'auto' : 'smooth',
             block: 'start'
           });
         }

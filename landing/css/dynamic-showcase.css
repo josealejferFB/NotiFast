@@ -139,7 +139,7 @@
 .radar-chip.active {
   background: var(--brand-primary);
   color: #FFFFFF;
-  box-shadow: 0 6px 16px rgba(158, 27, 50, 0.28);
+  box-shadow: 0 4px 12px -2px rgba(24, 26, 31, 0.16);
   transform: translateY(-1px);
 }
 
@@ -162,13 +162,13 @@
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(158, 27, 50, 0.25);
+  box-shadow: 0 4px 12px -2px rgba(24, 26, 31, 0.16);
   transition: transform 0.22s var(--ease-spring), box-shadow 0.22s ease;
 }
 
 .radar-cta-chip:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 10px 22px rgba(158, 27, 50, 0.32);
+  box-shadow: 0 8px 20px -4px rgba(24, 26, 31, 0.22);
 }
 
 .radar-cta-chip svg {
@@ -1797,7 +1797,8 @@
    8. COMPARTIR P2P OFFLINE (Android Nearby & Código QR)
    -------------------------------------------------------------------------- */
 
-.nearby-transfer-card {
+.nearby-transfer-card,
+.nearby-transfer-panel {
   background: #FFFFFF;
   border: 1.5px solid rgba(24, 26, 31, 0.08);
   border-radius: 24px;
@@ -2303,7 +2304,7 @@
 
 .emblem-watermark-tag {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--brand-secondary);
@@ -2375,7 +2376,7 @@
 
 .emblem-spec-pill {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-muted);
   background-color: var(--bg-surface-container);
@@ -2484,7 +2485,7 @@
 
 .node-sub {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -2704,6 +2705,18 @@
   border-color: var(--brand-primary);
 }
 
+.theme-swatch-btn:active,
+.accent-swatch-btn:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
+.theme-swatch-btn:focus-visible,
+.accent-swatch-btn:focus-visible {
+  outline: 2.5px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
 .theme-swatch-btn.active,
 .accent-swatch-btn.active {
   background-color: var(--bg-surface);
@@ -2762,12 +2775,22 @@
   background-color: var(--bg-surface-container);
   border: 1.5px solid var(--border-hairline);
   cursor: pointer;
-  transition: transform 0.2s var(--ease-spring), border-color 0.2s;
+  transition: transform 0.2s var(--ease-spring), border-color 0.2s, background-color 0.2s;
 }
 
 .canvas-swatch-chip:hover {
   transform: translateY(-2px);
   border-color: var(--brand-primary);
+}
+
+.canvas-swatch-chip:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
+.canvas-swatch-chip:focus-visible {
+  outline: 2.5px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 .canvas-swatch-chip.active {
@@ -3043,6 +3066,12 @@
   border-color: var(--brand-primary);
 }
 
+.notif-channel-row:focus-visible {
+  outline: 2.5px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
 .channel-row-top {
   display: flex;
   align-items: center;
@@ -3131,7 +3160,16 @@
   background-color: var(--bg-surface);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: transform 0.15s, background-color 0.15s, border-color 0.15s;
+}
+
+.timing-chip:active {
+  transform: scale(0.95);
+}
+
+.timing-chip:focus-visible {
+  outline: 2.5px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 .timing-chip.active {
@@ -3482,7 +3520,7 @@
 
 .dace-period-chip {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: var(--brand-primary);
@@ -3495,7 +3533,7 @@
 
 .dace-preview-label {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--text-muted);
@@ -3558,7 +3596,7 @@
 
 .dace-subject-meta {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -3575,7 +3613,7 @@
 
 .dace-schedule-chips span {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--brand-secondary);
   background: var(--brand-secondary-light);
@@ -3611,7 +3649,7 @@
 
 .dace-strategy-label {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -3679,7 +3717,8 @@
 }
 
 .study-docs-card,
-.cover-creator-card {
+.cover-creator-card,
+.cover-creator-panel {
   background-color: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
@@ -3692,7 +3731,8 @@
 }
 
 .study-docs-card:hover,
-.cover-creator-card:hover {
+.cover-creator-card:hover,
+.cover-creator-panel:hover {
   transform: translateY(-4px);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.08);
 }
@@ -3733,7 +3773,7 @@
   background: var(--bg-surface);
   color: var(--text-secondary);
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
   transition: all var(--duration-fast) var(--ease-smooth);
@@ -3782,7 +3822,7 @@
   justify-content: center;
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -3816,7 +3856,7 @@
 
 .study-doc-meta {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -3844,7 +3884,7 @@
   flex-wrap: wrap;
   gap: 8px 14px;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--brand-secondary);
 }
@@ -3871,11 +3911,10 @@
   align-items: center;
   gap: 10px;
   text-align: center;
-  box-shadow: var(--shadow-tactile);
 }
 
 .cover-uni-line {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   line-height: 1.35;
@@ -3906,7 +3945,7 @@
 }
 
 .cover-title-block span {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   line-height: 1.35;
@@ -3916,7 +3955,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
   line-height: 1.4;
@@ -3927,7 +3966,7 @@
   top: 10px;
   right: 12px;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: var(--brand-secondary);
@@ -3984,9 +4023,10 @@
 /* --- Apuntes por bloques: realce, foto anotada y pie de lectura --- */
 
 .md-highlight {
-  background: #FFF59D;
-  color: inherit;
-  padding: 0 3px;
+  background: #FEF08A;
+  color: #451A03;
+  font-weight: 600;
+  padding: 1px 4px;
   border-radius: 3px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
@@ -4040,7 +4080,7 @@
 
 .board-photo-label {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -4062,7 +4102,7 @@
   padding-top: 10px;
   border-top: 1px solid var(--border-hairline);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
 }
@@ -4095,7 +4135,7 @@
 
 .subject-section-chip {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   color: var(--brand-primary);
@@ -4128,7 +4168,8 @@
 
 /* --- Directorio de Docentes & Contacto Directo --- */
 
-.teachers-directory-card {
+.teachers-directory-card,
+.teachers-directory-panel {
   background-color: var(--bg-surface);
   border: 1.5px solid var(--border-hairline);
   border-radius: 24px;
@@ -4140,7 +4181,8 @@
   transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-smooth);
 }
 
-.teachers-directory-card:hover {
+.teachers-directory-card:hover,
+.teachers-directory-panel:hover {
   transform: translateY(-4px);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.08);
 }
@@ -4193,7 +4235,8 @@
   display: none;
 }
 
-.teacher-mini-card {
+.teacher-mini-card,
+.teacher-mini-chip {
   flex: 0 0 148px;
   min-height: 112px;
   padding: 12px;
@@ -4206,13 +4249,15 @@
   transition: border-color var(--duration-fast) var(--ease-smooth), transform var(--duration-fast) var(--ease-spring);
 }
 
-.teacher-mini-card:hover {
+.teacher-mini-card:hover,
+.teacher-mini-chip:hover {
   transform: translateY(-2px);
 }
 
-.teacher-mini-card.active {
-  border-color: rgba(27, 94, 94, 0.4);
-  box-shadow: 0 8px 20px rgba(27, 94, 94, 0.08);
+.teacher-mini-card.active,
+.teacher-mini-chip.active {
+  border-color: rgba(27, 94, 94, 0.5);
+  background: var(--bg-surface-container);
 }
 
 .teacher-mini-top {
@@ -4258,7 +4303,7 @@
 }
 
 .teacher-mini-sub {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -4317,7 +4362,7 @@
 }
 
 .teacher-subject-chip {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--brand-secondary);
   background: var(--brand-secondary-light);
@@ -4350,7 +4395,7 @@
   padding: 4px 2px;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   transition: transform var(--duration-fast) var(--ease-spring);
@@ -4394,12 +4439,11 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: 14px;
-  border-left: 3px solid var(--brand-success);
 }
 
 .wa-greeting-label {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -4451,7 +4495,7 @@
 
 .status-chip {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -4492,13 +4536,15 @@
 
 .status-row-meta {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 .analytics-alerts-card,
-.analytics-tips-card {
+.analytics-alerts-panel,
+.analytics-tips-card,
+.analytics-tips-panel {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: 16px;
@@ -4525,7 +4571,7 @@
 
 .alerts-count-badge {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--brand-on-primary);
   background: var(--brand-primary);
@@ -4555,7 +4601,7 @@
 
 .alert-tag {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -4589,7 +4635,7 @@
 
 .alert-body span {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -4651,7 +4697,7 @@
 
 .cloud-private-badge {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   background: var(--bg-surface-container);
@@ -4699,7 +4745,7 @@
 
 .share-subject-text span {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -4771,7 +4817,7 @@
 
 .qr-preview-label {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -4841,7 +4887,7 @@
 }
 
 .share-option-text span {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -4915,7 +4961,7 @@
 
 .cloud-mini-badge {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   background: var(--bg-surface-container);
@@ -4925,7 +4971,7 @@
 
 .cloud-status-chip {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   padding: 4px 9px;
@@ -5102,23 +5148,29 @@
 .sim-stat-box,
 .histogram-preview-card,
 .nearby-transfer-card,
+.nearby-transfer-panel,
 .pack-contents-box,
 .subject-feature-card,
 .dace-import-card,
 .dace-subject-row,
 .study-docs-card,
 .cover-creator-card,
+.cover-creator-panel,
 .study-doc-row,
 .cover-page-preview,
 .cover-out-btn,
 .teachers-directory-card,
+.teachers-directory-panel,
 .teacher-mini-card,
+.teacher-mini-chip,
 .teacher-detail-sheet,
 .board-photo-block,
 .wa-greeting-bubble,
 .analytics-status-row,
 .analytics-alerts-card,
+.analytics-alerts-panel,
 .analytics-tips-card,
+.analytics-tips-panel,
 .share-pack-card,
 .cloud-backup-card,
 .share-option-row,

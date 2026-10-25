@@ -79,36 +79,68 @@
     });
   }
 
-  // Animation Loop (only if reduced motion is false)
-  if (!isReducedMotion) {
-    let lastScrollY = window.scrollY;
-    let targetScrollY = window.scrollY;
-    let currentScrollY = window.scrollY;
-    let time = 0;
+  // Animation Loop with robust prefers-reduced-motion reactivity
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let isReducedMotion = motionQuery.matches;
+  let animId = null;
+  let targetScrollY = window.scrollY;
+  let currentScrollY = window.scrollY;
+  let time = 0;
 
-    window.addEventListener('scroll', () => {
-      targetScrollY = window.scrollY;
-    }, { passive: true });
+  function onScroll() {
+    targetScrollY = window.scrollY;
+  }
 
-    function tick() {
-      time += 0.02;
-      currentScrollY += (targetScrollY - currentScrollY) * 0.1;
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        // Vertical float wave
-        const floatY = Math.sin(time + p.phase) * p.amplitude;
-        // Parallax shift from scroll
-        const scrollShift = currentScrollY * p.speed * -0.3;
-        // Gentle rotation
-        const rot = Math.sin(time * 0.5 + p.phase) * 12;
-
-        p.el.style.transform = `translate3d(0, ${floatY + scrollShift}px, 0) rotate(${rot}deg)`;
-      }
-
-      requestAnimationFrame(tick);
+  function tick() {
+    if (isReducedMotion) {
+      animId = null;
+      return;
     }
 
-    requestAnimationFrame(tick);
+    time += 0.02;
+    currentScrollY += (targetScrollY - currentScrollY) * 0.1;
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      // Vertical float wave
+      const floatY = Math.sin(time + p.phase) * p.amplitude;
+      // Parallax shift from scroll
+      const scrollShift = currentScrollY * p.speed * -0.3;
+      // Gentle rotation
+      const rot = Math.sin(time * 0.5 + p.phase) * 12;
+
+      p.el.style.transform = `translate3d(0, ${floatY + scrollShift}px, 0) rotate(${rot}deg)`;
+    }
+
+    animId = requestAnimationFrame(tick);
   }
+
+  function applyMotionState(reduced) {
+    isReducedMotion = reduced;
+    if (isReducedMotion) {
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+      window.removeEventListener('scroll', onScroll);
+      particles.forEach(p => {
+        p.el.style.transform = 'none';
+      });
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      if (!animId) {
+        animId = requestAnimationFrame(tick);
+      }
+    }
+  }
+
+  // Reactive listener for motion preference changes
+  if (motionQuery.addEventListener) {
+    motionQuery.addEventListener('change', (e) => applyMotionState(e.matches));
+  } else if (motionQuery.addListener) {
+    motionQuery.addListener((e) => applyMotionState(e.matches));
+  }
+
+  // Initial startup
+  applyMotionState(isReducedMotion);
 })();
