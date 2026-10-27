@@ -81,7 +81,7 @@
   <div class="docs-layout-container">
 
     <!-- Backdrop para menú móvil -->
-    <div class="docs-sidebar-backdrop" id="docs-sidebar-backdrop" hidden></div>
+    <div class="docs-sidebar-backdrop" id="docs-sidebar-backdrop" hidden style="display:none;"></div>
 
     <!-- Columna 1: Sidebar Izquierdo -->
     <aside class="docs-sidebar" id="docs-sidebar" aria-label="Jerarquía de Documentación">
@@ -166,14 +166,14 @@
   </div>
 
   <!-- Modal de Búsqueda Instantánea (Ctrl + K) -->
-  <div class="search-modal-backdrop" id="docs-search-modal" hidden>
+  <div class="search-modal-backdrop" id="docs-search-modal" hidden style="display:none;">
     <div class="search-modal-card" role="dialog" aria-modal="true" aria-label="Búsqueda de documentación">
       <div class="search-input-header">
         <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
         </svg>
         <input type="text" class="search-main-input" id="docs-search-input" placeholder="Buscar palabras clave, FR-001, ADR, Room SQLite..." autocomplete="off" spellcheck="false">
-        <kbd class="search-esc-badge">ESC</kbd>
+        <button type="button" class="search-esc-badge" id="docs-search-close-btn" title="Cerrar búsqueda (ESC)">ESC</button>
       </div>
 
       <div class="search-filters-row">

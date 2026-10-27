@@ -513,6 +513,10 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("js/docs-data.js", html)
         self.assertIn("js/docs.js", html)
 
+        # Modal de búsqueda oculto por defecto y con botón de cierre ESC
+        self.assertIn('id="docs-search-modal" hidden style="display:none;"', html)
+        self.assertIn('id="docs-search-close-btn"', html)
+
         # CDN de renderizado matemático y de diagramas
         self.assertIn("katex", html)
         self.assertIn("mermaid", html)
@@ -527,6 +531,8 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".docs-sidebar", css)
         self.assertIn(".docs-toc", css)
         self.assertIn(".search-modal-backdrop", css)
+        self.assertIn("display: none;", css)
+        self.assertIn(".search-modal-backdrop.open", css)
 
         self.assertTrue(os.path.exists("landing/js/docs.js"))
         with open("landing/js/docs.js", "r", encoding="utf-8") as f:
@@ -535,6 +541,7 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("performSearch", js)
         self.assertIn("renderMermaid", js)
         self.assertIn("renderKaTeX", js)
+        self.assertIn("docs-search-close-btn", js)
 
         self.assertTrue(os.path.exists("landing/js/docs-data.js"))
         with open("landing/js/docs-data.js", "r", encoding="utf-8") as f:

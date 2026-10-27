@@ -794,17 +794,27 @@ button {
 /* --------------------------------------------------------------------------
    MODAL DE BÚSQUEDA INSTANTÁNEA (Ctrl + K)
    -------------------------------------------------------------------------- */
+[hidden],
+.search-modal-backdrop[hidden],
+.docs-sidebar-backdrop[hidden] {
+  display: none !important;
+}
+
 .search-modal-backdrop {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 1000;
   background-color: rgba(14, 19, 31, 0.65);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  display: flex;
   align-items: flex-start;
   justify-content: center;
   padding: 80px var(--space-md) var(--space-md) var(--space-md);
+}
+
+.search-modal-backdrop.open {
+  display: flex !important;
 }
 
 .search-modal-card {
@@ -857,11 +867,18 @@ button {
 .search-esc-badge {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  padding: 2px 6px;
+  padding: 3px 8px;
   background-color: var(--bg-surface-container);
   border: 1px solid var(--border-hairline);
   border-radius: 4px;
   color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+.search-esc-badge:hover {
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
 }
 
 .search-filters-row {
@@ -1028,11 +1045,16 @@ button {
   }
 
   .docs-sidebar-backdrop {
+    display: none;
     position: fixed;
     inset: 64px 0 0 0;
     z-index: 199;
     background-color: rgba(14, 19, 31, 0.5);
     backdrop-filter: blur(4px);
+  }
+
+  .docs-sidebar-backdrop.open {
+    display: block !important;
   }
 
   .docs-main-wrapper {

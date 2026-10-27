@@ -476,9 +476,13 @@
   function openSearchModal() {
     if (!searchModal) return;
     searchModal.removeAttribute('hidden');
+    searchModal.classList.add('open');
+    searchModal.style.display = 'flex';
     if (searchInput) {
       searchInput.value = '';
-      searchInput.focus();
+      setTimeout(() => {
+        searchInput.focus();
+      }, 50);
     }
     performSearch('');
   }
@@ -486,6 +490,8 @@
   function closeSearchModal() {
     if (!searchModal) return;
     searchModal.setAttribute('hidden', '');
+    searchModal.classList.remove('open');
+    searchModal.style.display = 'none';
   }
 
   function performSearch(query) {
@@ -630,12 +636,20 @@
   // --------------------------------------------------------------------------
   function openMobileSidebar() {
     if (sidebarEl) sidebarEl.classList.add('open');
-    if (sidebarBackdrop) sidebarBackdrop.removeAttribute('hidden');
+    if (sidebarBackdrop) {
+      sidebarBackdrop.removeAttribute('hidden');
+      sidebarBackdrop.classList.add('open');
+      sidebarBackdrop.style.display = 'block';
+    }
   }
 
   function closeMobileSidebar() {
     if (sidebarEl) sidebarEl.classList.remove('open');
-    if (sidebarBackdrop) sidebarBackdrop.setAttribute('hidden', '');
+    if (sidebarBackdrop) {
+      sidebarBackdrop.setAttribute('hidden', '');
+      sidebarBackdrop.classList.remove('open');
+      sidebarBackdrop.style.display = 'none';
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -683,14 +697,16 @@
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        if (searchModal.hasAttribute('hidden')) {
-          openSearchModal();
-        } else {
+        const isOpen = searchModal && !searchModal.hasAttribute('hidden') && searchModal.classList.contains('open');
+        if (isOpen) {
           closeSearchModal();
+        } else {
+          openSearchModal();
         }
       }
-      if (e.key === 'Escape' && !searchModal.hasAttribute('hidden')) {
+      if (e.key === 'Escape') {
         closeSearchModal();
+        closeMobileSidebar();
       }
     });
 
@@ -701,6 +717,11 @@
           closeSearchModal();
         }
       });
+    }
+
+    const searchCloseBtn = document.getElementById('docs-search-close-btn');
+    if (searchCloseBtn) {
+      searchCloseBtn.addEventListener('click', closeSearchModal);
     }
 
     // Search filters
