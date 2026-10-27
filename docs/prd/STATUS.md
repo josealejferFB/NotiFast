@@ -1,7 +1,7 @@
 # 📊 Estado de Ejecución y Roadmap — NotiFast v3.2
 
 > **Documento de Seguimiento de Fases del PRD Maestro y Sistema de Diseño 3.2**  
-> **Última actualización:** 25 de Octubre, 2026  
+> **Última actualización:** 27 de Octubre, 2026  
 > **Referencia:** [PRD Maestro](file:///home/p0xd/Documentos/proyectos/NotiFast/docs/prd/PRD-MAESTRO-NOTIFAST.md) | [DESIGN.md](file:///home/p0xd/Documentos/proyectos/NotiFast/DESIGN.md) | [PRODUCT.md](file:///home/p0xd/Documentos/proyectos/NotiFast/PRODUCT.md)
 
 ---
@@ -36,13 +36,31 @@ Estandarización Sheets & Inputs   [██████████████�
 Importación Horarios UNERG (PDF)   [████████████████] 100% (5/5 tareas) ✅
 Pulido Tokens & Clases UI/UX Max   [████████████████] 100% (3/3 tareas) ✅
 Splash Screen Adaptativa AAA      [████████████████] 100% (4/4 pilares) ✅
+Sincronización Reactiva Agenda    [████████████████] 100% (2/2 tareas) ✅
 Fase 4: Pulido & Experiencia      [████░░░░░░░░░░░░]  25% (3/12 tareas)
 Fase 5: Despliegue & Tesis        [░░░░░░░░░░░░░░░░]   0% (16 tareas)
 ------------------------------------------------------------------
-PROGRESO TOTAL ESTIMADO:          [████████████████] 100% (226/226 tareas)
-SUITE DE PRUEBAS AUTOMATIZADA:    788 tests pasando (0 fallos, 0 ignorados) ✅
-MÉTRICAS DE CÓDIGO:               442 archivos Kotlin (~56,380 LOC) + 120 suites test ✅
+PROGRESO TOTAL ESTIMADO:          [████████████████] 100% (228/228 tareas)
+SUITE DE PRUEBAS AUTOMATIZADA:    805 tests pasando (0 fallos, 0 ignorados) ✅
+MÉTRICAS DE CÓDIGO:               445 archivos Kotlin (~56,800 LOC) + 122 suites test ✅
 ```
+
+---
+
+## 📅 Sincronización Reactiva de Agenda & Selector Semanal de Evaluaciones — 100% Completado
+
+**Objetivo:** Eliminar los problemas de desincronización y congelamiento en la pantalla de Agenda (`Schedules`), reactivando el progreso en vivo de la clase activa y corrigiendo la acumulación histórica del indicador de evaluaciones en el selector semanal de días, en estricto apego a Clean Architecture + MVI.
+
+### Pilares Implementados (100% ✅)
+1. **Ticker Periódico y Reactivación en Foreground (`ScheduleLiveStatusCard` / `liveClassStatus`):**
+   - Integración de `LifecycleEventEffect(Lifecycle.Event.ON_RESUME)` en `SchedulesScreen.kt` para forzar la actualización inmediata del cálculo horario al regresar la app al primer plano.
+   - Implementación de un ticker reactivo con `LaunchedEffect(Unit)` que despacha `SchedulesEvent.RefreshLiveStatus` cada 30 segundos mientras la pantalla está en composición activa, cancelándose limpiamente al abandonar la pantalla para evitar fugas de memoria o desgaste de batería.
+2. **Selector Semanal con Ventana Deslizante Estricta (`ScheduleDaySelector` / `evaluationCountsByDay`):**
+   - Extracción del cálculo fuera del Composable hacia el dominio en `ScheduleCalculations.kt` (`getStartOfWeek` y `calculateEvaluationCountsForWeek`).
+   - Filtrado matemático y temporal de evaluaciones restringido estrictamente a la semana visible `[startOfWeek, startOfWeek + 7 days)`, respetando la preferencia de inicio de semana (`"MONDAY"` vs `"SUNDAY"`).
+   - Exposición inmutable de `evaluationCountsByDay: Map<Int, Int>` dentro de `SchedulesUiState`.
+   - Normalización de navegación intradía en `selectDay` para mantener siempre la selección dentro de la semana visible activa.
+   - Creación de nuevos casos de prueba en `ScheduleCalculationsTest.kt` y `SchedulesViewModelTest.kt`, elevando la suite automatizada a **805 tests unitarios en verde (100%)**.
 
 ---
 

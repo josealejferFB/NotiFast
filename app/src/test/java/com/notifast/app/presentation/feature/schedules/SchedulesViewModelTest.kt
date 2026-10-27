@@ -335,4 +335,113 @@ class SchedulesViewModelTest {
         assertEquals("Calculate", mathClass?.subjectIcon)
         assertEquals("#BF092F", mathClass?.subjectColorHex)
     }
+
+    @Test
+    fun `when RefreshLiveStatus is received, updates liveClassStatus and timelineItems with latest time from timeProvider`() = runTest {
+        var currentTime = "08:00"
+        val viewModel = SchedulesViewModel(scheduleRepository, evaluationRepository, authRepository) { 1 to currentTime }
+        advanceUntilIdle()
+
+        var state = viewModel.uiState.value
+        assertTrue(state.liveClassStatus is LiveClassStatus.Active)
+        assertEquals(120, (state.liveClassStatus as LiveClassStatus.Active).remainingMinutes)
+
+        // Time moves forward by 30 minutes
+        currentTime = "08:30"
+        viewModel.onEvent(SchedulesEvent.RefreshLiveStatus)
+        advanceUntilIdle()
+
+        state = viewModel.uiState.value
+        assertTrue(state.liveClassStatus is LiveClassStatus.Active)
+        val active = state.liveClassStatus as LiveClassStatus.Active
+        assertEquals(90, active.remainingMinutes)
+        assertEquals(0.25f, active.progressFraction, 0.05f)
+
+        // Time moves after first class ended and before second class starts (first is 08:00-10:00, second is 12:00-14:00)
+        currentTime = "10:30"
+        viewModel.onEvent(SchedulesEvent.RefreshLiveStatus)
+        advanceUntilIdle()
+
+        state = viewModel.uiState.value
+        assertTrue(state.liveClassStatus is LiveClassStatus.Upcoming)
+        val upcoming = state.liveClassStatus as LiveClassStatus.Upcoming
+        assertEquals("Física", upcoming.schedule.subjectName)
+        assertEquals(90, upcoming.startsInMinutes)
+    }
+
+    @Test
+    fun `when initialized, calculates evaluationCountsByDay for visible week only and ignores distant evaluations`() = runTest {
+        val cal = Calendar.getInstance()
+        val currentDow = (cal.get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it }
+
+        // Evaluation today
+        val evalToday = Evaluation(id = "e_today", title = "Examen Hoy", date = cal.time)
+
+        // Evaluation 3 weeks in the future on the exact same day of week
+        val calFuture = (cal.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 21) }
+        val evalFuture = Evaluation(id = "e_future", title = "Examen en 3 semanas", date = calFuture.time)
+
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(listOf(evalToday, evalFuture))
+
+        val viewModel = SchedulesViewModel(scheduleRepository, evaluationRepository, authRepository)
+        advanceUntilIdle()
+
+        val counts = viewModel.uiState.value.evaluationCountsByDay
+        // The count for today's day of week must be 1, NOT 2 (the future evaluation must not be counted in current week)
+        assertEquals(1, counts[currentDow])
+    }
+
+    @Test
+    fun `when date in different week is selected, recalculates evaluationCountsByDay for that week`() = runTest {
+        val cal = Calendar.getInstance()
+        val currentDow = (cal.get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it }
+
+        val evalToday = Evaluation(id = "e_today", title = "Examen Hoy", date = cal.time)
+        val calFuture = (cal.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 21) }
+        val evalFuture = Evaluation(id = "e_future", title = "Examen en 3 semanas", date = calFuture.time)
+
+        coEvery { evaluationRepository.getEvaluations("user_123") } returns flowOf(listOf(evalToday, evalFuture))
+
+        val viewModel = SchedulesViewModel(scheduleRepository, evaluationRepository, authRepository)
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.uiState.value.evaluationCountsByDay[currentDow])
+
+        // Select the date 3 weeks in the future
+        viewModel.onEvent(SchedulesEvent.SelectDate(calFuture))
+        advanceUntilIdle()
+
+        // In that future week, the future evaluation is counted
+        assertEquals(1, viewModel.uiState.value.evaluationCountsByDay[currentDow])
+    }
+
+    @Test
+    fun `when selectDay is called for Sunday in MONDAY-first week, selects Sunday of same week`() = runTest {
+        val userPrefsRepository: com.notifast.app.domain.repository.UserPrefsRepository = mockk(relaxed = true)
+        coEvery { userPrefsRepository.firstDayOfWeekFlow } returns flowOf("MONDAY")
+        coEvery { userPrefsRepository.defaultGradeScaleFlow } returns flowOf("0-10")
+
+        val viewModel = SchedulesViewModel(
+            scheduleRepository = scheduleRepository,
+            evaluationRepository = evaluationRepository,
+            authRepository = authRepository,
+            userPrefsRepository = userPrefsRepository
+        )
+        advanceUntilIdle()
+
+        // Select Wednesday (3)
+        viewModel.onEvent(SchedulesEvent.SelectDay(3))
+        advanceUntilIdle()
+        val wednesdayDate = viewModel.uiState.value.selectedDate.clone() as Calendar
+
+        // Now select Sunday (0)
+        viewModel.onEvent(SchedulesEvent.SelectDay(0))
+        advanceUntilIdle()
+        val sundayDate = viewModel.uiState.value.selectedDate
+
+        // Sunday must be 4 days AFTER Wednesday (not 3 days BEFORE Wednesday)
+        val diffDays = ((sundayDate.timeInMillis - wednesdayDate.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
+        assertEquals(4, diffDays)
+    }
 }
+

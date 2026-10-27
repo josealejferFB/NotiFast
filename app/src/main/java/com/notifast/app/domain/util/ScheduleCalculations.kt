@@ -1,5 +1,6 @@
 package com.notifast.app.domain.util
 
+import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
 import com.notifast.app.data.model.SubjectData
 import com.notifast.app.presentation.feature.schedules.LiveClassStatus
@@ -251,4 +252,48 @@ object ScheduleCalculations {
         val mins = remainingMinutes % 60
         return if (mins == 0) "Termina en $hours h" else "Termina en $hours h $mins min"
     }
+
+    fun getStartOfWeek(referenceDate: Calendar, firstDayOfWeek: String = "SUNDAY"): Calendar {
+        val cal = (referenceDate.clone() as Calendar).apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val dow = (cal.get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it }
+        val daysFromStart = if (firstDayOfWeek.equals("SUNDAY", ignoreCase = true)) {
+            dow
+        } else {
+            (dow - 1 + 7) % 7
+        }
+        cal.add(Calendar.DAY_OF_YEAR, -daysFromStart)
+        return cal
+    }
+
+    fun calculateEvaluationCountsForWeek(
+        evaluations: List<Evaluation>,
+        referenceDate: Calendar,
+        firstDayOfWeek: String = "SUNDAY"
+    ): Map<Int, Int> {
+        if (evaluations.isEmpty()) return emptyMap()
+        val startCal = getStartOfWeek(referenceDate, firstDayOfWeek)
+        val startTime = startCal.timeInMillis
+        val endCal = (startCal.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 7) }
+        val endTime = endCal.timeInMillis
+
+        val evalCal = Calendar.getInstance()
+        val counts = mutableMapOf<Int, Int>()
+
+        for (evaluation in evaluations) {
+            val date = evaluation.date ?: continue
+            val time = date.time
+            if (time in startTime until endTime) {
+                evalCal.time = date
+                val dayOfWeek = (evalCal.get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it }
+                counts[dayOfWeek] = (counts[dayOfWeek] ?: 0) + 1
+            }
+        }
+        return counts
+    }
 }
+

@@ -191,6 +191,10 @@
     <string name="btn_back">Atrás</string>
     <string name="note_camera_capture">Tomar foto</string>
     <string name="note_gallery_pick">Elegir de galería</string>
+    <string name="image_picker_dialog_title">Añadir imagen</string>
+    <string name="image_picker_camera_desc">Usa la cámara del dispositivo</string>
+    <string name="image_picker_gallery_desc">Selecciona desde tus fotos o archivos</string>
+    <string name="camera_permission_denied">Se requiere permiso de cámara para tomar fotos</string>
     <string name="note_annotate_title">Anotar foto</string>
     <string name="note_annotate_pen">Lápiz</string>
     <string name="note_annotate_highlighter">Resaltador</string>

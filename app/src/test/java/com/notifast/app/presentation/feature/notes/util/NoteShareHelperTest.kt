@@ -9,11 +9,13 @@ import com.notifast.app.data.model.NoteBlock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import androidx.core.content.FileProvider
 import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
@@ -25,6 +27,15 @@ class NoteShareHelperTest {
     @Before
     fun setUp() {
         context = RuntimeEnvironment.getApplication()
+    }
+
+    @After
+    fun tearDown() {
+        runCatching {
+            val field = FileProvider::class.java.getDeclaredField("sCache")
+            field.isAccessible = true
+            (field.get(null) as? MutableMap<*, *>)?.clear()
+        }
     }
 
     @Test

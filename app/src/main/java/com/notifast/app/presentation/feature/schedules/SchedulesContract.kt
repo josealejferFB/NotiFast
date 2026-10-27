@@ -78,6 +78,7 @@ data class SchedulesUiState(
     val evaluations: List<Evaluation> = emptyList(),
     val evaluationsByDate: Map<String, List<Evaluation>> = emptyMap(),
     val dailyEvaluations: List<Evaluation> = emptyList(),
+    val evaluationCountsByDay: Map<Int, Int> = emptyMap(),
     val subjects: List<SubjectData> = emptyList(),
     val subjectMap: Map<String, SubjectData> = emptyMap(),
     val selectedDay: Int = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it },

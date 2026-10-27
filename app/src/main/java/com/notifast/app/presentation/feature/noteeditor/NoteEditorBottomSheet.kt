@@ -1,26 +1,18 @@
 package com.notifast.app.presentation.feature.noteeditor
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,9 +42,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notifast.app.presentation.atoms.clearFocusOnTapOutside
 import com.notifast.app.presentation.atoms.rememberClearFocusAction
 import com.notifast.app.presentation.feature.noteeditor.components.DockedAccessoryToolbar
+import com.notifast.app.presentation.feature.noteeditor.components.ImageSourcePickerDialog
 import com.notifast.app.presentation.feature.noteeditor.components.NoteEditorDiscardDialog
 import com.notifast.app.presentation.feature.noteeditor.components.NoteEditorSheetHeader
 import com.notifast.app.presentation.feature.noteeditor.util.SmartMarkdownFormatter
+import com.notifast.app.presentation.feature.noteeditor.util.rememberNoteImagePicker
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -91,7 +85,7 @@ fun NoteEditorBottomSheet(
         viewModel.onEvent(NoteEditorEvent.Init(noteId, subject))
     }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val imagePicker = rememberNoteImagePicker { uri ->
         viewModel.onEvent(NoteEditorEvent.ImageSelected(uri))
     }
 
@@ -139,9 +133,15 @@ fun NoteEditorBottomSheet(
                 showDiscardDialog = false
                 dismissSheet()
             },
-            onDismiss = {
-                showDiscardDialog = false
-            }
+            onDismiss = { showDiscardDialog = false }
+        )
+    }
+
+    if (imagePicker.isSourcePickerVisible) {
+        ImageSourcePickerDialog(
+            onDismiss = imagePicker.dismissSourcePicker,
+            onCameraClick = imagePicker.launchCamera,
+            onGalleryClick = imagePicker.launchGallery
         )
     }
 
@@ -154,12 +154,8 @@ fun NoteEditorBottomSheet(
     val canSave = uiState.subject.isNotBlank() && uiState.title.isNotBlank() && !uiState.isLoading
 
     ModalBottomSheet(
-        onDismissRequest = {
-            if (hasUnsavedChanges) showDiscardDialog = true else dismissSheet()
-        },
-        properties = ModalBottomSheetProperties(
-            shouldDismissOnBackPress = false
-        ),
+        onDismissRequest = { if (hasUnsavedChanges) showDiscardDialog = true else dismissSheet() },
+        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -215,6 +211,7 @@ fun NoteEditorBottomSheet(
                     onCustomTagRemoved = { viewModel.onEvent(NoteEditorEvent.CustomTagRemoved(it)) },
                     onTaskCheckToggled = { i, c -> viewModel.onEvent(NoteEditorEvent.TaskCheckToggled(i, c)) },
                     onImageSelected = { viewModel.onEvent(NoteEditorEvent.ImageSelected(it)) },
+                    onAttachImageClick = imagePicker.showSourcePicker,
                     onCreateSubjectClick = handleCreateSubject,
                     bringIntoViewRequester = bringIntoViewRequester,
                     onTapOutside = clearFocusAndKeyboard
@@ -234,7 +231,7 @@ fun NoteEditorBottomSheet(
                         scope.launch { bringIntoViewRequester.bringIntoView() }
                     },
                     onInsertFormatting = { p, s -> viewModel.onEvent(NoteEditorEvent.InsertFormatting(p, s)) },
-                    onAttachPhotoClick = { imagePickerLauncher.launch("image/*") },
+                    onAttachPhotoClick = imagePicker.showSourcePicker,
                     modifier = Modifier
                         .fillMaxWidth()
                         .navigationBarsPadding()

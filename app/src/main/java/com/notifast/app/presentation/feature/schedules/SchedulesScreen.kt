@@ -32,7 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import com.notifast.app.R
 import com.notifast.app.data.model.Evaluation
 import com.notifast.app.data.model.Schedule
@@ -45,7 +49,6 @@ import com.notifast.app.presentation.feature.schedules.components.ScheduleLiveSt
 import com.notifast.app.presentation.feature.schedules.components.ScheduleTimelineView
 import com.notifast.app.presentation.feature.schedules.components.ScheduleWeekBentoSummary
 import com.notifast.app.presentation.feature.schedules.components.SchedulesDialogsHost
-import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +79,17 @@ fun SchedulesScreen(
         uiState.importSuccessMessage?.let { msg ->
             showAlert(msg, AlertSeverity.SUCCESS)
             viewModel.onEvent(SchedulesEvent.ClearImportSuccess)
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onEvent(SchedulesEvent.RefreshLiveStatus)
+    }
+
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            delay(30_000L)
+            viewModel.onEvent(SchedulesEvent.RefreshLiveStatus)
         }
     }
 
@@ -119,13 +133,6 @@ fun SchedulesScreen(
             }
 
             val classCounts = remember(uiState.groupedSchedules) { uiState.groupedSchedules.mapValues { it.value.size } }
-            val evalCounts = remember(uiState.evaluations) {
-                val cal = Calendar.getInstance()
-                uiState.evaluations.filter { it.date != null }.groupBy {
-                    cal.time = it.date!!
-                    (cal.get(Calendar.DAY_OF_WEEK) - 1).let { d -> if (d == 0) 0 else d }
-                }.mapValues { it.value.size }
-            }
 
             Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                 uiState.error?.let { err ->
@@ -146,7 +153,7 @@ fun SchedulesScreen(
                 ScheduleDaySelector(
                     selectedDay = uiState.selectedDay,
                     classCountsByDay = classCounts,
-                    evaluationCountsByDay = evalCounts,
+                    evaluationCountsByDay = uiState.evaluationCountsByDay,
                     viewMode = uiState.viewMode,
                     onDaySelected = { viewModel.onEvent(SchedulesEvent.SelectDay(it)) },
                     onViewModeChanged = { viewModel.onEvent(SchedulesEvent.SetViewMode(it)) },

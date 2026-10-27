@@ -116,7 +116,14 @@ class SchedulesViewModel @Inject constructor(
         }
         viewModelScope.launch {
             userPrefsRepository?.firstDayOfWeekFlow?.collect { day ->
-                _uiState.update { it.copy(firstDayOfWeek = day) }
+                _uiState.update { current ->
+                    val evalCounts = ScheduleCalculations.calculateEvaluationCountsForWeek(
+                        evaluations = current.evaluations,
+                        referenceDate = current.selectedDate,
+                        firstDayOfWeek = day
+                    )
+                    current.copy(firstDayOfWeek = day, evaluationCountsByDay = evalCounts)
+                }
             }
         }
         viewModelScope.launch {
@@ -263,19 +270,30 @@ class SchedulesViewModel @Inject constructor(
                 current.subjectMap
             )
 
-            val adjustedDate = (current.selectedDate.clone() as Calendar).apply {
-                val currentDow = (get(Calendar.DAY_OF_WEEK) - 1).let { if (it == 0) 0 else it }
-                add(Calendar.DAY_OF_YEAR, dayOfWeek - currentDow)
+            val startOfWeek = ScheduleCalculations.getStartOfWeek(current.selectedDate, current.firstDayOfWeek)
+            val dayOffset = if (current.firstDayOfWeek.equals("SUNDAY", ignoreCase = true)) {
+                dayOfWeek
+            } else {
+                (dayOfWeek - 1 + 7) % 7
+            }
+            val adjustedDate = (startOfWeek.clone() as Calendar).apply {
+                add(Calendar.DAY_OF_YEAR, dayOffset)
             }
             val key = dateFormat.format(adjustedDate.time)
             val dailyEvals = current.evaluationsByDate[key] ?: emptyList()
+            val evalCounts = ScheduleCalculations.calculateEvaluationCountsForWeek(
+                evaluations = current.evaluations,
+                referenceDate = adjustedDate,
+                firstDayOfWeek = current.firstDayOfWeek
+            )
 
             current.copy(
                 selectedDay = dayOfWeek,
                 selectedDate = adjustedDate,
                 dailyEvaluations = dailyEvals,
                 conflicts = conflicts,
-                timelineItems = timelineItems
+                timelineItems = timelineItems,
+                evaluationCountsByDay = evalCounts
             )
         }
     }
@@ -297,13 +315,19 @@ class SchedulesViewModel @Inject constructor(
                 conflicts,
                 current.subjectMap
             )
+            val evalCounts = ScheduleCalculations.calculateEvaluationCountsForWeek(
+                evaluations = current.evaluations,
+                referenceDate = date,
+                firstDayOfWeek = current.firstDayOfWeek
+            )
 
             current.copy(
                 selectedDate = date,
                 selectedDay = dayOfWeek,
                 dailyEvaluations = dailyEvals,
                 conflicts = conflicts,
-                timelineItems = timelineItems
+                timelineItems = timelineItems,
+                evaluationCountsByDay = evalCounts
             )
         }
     }
@@ -354,6 +378,11 @@ class SchedulesViewModel @Inject constructor(
         }
         val dateKey = dateFormat.format(selectedDate.time)
         val dailyEvals = evalsByDate[dateKey] ?: emptyList()
+        val evalCounts = ScheduleCalculations.calculateEvaluationCountsForWeek(
+            evaluations = evaluations,
+            referenceDate = selectedDate,
+            firstDayOfWeek = _uiState.value.firstDayOfWeek
+        )
 
         _uiState.update { current ->
             current.copy(
@@ -371,7 +400,8 @@ class SchedulesViewModel @Inject constructor(
                 liveClassStatus = liveStatus,
                 conflicts = conflicts,
                 timelineItems = timelineItems,
-                weeklySummary = weeklySummary
+                weeklySummary = weeklySummary,
+                evaluationCountsByDay = evalCounts
             )
         }
     }

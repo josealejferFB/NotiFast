@@ -60,6 +60,7 @@ fun NoteEditorContent(
     onImageSelected: (Uri?) -> Unit,
     onCreateSubjectClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onAttachImageClick: () -> Unit = {},
     bringIntoViewRequester: BringIntoViewRequester = remember { BringIntoViewRequester() },
     onTapOutside: () -> Unit = {}
 ) {
@@ -127,7 +128,8 @@ fun NoteEditorContent(
                 NoteAttachmentPreview(
                     existingImageUrl = uiState.imageUrl,
                     imageUri = uiState.imageUri,
-                    onImageSelected = onImageSelected
+                    onImageSelected = onImageSelected,
+                    onAttachClick = onAttachImageClick
                 )
 
                 // 5. Etiquetas temáticas (Tags editor)

@@ -1,8 +1,6 @@
 package com.notifast.app.presentation.feature.noteeditor.components
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,14 +39,9 @@ fun NoteAttachmentPreview(
     existingImageUrl: String?,
     imageUri: Uri?,
     onImageSelected: (Uri?) -> Unit,
+    onAttachClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) onImageSelected(uri)
-    }
-
     val displayModel: Any? = imageUri ?: existingImageUrl?.takeIf { it.isNotBlank() }
 
     Box(modifier = modifier.fillMaxWidth()) {
@@ -95,7 +88,7 @@ fun NoteAttachmentPreview(
                 border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { galleryLauncher.launch("image/*") }
+                    .clickable { onAttachClick() }
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
