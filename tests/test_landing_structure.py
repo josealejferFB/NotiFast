@@ -138,12 +138,17 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn("cta-glow-ruby", html)
         self.assertIn("cta-glow-aqua", html)
 
-        # Radar inferior mejorado
+        # Radar inferior mejorado (barra de navegación simulando la app, solo iconos sin texto)
         self.assertIn("radar-progress-fill", html)
         self.assertIn("radar-cta-chip", html)
         self.assertIn('data-target="#importador"', html)
         self.assertIn('data-target="#estudio"', html)
         self.assertIn('data-target="#docentes"', html)
+        self.assertNotIn("<span>Agenda</span>", html)
+        self.assertNotIn("<span>Docentes</span>", html)
+        self.assertNotIn("<span>APK</span>", html)
+        self.assertIn('aria-label="Agenda Activa"', html)
+        self.assertIn('aria-label="Directorio Docente &amp; Contacto"', html)
 
         with open("landing/css/styles.css", "r", encoding="utf-8") as f:
             styles = f.read()

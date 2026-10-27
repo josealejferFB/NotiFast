@@ -32,8 +32,8 @@
   z-index: 990;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px 8px 10px;
+  gap: 6px;
+  padding: 6px 10px;
   background: var(--header-glass);
   backdrop-filter: blur(20px) saturate(1.35);
   -webkit-backdrop-filter: blur(20px) saturate(1.35);
@@ -44,7 +44,7 @@
     0 4px 12px rgba(24, 26, 31, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-  max-width: min(1120px, calc(100vw - 28px));
+  max-width: min(720px, calc(100vw - 28px));
 }
 
 .hub-floating-radar.visible {
@@ -76,7 +76,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding-right: 8px;
+  padding-right: 6px;
   border-right: 1px solid var(--border-hairline);
   text-decoration: none;
   transition: transform 0.25s var(--ease-spring);
@@ -111,69 +111,73 @@
 .radar-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 11px;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
   border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
   color: var(--text-secondary);
   text-decoration: none;
-  white-space: nowrap;
   flex-shrink: 0;
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s var(--ease-spring), box-shadow 0.2s ease;
 }
 
 .radar-chip svg {
-  width: 15px;
-  height: 15px;
+  width: 19px;
+  height: 19px;
   flex-shrink: 0;
-  opacity: 0.9;
+  opacity: 0.85;
+  transition: transform 0.2s var(--ease-spring), opacity 0.2s ease;
 }
 
 .radar-chip:hover {
   color: var(--brand-primary);
   background: var(--brand-primary-light);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.radar-chip:hover svg {
+  opacity: 1;
+  transform: scale(1.12);
 }
 
 .radar-chip.active {
   background: var(--brand-primary);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px -2px rgba(24, 26, 31, 0.16);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(24, 26, 31, 0.2);
+  transform: translateY(-2px);
 }
 
 .radar-chip.active svg {
   opacity: 1;
+  transform: scale(1.1);
 }
 
 .radar-cta-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-left: 4px;
-  padding: 8px 13px;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  margin-left: 2px;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover));
   color: var(--brand-on-primary);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
   text-decoration: none;
-  white-space: nowrap;
   flex-shrink: 0;
   box-shadow: 0 4px 12px -2px rgba(24, 26, 31, 0.16);
   transition: transform 0.22s var(--ease-spring), box-shadow 0.22s ease;
 }
 
 .radar-cta-chip:hover {
-  transform: translateY(-2px) scale(1.03);
+  transform: translateY(-2px) scale(1.08);
   box-shadow: 0 8px 20px -4px rgba(24, 26, 31, 0.22);
 }
 
 .radar-cta-chip svg {
-  width: 15px;
-  height: 15px;
+  width: 19px;
+  height: 19px;
 }
 
 /* Spotlight Highlight when navigated from hub card */
@@ -2172,25 +2176,6 @@
   }
 }
 
-@media (max-width: 1100px) {
-  .radar-chip span {
-    display: none;
-  }
-
-  .radar-chip {
-    padding: 9px 10px;
-    border-radius: 12px;
-  }
-
-  .radar-cta-chip span {
-    display: none;
-  }
-
-  .radar-cta-chip {
-    padding: 9px 11px;
-  }
-}
-
 @media (max-width: 992px) {
   .hub-app-status-bar {
     display: none;
@@ -2199,7 +2184,19 @@
     display: none;
   }
   .hub-floating-radar {
-    display: none !important;
+    bottom: 14px;
+    padding: 5px 8px;
+    max-width: calc(100vw - 20px);
+  }
+  .radar-chip,
+  .radar-cta-chip {
+    width: 34px;
+    height: 34px;
+  }
+  .radar-chip svg,
+  .radar-cta-chip svg {
+    width: 17px;
+    height: 17px;
   }
 }
 
