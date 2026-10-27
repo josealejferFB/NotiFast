@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Documentación Técnica &amp; Tesis — NotiFast</title>
+
+  <meta name="description" content="Portal interactivo de documentación técnica, arquitectura de software, modelo de datos Room SQLite v9, especificación PRD y decisiones de arquitectura (ADRs) de NotiFast.">
+  <meta name="theme-color" content="#FAF9F6">
+  <link rel="canonical" href="https://notifast.pages.dev/docs">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="apple-touch-icon" href="/assets/logo.png">
+
+  <!-- Design Tokens & Fonts -->
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/docs.css">
+
+  <!-- KaTeX Math CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+
+  <!-- Prism.js Syntax Highlighting CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+  <!-- Header de Navegación del Portal de Documentación -->
+  <header class="docs-header" id="docs-header">
+    <div class="docs-header-left">
+      <button type="button" class="docs-mobile-toggle" id="docs-mobile-toggle" aria-label="Abrir menú lateral de navegación">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+      </button>
+
+      <a href="/" class="docs-brand-logo" title="Volver al inicio de NotiFast">
+        <img src="/assets/logo.png" alt="NotiFast App Icon">
+        <span>NotiFast</span>
+        <span class="docs-badge-sub">Docs</span>
+      </a>
+
+      <a href="/" class="docs-back-link" title="Regresar a la página principal de NotiFast">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        <span>Volver a la Landing</span>
+      </a>
+    </div>
+
+    <div class="docs-header-center">
+      <button type="button" class="docs-search-trigger" id="docs-search-trigger" title="Buscar en toda la documentación (Atajo: Ctrl + K)">
+        <div class="docs-search-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          <span>Buscar en la documentación...</span>
+        </div>
+        <kbd class="docs-search-kbd">Ctrl K</kbd>
+      </button>
+    </div>
+
+    <div class="docs-header-right">
+      <button type="button" class="docs-theme-toggle" id="docs-theme-toggle" title="Alternar modo claro y oscuro">
+        <span class="docs-theme-dot" aria-hidden="true"></span>
+        <span id="docs-theme-label">Modo Oscuro</span>
+      </button>
+
+      <a href="https://github.com/P0X-D/NotiFast" class="docs-icon-btn" target="_blank" rel="noopener noreferrer" title="Ver código fuente en GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+      </a>
+
+      <a href="https://github.com/P0X-D/NotiFast/releases/latest" class="docs-doc-action-btn" target="_blank" rel="noopener noreferrer" style="background:var(--brand-primary);color:#FFFFFF;border-color:var(--brand-primary);">
+        <span>Descargar APK</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Contenedor de Tres Columnas -->
+  <div class="docs-layout-container">
+
+    <!-- Backdrop para menú móvil -->
+    <div class="docs-sidebar-backdrop" id="docs-sidebar-backdrop" hidden></div>
+
+    <!-- Columna 1: Sidebar Izquierdo -->
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Jerarquía de Documentación">
+      <div class="docs-filter-box">
+        <svg class="docs-filter-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input type="text" class="docs-filter-input" id="docs-sidebar-filter" placeholder="Filtrar temas..." aria-label="Filtrar documentos por título">
+      </div>
+
+      <!-- Navegación Inyectada Dinámicamente por docs.js -->
+      <nav id="docs-sidebar-nav" aria-label="Menú de temas"></nav>
+    </aside>
+
+    <!-- Columna 2: Visor de Lectura Central -->
+    <main class="docs-main-wrapper" id="docs-main-content">
+      <article class="docs-content-container">
+
+        <!-- Barra de Metadatos Superior -->
+        <div class="docs-doc-meta-bar">
+          <div class="docs-breadcrumbs">
+            <span>Docs</span>
+            <span class="docs-breadcrumb-sep">/</span>
+            <span id="docs-meta-category">General</span>
+            <span class="docs-breadcrumb-sep">/</span>
+            <span class="docs-breadcrumb-current" id="docs-breadcrumb-current">Cargando...</span>
+          </div>
+
+          <div class="docs-doc-actions">
+            <span id="docs-meta-stats" style="margin-right: 8px;">~3 min de lectura</span>
+            <button type="button" class="docs-doc-action-btn" id="docs-copy-link-btn" title="Copiar enlace directo">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+              </svg>
+              <span>Copiar enlace</span>
+            </button>
+            <a href="https://github.com/P0X-D/NotiFast/tree/main/docs" class="docs-doc-action-btn" target="_blank" rel="noopener noreferrer" title="Editar o ver en GitHub">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+              <span>GitHub</span>
+            </a>
+          </div>
+        </div>
+
+        <h1 id="docs-current-title" style="display:none;">Documentación de NotiFast</h1>
+
+        <!-- Contenedor del Cuerpo Markdown Renderizado -->
+        <div class="docs-body" id="docs-content-body">
+          <p>Cargando documentación técnica de NotiFast...</p>
+        </div>
+
+        <!-- Paginación Inferior (Anterior / Siguiente) -->
+        <nav class="docs-pagination" id="docs-pagination" aria-label="Navegación entre documentos"></nav>
+
+        <!-- Sub-footer del visor -->
+        <footer style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-hairline); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <p style="margin: 0;">&copy; 2026 NotiFast. Documentación oficial de tesis e ingeniería de software.</p>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span>100% Offline-First</span>
+            <span>&bull;</span>
+            <span>Room SQLite v9</span>
+            <span>&bull;</span>
+            <a href="#docs-header" style="color: var(--brand-primary); font-weight: 600;">Volver arriba &uarr;</a>
+          </div>
+        </footer>
+
+      </article>
+    </main>
+
+    <!-- Columna 3: Tabla de Contenidos Lateral Derecha -->
+    <aside class="docs-toc" id="docs-toc" aria-label="Tabla de contenidos de esta página">
+      <div class="docs-toc-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z"/>
+        </svg>
+        <span>En este documento</span>
+      </div>
+      <ul class="docs-toc-list" id="docs-toc-list"></ul>
+    </aside>
+
+  </div>
+
+  <!-- Modal de Búsqueda Instantánea (Ctrl + K) -->
+  <div class="search-modal-backdrop" id="docs-search-modal" hidden>
+    <div class="search-modal-card" role="dialog" aria-modal="true" aria-label="Búsqueda de documentación">
+      <div class="search-input-header">
+        <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input type="text" class="search-main-input" id="docs-search-input" placeholder="Buscar palabras clave, FR-001, ADR, Room SQLite..." autocomplete="off" spellcheck="false">
+        <kbd class="search-esc-badge">ESC</kbd>
+      </div>
+
+      <div class="search-filters-row">
+        <button type="button" class="search-filter-chip active" data-filter="all">Todos</button>
+        <button type="button" class="search-filter-chip" data-filter="requirements">Requisitos (FR/NFR)</button>
+        <button type="button" class="search-filter-chip" data-filter="adr">ADRs</button>
+        <button type="button" class="search-filter-chip" data-filter="architecture">Arquitectura</button>
+        <button type="button" class="search-filter-chip" data-filter="glossary">Glosario</button>
+      </div>
+
+      <ul class="search-results-list" id="docs-search-results"></ul>
+
+      <div class="search-modal-footer">
+        <div class="search-shortcuts-guide">
+          <span>&uarr;&darr; Navegar</span>
+          <span>&crarr; Seleccionar</span>
+          <span>ESC Cerrar</span>
+        </div>
+        <span>25 documentos indexados</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js" crossorigin="anonymous"></script>
+
+  <!-- Data & Application Logic -->
+  <script src="/js/docs-data.js"></script>
+  <script src="/js/docs.js"></script>
+</body>
+</html>

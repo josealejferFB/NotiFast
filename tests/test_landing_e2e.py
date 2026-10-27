@@ -55,18 +55,19 @@ class TestLandingE2E(unittest.TestCase):
             self.assertIn("download-toast", body)
 
     def test_get_docs_html(self):
-        url = self.get_url("/docs.html")
-        with urllib.request.urlopen(url) as response:
-            self.assertEqual(response.status, 200)
-            content_type = response.headers.get("Content-Type", "")
-            self.assertIn("text/html", content_type)
-            body = response.read().decode("utf-8")
-            self.assertIn("<!DOCTYPE html>", body)
-            self.assertIn("NotiFast", body)
-            self.assertIn("docs-header", body)
-            self.assertIn("docs-sidebar", body)
-            self.assertIn("docs-search-modal", body)
-            self.assertIn("Volver a la Landing", body)
+        for path in ["/docs.html", "/docs/"]:
+            url = self.get_url(path)
+            with urllib.request.urlopen(url) as response:
+                self.assertEqual(response.status, 200)
+                content_type = response.headers.get("Content-Type", "")
+                self.assertIn("text/html", content_type)
+                body = response.read().decode("utf-8")
+                self.assertIn("<!DOCTYPE html>", body)
+                self.assertIn("NotiFast", body)
+                self.assertIn("docs-header", body)
+                self.assertIn("docs-sidebar", body)
+                self.assertIn("docs-search-modal", body)
+                self.assertIn("Volver a la Landing", body)
 
     def test_css_assets_serve_correctly(self):
         for css_file in ["/css/tokens.css", "/css/styles.css", "/css/dynamic-showcase.css", "/css/docs.css"]:

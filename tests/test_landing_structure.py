@@ -548,20 +548,21 @@ class TestLandingStructure(unittest.TestCase):
 
         # Botón Documentación en navbar desktop y drawer móvil
         self.assertIn("nav-desktop-docs", html)
-        self.assertIn('href="docs.html"', html)
+        self.assertIn('href="/docs"', html)
         self.assertIn("mobile-nav-highlight", html)
 
         # Enlaces en footer a documentos clave
-        self.assertIn('href="docs.html#prd"', html)
-        self.assertIn('href="docs.html#system-overview"', html)
-        self.assertIn('href="docs.html#testing-strategy"', html)
-        self.assertIn('href="docs.html#legal-notes"', html)
+        self.assertIn('href="/docs#prd"', html)
+        self.assertIn('href="/docs#system-overview"', html)
+        self.assertIn('href="/docs#testing-strategy"', html)
+        self.assertIn('href="/docs#legal-notes"', html)
 
-        # Redirecciones en Cloudflare Pages y Firebase
+        # Redirecciones en Cloudflare Pages
         self.assertTrue(os.path.exists("landing/_redirects"))
         with open("landing/_redirects", "r", encoding="utf-8") as f:
             redirects = f.read()
-        self.assertIn("/docs /docs.html 200", redirects)
+        self.assertIn("/docs.html /docs 301", redirects)
+        self.assertIn("/docs/* /docs 200", redirects)
 
     def test_zero_emojis_in_docs(self):
         forbidden = ["⏰", "☑", "📷", "📱", "📅", "📝", "☀️", "🚀", "✨", "🔥", "💡"]

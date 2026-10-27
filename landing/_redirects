@@ -1,9 +1,11 @@
 # Cloudflare Pages Redirects & Fallbacks
 # Format: /source /destination [status]
 
-# Clean URL Rewrite for Interactive Docs Portal
-/docs /docs.html 200
-/docs/* /docs.html 200
+# Redirect .html to clean /docs URL
+/docs.html /docs 301
+
+# SPA routing for docs sub-routes
+/docs/* /docs 200
 
 # Fallback 404
 /* /404.html 404
