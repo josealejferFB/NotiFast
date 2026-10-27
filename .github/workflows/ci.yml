@@ -60,7 +60,7 @@ jobs:
           echo "Verifying live deployment at https://notifast.pages.dev/ ..."
           for i in 1 2 3 4 5; do
             HTML=$(curl -fsSL "https://notifast.pages.dev/")
-            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'id="notificaciones"' && echo "$HTML" | grep -q 'hero-phone-frame'; then
+            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'id="notificaciones"' && echo "$HTML" | grep -q 'hero-logo-stage'; then
               echo "✅ Cloudflare Pages (https://notifast.pages.dev/) is live and serving the latest NotiFast landing!"
               exit 0
             fi
