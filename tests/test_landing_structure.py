@@ -486,6 +486,91 @@ class TestLandingStructure(unittest.TestCase):
             self.assertNotIn(forbidden_emoji, html)
             self.assertNotIn(forbidden_emoji, js)
 
+    def test_docs_html_structure_and_integration(self):
+        self.assertTrue(os.path.exists("landing/docs.html"))
+        with open("landing/docs.html", "r", encoding="utf-8") as f:
+            html = f.read()
+
+        self.assertIn("<!DOCTYPE html>", html)
+        self.assertIn("<meta name=\"viewport\"", html)
+        self.assertIn("Documentación Técnica", html)
+        self.assertIn("https://notifast.pages.dev/docs", html)
+
+        # Componentes del Layout de 3 columnas
+        self.assertIn('id="docs-header"', html)
+        self.assertIn('id="docs-sidebar"', html)
+        self.assertIn('id="docs-main-content"', html)
+        self.assertIn('id="docs-toc"', html)
+        self.assertIn('id="docs-search-modal"', html)
+
+        # Enlace de regreso a la landing
+        self.assertIn('Volver a la Landing', html)
+        self.assertIn('href="/"', html)
+
+        # Dependencias de diseño y scripts
+        self.assertIn("css/tokens.css", html)
+        self.assertIn("css/docs.css", html)
+        self.assertIn("js/docs-data.js", html)
+        self.assertIn("js/docs.js", html)
+
+        # CDN de renderizado matemático y de diagramas
+        self.assertIn("katex", html)
+        self.assertIn("mermaid", html)
+        self.assertIn("prism", html)
+        self.assertIn("marked", html)
+
+    def test_docs_assets_exist(self):
+        self.assertTrue(os.path.exists("landing/css/docs.css"))
+        with open("landing/css/docs.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".docs-header", css)
+        self.assertIn(".docs-sidebar", css)
+        self.assertIn(".docs-toc", css)
+        self.assertIn(".search-modal-backdrop", css)
+
+        self.assertTrue(os.path.exists("landing/js/docs.js"))
+        with open("landing/js/docs.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("NOTIFAST_DOCS_DATA", js)
+        self.assertIn("performSearch", js)
+        self.assertIn("renderMermaid", js)
+        self.assertIn("renderKaTeX", js)
+
+        self.assertTrue(os.path.exists("landing/js/docs-data.js"))
+        with open("landing/js/docs-data.js", "r", encoding="utf-8") as f:
+            data_content = f.read()
+        self.assertIn("window.NOTIFAST_DOCS_DATA", data_content)
+        self.assertIn('"totalDocs": 25', data_content)
+
+    def test_landing_docs_navigation_integration(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+
+        # Botón Documentación en navbar desktop y drawer móvil
+        self.assertIn("nav-desktop-docs", html)
+        self.assertIn('href="docs.html"', html)
+        self.assertIn("mobile-nav-highlight", html)
+
+        # Enlaces en footer a documentos clave
+        self.assertIn('href="docs.html#prd"', html)
+        self.assertIn('href="docs.html#system-overview"', html)
+        self.assertIn('href="docs.html#testing-strategy"', html)
+        self.assertIn('href="docs.html#legal-notes"', html)
+
+        # Redirecciones en Cloudflare Pages y Firebase
+        self.assertTrue(os.path.exists("landing/_redirects"))
+        with open("landing/_redirects", "r", encoding="utf-8") as f:
+            redirects = f.read()
+        self.assertIn("/docs /docs.html 200", redirects)
+
+    def test_zero_emojis_in_docs(self):
+        forbidden = ["⏰", "☑", "📷", "📱", "📅", "📝", "☀️", "🚀", "✨", "🔥", "💡"]
+        for filepath in ["landing/docs.html", "landing/css/docs.css", "landing/js/docs.js"]:
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+            for emoji in forbidden:
+                self.assertNotIn(emoji, content, f"Emoji prohibido {emoji} encontrado en {filepath}")
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -7,6 +7,9 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Cache-Control: public, max-age=3600, must-revalidate
 
+/docs.html
+  Cache-Control: public, max-age=3600, must-revalidate
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 

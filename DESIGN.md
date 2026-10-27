@@ -134,6 +134,8 @@ components:
 
 # Design System NotiFast 3.2: "Tactile Papercraft & Dynamic Academic Studio"
 
+> 📖 **Documentación Canónica:** Este archivo contiene los tokens semánticos base. La especificación completa del sistema de diseño, flujos UX y brief de marca reside en [`docs/02-design/design-system.md`](docs/02-design/design-system.md), [`docs/02-design/ux-flows.md`](docs/02-design/ux-flows.md) y [`docs/02-design/brand/logo-brief.md`](docs/02-design/brand/logo-brief.md).
+
 ## 1. Visión y Estrella Polar de Diseño
 
 **Creative North Star: "El Cuaderno de Estudio Táctil, Adaptable y de Alta Precisión"**

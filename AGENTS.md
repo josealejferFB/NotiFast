@@ -23,7 +23,7 @@
 - **Inyección de Dependencias (DI):** Hilt `2.59` (Dagger)
 - **Carga de Imágenes:** Coil `2.7.0`
 - **Navegación:** Navigation Compose `2.8.5` (con soporte de Deep-Linking reactivo y BottomSheets modales unificados)
-- **Testing:** JUnit 4, MockK `1.13.8`, Coroutines Test `1.9.0`, Turbine `1.0.0`, Room Testing, OkHttp MockWebServer y Robolectric `4.13` (**684 tests unitarios en verde**)
+- **Testing:** JUnit 4, MockK `1.13.8`, Coroutines Test `1.9.0`, Turbine `1.0.0`, Room Testing, OkHttp MockWebServer y Robolectric `4.13` (**805 tests unitarios en verde**)
 - **Build System:** Android Gradle Plugin (AGP) `9.0.1`, `compileSdk 36`, `minSdk 26`, R8/Minification
 
 ---
@@ -34,14 +34,17 @@ Antes de iniciar cualquier trabajo o responder sobre el roadmap, consulta siempr
 
 | Documento | Ubicación | Propósito |
 |---|---|---|
-| **Producto & Visión** | [`PRODUCT.md`](PRODUCT.md) | Posicionamiento, arquetipo visual, usuarios y principios de producto actualizados. |
-| **Sistema de Diseño 3.2** | [`DESIGN.md`](DESIGN.md) | Tokens semánticos, 6 `ThemePreset`, 6 `BackgroundPreset`, Estudio Hex/HSL y tipografía. |
+| **Índice Maestro de Documentación** | [`docs/README.md`](docs/README.md) | Guía de navegación modular, convenciones y mapa de ingeniería. |
+| **Visión de Producto & Alcance** | [`docs/00-vision/product-vision.md`](docs/00-vision/product-vision.md) | Propósito dual (comercial + tesis), problemas reales y propuesta de valor. |
+| **PRD Maestro v3.2** | [`docs/01-product/PRD.md`](docs/01-product/PRD.md) | Requisitos funcionales (FR-XXX) y no funcionales (NFR-XXX) consolidados. |
+| **Estado del Roadmap** | [`docs/01-product/roadmap.md`](docs/01-product/roadmap.md) | Tablero de control en tiempo real: Fases 0 a 4 completadas, Fase 5 tesis (805 tests pasando). |
+| **Sistema de Diseño 3.2** | [`docs/02-design/design-system.md`](docs/02-design/design-system.md) | Tokens semánticos, 6 ThemePreset, 6 BackgroundPreset, Estudio Hex/HSL y tipografía. |
 | **Impeccable Design JSON** | [`.impeccable/design.json`](.impeccable/design.json) | Esquema estructurado de tokens, componentes y reglas para auditoría visual Impeccable. |
-| **PRD Maestro v2.0** | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) | Especificación de requisitos de producto de Fases 0 a 5. |
-| **Estado del Roadmap** | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) | Tablero de control en tiempo real: 99% completado, 684 tests unitarios y entregables AAA. |
-| **Cloud Backup Spec** | [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md) | Especificación de arquitectura para Google Drive Cloud Backup (`appDataFolder`). |
-| **Matriz de Resultados Cloud** | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) | Verificación de los 51 escenarios de prueba y accesibilidad. |
-| **Kickoff Fase 4** | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) | Guía de arranque para Pulido de Experiencia, a11y y Rendimiento. |
+| **Arquitectura del Sistema** | [`docs/03-architecture/system-overview.md`](docs/03-architecture/system-overview.md) | Clean Architecture + MVI, 3 capas, UDF, flujo de coroutines y Hilt DI. |
+| **Modelo de Datos Room v9** | [`docs/03-architecture/data-model.md`](docs/03-architecture/data-model.md) | Esquema SQLite v9, entidades, DAOs, migraciones 1➔...➔9, DataStore y GlobalSnapshot. |
+| **Registro de Decisiones (ADRs)** | [`docs/03-architecture/adr/`](docs/03-architecture/adr/) | Decisiones arquitecturales vigentes (ADR-0001 a ADR-0007). |
+| **Estrategia de Pruebas** | [`docs/04-quality-privacy/testing-strategy.md`](docs/04-quality-privacy/testing-strategy.md) | Pirámide de pruebas y suite automatizada de 805 tests unitarios. |
+| **Privacidad & Soberanía** | [`docs/04-quality-privacy/privacy-offline-first.md`](docs/04-quality-privacy/privacy-offline-first.md) | Principios de privacidad radical, cero Firestore y respaldo privado en Drive. |
 | **Landing Page Showcase** | [`landing/index.html`](landing/index.html) • [`https://notifast.pages.dev/`](https://notifast.pages.dev/) | Web interactiva en Cloudflare Pages (CI/CD en `.github/workflows/ci.yml`) con Estudio de Temas en Vivo y Simulador de Notificaciones. |
 
 ---
@@ -67,8 +70,8 @@ Todo agente operando en este repositorio debe aplicar sin excepción estos 5 pil
 - Si el código no compila o no pasa pruebas, el trabajo **NO** está terminado.
 
 ### 📋 5. Mantenimiento de Estado y Generación de Kickoff Siguiente
-- Tras culminar cualquier tarea del roadmap, es **obligatorio actualizar** el archivo [`docs/prd/STATUS.md`](docs/prd/STATUS.md).
-- Al completar el **100% de una fase**, el agente DEBE **generar automáticamente el documento `docs/prd/KICKOFF_FASE_{N+1}.md`** con el prompt detallado y la guía técnica para la fase subsiguiente.
+- Tras culminar cualquier tarea del roadmap, es **obligatorio actualizar** el archivo [`docs/01-product/roadmap.md`](docs/01-product/roadmap.md).
+- Al completar el **100% de una fase**, el agente DEBE **generar automáticamente el documento `docs/01-product/KICKOFF_FASE_{N+1}.md`** con el prompt detallado y la guía técnica para la fase subsiguiente.
 
 ---
 

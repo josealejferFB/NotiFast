@@ -1,12 +1,14 @@
 # PRODUCT.md — NotiFast: Cuaderno Académico Inteligente & Hub de Estudio
 
+> 📖 **Documentación Canónica:** Este archivo es un resumen de producto. La especificación completa, rigurosa y modular reside en [`docs/00-vision/product-vision.md`](docs/00-vision/product-vision.md) y [`docs/01-product/PRD.md`](docs/01-product/PRD.md).
+
 ## 1. Registro de Producto
 
 - **Nombre:** NotiFast
-- **Versión Actual:** `1.0 RC` (Design System 3.0 — Tactile Studio AAA)
+- **Versión Actual:** `1.0 RC` (Design System 3.2 — Tactile Studio AAA)
 - **Categoría:** EdTech / Productividad Académica / Cuaderno Estudiantil Offline-First
 - **Plataformas:**
-  - **App Móvil:** Android Nativo (`minSdk 26`, `targetSdk 36`, Kotlin `2.0.21`, Jetpack Compose, Material 3, Room SQLite `2.7.2`)
+  - **App Móvil:** Android Nativo (`minSdk 26`, `targetSdk 36`, Kotlin `2.0.21`, Jetpack Compose, Material 3, Room SQLite `v9`)
   - **Web Showcase (Cloudflare Pages):** [`https://notifast.pages.dev/`](https://notifast.pages.dev/) (`landing/index.html`) con Estudio de Temas en Vivo, Simulador de Notificaciones Proactivas y Teléfono Android Interactivo
 - **Arquetipo Visual:** Tactile Papercraft / Digital Studio Notebook con Motor de Temas Personalizables WCAG AAA
 
@@ -17,7 +19,7 @@
 ### Audiencia Primaria
 1. **Estudiantes de Secundaria (14–18 años):** Sobrecargados por múltiples materias, tareas simultáneas y calendarios cambiantes. Necesitan simplicidad visual instantánea, recordatorios proactivos puntuales y confirmación clara de lo que ya completaron.
 2. **Estudiantes Universitarios y de Grado (18–25+ años):** Manejan esquemas de ponderación complejos (porcentajes de notas, escalas 0–10, 0–20, 0–100% y GPA A–F, solapamiento de horarios de cátedra y laboratorio, y directorio de profesores). Requieren precisión matemática IEEE 754, apuntes estructurados por bloques con fórmulas y fotos de pizarra anotadas, y un entorno sin distracciones.
-3. **Investigadores / Jurado de Tesis (Demostración de Ingeniería):** NotiFast funge como producto comercial para Google Play Store y como proyecto de tesis con Clean Architecture + MVI, **684 pruebas unitarias automatizadas**, persistencia local transaccional y sincronización cifrada con Google Drive.
+3. **Investigadores / Jurado de Tesis (Demostración de Ingeniería):** NotiFast funge como producto comercial para Google Play Store y como proyecto de tesis con Clean Architecture + MVI, **805 pruebas unitarias automatizadas**, persistencia local transaccional y sincronización cifrada con Google Drive.
 
 ### Contexto Emocional y Estado Mental del Usuario
 El estudiante recurre a NotiFast en momentos de **alta carga cognitiva y estrés pre-exámenes**. La aplicación opera como un **"anclaje de calma"**:

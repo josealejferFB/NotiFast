@@ -126,31 +126,32 @@ NotiFast incluye un motor cromático algorítmico (`ThemePaletteGenerator`) que 
 
 ---
 
-## 📖 Documentación del Proyecto
+## 📖 Documentación del Proyecto (Estándar Modular)
 
-| Documento | Ubicación |
-|---|---|
-| **Especificación de Producto (`PRODUCT.md`)** | [`PRODUCT.md`](PRODUCT.md) |
-| **Sistema de Diseño 3.2 (`DESIGN.md`)** | [`DESIGN.md`](DESIGN.md) |
-| **Guía Maestra para Agentes AI (`AGENTS.md`)** | [`AGENTS.md`](AGENTS.md) |
-| **Estado del Roadmap en Tiempo Real (`STATUS.md`)** | [`docs/prd/STATUS.md`](docs/prd/STATUS.md) |
-| **PRD Maestro v2.0** | [`docs/prd/PRD-MAESTRO-NOTIFAST.md`](docs/prd/PRD-MAESTRO-NOTIFAST.md) |
-| **Especificación Cloud Backup Google Drive** | [`docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md`](docs/superpowers/specs/2026-10-15-cloud-backup-google-drive-design.md) |
-| **Matriz de Escenarios Cloud Backup (51 casos)** | [`docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md`](docs/superpowers/specs/2026-10-15-cloud-backup-scenario-matrix-results.md) |
-| **Kickoff Fase 4 (Pulido, a11y & Rendimiento)** | [`docs/prd/KICKOFF_FASE_4.md`](docs/prd/KICKOFF_FASE_4.md) |
+La documentación técnica y de tesis de NotiFast se organiza bajo una jerarquía modular estricta en el directorio [`docs/`](docs/):
+
+| Módulo | Documento Clave | Descripción |
+|---|---|---|
+| 🧭 **Índice Maestro** | [`docs/README.md`](docs/README.md) | Mapa de navegación completo, guía de convenciones y trazabilidad. |
+| 🎯 **00 - Visión** | [`docs/00-vision/product-vision.md`](docs/00-vision/product-vision.md) • [`glossary.md`](docs/00-vision/glossary.md) | Propósito dual (comercial + tesis), problemas reales y glosario canónico. |
+| 📋 **01 - Producto** | [`docs/01-product/PRD.md`](docs/01-product/PRD.md) • [`roadmap.md`](docs/01-product/roadmap.md) | PRD consolidado (Fases 0 a 5), historias en Gherkin, personas y métricas. |
+| 🎨 **02 - Diseño** | [`docs/02-design/design-system.md`](docs/02-design/design-system.md) • [`ux-flows.md`](docs/02-design/ux-flows.md) | Tokens semánticos 3.2, ThemePaletteGenerator WCAG AAA y flujos UX críticos. |
+| 🏗️ **03 - Arquitectura** | [`docs/03-architecture/system-overview.md`](docs/03-architecture/system-overview.md) • [`adr/`](docs/03-architecture/adr/) | Clean Architecture + MVI, modelo de datos Room v9 e índice de ADRs (0001 a 0007). |
+| 🛡️ **04 - Calidad & Privacidad** | [`docs/04-quality-privacy/testing-strategy.md`](docs/04-quality-privacy/testing-strategy.md) • [`privacy-offline-first.md`](docs/04-quality-privacy/privacy-offline-first.md) | Pirámide de pruebas (805 tests) y soberanía de datos 100% Offline-First. |
+| ⚖️ **05 - Legal** | [`docs/05-legal/legal-notes.md`](docs/05-legal/legal-notes.md) | Licencia Apache 2.0, política de privacidad escolar y notas institucionales UNERG. |
 
 ---
 
 ## 📊 Métricas Actuales de Ingeniería
 
-- **~44,260** líneas de código Kotlin de producción
-- **360** archivos fuente Kotlin modulares (cumpliendo $\le 250$ LOC por archivo `@Composable`)
-- **92** suites de pruebas automatizadas con **684 tests unitarios pasando al 100%**
+- **~56,800** líneas de código Kotlin totales (producción y pruebas)
+- **445** archivos fuente Kotlin modulares (cumpliendo $\le 250$ LOC por archivo `@Composable`)
+- **122** suites de pruebas automatizadas con **805 tests unitarios pasando al 100% (0 fallos)**
 - **17** módulos de presentación con arquitectura MVI + Clean Architecture
-- **4** versiones de esquema Room SQLite con migraciones transaccionales probadas en memoria
+- **9** versiones de esquema Room SQLite con migraciones no destructivas probadas en memoria (`1➔2➔...➔9`)
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto es de autoría académica y comercial del equipo de desarrollo de **NotiFast**.
+Este proyecto se distribuye bajo la licencia **Apache License, Version 2.0**. Consulta [`docs/05-legal/legal-notes.md`](docs/05-legal/legal-notes.md) para más detalles.
