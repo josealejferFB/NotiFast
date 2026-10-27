@@ -27,6 +27,6 @@ __pycache__/
 *.py[cod]
 
 # Logs & dumps
-*.log
-*.logcat
-logcat_dump.txt
+# Binary release artifacts
+*.apk
+/release/
