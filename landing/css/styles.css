@@ -186,32 +186,6 @@ body {
   gap: 10px;
 }
 
-.nav-desktop-docs {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--bg-surface-container);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform var(--duration-fast) var(--ease-spring),
-              border-color var(--duration-fast),
-              color var(--duration-fast);
-}
-
-.nav-desktop-docs:hover {
-  border-color: var(--brand-secondary-canonical);
-  color: var(--brand-secondary-canonical);
-  transform: translateY(-1px);
-  text-decoration: none;
-}
 
 .mobile-nav-item.mobile-nav-highlight {
   background-color: var(--brand-primary-light);
@@ -524,6 +498,59 @@ body {
   margin-bottom: 32px;
 }
 
+/* Botón de Documentación Hero (Al lado del botón Descargar APK) */
+.btn-hero-docs {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-tactile);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              background-color var(--duration-fast) var(--ease-smooth),
+              box-shadow var(--duration-fast) var(--ease-smooth),
+              border-color var(--duration-fast) var(--ease-smooth),
+              color var(--duration-fast);
+}
+
+.btn-hero-docs:hover {
+  background-color: var(--bg-surface-container);
+  border-color: var(--brand-secondary-canonical);
+  color: var(--brand-secondary-canonical);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.hero-docs-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background-color: var(--brand-secondary-light);
+  color: var(--brand-secondary);
+  border: 1px solid rgba(var(--brand-secondary-rgb), 0.25);
+  line-height: 1.2;
+}
+
+.btn-hero-themes {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-hairline);
+  box-shadow: none;
+}
+
+.btn-hero-themes:hover {
+  background-color: var(--bg-surface-container);
+  color: var(--text-primary);
+  border-color: var(--brand-primary);
+  border-style: solid;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-tactile);
+}
+
 .hero-proof-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -558,8 +585,7 @@ body {
 
 /* Responsive */
 @media (max-width: 991px) {
-  .nav-links,
-  .nav-desktop-docs {
+  .nav-links {
     display: none;
   }
   .mobile-menu-toggle {
@@ -1179,6 +1205,31 @@ body {
   transform: scale(0.97);
 }
 
+.btn-cta-docs {
+  min-height: 58px;
+  padding: 14px 24px;
+  border-radius: 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  gap: 10px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-tactile);
+  transition: transform 0.25s var(--ease-spring), border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.btn-cta-docs:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-secondary-canonical);
+  color: var(--brand-secondary-canonical);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-cta-docs:active {
+  transform: scale(0.97);
+}
+
 .cta-trust-row {
   list-style: none;
   display: flex;
@@ -1577,6 +1628,7 @@ body {
     width: 100%;
   }
   .btn-cta-hero,
+  .btn-cta-docs,
   .btn-cta-github {
     width: 100%;
     justify-content: center;

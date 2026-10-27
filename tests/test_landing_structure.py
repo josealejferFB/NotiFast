@@ -553,8 +553,10 @@ class TestLandingStructure(unittest.TestCase):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
 
-        # Botón Documentación en navbar desktop y drawer móvil
-        self.assertIn("nav-desktop-docs", html)
+        # Botón Documentación reubicado al lado del botón de descarga (fuera de la navbar)
+        self.assertNotIn("nav-desktop-docs", html)
+        self.assertIn("btn-hero-docs", html)
+        self.assertIn("btn-cta-docs", html)
         self.assertIn('href="/docs"', html)
         self.assertIn("mobile-nav-highlight", html)
 
