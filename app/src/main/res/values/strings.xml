@@ -470,6 +470,8 @@
     <string name="settings_storage_cache_cleared_toast">Caché liberada correctamente</string>
     <string name="settings_storage_privacy_title">Privacidad &amp; Arquitectura Offline-First</string>
     <string name="settings_storage_privacy_subtitle">100% local en tu dispositivo • Respaldo privado en Drive</string>
+    <string name="settings_privacy_policy_web_title">Política de Privacidad en Línea</string>
+    <string name="settings_privacy_policy_web_subtitle">Versión completa y actualizada en notifast.pages.dev</string>
     <string name="settings_privacy_dialog_title">Privacidad &amp; Arquitectura Offline-First</string>
     <string name="settings_privacy_dialog_content">NotiFast opera bajo una arquitectura 100% Offline-First. Tus apuntes, calificaciones, horarios y directorio docente se almacenan localmente en tu dispositivo mediante Room SQLite sin depender de servidores externos.\n\nSi vinculas tu cuenta de Google, tus respaldos se guardan exclusivamente en la carpeta privada oculta (appDataFolder) de tu propio Google Drive, accesible únicamente por NotiFast. Tus datos jamás son leídos, analizados ni compartidos con terceros.</string>
 
@@ -725,6 +727,8 @@
     <string name="onboarding_google_card_desc">Restaura tus asignaturas o activa el respaldo en tu Google Drive personal.</string>
     <string name="onboarding_btn_google_backup">Vincular Google Drive para respaldo</string>
     <string name="onboarding_google_error_generic">Error al conectar con Google. Puedes continuar en Modo Local.</string>
+    <string name="onboarding_privacy_title">Política de Privacidad</string>
+    <string name="onboarding_privacy_subtitle">Tus datos viven en tu dispositivo. Conoce cómo los protegemos.</string>
 
     <!-- Sanitización y Normalización AAA: strings de errores y alertas -->
     <string name="error_generic">Ocurrió un error inesperado. Intenta nuevamente.</string>

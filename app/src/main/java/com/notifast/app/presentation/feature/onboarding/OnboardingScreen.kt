@@ -31,10 +31,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notifast.app.R
+import com.notifast.app.presentation.atoms.AlertSeverity
 import com.notifast.app.presentation.atoms.NotiFastStudyBackground
+import com.notifast.app.presentation.atoms.rememberNotiFastAlert
 import com.notifast.app.presentation.feature.onboarding.components.GoogleDriveBackupCard
 import com.notifast.app.presentation.feature.onboarding.components.LocalProfileSection
 import com.notifast.app.presentation.feature.onboarding.components.OnboardingHeader
+import com.notifast.app.presentation.feature.onboarding.components.OnboardingPrivacySection
+import com.notifast.app.presentation.util.PrivacyPolicyIntents
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,6 +49,7 @@ fun OnboardingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val showAlert = rememberNotiFastAlert()
 
     val authLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult()
@@ -141,6 +147,16 @@ fun OnboardingScreen(
                 isLocalLoading = uiState.isLoading,
                 onSignInWithGoogle = {
                     viewModel.onEvent(OnboardingEvent.SignInWithGoogle(context))
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OnboardingPrivacySection(
+                onOpenPrivacyPolicy = {
+                    if (!PrivacyPolicyIntents.openPolicyPage(context)) {
+                        showAlert(context.getString(R.string.error_open_link), AlertSeverity.ERROR)
+                    }
                 }
             )
 

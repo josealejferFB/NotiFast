@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Shield
@@ -39,6 +40,7 @@ import com.notifast.app.presentation.feature.settings.SettingsDialogType
 import com.notifast.app.presentation.feature.settings.SettingsEvent
 import com.notifast.app.presentation.feature.settings.SettingsUiState
 import com.notifast.app.presentation.util.GradeFormatters
+import com.notifast.app.presentation.util.PrivacyPolicyIntents
 
 @Composable
 fun SettingsSectionsContent(
@@ -163,13 +165,23 @@ private fun SettingsStorageAboutSection(uiState: SettingsUiState, context: Conte
             icon = Icons.Default.Shield,
             onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.PRIVACY_POLICY)) }
         )
+        val showAlert = rememberNotiFastAlert()
+        SettingsRowItem(
+            title = stringResource(R.string.settings_privacy_policy_web_title),
+            subtitle = stringResource(R.string.settings_privacy_policy_web_subtitle),
+            icon = Icons.Default.OpenInNew,
+            onClick = {
+                if (!PrivacyPolicyIntents.openPolicyPage(context)) {
+                    showAlert(context.getString(R.string.error_open_link), AlertSeverity.ERROR)
+                }
+            }
+        )
         SettingsRowItem(
             title = stringResource(R.string.settings_about_thesis_title),
             subtitle = stringResource(R.string.settings_about_version_value),
             icon = Icons.Default.Info,
             onClick = { onEvent(SettingsEvent.OpenDialog(SettingsDialogType.ABOUT_BOTTOM_SHEET)) }
         )
-        val showAlert = rememberNotiFastAlert()
         SettingsRowItem(
             title = stringResource(R.string.settings_about_feedback_title),
             subtitle = stringResource(R.string.settings_about_feedback_subtitle),
