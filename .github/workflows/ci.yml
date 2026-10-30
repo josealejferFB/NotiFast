@@ -47,27 +47,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Deploy via Wrangler (when Cloudflare secrets are set)
-        if: env.CF_API_TOKEN != '' && env.CF_ACCOUNT_ID != ''
+      - name: Verify Cloudflare Secrets Are Configured
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::Faltan los secrets CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Settings > Secrets and variables > Actions. El deploy a Cloudflare Pages no puede ejecutarse."
+            exit 1
+          fi
+          echo "Secrets de Cloudflare disponibles."
+
+      - name: Deploy via Wrangler (production branch: develop)
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy landing --project-name=notifast --branch=main --commit-dirty=true
+          command: pages deploy landing --project-name=notifast --branch=develop --commit-dirty=true
 
       - name: Verify Live Cloudflare Pages Deployment (https://notifast.pages.dev/)
         run: |
           echo "Verifying live deployment at https://notifast.pages.dev/ ..."
-          for i in 1 2 3 4 5; do
-            HTML=$(curl -fsSL "https://notifast.pages.dev/")
-            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'id="notificaciones"' && echo "$HTML" | grep -q 'hero-logo-stage'; then
-              echo "✅ Cloudflare Pages (https://notifast.pages.dev/) is live and serving the latest NotiFast landing!"
+          for i in 1 2 3 4 5 6 7 8; do
+            HTML=$(curl -fsSL "https://notifast.pages.dev/" || true)
+            PRIVACY=$(curl -fsSL "https://notifast.pages.dev/privacy" || true)
+            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'id="notificaciones"' && echo "$HTML" | grep -q 'hero-logo-stage' && echo "$PRIVACY" | grep -q 'Políticas de Privacidad'; then
+              echo "Cloudflare Pages (https://notifast.pages.dev/) is live and serving the latest NotiFast landing + privacy policy!"
               exit 0
             fi
-            echo "Waiting for Cloudflare Pages edge propagation (attempt $i/5)..."
+            echo "Waiting for Cloudflare Pages edge propagation (attempt $i/8)..."
             sleep 6
           done
-          echo "❌ Verification failed: Expected sections not found on https://notifast.pages.dev/"
+          echo "Verification failed: Expected sections not found on https://notifast.pages.dev/"
           exit 1
 
   android-tests:
