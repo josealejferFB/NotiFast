@@ -93,6 +93,8 @@ SUITE DE PRUEBAS AUTOMATIZADA:                  805 tests unitarios en verde (10
 |---|---|---|
 | **T5.1** | Reestructuración y consolidación de la documentación técnica modular en `docs/` (Estándar SHOPYSAN). | 🟢 Completada |
 | **T5.1.1** | Portal Web Interactivo de Documentación (`landing/docs.html`) desplegado en Cloudflare Pages con SPA, búsqueda instantánea `Ctrl+K`, renderizado KaTeX/Mermaid y navegación táctil WCAG AAA. | 🟢 Completada |
+| **T5.1.2** | Portal Web de Políticas de Privacidad (`landing/privacy.html`, ruta limpia `/privacy`) con Privacidad Radical, 4 Pilares, permisos y derecho al olvido, en vivo en `notifast.pages.dev/privacy` con la estética del portal de docs. | 🟢 Completada |
+| **T5.1.3** | Acceso en la app Android a la política de privacidad en línea: apartado en el Onboarding (login) y fila en Ajustes → Almacenamiento, Privacidad & Acerca de, vía `PrivacyPolicyIntents` (3 tests unitarios nuevos, suite en 808 en verde). | 🟢 Completada |
 | **T5.2** | Preparación del documento formal de Tesis de Grado (Capítulos I a V: Planteamiento, Marco Teórico, Metodología, Desarrollo y Resultados). | 🟡 En redacción |
 | **T5.3** | Ejecución de pruebas de campo en aula real con estudiantes del Área de Ingeniería de Sistemas de la UNERG (Encuesta SUS y Likert). | 🟡 En preparación |
 | **T5.4** | Firma de artefacto de producción (Release AAB con R8 y optimización Proguard). | ⚪ Pendiente |
