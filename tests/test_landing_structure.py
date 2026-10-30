@@ -586,6 +586,92 @@ class TestLandingStructure(unittest.TestCase):
             for emoji in forbidden:
                 self.assertNotIn(emoji, content, f"Emoji prohibido {emoji} encontrado en {filepath}")
 
+    def test_privacy_page_structure_and_integration(self):
+        self.assertTrue(os.path.exists("landing/privacy.html"))
+        self.assertTrue(os.path.exists("landing/privacy/index.html"))
+        with open("landing/privacy.html", "r", encoding="utf-8") as f:
+            html = f.read()
+
+        self.assertIn("<!DOCTYPE html>", html)
+        self.assertIn("<meta name=\"viewport\"", html)
+        self.assertIn("Políticas de Privacidad", html)
+        self.assertIn("https://notifast.pages.dev/privacy", html)
+
+        # Layout de 3 columnas (mismo chrome visual que el portal de docs)
+        self.assertIn('id="privacy-header"', html)
+        self.assertIn('id="privacy-sidebar"', html)
+        self.assertIn('id="privacy-main-content"', html)
+        self.assertIn('id="privacy-toc"', html)
+
+        # Enlace de regreso a la landing y control de tema
+        self.assertIn("Volver a la Landing", html)
+        self.assertIn('href="/"', html)
+        self.assertIn('id="privacy-theme-toggle"', html)
+
+        # Secciones esenciales de la política
+        for section_id in [
+            "resumen", "filosofia", "pilares", "sin-recopilar",
+            "almacenamiento-local", "respaldo-drive", "compartir-p2p",
+            "telemetria", "permisos", "derechos", "menores", "cambios", "contacto"
+        ]:
+            self.assertIn(f'id="{section_id}"', html)
+
+        # Pilares de privacidad del producto real
+        self.assertIn("Privacidad Radical", html)
+        self.assertIn("appDataFolder", html)
+        self.assertIn("Crashlytics", html)
+        self.assertIn(".notifast", html)
+
+        # Dependencias de diseño (tokens compartidos + chrome del portal + estilos propios)
+        self.assertIn("css/tokens.css", html)
+        self.assertIn("css/docs.css", html)
+        self.assertIn("css/privacy.css", html)
+        self.assertIn("js/privacy.js", html)
+
+        # Copia canónica idéntica para la ruta limpia /privacy en Cloudflare Pages
+        with open("landing/privacy/index.html", "r", encoding="utf-8") as f:
+            index_copy = f.read()
+        self.assertEqual(html, index_copy)
+
+    def test_privacy_assets_exist(self):
+        self.assertTrue(os.path.exists("landing/css/privacy.css"))
+        with open("landing/css/privacy.css", "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".privacy-hero", css)
+        self.assertIn(".privacy-quote-card", css)
+        self.assertIn(".privacy-pillar-grid", css)
+        self.assertIn(".privacy-check-list", css)
+
+        self.assertTrue(os.path.exists("landing/js/privacy.js"))
+        with open("landing/js/privacy.js", "r", encoding="utf-8") as f:
+            js = f.read()
+        self.assertIn("notifast_theme_mode", js)
+        self.assertIn("privacy-theme-toggle", js)
+        self.assertIn("privacy-mobile-toggle", js)
+        self.assertIn("IntersectionObserver", js)
+
+    def test_landing_privacy_navigation_integration(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('href="/privacy"', html)
+        self.assertIn("Política de Privacidad", html)
+
+        self.assertTrue(os.path.exists("landing/_redirects"))
+        with open("landing/_redirects", "r", encoding="utf-8") as f:
+            redirects = f.read()
+        self.assertIn("/privacy.html /privacy 301", redirects)
+        self.assertIn("/privacy/* /privacy 200", redirects)
+
+    def test_zero_emojis_in_privacy(self):
+        forbidden = ["⏰", "☑", "📷", "📱", "📅", "📝", "☀️", "🚀", "✨", "🔥", "💡"]
+        for filepath in ["landing/privacy.html", "landing/privacy/index.html",
+                         "landing/css/privacy.css", "landing/js/privacy.js"]:
+            self.assertTrue(os.path.exists(filepath), f"Falta el archivo {filepath}")
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+            for emoji in forbidden:
+                self.assertNotIn(emoji, content, f"Emoji prohibido {emoji} encontrado en {filepath}")
+
 if __name__ == "__main__":
     unittest.main()
 

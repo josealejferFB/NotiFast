@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Políticas de Privacidad — NotiFast</title>
+
+  <meta name="description" content="Políticas de Privacidad de NotiFast: privacidad radical offline-first, cero servidores propietarios, respaldo opcional en Google Drive (appDataFolder), telemetría anónima sin PII y soberanía total de tus datos académicos.">
+  <meta name="theme-color" content="#FAF9F6">
+  <link rel="canonical" href="https://notifast.pages.dev/privacy">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="apple-touch-icon" href="/assets/logo.png">
+
+  <!-- Design Tokens & Fonts -->
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/docs.css">
+  <link rel="stylesheet" href="/css/privacy.css">
+</head>
+<body>
+
+  <!-- Header de Navegación de Políticas de Privacidad -->
+  <header class="docs-header" id="privacy-header">
+    <div class="docs-header-left">
+      <button type="button" class="docs-mobile-toggle" id="privacy-mobile-toggle" aria-label="Abrir menú lateral de secciones">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+      </button>
+
+      <a href="/" class="docs-brand-logo" title="Volver al inicio de NotiFast">
+        <img src="/assets/logo.png" alt="NotiFast App Icon">
+        <span>NotiFast</span>
+        <span class="docs-badge-sub">Privacidad</span>
+      </a>
+
+      <a href="/" class="docs-back-link" title="Regresar a la página principal de NotiFast">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        <span>Volver a la Landing</span>
+      </a>
+    </div>
+
+    <div class="docs-header-center">
+      <div class="privacy-updated-pill" title="Fecha de entrada en vigor de esta política">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+        </svg>
+        <span>Última actualización: 27 de octubre de 2026</span>
+      </div>
+    </div>
+
+    <div class="docs-header-right">
+      <button type="button" class="docs-theme-toggle" id="privacy-theme-toggle" title="Alternar modo claro y oscuro">
+        <span class="docs-theme-dot" aria-hidden="true"></span>
+        <span id="privacy-theme-label">Modo Oscuro</span>
+      </button>
+
+      <a href="https://github.com/josealejferFB/NotiFast" class="docs-icon-btn" target="_blank" rel="noopener noreferrer" title="Ver código fuente en GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+      </a>
+
+      <a href="https://github.com/josealejferFB/NotiFast/releases/latest" class="docs-doc-action-btn" target="_blank" rel="noopener noreferrer" style="background:var(--brand-primary);color:#FFFFFF;border-color:var(--brand-primary);">
+        <span>Descargar APK</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Contenedor de Tres Columnas -->
+  <div class="docs-layout-container">
+
+    <!-- Backdrop para menú móvil -->
+    <div class="docs-sidebar-backdrop" id="privacy-sidebar-backdrop" hidden style="display:none;"></div>
+
+    <!-- Columna 1: Sidebar Izquierdo de Secciones -->
+    <aside class="docs-sidebar" id="privacy-sidebar" aria-label="Secciones de la Política de Privacidad">
+      <nav aria-label="Menú de secciones de la política">
+
+        <div class="docs-nav-category">
+          <div class="docs-category-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+            </svg>
+            <span>Principios</span>
+          </div>
+          <ul class="docs-nav-list">
+            <li class="docs-nav-item"><a class="docs-nav-link active" href="#resumen">Resumen de esta Política</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#filosofia">Privacidad Radical</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#pilares">Los 4 Pilares del Blindaje</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#sin-recopilar">Lo que NO Recopilamos</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-category">
+          <div class="docs-category-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+            <span>Tus Datos</span>
+          </div>
+          <ul class="docs-nav-list">
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#almacenamiento-local">Almacenamiento Local</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#respaldo-drive">Respaldo en Google Drive</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#compartir-p2p">Compartir P2P Local</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#telemetria">Telemetría sin PII</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-category">
+          <div class="docs-category-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span>Derechos y Control</span>
+          </div>
+          <ul class="docs-nav-list">
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#permisos">Permisos de la App</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#derechos">Derecho al Olvido</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#menores">Privacidad de Menores</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-category">
+          <div class="docs-category-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/>
+            </svg>
+            <span>Legal</span>
+          </div>
+          <ul class="docs-nav-list">
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#cambios">Cambios a esta Política</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="#contacto">Contacto</a></li>
+          </ul>
+        </div>
+
+        <div class="docs-nav-category">
+          <div class="docs-category-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+            </svg>
+            <span>Recursos Relacionados</span>
+          </div>
+          <ul class="docs-nav-list">
+            <li class="docs-nav-item"><a class="docs-nav-link" href="/docs#privacy-offline-first">Privacidad en Documentación</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="/docs#legal-notes">Notas Legales / Tesis</a></li>
+            <li class="docs-nav-item"><a class="docs-nav-link" href="/docs">Portal de Documentación</a></li>
+          </ul>
+        </div>
+
+      </nav>
+    </aside>
+
+    <!-- Columna 2: Visor de Lectura Central -->
+    <main class="docs-main-wrapper" id="privacy-main-content">
+      <article class="docs-content-container">
+
+        <!-- Barra de Metadatos Superior -->
+        <div class="docs-doc-meta-bar">
+          <div class="docs-breadcrumbs">
+            <span>Privacidad</span>
+            <span class="docs-breadcrumb-sep">/</span>
+            <span class="docs-breadcrumb-current">Política de Privacidad</span>
+          </div>
+
+          <div class="docs-doc-actions">
+            <span style="margin-right: 8px;">~6 min de lectura</span>
+            <button type="button" class="docs-doc-action-btn" id="privacy-copy-link-btn" title="Copiar enlace directo">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+              </svg>
+              <span>Copiar enlace</span>
+            </button>
+            <a href="https://github.com/josealejferFB/NotiFast/tree/main/docs/04-quality-privacy" class="docs-doc-action-btn" target="_blank" rel="noopener noreferrer" title="Ver la fuente documental en GitHub">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              </svg>
+              <span>GitHub</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero de Privacidad Radical -->
+        <header class="privacy-hero">
+          <span class="privacy-eyebrow">Transparencia Total</span>
+          <h1 class="privacy-hero-title">Políticas de Privacidad</h1>
+          <p class="privacy-hero-subtitle">
+            NotiFast es una aplicación <strong>100% Offline-First</strong>. Tus apuntes, materias,
+            calificaciones y horarios viven en tu dispositivo. Esta política explica, con la misma
+            claridad con la que diseñamos la app, exactamente qué datos existen, dónde residen y
+            bajo tu control absoluto.
+          </p>
+
+          <blockquote class="privacy-quote-card">
+            <span class="privacy-quote-mark" aria-hidden="true">&ldquo;</span>
+            <p>
+              Tus apuntes, tus materias, tus calificaciones y tus rutinas pertenecen
+              exclusivamente a ti y a tu dispositivo. NotiFast no sabe qué materias cursas
+              ni qué notas obtienes.
+            </p>
+            <footer class="privacy-quote-source">Principio Rector &mdash; Privacidad Radical</footer>
+          </blockquote>
+
+          <div class="privacy-fact-pills" role="list" aria-label="Compromisos de privacidad clave">
+            <span class="privacy-fact-pill" role="listitem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <span>0 bytes en servidores ajenos</span>
+            </span>
+            <span class="privacy-fact-pill" role="listitem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              <span>Sin anuncios ni rastreadores</span>
+            </span>
+            <span class="privacy-fact-pill" role="listitem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+              <span>Código abierto auditable</span>
+            </span>
+            <span class="privacy-fact-pill" role="listitem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              <span>Sin cuenta ni registro</span>
+            </span>
+          </div>
+        </header>
+
+        <!-- Cuerpo de la Política -->
+        <div class="docs-body">
+
+          <section id="resumen" class="privacy-section">
+            <h2>1. Resumen de esta Política</h2>
+            <p>
+              Esta política aplica a la aplicación Android <strong>NotiFast</strong> y a este sitio web
+              de presentación (<code>notifast.pages.dev</code>). Describe los principios y mecanismos
+              con los que protegemos tu información académica.
+            </p>
+            <div class="privacy-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Compromiso</th>
+                    <th>Detalle verificable</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Almacenamiento centralizado ajeno</td>
+                    <td><strong>0 bytes.</strong> Sin servidores propietarios, sin Firestore, sin bases de datos compartidas.</td>
+                  </tr>
+                  <tr>
+                    <td>Copia en la nube</td>
+                    <td>Exclusivamente en <strong>tu</strong> Google Drive personal, carpeta oculta <code>appDataFolder</code>, y solo si tú la activas.</td>
+                  </tr>
+                  <tr>
+                    <td>Telemetría</td>
+                    <td>Solo datos técnicos anónimos de estabilidad (Firebase Crashlytics), sin PII.</td>
+                  </tr>
+                  <tr>
+                    <td>Cuenta de usuario</td>
+                    <td>No existe. No hay registro, login ni perfil vinculado a tu identidad.</td>
+                  </tr>
+                  <tr>
+                    <td>Monetización con datos</td>
+                    <td>Ninguna. Sin anuncios, sin venta de datos, sin perfiles publicitarios.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="filosofia" class="privacy-section">
+            <h2>2. Filosofía: Privacidad Radical</h2>
+            <p>
+              Las herramientas de productividad académica convencionales almacenan la totalidad de tus
+              apuntes, horarios, hábitos de estudio y calificaciones en servidores corporativos remotos,
+              sujetos a minería de datos, caídas de servicio o brechas de seguridad masivas.
+            </p>
+            <p>
+              NotiFast adopta una postura ética y técnica de <strong>Privacidad Radical</strong>: la
+              soberanía total de tus datos (<em>Data Ownership by Design</em>) no es una opción de
+              configuración, sino la arquitectura misma de la aplicación. No existe forma de que
+              NotiFast &mdash; ni nadie más que tú &mdash; lea tus notas, porque nunca salen de tu
+              dispositivo salvo que tú lo decidas explícitamente.
+            </p>
+            <blockquote class="admonition-note">
+              <p>
+                <strong>Verificable:</strong> el código fuente de NotiFast es público y auditable bajo
+                la licencia Apache 2.0. Cualquier persona, padre, docente o institución puede comprobar
+                que la app no extrae ni monetiza tu información.
+              </p>
+            </blockquote>
+          </section>
+
+          <section id="pilares" class="privacy-section">
+            <h2>3. Los 4 Pilares del Blindaje de Privacidad</h2>
+            <p>
+              La protección de tu información académica se sostiene sobre cuatro pilares técnicos,
+              cada uno verificable en la arquitectura pública del proyecto:
+            </p>
+            <div class="privacy-pillar-grid">
+              <article class="privacy-pillar-card">
+                <div class="privacy-pillar-top">
+                  <span class="privacy-pillar-num">01</span>
+                  <svg class="privacy-pillar-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                </div>
+                <h3>Cero Base de Datos Ajena</h3>
+                <p>
+                  Cero Firestore, cero backend propietario en la nube. NotiFast no opera servidores
+                  intermedios que almacenen registros de usuario.
+                </p>
+              </article>
+              <article class="privacy-pillar-card">
+                <div class="privacy-pillar-top">
+                  <span class="privacy-pillar-num">02</span>
+                  <svg class="privacy-pillar-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                </div>
+                <h3>Sandbox Local Seguro</h3>
+                <p>
+                  Room SQLite (<code>notifast.db</code>), preferencias DataStore y fotos de apuntes
+                  residen en el almacenamiento privado de Android. Ninguna otra app puede acceder.
+                </p>
+              </article>
+              <article class="privacy-pillar-card">
+                <div class="privacy-pillar-top">
+                  <span class="privacy-pillar-num">03</span>
+                  <svg class="privacy-pillar-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z"/></svg>
+                </div>
+                <h3>Drive Privado Aislado</h3>
+                <p>
+                  El respaldo opcional viaja cifrado en tránsito (HTTPS/TLS) hacia la carpeta oculta
+                  <code>appDataFolder</code> de <strong>tu</strong> cuenta de Google Drive. Invisible
+                  para terceros e incluso para otras apps.
+                </p>
+              </article>
+              <article class="privacy-pillar-card">
+                <div class="privacy-pillar-top">
+                  <span class="privacy-pillar-num">04</span>
+                  <svg class="privacy-pillar-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <h3>Telemetría Anónima sin PII</h3>
+                <p>
+                  Firebase Crashlytics se limita a trazas de excepción técnica. Prohibido registrar
+                  nombres de materias, profesores, apuntes o calificaciones.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section id="sin-recopilar" class="privacy-section">
+            <h2>4. Lo que NotiFast NO Recopila</h2>
+            <p>
+              La forma más honesta de explicar nuestra política es listar lo que simplemente
+              <strong>no existe</strong> en nuestros sistemas, porque no hay sistemas donde exista:
+            </p>
+            <ul class="privacy-check-list">
+              <li class="privacy-check-item privacy-check-no"><span class="privacy-check-badge">No</span> Nombre, correo electrónico, teléfono o fotografía de perfil.</li>
+              <li class="privacy-check-item privacy-check-no"><span class="privacy-check-badge">No</span> Títulos de apuntes, nombres de materias, notas o calificaciones.</li>
+              <li class="privacy-check-item privacy-check-no"><span class="privacy-check-badge">No</span> Ubicación geográfica, contactos, calendario o historial de llamadas.</li>
+              <li class="privacy-check-item privacy-check-no"><span class="privacy-check-badge">No</span> Identificadores publicitarios (IDFA/AAID) ni perfiles de comportamiento.</li>
+              <li class="privacy-check-item privacy-check-no"><span class="privacy-check-badge">No</span> Cookies de rastreo ni analítica de terceros en este sitio web.</li>
+              <li class="privacy-check-item privacy-check-no"><span class="privacy-check-badge">No</span> Credenciales de tu cuenta de Google: usamos OAuth con alcance mínimo y nunca vemos tu contraseña.</li>
+              <li class="privacy-check-item privacy-check-ok"><span class="privacy-check-badge">Sí</span> Datos locales en tu dispositivo, bajo tu control exclusivo.</li>
+              <li class="privacy-check-item privacy-check-ok"><span class="privacy-check-badge">Sí</span> Reportes técnicos anónimos de fallos, solo si ocurre un error y solo para corregirlo.</li>
+            </ul>
+          </section>
+
+          <section id="almacenamiento-local" class="privacy-section">
+            <h2>5. Almacenamiento Local en tu Dispositivo</h2>
+            <p>
+              Toda la información que creas en NotiFast reside dentro del sandbox privado que Android
+              asigna a cada aplicación, en el almacenamiento interno del dispositivo:
+            </p>
+            <div class="privacy-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Artefacto</th>
+                    <th>Ubicación técnica</th>
+                    <th>Contenido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Base de datos académica</td>
+                    <td><code>notifast.db</code> (Room SQLite v9)</td>
+                    <td>Materias, evaluaciones, notas, profesores y horarios.</td>
+                  </tr>
+                  <tr>
+                    <td>Preferencias de la app</td>
+                    <td>Jetpack DataStore</td>
+                    <td>Temas visuales, configuración de alertas y ajustes.</td>
+                  </tr>
+                  <tr>
+                    <td>Fotos de apuntes</td>
+                    <td><code>filesDir/images/</code></td>
+                    <td>Imágenes que tú adjuntas a tus propias notas.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Ninguna otra aplicación instalada en el dispositivo tiene permiso para leer estos archivos.
+              Al desinstalar NotiFast, el sistema operativo elimina este sandbox por completo. La única
+              copia que puede sobrevivir es la que tú hayas respaldado voluntariamente en tu Google Drive,
+              que también puedes borrar en cualquier momento.
+            </p>
+          </section>
+
+          <section id="respaldo-drive" class="privacy-section">
+            <h2>6. Respaldo Opcional en Google Drive</h2>
+            <p>
+              El respaldo en la nube es <strong>opt-in</strong>: nunca se activa sin tu acción expresa.
+              Cuando lo enciendes, los datos viajan cifrados en tránsito (HTTPS/TLS) directamente hacia
+              <strong>tu propia cuenta</strong> de Google Drive.
+            </p>
+            <ul>
+              <li>
+                <strong>Alcance mínimo:</strong> usamos exclusivamente el alcance <code>drive.appdata</code>,
+                que escribe en la carpeta oculta de la aplicación. No pedimos permisos de lectura sobre
+                tus demás archivos de Drive.
+              </li>
+              <li>
+                <strong>Aislamiento garantizado:</strong> ni el equipo de NotiFast ni ningún tercero
+                tienen acceso a esa carpeta. Otras apps con acceso común a Drive tampoco pueden leerla,
+                y no aparece en la interfaz web de Drive para evitar borrados accidentales.
+              </li>
+              <li>
+                <strong>Sincronización inteligente:</strong> las copias incrementales se calculan con
+                huellas <code>SHA-256</code> para subir solo los cambios, sin duplicar información.
+              </li>
+              <li>
+                <strong>Desvinculación limpia:</strong> puedes desconectar tu cuenta de Google desde
+                Ajustes en cualquier momento sin que se altere un solo byte de tus datos locales.
+              </li>
+            </ul>
+            <blockquote class="admonition-tip">
+              <p>
+                Recuerda: si nunca activas el respaldo, tu información jamás sale del dispositivo.
+                La nube en NotiFast es una comodidad opcional, no un requisito.
+              </p>
+            </blockquote>
+          </section>
+
+          <section id="compartir-p2p" class="privacy-section">
+            <h2>7. Compartir P2P sin Huella de Red</h2>
+            <p>
+              El intercambio de materias mediante códigos QR o paquetes <code>.notifast</code> ocurre
+              de forma estrictamente local entre dos dispositivos: señales ópticas (pantalla-cámara)
+              o transferencias directas de archivo (Bluetooth / Sharesheet de Android).
+            </p>
+            <ul>
+              <li>No se emite ninguna llamada a internet para registrar quién compartió o quién recibió una materia.</li>
+              <li>No existe un servidor de intermediación: los paquetes viajan de dispositivo a dispositivo.</li>
+              <li>Tú decides si el paquete incluye tus apuntes personales o solo la estructura de la materia.</li>
+            </ul>
+          </section>
+
+          <section id="telemetria" class="privacy-section">
+            <h2>8. Telemetría Técnica sin Información Personal</h2>
+            <p>
+              Para asegurar la calidad del software &mdash; identificación temprana de caídas o
+              incompatibilidades entre versiones de Android &mdash; NotiFast incluye Firebase
+              Crashlytics y Firebase Analytics bajo restricciones severas:
+            </p>
+            <ol>
+              <li>
+                <strong>Cero Información de Identificación Personal (No PII):</strong> está
+                estrictamente prohibido adjuntar nombres de estudiantes, correos, títulos de apuntes,
+                nombres de materias o calificaciones en los metadatos de Crashlytics.
+              </li>
+              <li>
+                <strong>Reportes técnicos anónimos:</strong> únicamente se recolectan trazas de pila
+                (<em>stacktraces</em>) de excepciones no controladas, modelo del dispositivo, versión
+                del sistema operativo y métricas agregadas de rendimiento de la interfaz.
+              </li>
+              <li>
+                <strong>Opt-Out respetado:</strong> si utilizas la app en modo offline o bloqueas las
+                conexiones de telemetría a nivel de DNS o firewall, la aplicación no altera en lo
+                absoluto su funcionamiento.
+              </li>
+            </ol>
+            <blockquote class="admonition-warning">
+              <p>
+                La telemetría existe para reparar errores de programación, nunca para perfilar
+                estudiantes. Si un día dejara de ser cierto, esta política dejaría de ser válida
+                y te lo avisaríamos antes de cualquier cambio.
+              </p>
+            </blockquote>
+          </section>
+
+          <section id="permisos" class="privacy-section">
+            <h2>9. Permisos de la Aplicación</h2>
+            <p>
+              NotiFast solicita el menor conjunto de permisos posible para funcionar. Ninguno otorga
+              acceso a tu identidad, tus contactos o tu ubicación:
+            </p>
+            <div class="privacy-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Permiso de Android</th>
+                    <th>Por qué se necesita</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>INTERNET</code></td>
+                    <td>Solo para el respaldo opcional en Google Drive y los reportes anónimos de fallos. La app funciona completa sin conexión.</td>
+                  </tr>
+                  <tr>
+                    <td><code>POST_NOTIFICATIONS</code></td>
+                    <td>Mostrar los recordatorios de clases, evaluaciones y hábitos de estudio que tú configuras.</td>
+                  </tr>
+                  <tr>
+                    <td><code>SCHEDULE_EXACT_ALARM</code></td>
+                    <td>Programar alertas exactas de horarios y exámenes sin depender del sistema de colas difusas.</td>
+                  </tr>
+                  <tr>
+                    <td><code>RECEIVE_BOOT_COMPLETED</code></td>
+                    <td>Reprogramar tus alertas después de reiniciar el teléfono.</td>
+                  </tr>
+                  <tr>
+                    <td><code>VIBRATE</code></td>
+                    <td>Retroalimentación háptica suave cuando se dispara una notificación.</td>
+                  </tr>
+                  <tr>
+                    <td><code>CAMERA</code></td>
+                    <td>Escanear códigos QR offline al compartir materias. La cámara solo se activa cuando tú abres el escáner.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              NotiFast <strong>no</strong> solicita permisos de contactos, ubicación, teléfono,
+              SMS ni acceso amplio al almacenamiento. La importación de archivos (PDF o imágenes)
+              utiliza el selector seguro de Android (Storage Access Framework), que solo ve los
+              documentos que tú eliges explícitamente.
+            </p>
+          </section>
+
+          <section id="derechos" class="privacy-section">
+            <h2>10. Derechos del Usuario y Derecho al Olvido</h2>
+            <p>
+              NotiFast garantiza el control absoluto del ciclo de vida de tu información. Como no
+              existe una cuenta en nuestros servidores, no hay nada que solicitarle a un tercero:
+              el poder de borrado está siempre en tus manos.
+            </p>
+            <ul>
+              <li>
+                <strong>Borrado en cascada inmediato:</strong> al eliminar una materia, nota o
+                profesor, el borrado en Room SQLite y la eliminación física de las imágenes en disco
+                se ejecutan de forma inmediata dentro de una transacción atómica.
+              </li>
+              <li>
+                <strong>Borrado en la nube con un solo toque:</strong> al eliminar contenido puedes
+                elegir <em>&laquo;Borrar solo local&raquo;</em> o
+                <em>&laquo;Borrar en teléfono y en Google Drive&raquo;</em>, eliminando la copia
+                remota de forma irreversible.
+              </li>
+              <li>
+                <strong>Acceso, rectificación y portabilidad:</strong> toda tu información es visible
+                y editable dentro de la app, y puedes exportarla en cualquier momento mediante paquetes
+                <code>.notifast</code> o resúmenes en Markdown.
+              </li>
+              <li>
+                <strong>Desvinculación:</strong> puedes retirar el acceso de Google Drive desde Ajustes
+                o desde la consola de permisos de tu cuenta de Google.
+              </li>
+            </ul>
+          </section>
+
+          <section id="menores" class="privacy-section">
+            <h2>11. Privacidad de Menores de Edad</h2>
+            <p>
+              NotiFast está pensado para estudiantes de secundaria y universidad, por lo que es
+              posible que menores de edad la utilicen. Precisamente por eso la política es simple:
+            </p>
+            <ul>
+              <li>No recopilamos datos personales de ningún usuario, con independencia de su edad.</li>
+              <li>No hay perfiles, publicidad ni funciones sociales que expongan a menores.</li>
+              <li>Recomendamos la supervisión de padres o tutores en la configuración de copias de seguridad y compartición de materias.</li>
+            </ul>
+            <p>
+              Si eres padre, madre o tutor y detectas que un menor ha compartido información personal
+              a través de la app (por ejemplo, dentro de un paquete <code>.notifast</code> enviado a un
+              tercero), puedes escribirnos para recibir asesoría sobre cómo eliminar esa información
+              en origen y en destino.
+            </p>
+          </section>
+
+          <section id="cambios" class="privacy-section">
+            <h2>12. Cambios a esta Política</h2>
+            <p>
+              Esta política puede evolucionar junto con la aplicación. Cuando eso ocurra:
+            </p>
+            <ul>
+              <li>Publicaremos la versión actualizada en esta misma página, con su nueva fecha de entrada en vigor.</li>
+              <li>Los cambios materiales se destacarán en las notas de versión de la aplicación.</li>
+              <li>Si un cambio afectara los principios de Privacidad Radical, lo anunciaremos antes de implementarlo, nunca después.</li>
+            </ul>
+            <p>
+              El uso continuado de NotiFast tras la publicación de una versión actualizada implica la
+              aceptación de la misma. Si no estás de acuerdo con los cambios, puedes dejar de usar la
+              app y eliminar tus datos locales y remotos en cualquier momento.
+            </p>
+          </section>
+
+          <section id="contacto" class="privacy-section">
+            <h2>13. Contacto</h2>
+            <p>
+              NotiFast es un proyecto de código abierto independiente, sin departamento comercial ni
+              servidores de correo corporativos. La vía de contacto directa y auditada públicamente es
+              el repositorio de GitHub:
+            </p>
+            <div class="privacy-contact-card">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+              <div class="privacy-contact-body">
+                <strong>Repositorio oficial de NotiFast</strong>
+                <p>
+                  Dudas, consultas sobre privacidad o solicitudes de borrado de información compartida:
+                  abre un <em>issue</em> en el repositorio o consulta el código directamente.
+                </p>
+                <div class="privacy-contact-actions">
+                  <a href="https://github.com/josealejferFB/NotiFast/issues" class="docs-doc-action-btn" target="_blank" rel="noopener noreferrer" style="background:var(--brand-primary);color:#FFFFFF;border-color:var(--brand-primary);">
+                    <span>Abrir un Issue</span>
+                  </a>
+                  <a href="https://github.com/josealejferFB/NotiFast" class="docs-doc-action-btn" target="_blank" rel="noopener noreferrer">
+                    <span>Ver Código Fuente</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <p>
+              Este documento complementa las <a href="/docs#legal-notes">Notas Legales</a> y la
+              descripción técnica de la <a href="/docs#privacy-offline-first">arquitectura de privacidad</a>
+              disponibles en el portal de documentación.
+            </p>
+          </section>
+
+        </div>
+
+        <!-- Navegación Inferior (Landing / Documentación) -->
+        <nav class="docs-pagination" aria-label="Navegación relacionada">
+          <a href="/" class="docs-page-card prev">
+            <span class="docs-page-sub">Anterior</span>
+            <span class="docs-page-title">Volver a la Landing</span>
+          </a>
+          <a href="/docs" class="docs-page-card next">
+            <span class="docs-page-sub">Siguiente</span>
+            <span class="docs-page-title">Documentación Técnica &amp; Tesis</span>
+          </a>
+        </nav>
+
+        <!-- Sub-footer del visor -->
+        <footer style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-hairline); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <p style="margin: 0;">&copy; 2026 NotiFast. Políticas de Privacidad &mdash; Privacidad Radical Offline-First.</p>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span>0 bytes en servidores ajenos</span>
+            <span>&bull;</span>
+            <span>Sin anuncios ni rastreadores</span>
+            <span>&bull;</span>
+            <a href="#privacy-header" style="color: var(--brand-primary); font-weight: 600;">Volver arriba &uarr;</a>
+          </div>
+        </footer>
+
+      </article>
+    </main>
+
+    <!-- Columna 3: Tabla de Contenidos Lateral Derecha -->
+    <aside class="docs-toc" id="privacy-toc" aria-label="Tabla de contenidos de esta política">
+      <div class="docs-toc-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z"/>
+        </svg>
+        <span>En esta política</span>
+      </div>
+      <ul class="docs-toc-list" id="privacy-toc-list">
+        <li class="docs-toc-item"><a class="docs-toc-link active" href="#resumen">1. Resumen</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#filosofia">2. Privacidad Radical</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#pilares">3. Los 4 Pilares</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#sin-recopilar">4. Lo que NO Recopilamos</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#almacenamiento-local">5. Almacenamiento Local</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#respaldo-drive">6. Respaldo en Google Drive</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#compartir-p2p">7. Compartir P2P</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#telemetria">8. Telemetría sin PII</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#permisos">9. Permisos de la App</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#derechos">10. Derecho al Olvido</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#menores">11. Privacidad de Menores</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#cambios">12. Cambios a esta Política</a></li>
+        <li class="docs-toc-item"><a class="docs-toc-link" href="#contacto">13. Contacto</a></li>
+      </ul>
+    </aside>
+
+  </div>
+
+  <!-- Application Logic -->
+  <script src="/js/privacy.js"></script>
+</body>
+</html>
+
+

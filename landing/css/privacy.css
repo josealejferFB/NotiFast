@@ -1,0 +1,344 @@
+/* ==========================================================================
+   NOTIFAST — POLÍTICAS DE PRIVACIDAD (landing/css/privacy.css)
+   Componentes específicos de la página de privacidad.
+   El chrome visual (header, sidebar, body tipográfico, TOC) se comparte con
+   css/docs.css para garantizar la identidad del portal (Tactile Papercraft).
+   Tokens: css/tokens.css • WCAG AAA • Dual-Axis Light/Dark
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   PILL DE ACTUALIZACIÓN (Centro del Header)
+   -------------------------------------------------------------------------- */
+.privacy-updated-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.privacy-updated-pill svg {
+  color: var(--brand-secondary-canonical);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   HERO DE PRIVACIDAD RADICAL
+   -------------------------------------------------------------------------- */
+.privacy-hero {
+  padding: var(--space-xl) 0 var(--space-xxl) 0;
+  border-bottom: 1px solid var(--border-hairline);
+  margin-bottom: var(--space-lg);
+}
+
+.privacy-eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--brand-primary);
+  background-color: var(--brand-primary-light);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-md);
+}
+
+.privacy-hero-title {
+  font-size: clamp(1.95rem, 3.6vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.privacy-hero-subtitle {
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  max-width: 760px;
+  margin: 0 0 var(--space-xl) 0;
+}
+
+/* Cita del Principio Rector */
+.privacy-quote-card {
+  position: relative;
+  margin: 0 0 var(--space-xl) 0;
+  padding: var(--space-lg) var(--space-xl) var(--space-lg) var(--space-xl);
+  background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--bg-surface-container) 100%);
+  border: 1px solid var(--border-hairline);
+  border-left: 4px solid var(--brand-primary);
+  border-radius: var(--radius-md);
+}
+
+.privacy-quote-mark {
+  position: absolute;
+  top: -6px;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 3.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--brand-primary);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.privacy-quote-card p {
+  font-size: 1.12rem;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.privacy-quote-source {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brand-primary);
+}
+
+/* Pills de Compromisos Clave */
+.privacy-fact-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.privacy-fact-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.privacy-fact-pill svg {
+  color: var(--brand-secondary-canonical);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   SECCIONES Y ANCLAJE
+   -------------------------------------------------------------------------- */
+.privacy-section {
+  scroll-margin-top: 80px;
+}
+.privacy-section:first-of-type h2 {
+  margin-top: var(--space-lg);
+}
+
+/* --------------------------------------------------------------------------
+   REJILLA DE LOS 4 PILARES
+   -------------------------------------------------------------------------- */
+.privacy-pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin: var(--space-lg) 0 var(--space-xl) 0;
+}
+
+.privacy-pillar-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  transition: all var(--duration-fast) ease;
+}
+.privacy-pillar-card:hover {
+  border-color: var(--brand-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-tactile);
+}
+
+.privacy-pillar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.privacy-pillar-num {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+  background-color: var(--brand-primary-light);
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.05em;
+}
+
+.privacy-pillar-icon {
+  color: var(--brand-secondary-canonical);
+}
+
+.privacy-pillar-card h3 {
+  margin: 0 0 var(--space-xs) 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.privacy-pillar-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   CHECKLIST "LO QUE NO RECOPILAMOS"
+   -------------------------------------------------------------------------- */
+.privacy-check-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-md) 0 var(--space-xl) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.privacy-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-hairline);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.privacy-check-no {
+  background-color: var(--bg-surface);
+}
+
+.privacy-check-ok {
+  background-color: var(--brand-success-light);
+  border-color: rgba(21, 128, 61, 0.28);
+  color: var(--text-primary);
+}
+
+.privacy-check-badge {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  margin-top: 2px;
+}
+
+.privacy-check-no .privacy-check-badge {
+  background-color: var(--brand-error-light);
+  color: var(--brand-error);
+}
+
+.privacy-check-ok .privacy-check-badge {
+  background-color: var(--brand-success);
+  color: var(--brand-on-success);
+}
+
+/* --------------------------------------------------------------------------
+   TABLAS CON SCROLL (mismo lenguaje que .docs-table-wrapper)
+   -------------------------------------------------------------------------- */
+.privacy-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: var(--space-md) 0 var(--space-lg) 0;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* --------------------------------------------------------------------------
+   TARJETA DE CONTACTO
+   -------------------------------------------------------------------------- */
+.privacy-contact-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
+  padding: var(--space-lg);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-tactile);
+}
+.privacy-contact-card > svg {
+  color: var(--text-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.privacy-contact-body {
+  flex: 1;
+}
+.privacy-contact-body strong {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+.privacy-contact-body p {
+  margin: 0 0 var(--space-md) 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.privacy-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .privacy-updated-pill span {
+    display: none;
+  }
+  .privacy-updated-pill {
+    padding: 8px;
+  }
+  .privacy-pillar-grid {
+    grid-template-columns: 1fr;
+  }
+  .privacy-contact-card {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .privacy-hero {
+    padding-top: var(--space-lg);
+  }
+  .privacy-quote-card {
+    padding: var(--space-md) var(--space-lg);
+  }
+  .privacy-quote-mark {
+    display: none;
+  }
+}

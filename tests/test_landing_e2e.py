@@ -69,8 +69,24 @@ class TestLandingE2E(unittest.TestCase):
                 self.assertIn("docs-search-modal", body)
                 self.assertIn("Volver a la Landing", body)
 
+    def test_get_privacy_html(self):
+        for path in ["/privacy.html", "/privacy/"]:
+            url = self.get_url(path)
+            with urllib.request.urlopen(url) as response:
+                self.assertEqual(response.status, 200)
+                content_type = response.headers.get("Content-Type", "")
+                self.assertIn("text/html", content_type)
+                body = response.read().decode("utf-8")
+                self.assertIn("<!DOCTYPE html>", body)
+                self.assertIn("Políticas de Privacidad", body)
+                self.assertIn("privacy-header", body)
+                self.assertIn("privacy-sidebar", body)
+                self.assertIn("privacy-toc", body)
+                self.assertIn("Privacidad Radical", body)
+                self.assertIn("Volver a la Landing", body)
+
     def test_css_assets_serve_correctly(self):
-        for css_file in ["/css/tokens.css", "/css/styles.css", "/css/dynamic-showcase.css", "/css/docs.css"]:
+        for css_file in ["/css/tokens.css", "/css/styles.css", "/css/dynamic-showcase.css", "/css/docs.css", "/css/privacy.css"]:
             url = self.get_url(css_file)
             with urllib.request.urlopen(url) as response:
                 self.assertEqual(response.status, 200)
@@ -78,7 +94,7 @@ class TestLandingE2E(unittest.TestCase):
                 self.assertGreater(len(content), 100)
 
     def test_js_assets_serve_correctly(self):
-        for js_file in ["/js/background.js", "/js/interactive-showcase.js", "/js/main.js", "/js/docs.js", "/js/docs-data.js"]:
+        for js_file in ["/js/background.js", "/js/interactive-showcase.js", "/js/main.js", "/js/docs.js", "/js/docs-data.js", "/js/privacy.js"]:
             url = self.get_url(js_file)
             with urllib.request.urlopen(url) as response:
                 self.assertEqual(response.status, 200)
