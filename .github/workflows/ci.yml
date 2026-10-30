@@ -55,7 +55,7 @@ jobs:
           fi
           echo "Secrets de Cloudflare disponibles."
 
-      - name: Deploy via Wrangler (production branch: develop)
+      - name: Deploy via Wrangler to Cloudflare Pages develop branch
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
