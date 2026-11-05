@@ -16,7 +16,7 @@
 # Clean routing for vistas
 /vistas.html /vistas/ 301
 /vistas /vistas/ 301
-/vistas/* /vistas/ 200
 
 # Fallback 404
 /* /404.html 404
+
