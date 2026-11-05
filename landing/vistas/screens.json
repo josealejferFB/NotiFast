@@ -1,0 +1,477 @@
+{
+  "screens": [
+    {
+      "id": "01-onboarding",
+      "title": "Onboarding",
+      "group": "Acceso",
+      "route": "onboarding",
+      "type": "screen",
+      "howToReach": "App cold start en modo local (sin autenticación). Screen.Onboarding.route",
+      "interestingStates": [
+        "Paso 1: Bienvenida",
+        "Paso 2: Permisos de notificación",
+        "Paso 3: Tema y fondo",
+        "Completado → Home"
+      ],
+      "expectedCaptureFile": "01-onboarding-light.png",
+      "darkCaptureFile": "01-onboarding-dark.png",
+      "reachable": true,
+      "note": "Bienvenida, permisos de notificación y tema en pasos."
+    },
+    {
+      "id": "02-notes-home",
+      "title": "Home / Apuntes",
+      "group": "Acceso",
+      "route": "notes",
+      "type": "screen",
+      "howToReach": "BottomNav → Apuntes (Screen.Notes.route). Pantalla principal tras onboarding.",
+      "interestingStates": [
+        "Lista de materias (bento grid)",
+        "Materia expandida con notas",
+        "FAB: Nueva materia / Nueva nota",
+        "Búsqueda global",
+        "CloudHub sheet"
+      ],
+      "expectedCaptureFile": "02-notes-home-light.png",
+      "darkCaptureFile": "02-notes-home-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "03-add-subject",
+      "title": "Nueva Materia",
+      "group": "Apuntes",
+      "route": "add_subject",
+      "type": "sheet",
+      "howToReach": "Home → FAB '+' → 'Nueva materia' abre AddSubjectBottomSheet (06). AddSubjectScreen es código muerto: NotesScreen.kt:142/153 sobrescribe onAddSubjectClick.",
+      "interestingStates": [
+        "Formulario vacío",
+        "Con nombre e icono/color seleccionados",
+        "Error de validación"
+      ],
+      "expectedCaptureFile": "03-add-subject-light.png",
+      "darkCaptureFile": "03-add-subject-dark.png",
+      "reachable": true,
+      "note": "AddSubjectScreen es código muerto; la captura muestra el camino real FAB → sheet Nueva Materia."
+    },
+    {
+      "id": "04-subject-detail",
+      "title": "Detalle de Materia",
+      "group": "Apuntes",
+      "route": "subject_detail/{subjectName}",
+      "type": "screen",
+      "howToReach": "Home → Tap en materia (Screen.SubjectDetail.createRoute(subjectName))",
+      "interestingStates": [
+        "Lista de notas de la materia",
+        "Lista de evaluaciones",
+        "Horario de la materia",
+        "FAB: Nota / Evaluación / Horario",
+        "Vista vacía sin notas"
+      ],
+      "expectedCaptureFile": "04-subject-detail-light.png",
+      "darkCaptureFile": "04-subject-detail-dark.png",
+      "reachable": true,
+      "note": "Panorama de Cálculo II: notas, evaluaciones y horario."
+    },
+    {
+      "id": "05-note-editor",
+      "title": "Editor de Apunte",
+      "group": "Apuntes",
+      "route": "note_editor (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Home/SubjectDetail → FAB Nota o tap en nota existente (NoteEditorBottomSheet via activeNoteEditorArgs)",
+      "interestingStates": [
+        "Nuevo apunte (vacío)",
+        "Editar apunte con markdown",
+        "Con checklists",
+        "Con imágenes (placeholder)",
+        "Selector de materia desde editor"
+      ],
+      "expectedCaptureFile": "05-note-editor-light.png",
+      "darkCaptureFile": "05-note-editor-dark.png",
+      "reachable": true,
+      "note": "Apunte existente con markdown, fórmulas y checklist."
+    },
+    {
+      "id": "06-add-subject-sheet",
+      "title": "Nueva Materia (Sheet)",
+      "group": "Apuntes",
+      "route": "add_subject_sheet (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Desde NoteEditor / ScheduleEditor / EvaluationEditor → 'Crear materia' (AddSubjectBottomSheet)",
+      "interestingStates": [
+        "Formulario compacto en sheet",
+        "Creación exitosa → vuelve al editor padre"
+      ],
+      "expectedCaptureFile": "06-add-subject-sheet-light.png",
+      "darkCaptureFile": "06-add-subject-sheet-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "07-schedules",
+      "title": "Agenda / Horarios",
+      "group": "Agenda",
+      "route": "agenda",
+      "type": "screen",
+      "howToReach": "BottomNav → Agenda (Screen.Schedules.route)",
+      "interestingStates": [
+        "Timeline semanal L-V con clases",
+        "Clase activa 'en vivo' (badge)",
+        "Conflictos de horario",
+        "FAB: Nuevo horario / Nueva evaluación",
+        "Vista vacía"
+      ],
+      "expectedCaptureFile": "07-schedules-light.png",
+      "darkCaptureFile": "07-schedules-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "08-add-schedule",
+      "title": "Nuevo Horario",
+      "group": "Agenda",
+      "route": "add_schedule (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Agenda → FAB '+' → Nuevo horario (ScheduleEditorBottomSheet via activeScheduleEditorArgs)",
+      "interestingStates": [
+        "Formulario: materia, día, hora, aula, tipo, recurrencia",
+        "Selector de materia",
+        "Validación de conflictos"
+      ],
+      "expectedCaptureFile": "08-add-schedule-light.png",
+      "darkCaptureFile": "08-add-schedule-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "09-edit-schedule",
+      "title": "Editar Horario",
+      "group": "Agenda",
+      "route": "edit_schedule/{scheduleId} (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Agenda → Tap en horario → Editar (ScheduleEditorBottomSheet con scheduleId)",
+      "interestingStates": [
+        "Formulario precargado",
+        "Cambio de día/hora/aula",
+        "Eliminar horario"
+      ],
+      "expectedCaptureFile": "09-edit-schedule-light.png",
+      "darkCaptureFile": "09-edit-schedule-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "10-study-hub",
+      "title": "Centro de Estudio",
+      "group": "Estudio",
+      "route": "estudio",
+      "type": "screen",
+      "howToReach": "BottomNav → Estudio (Screen.StudyHub.route)",
+      "interestingStates": [
+        "Documentos de estudio (PDF/imágenes)",
+        "Categorías: Guías, Formularios, Apuntes",
+        "Vista vacía",
+        "Búsqueda global"
+      ],
+      "expectedCaptureFile": "10-study-hub-light.png",
+      "darkCaptureFile": "10-study-hub-dark.png",
+      "reachable": true,
+      "note": "Documentos de estudio (guías, formularios) y plantillas."
+    },
+    {
+      "id": "11-grades",
+      "title": "Calificaciones",
+      "group": "Calificaciones",
+      "route": "calificaciones",
+      "type": "screen",
+      "howToReach": "BottomNav → Calificaciones (Screen.Grades.route)",
+      "interestingStates": [
+        "Promedio general (hero card)",
+        "Lista de materias con promedio ponderado",
+        "Detalle de evaluaciones por materia",
+        "Pendientes sin nota",
+        "Escala 0-20"
+      ],
+      "expectedCaptureFile": "11-grades-light.png",
+      "darkCaptureFile": "11-grades-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "12-add-evaluation",
+      "title": "Nueva Evaluación",
+      "group": "Calificaciones",
+      "route": "add_evaluation?subject={subject} (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Grades/SubjectDetail/Agenda → FAB Evaluación (EvaluationEditorBottomSheet via activeEvaluationEditorArgs)",
+      "interestingStates": [
+        "Formulario: nombre, tipo, peso, nota, fecha",
+        "Selector de materia",
+        "Nota pendiente (vacía)",
+        "Validación de peso total ≤ 100%"
+      ],
+      "expectedCaptureFile": "12-add-evaluation-light.png",
+      "darkCaptureFile": "12-add-evaluation-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "13-edit-evaluation",
+      "title": "Editar Evaluación",
+      "group": "Calificaciones",
+      "route": "edit_evaluation/{evalId} (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Grades/SubjectDetail → Tap en evaluación → Editar (EvaluationEditorBottomSheet con evalId)",
+      "interestingStates": [
+        "Formulario precargado",
+        "Actualizar nota",
+        "Cambiar peso/tipo",
+        "Eliminar evaluación"
+      ],
+      "expectedCaptureFile": "13-edit-evaluation-light.png",
+      "darkCaptureFile": "13-edit-evaluation-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "14-settings",
+      "title": "Ajustes",
+      "group": "Ajustes",
+      "route": "settings",
+      "type": "screen",
+      "howToReach": "BottomNav → Ajustes (Screen.Settings.route)",
+      "interestingStates": [
+        "Perfil (nombre, email, foto)",
+        "Tema: Classic/Forest Sage, Claro/Oscuro/Sistema",
+        "Fondo: Pergamino/Pizarra/Blanco",
+        "CloudHub (sync/backup)",
+        "Privacidad / Acerca de",
+        "Cerrar sesión → Onboarding"
+      ],
+      "expectedCaptureFile": "14-settings-light.png",
+      "darkCaptureFile": "14-settings-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "15-edit-profile",
+      "title": "Editar Perfil",
+      "group": "Ajustes",
+      "route": "edit_profile",
+      "type": "screen",
+      "howToReach": "Settings → Editar perfil / TopBar → Foto de perfil (Screen.EditProfile.route)",
+      "interestingStates": [
+        "Formulario: nombre, email",
+        "Selector de foto (cámara/galería - mock)",
+        "Guardar / Cancelar"
+      ],
+      "expectedCaptureFile": "15-edit-profile-light.png",
+      "darkCaptureFile": "15-edit-profile-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "16-global-search",
+      "title": "Búsqueda Global",
+      "group": "Búsqueda y Compartir",
+      "route": "global_search (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "TopBar → Lupa (GlobalSearchBottomSheet via showGlobalSearchSheet)",
+      "interestingStates": [
+        "Resultados: notas, evaluaciones, horarios",
+        "Navegación directa a detalle",
+        "Historial reciente",
+        "Vacía sin resultados"
+      ],
+      "expectedCaptureFile": "16-global-search-light.png",
+      "darkCaptureFile": "16-global-search-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "17-cloud-hub",
+      "title": "Cloud Hub (Sync/Backup)",
+      "group": "Ajustes",
+      "route": "cloud_hub (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "TopBar → Nube (CloudHubSheet via showCloudHubSheet) / Onboarding auto-abre",
+      "interestingStates": [
+        "Estado: No conectado / Conectado / Sincronizando",
+        "Backup local → Drive",
+        "Restaurar desde Drive",
+        "Conflictos de merge"
+      ],
+      "expectedCaptureFile": "17-cloud-hub-light.png",
+      "darkCaptureFile": "17-cloud-hub-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "18-privacy-about",
+      "title": "Privacidad y Acerca de",
+      "group": "Ajustes",
+      "route": "settings → Privacy/About sections",
+      "type": "dialog",
+      "howToReach": "Settings → filas 'Privacidad' y 'Acerca de': abre SettingsPrivacyDialog (dialog) y SettingsAboutBottomSheet (sheet)",
+      "interestingStates": [
+        "Política de privacidad (texto)",
+        "Licencias de código abierto",
+        "Versión de la app",
+        "Contacto / Reportar bug"
+      ],
+      "expectedCaptureFile": "18-privacy-about-light.png",
+      "darkCaptureFile": "18-privacy-about-dark.png",
+      "reachable": true,
+      "note": "No son rutas independientes: dos estados desde filas de Settings."
+    },
+    {
+      "id": "19-theme-selector",
+      "title": "Selector de Tema",
+      "group": "Ajustes",
+      "route": "settings → Theme section",
+      "type": "screen",
+      "howToReach": "Settings → sección Apariencia → ThemeSelectorCard (selector inline). SettingsThemeDialog es inalcanzable: OpenDialog(THEME) nunca se dispara.",
+      "interestingStates": [
+        "Presets: Classic, Forest Sage",
+        "Modos: Claro, Oscuro, Sistema",
+        "Fondos: Pergamino, Pizarra, Blanco",
+        "Vista previa en vivo"
+      ],
+      "expectedCaptureFile": "19-theme-selector-light.png",
+      "darkCaptureFile": "19-theme-selector-dark.png",
+      "reachable": true,
+      "note": "Capturado el selector real inline (ThemeSelectorCard); el dialog no tiene trigger en la UI."
+    },
+    {
+      "id": "20-unerg-import",
+      "title": "Importación UNERG",
+      "group": "Agenda",
+      "route": "unerg_import (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Agenda → FAB expandible → 'Importar horario UNERG' (UnergScheduleImportSheet, ModalBottomSheet) → picker de PDF. NO hay entrada en Settings.",
+      "interestingStates": [
+        "Selector de archivo .ics/.json",
+        "Vista previa de materias a importar",
+        "Conflictos detectados",
+        "Importación exitosa"
+      ],
+      "expectedCaptureFile": "20-unerg-import-light.png",
+      "darkCaptureFile": "20-unerg-import-dark.png",
+      "reachable": true,
+      "note": "Parcial: el sheet exige un PDF real parseado; se capturó el FAB expandido con la opción. El picker del sistema no se captura (datos reales del dispositivo)."
+    },
+    {
+      "id": "21-share-subject",
+      "title": "Compartir Materia (Share/QR)",
+      "group": "Búsqueda y Compartir",
+      "route": "share_subject (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Detalle de Materia → icono compartir del hero (ShareSubjectBottomSheet; incluye QrCodeShareDialog). Compartir nota usa el share sheet del sistema (NoteShareHelper).",
+      "interestingStates": [
+        "Share sheet del sistema",
+        "Exportar apunte como .md/.txt",
+        "Exportar horario como .ics",
+        "Importar desde archivo"
+      ],
+      "expectedCaptureFile": "21-share-subject-light.png",
+      "darkCaptureFile": "21-share-subject-dark.png",
+      "reachable": true,
+      "note": "Sin export .md/.ics; compartir horario/evaluación no existe."
+    },
+    {
+      "id": "22-login",
+      "title": "Login (No alcanzable)",
+      "group": "Acceso",
+      "route": "login",
+      "type": "screen",
+      "howToReach": "Screen.Login existe en Screen.kt PERO no está en NavGraph.kt ni conectado en MainContent. No hay navegación a esta pantalla.",
+      "interestingStates": [
+        "N/A - No reachable from UI"
+      ],
+      "expectedCaptureFile": "N/A",
+      "darkCaptureFile": "N/A",
+      "reachable": false,
+      "unreachableReason": "Screen.Login definido en Screen.kt pero NO incluido en NavGraph.kt (MainContent). No hay botón, deep link ni navegación programática que lleve a esta pantalla. El flujo usa 'Comenzar en Modo Local' directamente a Onboarding.",
+      "note": "No se muestra en el mapa: el flujo de acceso usa Onboarding."
+    },
+    {
+      "id": "23-splash",
+      "title": "Splash Screen",
+      "group": "Acceso",
+      "route": "N/A (Compose SplashScreen API)",
+      "type": "screen",
+      "howToReach": "Cold start: MainActivity.installSplashScreen() → SplashScreen composable",
+      "interestingStates": [
+        "Animación de entrada",
+        "Carga de tema/fuentes",
+        "Transición a Onboarding/Notes"
+      ],
+      "expectedCaptureFile": "23-splash-light.png",
+      "darkCaptureFile": "23-splash-dark.png",
+      "reachable": true,
+      "note": "Emblema e identidad oficial NotiFast en pantalla de inicio."
+    },
+    {
+      "id": "24-import-subject",
+      "title": "Importar Materia (QR)",
+      "group": "Búsqueda y Compartir",
+      "route": "import_subject (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Apuntes/Home → FAB → 'Importar materia' (ImportSubjectBottomSheet, icono QR)",
+      "interestingStates": [
+        "Escaneo/pegado de QR",
+        "Vista previa de materia a importar",
+        "Confirmación"
+      ],
+      "expectedCaptureFile": "24-import-subject-light.png",
+      "darkCaptureFile": "24-import-subject-dark.png",
+      "reachable": true
+    },
+    {
+      "id": "25-cover-template-editor",
+      "title": "Editor de Portada / Plantilla",
+      "group": "Estudio",
+      "route": "cover_template_editor (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Estudio → FAB 'Nueva plantilla' o tap en plantilla (CoverTemplateEditorSheet; incluye plantilla UNERG)",
+      "interestingStates": [
+        "Nueva plantilla vacía",
+        "Editando plantilla UNERG",
+        "Selector de estilos"
+      ],
+      "expectedCaptureFile": "25-cover-template-editor-light.png",
+      "darkCaptureFile": "25-cover-template-editor-dark.png",
+      "reachable": true,
+      "note": "Editor de plantilla UNERG (título, tipografía APA, autores)."
+    },
+    {
+      "id": "26-study-document-preview",
+      "title": "Preview de Documento",
+      "group": "Estudio",
+      "route": "document_preview (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Estudio → tap en documento (DocumentPreviewModalSheet)",
+      "interestingStates": [
+        "Documento de texto",
+        "Documento PDF/imagen",
+        "Controles de zoom"
+      ],
+      "expectedCaptureFile": "26-study-document-preview-light.png",
+      "darkCaptureFile": "26-study-document-preview-dark.png",
+      "reachable": true,
+      "note": "Preview de 'Guía de derivadas' con acciones rápidas."
+    },
+    {
+      "id": "27-study-document-actions",
+      "title": "Acciones de Documento",
+      "group": "Estudio",
+      "route": "document_actions (bottom sheet)",
+      "type": "sheet",
+      "howToReach": "Estudio → menú de acciones del documento (StudyDocumentActionSheet)",
+      "interestingStates": [
+        "Renombrar, mover, compartir, eliminar",
+        "Confirmación de borrado"
+      ],
+      "expectedCaptureFile": "27-study-document-actions-light.png",
+      "darkCaptureFile": "27-study-document-actions-dark.png",
+      "reachable": true
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-11-05T13:07:12Z",
+    "totalReachable": 26,
+    "totalUnreachable": 1,
+    "device": "SM_A065M (Android)",
+    "appPackage": "com.notifast.app",
+    "notes": "Screen.Login existe en Screen.kt pero NO está en NavGraph: no alcanzable. Flujo de acceso: Onboarding → Notes (modo local). Fase 0 verificada contra Screen.kt/NavGraph.kt/MainActivity.kt: 18/19 son dialogs de Settings (no rutas), 20 UNERG solo desde Agenda (FAB), 21 compartición desde Detalle de Materia (ShareSubjectBottomSheet), 24 importación de materia vía QR (ImportSubjectBottomSheet), 25-27 sheets de Estudio (CoverTemplateEditorSheet, DocumentPreviewModalSheet, StudyDocumentActionSheet)."
+  }
+}

@@ -68,8 +68,9 @@ jobs:
           for i in 1 2 3 4 5 6 7 8; do
             HTML=$(curl -fsSL "https://notifast.pages.dev/" || true)
             PRIVACY=$(curl -fsSL "https://notifast.pages.dev/privacy" || true)
-            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'id="notificaciones"' && echo "$HTML" | grep -q 'hero-logo-stage' && echo "$PRIVACY" | grep -q 'Políticas de Privacidad'; then
-              echo "Cloudflare Pages (https://notifast.pages.dev/) is live and serving the latest NotiFast landing + privacy policy!"
+            VISTAS=$(curl -fsSL "https://notifast.pages.dev/vistas/" || true)
+            if echo "$HTML" | grep -q 'id="temas"' && echo "$HTML" | grep -q 'btn-hero-vistas' && echo "$PRIVACY" | grep -q 'Políticas de Privacidad' && echo "$VISTAS" | grep -q 'Mapa de vistas'; then
+              echo "Cloudflare Pages (https://notifast.pages.dev/) is live and serving the latest NotiFast landing, privacy policy and vistas showcase!"
               exit 0
             fi
             echo "Waiting for Cloudflare Pages edge propagation (attempt $i/8)..."

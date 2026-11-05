@@ -30,3 +30,5 @@ __pycache__/
 # Binary release artifacts
 *.apk
 /release/
+/output/
+

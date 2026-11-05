@@ -1,0 +1,501 @@
+/* NotiFast — Mapa de Vistas (landing/vistas)
+   Tokens copiados de landing/css/tokens.css. Fuentes locales: sin CDN ni Google Fonts. */
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('fonts/plus_jakarta_sans_regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('fonts/plus_jakarta_sans_medium.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('fonts/plus_jakarta_sans_semibold.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('fonts/plus_jakarta_sans_bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('fonts/jetbrains_mono_regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('fonts/jetbrains_mono_medium.ttf') format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('fonts/jetbrains_mono_semibold.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('fonts/jetbrains_mono_bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+:root {
+  --bg-canvas: #FAF9F6;
+  --bg-surface: #FFFFFF;
+  --bg-surface-container: #F3EFEA;
+  --bg-surface-container-high: #EBE6DF;
+  --border-hairline: #E5DFD7;
+  --border-subtle: rgba(24, 26, 31, 0.08);
+  --text-primary: #181A1F;
+  --text-secondary: #4B5563;
+  --text-muted: #475569;
+  --brand-primary: #9E1B32;
+  --brand-primary-light: #FDE8EB;
+  --brand-secondary: #1B5E5E;
+  --brand-secondary-light: #D6F2F0;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --shadow-tactile: 0 6px 22px -4px rgba(24, 26, 31, 0.06), 0 2px 6px -1px rgba(24, 26, 31, 0.03);
+  --shadow-hover: 0 16px 38px -6px rgba(24, 26, 31, 0.1), 0 4px 12px -2px rgba(24, 26, 31, 0.04);
+}
+
+* { box-sizing: border-box; }
+
+html { overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Topbar de Vistas ---- */
+.map-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-hairline);
+  margin-bottom: var(--space-sm);
+}
+
+.map-brand-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.btn-back-landing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  transition: all 0.2s ease;
+}
+
+.btn-back-landing:hover {
+  background: var(--brand-primary-light);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.btn-pdf-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--bg-surface);
+  background: var(--brand-primary);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-tactile);
+  transition: all 0.2s ease;
+}
+
+.btn-pdf-download:hover {
+  background: #7E1528;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.map-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.map-title .accent { color: var(--brand-primary); }
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  align-items: center;
+  margin: var(--space-xs) var(--space-lg) var(--space-lg);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  border: 1px solid var(--border-hairline);
+  background: var(--bg-surface);
+}
+.legend-dot.dark { background: #161E2D; border-color: #2A384E; }
+.legend-type {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-muted);
+}
+
+/* ---- Secciones por flujo ---- */
+main { padding-bottom: var(--space-xxl); }
+
+.flow {
+  margin: 0 var(--space-lg) var(--space-xxl);
+}
+.flow-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid var(--brand-primary);
+}
+.flow-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--brand-primary);
+}
+.flow-path {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ---- Grid de vistas: 4 / 2 / 1 columnas ---- */
+.view-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+  align-items: stretch;
+}
+@media (max-width: 1200px) {
+  .view-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+  .view-grid { grid-template-columns: 1fr; }
+  .map-title, .map-legend, .flow { margin-left: var(--space-md); margin-right: var(--space-md); }
+}
+
+/* ---- Tarjeta de vista ---- */
+.view-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-tactile);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.view-card.is-dual {
+  grid-column: span 2;
+}
+@media (max-width: 680px) {
+  .view-card.is-dual {
+    grid-column: span 1;
+  }
+}
+.view-card.is-unreachable {
+  background: var(--bg-surface-container);
+  border-style: dashed;
+}
+.view-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+.view-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.view-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.view-route {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface-container);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  padding: 2px 7px;
+  overflow-wrap: anywhere;
+}
+.view-type {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--brand-secondary);
+  background: var(--brand-secondary-light);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+}
+.view-type.sheet { color: var(--brand-primary); background: var(--brand-primary-light); }
+.view-type.dialog { color: #854D0E; background: #FEF9C3; }
+.view-note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* ---- Marcos de teléfono (capturas 720x1600 nativas) ---- */
+.shot-pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: stretch;
+  margin-top: auto;
+}
+.shot-pair.is-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+@media (max-width: 680px) {
+  .shot-pair.is-dual {
+    grid-template-columns: 1fr;
+  }
+}
+.shot {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+.shot-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.phone-frame {
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 720 / 1600;
+  border: 3.5px solid #1E232F;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-surface-container-high);
+  box-shadow: 0 4px 14px rgba(24, 26, 31, 0.07);
+  margin: 0 auto;
+}
+.phone-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+}
+.shot-missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 720 / 1600;
+  border: 2px dashed var(--border-hairline);
+  border-radius: var(--radius-md);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-sm);
+}
+
+/* ---- Reglas de Impresión y Exportación a PDF (A4 Landscape) ---- */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm 10mm;
+  }
+
+  html {
+    overflow: visible !important;
+  }
+
+  body {
+    background: var(--bg-canvas) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    font-size: 13px;
+    overflow: visible !important;
+  }
+
+  .map-topbar {
+    border-bottom: none !important;
+    padding: 0 0 4px 0 !important;
+    margin-bottom: 4px !important;
+    background: transparent !important;
+  }
+
+  .btn-back-landing, .btn-pdf-download {
+    display: none !important;
+  }
+
+  .map-title {
+    margin: 0 0 4px 0 !important;
+    font-size: 1.05rem !important;
+  }
+
+  .map-legend {
+    margin: 0 0 12px 0 !important;
+    font-size: 0.7rem !important;
+  }
+
+  .flow {
+    margin: 0 0 18px 0 !important;
+    break-before: page;
+    page-break-before: always;
+  }
+  .flow:first-of-type {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  .flow-head {
+    margin-bottom: 8px !important;
+    padding-bottom: 3px !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .flow-head h2 {
+    font-size: 0.92rem !important;
+  }
+
+  .view-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+    break-inside: auto;
+  }
+
+  .view-card {
+    padding: 10px !important;
+    gap: 6px !important;
+    border: 1px solid #D5CFC7 !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .view-card.is-dual {
+    grid-column: span 2 !important;
+  }
+
+  .view-card h3 {
+    font-size: 0.8125rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .view-meta {
+    gap: 4px !important;
+  }
+
+  .view-route {
+    font-size: 0.58rem !important;
+    padding: 1px 5px !important;
+  }
+
+  .view-type {
+    font-size: 0.53rem !important;
+    padding: 1px 5px !important;
+  }
+
+  .view-note {
+    font-size: 0.65rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .shot-pair {
+    margin-top: auto !important;
+    gap: 6px !important;
+  }
+
+  .shot-pair.is-dual {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .phone-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 485px !important;
+    border: 2.5px solid #1E232F !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+
+  .phone-frame img {
+    max-height: 485px !important;
+    object-fit: contain !important;
+  }
+}

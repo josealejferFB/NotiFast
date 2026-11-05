@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Debug-only mock data seeder. This manifest is merged only into the debug
+      variant; it is never part of a release build. Remove this file and
+      MockDataSeederActivity.kt to eliminate the seeder entirely.
+    -->
+    <application>
+        <activity
+            android:name=".debug.MockDataSeederActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="NotiFast Mock Seeder"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+    </application>
+
+</manifest>

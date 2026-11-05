@@ -672,6 +672,23 @@ class TestLandingStructure(unittest.TestCase):
             for emoji in forbidden:
                 self.assertNotIn(emoji, content, f"Emoji prohibido {emoji} encontrado en {filepath}")
 
+    def test_landing_vistas_integration(self):
+        with open("landing/index.html", "r", encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('href="/vistas/"', html)
+        self.assertIn("btn-hero-vistas", html)
+        self.assertIn("Ver Vistas", html)
+
+        self.assertTrue(os.path.exists("landing/vistas/index.html"))
+        self.assertTrue(os.path.exists("landing/vistas/styles.css"))
+        self.assertTrue(os.path.exists("landing/vistas/vistas.pdf"))
+
+        self.assertTrue(os.path.exists("landing/_redirects"))
+        with open("landing/_redirects", "r", encoding="utf-8") as f:
+            redirects = f.read()
+        self.assertIn("/vistas", redirects)
+
 if __name__ == "__main__":
     unittest.main()
+
 

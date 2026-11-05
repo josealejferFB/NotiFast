@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NotiFast · Mapa de vistas</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="map-topbar">
+  <div class="map-brand-group">
+    <a href="/" class="btn-back-landing" title="Volver a la Landing Page principal">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      <span>Volver a la Landing</span>
+    </a>
+    <p class="map-title"><span class="accent">NotiFast</span> · Mapa de vistas</p>
+  </div>
+  <a href="vistas.pdf" download="NotiFast-Vistas.pdf" class="btn-pdf-download" title="Descargar documento completo en PDF A4">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    <span>Descargar PDF</span>
+  </a>
+</header>
+<p class="map-legend">
+  <span class="legend-item"><span class="legend-dot"></span>Claro (26)</span>
+  <span class="legend-item"><span class="legend-dot dark"></span>Oscuro (6)</span>
+  <span class="legend-item"><span class="legend-type">pantalla</span></span>
+  <span class="legend-item"><span class="legend-type">sheet</span></span>
+  <span class="legend-item"><span class="legend-type">dialog</span></span>
+  <span class="legend-item">26 vistas mapeadas · SM-A065M 720×1600 nativo</span>
+</p>
+<main>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Acceso · Flujo Inicial</h2>
+      <span class="flow-path">Onboarding → Home · Inicialización y Bienvenida</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card is-dual">
+      <div class="view-header">
+        <h3>Onboarding</h3>
+        <div class="view-meta">
+          <code class="view-route">onboarding</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Bienvenida, permisos de notificación y tema en pasos.</p>
+      <div class="shot-pair is-dual"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/01-onboarding-light.png" alt="Onboarding — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure><figure class="shot"><span class="shot-label">Oscuro</span><div class="phone-frame"><img src="screens/01-onboarding-dark.png" alt="Onboarding — Oscuro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Splash Screen</h3>
+        <div class="view-meta">
+          <code class="view-route">N/A (Compose SplashScreen API)</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Emblema e identidad oficial NotiFast en pantalla de inicio.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/23-splash-light.png" alt="Splash Screen — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Apuntes · Navegación y Panorama</h2>
+      <span class="flow-path">Home → Detalle de Materia · Bento Grid</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card is-dual">
+      <div class="view-header">
+        <h3>Home / Apuntes</h3>
+        <div class="view-meta">
+          <code class="view-route">notes</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Lista de materias (bento grid)</p>
+      <div class="shot-pair is-dual"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/02-notes-home-light.png" alt="Home / Apuntes — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure><figure class="shot"><span class="shot-label">Oscuro</span><div class="phone-frame"><img src="screens/02-notes-home-dark.png" alt="Home / Apuntes — Oscuro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Nueva Materia</h3>
+        <div class="view-meta">
+          <code class="view-route">add_subject</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">AddSubjectScreen es código muerto; la captura muestra el camino real FAB → sheet Nueva Materia.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/03-add-subject-light.png" alt="Nueva Materia — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Detalle de Materia</h3>
+        <div class="view-meta">
+          <code class="view-route">subject_detail/{subjectName}</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Panorama de Cálculo II: notas, evaluaciones y horario.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/04-subject-detail-light.png" alt="Detalle de Materia — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Apuntes · Edición y Creación</h2>
+      <span class="flow-path">Editor de Bloques · Sheet de Materia</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Editor de Apunte</h3>
+        <div class="view-meta">
+          <code class="view-route">note_editor (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Apunte existente con markdown, fórmulas y checklist.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/05-note-editor-light.png" alt="Editor de Apunte — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Nueva Materia (Sheet)</h3>
+        <div class="view-meta">
+          <code class="view-route">add_subject_sheet (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Formulario compacto en sheet</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/06-add-subject-sheet-light.png" alt="Nueva Materia (Sheet) — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Agenda · Horarios Semanales</h2>
+      <span class="flow-path">Timeline L-V · Creación y Edición de Clases</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card is-dual">
+      <div class="view-header">
+        <h3>Agenda / Horarios</h3>
+        <div class="view-meta">
+          <code class="view-route">agenda</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Timeline semanal L-V con clases</p>
+      <div class="shot-pair is-dual"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/07-schedules-light.png" alt="Agenda / Horarios — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure><figure class="shot"><span class="shot-label">Oscuro</span><div class="phone-frame"><img src="screens/07-schedules-dark.png" alt="Agenda / Horarios — Oscuro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Nuevo Horario</h3>
+        <div class="view-meta">
+          <code class="view-route">add_schedule (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Formulario: materia, día, hora, aula, tipo, recurrencia</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/08-add-schedule-light.png" alt="Nuevo Horario — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Editar Horario</h3>
+        <div class="view-meta">
+          <code class="view-route">edit_schedule/{scheduleId} (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Formulario precargado</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/09-edit-schedule-light.png" alt="Editar Horario — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Agenda · Importación Académica</h2>
+      <span class="flow-path">Parser de Horarios PDF UNERG · FAB contextual</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Importación UNERG</h3>
+        <div class="view-meta">
+          <code class="view-route">unerg_import (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Parcial: el sheet exige un PDF real parseado; se capturó el FAB expandido con la opción. El picker del sistema no se captura (datos reales del dispositivo).</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/20-unerg-import-light.png" alt="Importación UNERG — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Estudio · Centro de Documentos</h2>
+      <span class="flow-path">StudyHub · Plantillas APA · Previsualización</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card is-dual">
+      <div class="view-header">
+        <h3>Centro de Estudio</h3>
+        <div class="view-meta">
+          <code class="view-route">estudio</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Documentos de estudio (guías, formularios) y plantillas.</p>
+      <div class="shot-pair is-dual"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/10-study-hub-light.png" alt="Centro de Estudio — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure><figure class="shot"><span class="shot-label">Oscuro</span><div class="phone-frame"><img src="screens/10-study-hub-dark.png" alt="Centro de Estudio — Oscuro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Editor de Portada / Plantilla</h3>
+        <div class="view-meta">
+          <code class="view-route">cover_template_editor (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Editor de plantilla UNERG (título, tipografía APA, autores).</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/25-cover-template-editor-light.png" alt="Editor de Portada / Plantilla — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Preview de Documento</h3>
+        <div class="view-meta">
+          <code class="view-route">document_preview (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Preview de &#x27;Guía de derivadas&#x27; con acciones rápidas.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/26-study-document-preview-light.png" alt="Preview de Documento — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Estudio · Gestión Documental</h2>
+      <span class="flow-path">Acciones de Documento · Organización de Archivos</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Acciones de Documento</h3>
+        <div class="view-meta">
+          <code class="view-route">document_actions (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Renombrar, mover, compartir, eliminar</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/27-study-document-actions-light.png" alt="Acciones de Documento — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Calificaciones · Promedios y Ponderación</h2>
+      <span class="flow-path">Promedio Global · Evaluación y Ponderaciones</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card is-dual">
+      <div class="view-header">
+        <h3>Calificaciones</h3>
+        <div class="view-meta">
+          <code class="view-route">calificaciones</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Promedio general (hero card)</p>
+      <div class="shot-pair is-dual"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/11-grades-light.png" alt="Calificaciones — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure><figure class="shot"><span class="shot-label">Oscuro</span><div class="phone-frame"><img src="screens/11-grades-dark.png" alt="Calificaciones — Oscuro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Nueva Evaluación</h3>
+        <div class="view-meta">
+          <code class="view-route">add_evaluation?subject={subject} (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Formulario: nombre, tipo, peso, nota, fecha</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/12-add-evaluation-light.png" alt="Nueva Evaluación — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Editar Evaluación</h3>
+        <div class="view-meta">
+          <code class="view-route">edit_evaluation/{evalId} (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Formulario precargado</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/13-edit-evaluation-light.png" alt="Editar Evaluación — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Ajustes · Perfil y Respaldo Cloud</h2>
+      <span class="flow-path">Perfil Estudiantil · Cloud Hub Google Drive</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card is-dual">
+      <div class="view-header">
+        <h3>Ajustes</h3>
+        <div class="view-meta">
+          <code class="view-route">settings</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Perfil (nombre, email, foto)</p>
+      <div class="shot-pair is-dual"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/14-settings-light.png" alt="Ajustes — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure><figure class="shot"><span class="shot-label">Oscuro</span><div class="phone-frame"><img src="screens/14-settings-dark.png" alt="Ajustes — Oscuro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Editar Perfil</h3>
+        <div class="view-meta">
+          <code class="view-route">edit_profile</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Formulario: nombre, email</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/15-edit-profile-light.png" alt="Editar Perfil — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Cloud Hub (Sync/Backup)</h3>
+        <div class="view-meta">
+          <code class="view-route">cloud_hub (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Estado: No conectado / Conectado / Sincronizando</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/17-cloud-hub-light.png" alt="Cloud Hub (Sync/Backup) — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Ajustes · Personalización y Privacidad</h2>
+      <span class="flow-path">Privacidad Offline-First · Selector de Tema</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Privacidad y Acerca de</h3>
+        <div class="view-meta">
+          <code class="view-route">settings → Privacy/About sections</code>
+          <span class="view-type dialog">dialog</span>
+        </div>
+      </div>
+      <p class="view-note">No son rutas independientes: dos estados desde filas de Settings.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/18-privacy-about-light.png" alt="Privacidad y Acerca de — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Selector de Tema</h3>
+        <div class="view-meta">
+          <code class="view-route">settings → Theme section</code>
+          <span class="view-type pantalla">pantalla</span>
+        </div>
+      </div>
+      <p class="view-note">Capturado el selector real inline (ThemeSelectorCard); el dialog no tiene trigger en la UI.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/19-theme-selector-light.png" alt="Selector de Tema — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+  <section class="flow">
+    <div class="flow-head">
+      <h2>Búsqueda y Compartir · Herramientas Globales</h2>
+      <span class="flow-path">Búsqueda Multi-Entidad · P2P QR y Archivo</span>
+    </div>
+    <div class="view-grid">
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Búsqueda Global</h3>
+        <div class="view-meta">
+          <code class="view-route">global_search (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Resultados: notas, evaluaciones, horarios</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/16-global-search-light.png" alt="Búsqueda Global — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Compartir Materia (Share/QR)</h3>
+        <div class="view-meta">
+          <code class="view-route">share_subject (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Sin export .md/.ics; compartir horario/evaluación no existe.</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/21-share-subject-light.png" alt="Compartir Materia (Share/QR) — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    <article class="view-card">
+      <div class="view-header">
+        <h3>Importar Materia (QR)</h3>
+        <div class="view-meta">
+          <code class="view-route">import_subject (bottom sheet)</code>
+          <span class="view-type sheet">sheet</span>
+        </div>
+      </div>
+      <p class="view-note">Escaneo/pegado de QR</p>
+      <div class="shot-pair"><figure class="shot"><span class="shot-label">Claro</span><div class="phone-frame"><img src="screens/24-import-subject-light.png" alt="Importar Materia (QR) — Claro" loading="eager" decoding="async" width="720" height="1600"></div></figure></div>
+    </article>
+    </div>
+  </section>
+</main>
+</body>
+</html>

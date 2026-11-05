@@ -85,6 +85,18 @@ class TestLandingE2E(unittest.TestCase):
                 self.assertIn("Privacidad Radical", body)
                 self.assertIn("Volver a la Landing", body)
 
+    def test_get_vistas_html(self):
+        url = self.get_url("/vistas/")
+        with urllib.request.urlopen(url) as response:
+            self.assertEqual(response.status, 200)
+            content_type = response.headers.get("Content-Type", "")
+            self.assertIn("text/html", content_type)
+            body = response.read().decode("utf-8")
+            self.assertIn("<!DOCTYPE html>", body)
+            self.assertIn("NotiFast · Mapa de vistas", body)
+            self.assertIn("Volver a la Landing", body)
+            self.assertIn("Descargar PDF", body)
+
     def test_css_assets_serve_correctly(self):
         for css_file in ["/css/tokens.css", "/css/styles.css", "/css/dynamic-showcase.css", "/css/docs.css", "/css/privacy.css"]:
             url = self.get_url(css_file)
