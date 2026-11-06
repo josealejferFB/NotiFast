@@ -247,27 +247,136 @@
     </defs>
   </svg>
 
-  <!-- Dynamic Educational Background Stickers (NotiFastStudyBackground.kt) -->
-  <div id="bg-particles-container" aria-hidden="true"></div>
+  <!-- Fondo Dinámico Ruby & Aqua con Auroras Orbitales y 12 Doodles Vectoriales -->
+  <div class="notifast-background" id="bgContainer" aria-hidden="true">
+    <!-- Auroras dinámicas Ruby & Aqua -->
+    <div class="aurora-orb aurora-ruby"></div>
+    <div class="aurora-orb aurora-aqua"></div>
+    <div class="aurora-orb aurora-indigo"></div>
+
+    <!-- Capa de símbolos vectoriales de materias -->
+    <div class="doodle-layer">
+      <!-- 1. Integral f(x) (Cálculo - Ruby) -->
+      <div class="doodle doodle-integral">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-ruby)" stroke-width="2.8" stroke-linecap="round">
+          <path d="M28 7c-5 0-7 3.5-7 8v18c0 4.5-2 8-7 8" />
+          <text x="25" y="27" fill="var(--color-ruby)" font-size="14" font-weight="800" font-family="sans-serif" stroke="none">f(x)</text>
+        </svg>
+      </div>
+
+      <!-- 2. Matraz (Química / Lab - Aqua) -->
+      <div class="doodle doodle-flask">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-aqua)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 6h10M24 6v12l11 18a4 4 0 0 1-3.4 6H16.4a4 4 0 0 1-3.4-6l11-18V6" fill="rgba(0, 168, 150, 0.12)" />
+          <path d="M15 32h18" stroke-dasharray="3 3" />
+          <circle cx="21" cy="36" r="2" fill="var(--color-aqua)" stroke="none" />
+          <circle cx="27" cy="34" r="1.5" fill="var(--color-aqua)" stroke="none" />
+        </svg>
+      </div>
+
+      <!-- 3. Átomo orbital (Física - Aqua) -->
+      <div class="doodle doodle-atom-tr">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-aqua)" stroke-width="2.4">
+          <ellipse cx="24" cy="24" rx="21" ry="8" transform="rotate(30 24 24)" fill="rgba(0, 168, 150, 0.1)" />
+          <ellipse cx="24" cy="24" rx="21" ry="8" transform="rotate(-30 24 24)" fill="rgba(0, 168, 150, 0.1)" />
+          <ellipse cx="24" cy="24" rx="21" ry="8" transform="rotate(90 24 24)" fill="rgba(0, 168, 150, 0.1)" />
+          <circle cx="24" cy="24" r="4" fill="var(--color-aqua)" stroke="none" />
+        </svg>
+      </div>
+
+      <!-- 4. Birrete de Grado (UNERG - Ruby) -->
+      <div class="doodle doodle-cap">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-ruby)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 7L3 17l21 11 21-11L24 7z" fill="rgba(158, 27, 50, 0.14)" />
+          <path d="M9 21v11c0 5 6.7 9 15 9s15-4 15-9V21" fill="rgba(158, 27, 50, 0.14)" />
+          <path d="M45 19v15" stroke-width="2.8" />
+          <circle cx="45" cy="35" r="2.5" fill="var(--color-ruby)" stroke="none" />
+        </svg>
+      </div>
+
+      <!-- 5. Compás Técnico (Dibujo / Portadas - Cyan) -->
+      <div class="doodle doodle-compass">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-cyan)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="9" r="4.5" fill="rgba(2, 132, 199, 0.12)" />
+          <path d="M21 14L9 43M27 14L39 43M14 31h20" />
+          <circle cx="24" cy="9" r="2" fill="var(--color-cyan)" stroke="none" />
+        </svg>
+      </div>
+
+      <!-- 6. Código < / > (Programación - Índigo) -->
+      <div class="doodle doodle-code">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-indigo)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 12L4 24l11 12M33 12l11 12-11 12M28 8L20 40" />
+        </svg>
+      </div>
+
+      <!-- 7. Número Pi π (Matemáticas - Ruby) -->
+      <div class="doodle doodle-pi">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-ruby)" stroke-width="2.8" stroke-linecap="round">
+          <path d="M7 13h34M17 13v24M31 13v21c0 3 2.5 4 4.5 4" />
+        </svg>
+      </div>
+
+      <!-- 8. Calculadora (Estadística - Esmeralda) -->
+      <div class="doodle doodle-calc">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-emerald)" stroke-width="2.6" stroke-linecap="round">
+          <rect x="9" y="5" width="30" height="38" rx="7" fill="rgba(21, 128, 61, 0.12)" />
+          <rect x="15" y="10" width="18" height="8" rx="2.5" fill="rgba(21, 128, 61, 0.2)" />
+          <path d="M15 24h5M28 24h5M15 31h5M28 31h5M15 37h5M28 37h5" stroke-width="2.4" />
+        </svg>
+      </div>
+
+      <!-- 9. Libro (Inglés / Humanidades - Ámbar) -->
+      <div class="doodle doodle-book">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-amber)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 9c6.5-3.5 13-2 19 2 6-4 12.5-5.5 19-2v27c-6.5-3.5-13-2-19 2-6-4-12.5-5.5-19-2V9z" fill="rgba(217, 119, 6, 0.12)" />
+          <path d="M24 11v27" />
+        </svg>
+      </div>
+
+      <!-- 10. Bombillo de Ideas (Estudio - Ámbar) -->
+      <div class="doodle doodle-lightbulb">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-amber)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 35h14M19 40h10M24 6a14 14 0 0 0-10 24c1.8 2.2 2.5 4.5 2.5 7h15c0-2.5.7-4.8 2.5-7A14 14 0 0 0 24 6z" fill="rgba(217, 119, 6, 0.14)" />
+          <path d="M21 21l3-4 3 4" stroke-width="2.2" />
+        </svg>
+      </div>
+
+      <!-- 11. Sumatoria Σ (Estadística - Esmeralda) -->
+      <div class="doodle doodle-sigma">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-emerald)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M38 9H13l13 15-13 15h25" fill="rgba(21, 128, 61, 0.12)" />
+        </svg>
+      </div>
+
+      <!-- 12. Átomo Bohr Inferior (Física - Aqua) -->
+      <div class="doodle doodle-atom-br">
+        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-aqua)" stroke-width="2.4">
+          <ellipse cx="24" cy="24" rx="21" ry="8" transform="rotate(30 24 24)" fill="rgba(0, 168, 150, 0.1)" />
+          <ellipse cx="24" cy="24" rx="21" ry="8" transform="rotate(-30 24 24)" fill="rgba(0, 168, 150, 0.1)" />
+          <ellipse cx="24" cy="24" rx="21" ry="8" transform="rotate(90 24 24)" fill="rgba(0, 168, 150, 0.1)" />
+          <circle cx="24" cy="24" r="4" fill="var(--color-aqua)" stroke="none" />
+        </svg>
+      </div>
+    </div>
+  </div>
 
   <!-- Header & Navigation -->
   <header class="header" id="main-header">
     <div class="nav-container">
       <a href="#" class="brand-logo" aria-label="NotiFast Inicio">
-        <img src="assets/logo.png" alt="NotiFast Logo" style="width: 32px; height: 32px; border-radius: 8px;">
+        <img src="assets/logo.png" alt="NotiFast Logo" style="width: 32px; height: 32px; border-radius: var(--radius-sm);">
         <span class="logo-text">NotiFast</span>
       </a>
       <nav class="nav-links" aria-label="Navegación principal">
         <a href="#agenda">Agenda</a>
-        <a href="#importador">Importar</a>
         <a href="#apuntes">Apuntes</a>
-        <a href="#estudio">Estudio</a>
-        <a href="#calificaciones">Calificaciones</a>
+        <a href="#calificaciones">Notas</a>
         <a href="#temas">Temas</a>
-        <a href="#notificaciones">Notificaciones</a>
-        <a href="#analiticas">Analíticas</a>
-        <a href="#compartir">Pack P2P</a>
-        <a href="#docentes">Docentes</a>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <a href="/vistas/">Vistas</a>
+        <a href="/docs">Docs</a>
+        <a href="/privacy">Privacidad</a>
       </nav>
       <div class="nav-actions">
         <button type="button" class="nav-theme-quick-btn" id="btn-nav-theme-mode" title="Alternar Modo Claro / Oscuro en vivo" aria-label="Alternar Modo Claro u Oscuro">
@@ -289,6 +398,14 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
           <span>Documentación &amp; Tesis</span>
         </a>
+        <a href="/vistas/" class="mobile-nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg>
+          <span>Mapa de Vistas (26)</span>
+        </a>
+        <a href="/privacy" class="mobile-nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-shield"></use></svg>
+          <span>Política de Privacidad</span>
+        </a>
         <a href="#agenda" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
           <span>Agenda Activa</span>
@@ -303,39 +420,15 @@
         </a>
         <a href="#estudio" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-description"></use></svg>
-          <span>Docs &amp; Portadas</span>
+          <span>Estudio &amp; Portadas</span>
         </a>
         <a href="#calificaciones" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
           <span>Calificaciones</span>
         </a>
-        <a href="#evaluaciones" class="mobile-nav-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-event"></use></svg>
-          <span>Calendario</span>
-        </a>
         <a href="#temas" class="mobile-nav-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
-          <span>Temas</span>
-        </a>
-        <a href="/vistas/" class="mobile-nav-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg>
-          <span>Mapa de Vistas (26)</span>
-        </a>
-        <a href="#notificaciones" class="mobile-nav-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-notifications"></use></svg>
-          <span>Notificaciones</span>
-        </a>
-        <a href="#analiticas" class="mobile-nav-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-analytics"></use></svg>
-          <span>Analíticas</span>
-        </a>
-        <a href="#compartir" class="mobile-nav-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-qr"></use></svg>
-          <span>Pack P2P &amp; Drive</span>
-        </a>
-        <a href="#docentes" class="mobile-nav-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
-          <span>Directorio Docente</span>
+          <span>Temas de Color</span>
         </a>
       </div>
       <div class="mobile-nav-footer">
@@ -345,23 +438,16 @@
   </header>
 
   <main id="main-content">
-    <!-- Hero Section: Split Asymmetric Showcase with Interactive Android Mockup -->
+    <!-- Hero Section: Primera Vista con Video Publicitario YouTube Short & Botones Clave -->
     <section class="hero-section">
       <div class="hero-split-grid">
-        <!-- Columna Izquierda: Propuesta de Valor & Métricas Reales -->
+        <!-- Columna Izquierda: Titular Directo + Botones de Descarga, Docs, Vistas y Privacidad -->
         <div class="hero-copy-col">
-          <div class="hero-status-strip">
-            <div class="hero-pill-badge">
-              <svg style="width: 15px; height: 15px; color: var(--brand-secondary);" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-autoawesome"></use></svg>
-              <span>NotiFast v1.0 RC • Android Nativo</span>
-            </div>
-          </div>
-
           <h1 class="hero-title">
-            Todo tu semestre,<br><span class="accent-ruby">desplegado con calma táctil.</span>
+            Todo tu semestre,<br><span class="accent-ruby">en calma y sin conexión.</span>
           </h1>
           <p class="hero-subtitle">
-            El cuaderno académico inteligente y 100% sin conexión. Apuntes en Markdown, cálculo exacto de promedios ponderados, temas de color para cuidar tu vista y alertas sin distracciones.
+            Importa tu horario DACE en un segundo, toma apuntes con LaTeX, simula tus notas y personaliza tu cuaderno en Android.
           </p>
 
           <div class="hero-ctas">
@@ -376,10 +462,6 @@
               <span>Documentación</span>
               <span class="hero-docs-tag">Tesis</span>
             </a>
-            <a href="#temas" class="btn btn-secondary btn-hero-themes" title="Probar Estudio de Temas de Color">
-              <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
-              <span>Probar Temas</span>
-            </a>
             <a href="/vistas/" class="btn btn-secondary btn-hero-vistas" title="Mapa Visual y Catálogo de 26 Pantallas de la App">
               <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg>
               <span>Ver Vistas</span>
@@ -387,123 +469,76 @@
             </a>
           </div>
 
-          <div class="hero-proof-bar" aria-label="Indicadores de ingeniería del proyecto">
-            <div class="proof-metric">
-              <span class="proof-value">100% Offline-First</span>
-              <span class="proof-label">Sin conexión requerida</span>
-            </div>
-            <div class="proof-metric">
-              <span class="proof-value">805 Tests</span>
-              <span class="proof-label">Pruebas unitarias en verde</span>
-            </div>
-            <div class="proof-metric">
-              <span class="proof-value">6 Paletas &amp; 6 Lienzos</span>
-              <span class="proof-label">Modo Claro, Oscuro y Papel</span>
-            </div>
+          <div class="hero-tertiary-links" aria-label="Accesos rápidos adicionales">
+            <a href="/privacy" class="hero-inline-link btn-hero-privacy" title="Política de Privacidad 100% Offline-First">
+              <svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-shield"></use></svg>
+              <span>Privacidad 100% Offline</span>
+            </a>
+            <a href="#temas" class="hero-inline-link btn-hero-themes" title="Probar Estudio de Temas de Color">
+              <svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-palette"></use></svg>
+              <span>Probar Estudio de Temas</span>
+            </a>
           </div>
         </div>
 
-        <!-- Columna Derecha: Emblema Académico & Motion del Logo NotiFast -->
-        <div class="hero-motion-stage" id="hero-logo-stage" aria-label="Emblema académico interactivo de NotiFast">
-          <!-- Aura ambiental suave y destellos de precisión -->
-          <div class="emblem-aura" aria-hidden="true"></div>
-
-          <!-- Anillos concéntricos geométricos de precisión (Astrolabio y compás académico) -->
-          <div class="emblem-orbit-outer" aria-hidden="true"></div>
-          <div class="emblem-orbit-inner" aria-hidden="true"></div>
-
-          <!-- Escudo / Tarjeta central de NotiFast -->
-          <div class="emblem-shield" id="emblem-shield">
-            <!-- Marco de relieve y resplandor del Logo -->
-            <div class="emblem-icon-frame">
-              <div class="emblem-logo-glow" aria-hidden="true"></div>
-              <img src="assets/logo.png" alt="NotiFast Logo Oficial" class="emblem-logo-img" width="88" height="88">
+        <!-- Columna Derecha: Video Publicitario Oficial en Formato Vertical 9:16 -->
+        <div class="hero-short-stage" id="hero-logo-stage" aria-label="Video publicitario oficial de NotiFast">
+          <div class="hero-short-frame" id="emblem-shield">
+            <div class="hero-short-bezel">
+              <span class="hero-short-badge">
+                <span class="hero-short-dot" aria-hidden="true"></span>
+                <span>NotiFast en acción</span>
+              </span>
+              <div class="hero-short-cam" aria-hidden="true"></div>
+              <span>Android</span>
             </div>
-
-            <!-- Nombre de marca e identidad académica -->
-            <div class="emblem-brand-card">
-              <span class="emblem-brand-title">NotiFast</span>
-              <span class="emblem-brand-subtitle">Cuaderno Académico Inteligente</span>
-              <div class="emblem-pills-row">
-                <span class="emblem-spec-pill"><span class="emblem-dot-live"></span> 100% Offline</span>
-                <span class="emblem-spec-pill">Sin Anuncios</span>
-                <span class="emblem-spec-pill">Código Abierto</span>
+            <div class="hero-short-viewport">
+              <div class="hero-short-fallback" aria-hidden="true">
+                <img src="assets/logo.png" alt="" width="48" height="48">
+                <strong>NotiFast Short Oficial</strong>
+                <span>Cargando vista previa en video...</span>
               </div>
+              <iframe
+                class="hero-short-iframe"
+                src="https://www.youtube.com/embed/BvFrJSQnDxo?rel=0&modestbranding=1&playsinline=1"
+                title="NotiFast — Video Publicitario Oficial"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+              </iframe>
             </div>
-          </div>
-
-          <!-- Nodos Satélites de los 4 Pilares Académicos -->
-          <div class="emblem-satellites-group">
-            <div class="emblem-node node-nw" title="Editor por Bloques, Markdown & LaTeX">
-              <div class="node-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-menubook"></use></svg>
-              </div>
-              <div class="node-text">
-                <span class="node-title">Apuntes &amp; LaTeX</span>
-                <span class="node-sub">Toma notas rápido</span>
-              </div>
-            </div>
-
-            <div class="emblem-node node-ne" title="Cálculo de Promedios Ponderados y Simulador de Metas">
-              <div class="node-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-emojievents"></use></svg>
-              </div>
-              <div class="node-text">
-                <span class="node-title">Promedios</span>
-                <span class="node-sub">Ponderación exacta</span>
-              </div>
-            </div>
-
-            <div class="emblem-node node-sw" title="Alertas Proactivas">
-              <div class="node-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-notifications"></use></svg>
-              </div>
-              <div class="node-text">
-                <span class="node-title">Recordatorios</span>
-                <span class="node-sub">Avisos antes de clase</span>
-              </div>
-            </div>
-
-            <div class="emblem-node node-se" title="Copia de Seguridad y Transferencia Offline">
-              <div class="node-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-cloud-drive"></use></svg>
-              </div>
-              <div class="node-text">
-                <span class="node-title">Respaldo</span>
-                <span class="node-sub">Código QR y Drive</span>
-              </div>
+            <div class="hero-short-footer">
+              <span>Activa el audio en el video</span>
+              <a href="https://youtube.com/shorts/BvFrJSQnDxo" class="hero-short-ext-link" target="_blank" rel="noopener noreferrer">
+                <span>Abrir en YouTube</span>
+              </a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ACTO I: CAPTURA Y RUTINA DIARIA -->
+    <div class="story-chapter-banner" aria-label="Acto I: Captura y Rutina Diaria">
+      <span class="story-chapter-pill">Acto I &bull; Captura y Rutina Diaria</span>
+      <div class="story-chapter-line" aria-hidden="true"></div>
+    </div>
 
-    <!-- 2. MÓDULO 1: AGENDA & CLASE EN CURSO (ScheduleLiveStatusCard fiel a la app) -->
+    <!-- STORYSCROLLING CAPÍTULO 1: AGENDA EN CURSO -->
     <section class="dynamic-feature-row section-schedule-radar" id="agenda">
       <div class="feature-info">
+        <span class="feature-kicker">01 &bull; Agenda Activa</span>
         <h2 class="feature-title">
-          Tu clase en curso,<br>con acción inmediata al apunte.
+          Tu clase en curso,<br>a un toque del apunte.
         </h2>
         <p class="feature-desc">
-          NotiFast identifica qué clase tienes en este momento. Mira el tiempo restante y entra a tus notas con un solo toque.
+          Detecta qué materia tienes ahora, muestra el aula y abre tu cuaderno al instante.
         </p>
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Baliza en vivo que muestra tu materia activa, aula y tiempo restante sin buscar en fotos.</span>
-          </li>
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Botón directo para abrir o tomar notas de la clase actual.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Tarjeta de Horario en Curso fiel a ScheduleLiveStatusCard.kt -->
         <div class="schedule-live-card">
-          <!-- Cabecera de Baliza -->
           <div class="live-beacon-header">
             <div class="beacon-tag">
               <span class="beacon-pulse-dot" aria-hidden="true"></span>
@@ -512,13 +547,11 @@
             <span class="beacon-remaining">Faltan 45 min</span>
           </div>
 
-          <!-- Información de la Clase -->
           <div class="live-class-details">
             <h3 class="live-subject-name">Cálculo Diferencial</h3>
             <p class="live-subject-time">08:00 - 10:00 • Aula 204 • Edificio de Ciencias</p>
           </div>
 
-          <!-- Barra de Tiempo Transcurrido (schedule-progress-bar) -->
           <div class="schedule-progress-container">
             <div class="schedule-progress-bar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100">
               <div class="progress-fill" style="width: 62.5%;"></div>
@@ -530,7 +563,6 @@
             </div>
           </div>
 
-          <!-- Botón de Acción Rápida: Tomar Apuntes -->
           <div class="live-actions-row">
             <button class="btn btn-primary btn-take-notes" id="btn-take-notes-demo">
               <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-menubook"></use></svg>
@@ -541,29 +573,18 @@
       </div>
     </section>
 
-    <!-- 3. MÓDULO NUEVO: IMPORTADOR AUTOMÁTICO DE HORARIOS DACE PDF (SchedulePdfImportSheet.kt & DaceScheduleParser.kt) -->
+    <!-- STORYSCROLLING CAPÍTULO 2: IMPORTADOR DACE PDF -->
     <section class="dynamic-feature-row row-reverse section-dace-import" id="importador">
       <div class="feature-info">
         <h2 class="feature-title">
           Tu comprobante de DACE,<br><span class="accent-ruby">convertido en agenda viva.</span>
         </h2>
         <p class="feature-desc">
-          Sube el PDF de tu inscripción en la <strong>UNERG</strong> y NotiFast extrae materias, secciones, aulas y horarios en menos de un segundo. Todo ocurre en tu teléfono: tus datos nunca salen de él.
+          Sube el PDF de inscripción de la UNERG y extrae materias, secciones y horarios sin conexión.
         </p>
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Extrae materias, secciones y aulas del PDF, descartando clases no presenciales.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Vista previa con interruptores por materia y estrategia: combinar o reemplazar.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Hoja de Vista Previa de Importación DACE (DaceScheduleImportPreviewSheet.kt) -->
         <div class="dace-import-card">
           <div class="dace-card-header">
             <div class="dace-file-beacon">
@@ -573,7 +594,6 @@
             <span class="dace-parser-badge">100% Offline</span>
           </div>
 
-          <!-- Datos del Estudiante Extraídos del PDF -->
           <div class="dace-student-strip">
             <div class="dace-student-row">
               <div class="dace-student-avatar" aria-hidden="true">
@@ -589,7 +609,6 @@
 
           <div class="dace-preview-label">VISTA PREVIA DE IMPORTACIÓN</div>
 
-          <!-- Materias Detectadas con Interruptores -->
           <div class="dace-subjects-list" role="list" aria-label="Materias detectadas en el PDF">
             <div class="dace-subject-row active" role="listitem">
               <div class="dace-subject-icon" style="background: #EFF6FF; color: #2563EB;" aria-hidden="true">
@@ -636,7 +655,6 @@
             </div>
           </div>
 
-          <!-- Estrategia de Importación (Merge vs Reemplazo) -->
           <div class="dace-strategy-box">
             <span class="dace-strategy-label">Estrategia de importación</span>
             <div class="dace-strategy-chips" role="radiogroup" aria-label="Estrategia de importación de horario">
@@ -656,31 +674,19 @@
       </div>
     </section>
 
-    <!-- 4. MÓDULO 3: APUNTES POR BLOQUES, MARKDOWN & FOTOS ANOTADAS (NoteEditorBottomSheet.kt fiel a la app) -->
+    <!-- STORYSCROLLING CAPÍTULO 3: APUNTES POR BLOQUES, MARKDOWN & FOTOS ANOTADAS -->
     <section class="dynamic-feature-row section-notes-flow" id="apuntes">
       <div class="feature-info">
         <h2 class="feature-title">
-          Tus apuntes por bloques OneNote-like,<br><span class="accent-ruby">con fórmulas LaTeX y fotos de pizarra.</span>
+          Apuntes por bloques,<br><span class="accent-ruby">con LaTeX y pizarra anotada.</span>
         </h2>
         <p class="feature-desc">
-          Arquitectura modular por bloques: combina títulos, listas de tareas, notas de voz, citas y fórmulas LaTeX en un solo apunte. Anota fotos de la pizarra con el dedo, protegido con blindaje contra swipe accidental y salvaguarda de borradores.
+          Combina texto, listas, voz, fórmulas y fotos rayadas a mano con autoguardado anticaídas.
         </p>
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Bloques modulares: títulos, listas, notas de voz, fórmulas LaTeX y fotos anotadas a mano.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-primary-light); color: var(--brand-primary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Blindaje anti-pérdida: protección contra swipe accidental, botón Atrás de 3 niveles y recuperación de borradores.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Simulador del Editor por Bloques de la App (NoteEditorBottomSheet.kt) -->
         <div class="note-editor-simulator">
-          <!-- Cabecera del Editor -->
           <div class="editor-sheet-header">
             <span class="editor-header-title">Nuevo Apunte</span>
             <div class="editor-header-actions">
@@ -689,7 +695,6 @@
             </div>
           </div>
 
-          <!-- Metadatos de la Nota (Materia y Etiquetas) -->
           <div class="editor-meta-strip">
             <div class="editor-subject-badge">
               <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
@@ -702,12 +707,10 @@
             </div>
           </div>
 
-          <!-- Título del Apunte -->
           <div class="editor-title-container">
             <h3 class="editor-note-title">Teorema del Valor Medio y Optimización</h3>
           </div>
 
-          <!-- Barra Docked Accessory de Markdown (DockedAccessoryToolbar.kt) -->
           <div class="markdown-toolbar" role="toolbar" aria-label="Herramientas de formato Markdown">
             <button class="tb-btn" title="Negrita"><b>B</b></button>
             <button class="tb-btn" title="Cursiva"><i>I</i></button>
@@ -723,7 +726,6 @@
             <button class="tb-btn" title="Adjuntar foto"><svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-camera"></use></svg></button>
           </div>
 
-          <!-- Hoja Renderizada del Editor (rich-editor-sheet) -->
           <div class="rich-editor-sheet">
             <div class="rendered-markdown-content">
               <h4># Teorema de Lagrange</h4>
@@ -748,7 +750,6 @@
                 </label>
               </div>
 
-              <!-- Foto de Pizarra Anotada (PhotoAnnotatorScreen.kt) -->
               <div class="board-photo-block">
                 <div class="board-photo-frame" aria-hidden="true">
                   <svg class="board-photo-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-camera"></use></svg>
@@ -778,25 +779,15 @@
       </div>
     </section>
 
-    <!-- 5. MÓDULO NUEVO: ÁREA DE ESTUDIO — DOCUMENTOS POR MATERIA & CREADOR DE PORTADAS (StudyDocumentsSheet.kt & AcademicCoverCreatorSheet.kt) -->
+    <!-- STORYSCROLLING CAPÍTULO 4: DOCUMENTOS POR MATERIA & CREADOR DE PORTADAS -->
     <section class="dynamic-feature-row row-reverse section-study-hub" id="estudio">
       <div class="feature-info">
         <h2 class="feature-title">
-          Documentos por materia<br><span class="accent-aqua">y portadas listas para entregar.</span>
+          Documentos por materia<br><span class="accent-aqua">y portadas en un toque.</span>
         </h2>
         <p class="feature-desc">
-          Centraliza tus PDF y DOCX junto a cada asignatura y genera portadas académicas con normas APA, IEEE o institucionales. Autocompletado inteligente, vista previa en vivo y salida a <code>.docx</code> o Google Docs.
+          Guarda tus PDF o DOCX por asignatura y genera portadas APA o IEEE hacia Word y Google Docs.
         </p>
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Organiza PDF y DOCX por materia, con visores integrados y almacenamiento privado.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Portadas APA, IEEE o de Tesis con autocompletado y salida a Word o Google Docs.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
@@ -911,17 +902,23 @@
       </div>
     </section>
 
-    <!-- 6. MÓDULO 4: CALIFICACIONES (MainAverageDashboard fiel a la app) -->
+    <!-- ACTO II: RENDIMIENTO Y SIMULACIÓN -->
+    <div class="story-chapter-banner" aria-label="Acto II: Rendimiento y Simulación">
+      <span class="story-chapter-pill">Acto II &bull; Rendimiento y Simulación</span>
+      <div class="story-chapter-line" aria-hidden="true"></div>
+    </div>
+
+    <!-- STORYSCROLLING CAPÍTULO 5: CALIFICACIONES MULTIESCALA -->
     <section class="dynamic-feature-row section-grades-lab" id="calificaciones">
       <div class="feature-info">
+        <span class="feature-kicker">05 &bull; Escalas por País</span>
         <h2 class="feature-title">
           Tu promedio ponderado,<br>en el sistema de tu país.
         </h2>
         <p class="feature-desc">
-          NotiFast se adapta automáticamente a tu institución: 0 a 10, 0 a 20, porcentaje (100%) o letras (A - F). Cambia en un toque y obtén tus promedios con cálculo exacto.
+          Cambia en un toque entre escala de 0 a 10, 0 a 20, porcentaje (100%) o letras (A - F).
         </p>
 
-        <!-- Selector Interactivo de Modelos de Calificación -->
         <div class="grade-scale-selector" role="tablist" aria-label="Modelos de Calificación por País">
           <button class="scale-chip active" data-scale="0-10" role="tab" aria-selected="true" title="Modelo de 0 a 10 puntos">
             <span class="scale-chip-title">Decimal (0 a 10)</span>
@@ -929,33 +926,21 @@
           </button>
           <button class="scale-chip" data-scale="0-20" role="tab" aria-selected="false" title="Modelo de 0 a 20 puntos">
             <span class="scale-chip-title">Vigesimal (0 a 20)</span>
-            <span class="scale-chip-meta">Perú • Latinoamérica</span>
+            <span class="scale-chip-meta">Venezuela • Perú</span>
           </button>
           <button class="scale-chip" data-scale="0-100" role="tab" aria-selected="false" title="Modelo de 0 a 100 por ciento">
             <span class="scale-chip-title">Porcentual (100%)</span>
-            <span class="scale-chip-meta">Internacional • Bachillerato</span>
+            <span class="scale-chip-meta">Internacional</span>
           </button>
           <button class="scale-chip" data-scale="A-F" role="tab" aria-selected="false" title="Modelo de letras A a F">
             <span class="scale-chip-title">Letras (A - F)</span>
-            <span class="scale-chip-meta">Sistema GPA / USA</span>
+            <span class="scale-chip-meta">Sistema GPA</span>
           </button>
         </div>
-
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-success-light); color: var(--brand-success);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Ponderación matemática exacta: parciales, tareas y proyectos con sus pesos reales.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-success-light); color: var(--brand-success);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Lectura numérica clara para saber cómo vas en cada asignatura del semestre.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
         <div class="grades-dashboard-stack">
-          <!-- Hero Card Fiel a MainAverageDashboard.kt (Adaptable a 0-10, 0-20, 0-100, A-F) -->
           <div class="main-average-card" id="main-average-hero-card">
             <span class="average-global-label" id="average-scale-title">PROMEDIO GLOBAL • ESCALA DECIMAL (0 - 10)</span>
             <div class="average-score-display" id="average-score-display">8.70</div>
@@ -971,7 +956,6 @@
             </div>
           </div>
 
-          <!-- Desglose por Materias Dinámico -->
           <div class="subject-grade-breakdown">
             <div class="subject-grade-row">
               <div class="s-icon" style="background: #EFF6FF; color: #2563EB;">
@@ -1010,17 +994,16 @@
       </div>
     </section>
 
-    <!-- 7. MÓDULO 5: CALENDARIO DE EVALUACIONES (AgendaMonthCalendarView.kt & AgendaEvaluationCard.kt) -->
+    <!-- STORYSCROLLING CAPÍTULO 6: CALENDARIO DE EVALUACIONES -->
     <section class="dynamic-feature-row row-reverse section-evaluations-calendar" id="evaluaciones">
       <div class="feature-info">
         <h2 class="feature-title">
           Fechas de examen y entregas,<br><span class="accent-ruby">siempre bajo control.</span>
         </h2>
         <p class="feature-desc">
-          Reúne parciales, proyectos y tareas en un Calendario &amp; Evaluaciones mensual. Conoce cuánto vale cada prueba para priorizar tu tiempo de estudio.
+          Calendario &amp; Evaluaciones mensual con el peso de cada prueba para priorizar tu estudio.
         </p>
 
-        <!-- Filtros Rápidos de Fecha / Tipo de Prueba -->
         <div class="eval-filters-strip" role="tablist" aria-label="Filtro rápido de evaluaciones">
           <button class="eval-filter-chip active" data-filter="all" role="tab" aria-selected="true" title="Ver todas las evaluaciones de Octubre">
             <span>Todo el mes (4)</span>
@@ -1038,23 +1021,10 @@
             <span>Calificada (8 Oct)</span>
           </button>
         </div>
-
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Vista mensual interactiva para saber qué entregar y qué días tienes pruebas.</span>
-          </li>
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Porcentaje de peso de cada examen para planificar tus sesiones de repaso.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Componente de Calendario Fiel a AgendaMonthCalendarView.kt -->
         <div class="evaluations-calendar-container" id="evaluations-calendar-component">
-          <!-- Cabecera de Navegación del Mes -->
           <div class="calendar-month-header">
             <button class="cal-nav-btn" id="btn-cal-prev" aria-label="Mes anterior" title="Mes anterior">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-chevron-left"></use></svg>
@@ -1074,7 +1044,6 @@
             </div>
           </div>
 
-          <!-- Matriz de Días (L M X J V S D) -->
           <div class="calendar-matrix-wrapper">
             <div class="calendar-weekdays-row" aria-hidden="true">
               <span>L</span>
@@ -1086,11 +1055,9 @@
               <span>D</span>
             </div>
             <div class="calendar-days-grid" id="calendar-days-grid" role="grid" aria-label="Días de Octubre 2026">
-              <!-- Celdas de días renderizadas dinámicamente -->
             </div>
           </div>
 
-          <!-- Panel de Evaluaciones del Día (AgendaDayEvaluationsSection.kt) -->
           <div class="daily-evaluations-panel" id="daily-evaluations-panel">
             <div class="daily-evals-header">
               <div class="daily-title-row">
@@ -1101,26 +1068,23 @@
               <span class="daily-status-hint" id="daily-status-hint">Toca un día con punto para explorar</span>
             </div>
 
-            <!-- Lista de Tarjetas fieles a AgendaEvaluationCard.kt -->
             <div class="eval-cards-list" id="eval-cards-list">
-              <!-- Renderizado interactivo -->
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 8. MÓDULO 6: ANALÍTICAS Y PROYECCIONES PREDICTIVAS (AcademicAnalyticsContent.kt & GradeSimulatorCard.kt) -->
+    <!-- STORYSCROLLING CAPÍTULO 7: ANALÍTICAS Y SIMULADOR PREDICTIVO -->
     <section class="dynamic-feature-row section-analytics-dashboard" id="analiticas">
       <div class="feature-info">
         <h2 class="feature-title">
           Dashboard Predictivo &amp; Proyecciones,<br><span class="accent-aqua">simula tu nota antes de rendir.</span>
         </h2>
         <p class="feature-desc">
-          Tasa de éxito proyectada, alertas tempranas y simulador de nota requerida en la escala de tu institución: 0 - 10, 0 - 20, 100% o letras.
+          Calcula cuánto necesitas en el porcentaje restante para alcanzar tu meta.
         </p>
 
-        <!-- Presets del Simulador de Nota Requerida -->
         <div class="sim-presets-strip" role="tablist" aria-label="Escenarios de simulación de notas">
           <button class="sim-preset-chip active" data-target-grade="8.5" role="tab" aria-selected="true" title="Simular meta de 8.5 puntos">
             <span class="preset-label">Meta: 8.5 pts</span>
@@ -1135,23 +1099,10 @@
             <span class="preset-sub">Mínimo Aprobatorio</span>
           </button>
         </div>
-
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Simulador que calcula la nota mínima en pendientes según tu meta y la ponderación restante.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Estado por materia con alertas de diagnóstico temprano: al día, en riesgo o crítico.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Componente Fiel a AcademicAnalyticsContent.kt y GradeSimulatorCard.kt -->
         <div class="analytics-dashboard-container" id="analytics-dashboard-component">
-          <!-- 1. Tarjeta Hero de Diagnóstico (AnalyticsHeroCard) -->
           <div class="analytics-hero-banner">
             <div class="hero-diag-top">
               <div>
@@ -1165,51 +1116,6 @@
             </div>
           </div>
 
-          <!-- 2. Estado por Materia (AnalyticsSubjectsStatus) -->
-          <div class="analytics-status-list" role="list" aria-label="Estado proyectado por materia">
-            <div class="analytics-status-row" role="listitem">
-              <div class="status-row-main">
-                <span class="status-subject-name">Cálculo Diferencial</span>
-                <span class="status-chip chip-on-track">Al día</span>
-              </div>
-              <div class="status-row-track">
-                <div class="status-row-fill" style="width: 72%; background: #2563EB;"></div>
-              </div>
-              <span class="status-row-meta">5.7 pts • Falta 35%</span>
-            </div>
-            <div class="analytics-status-row" role="listitem">
-              <div class="status-row-main">
-                <span class="status-subject-name">Física General</span>
-                <span class="status-chip chip-approved">Aprobada</span>
-              </div>
-              <div class="status-row-track">
-                <div class="status-row-fill" style="width: 100%; background: var(--brand-success);"></div>
-              </div>
-              <span class="status-row-meta">8.5 pts • Meta alcanzada</span>
-            </div>
-            <div class="analytics-status-row" role="listitem">
-              <div class="status-row-main">
-                <span class="status-subject-name">Química Orgánica</span>
-                <span class="status-chip chip-at-risk">En riesgo</span>
-              </div>
-              <div class="status-row-track">
-                <div class="status-row-fill" style="width: 38%; background: var(--brand-warning);"></div>
-              </div>
-              <span class="status-row-meta">3.1 pts • Falta 42%</span>
-            </div>
-            <div class="analytics-status-row" role="listitem">
-              <div class="status-row-main">
-                <span class="status-subject-name">Literatura Universal</span>
-                <span class="status-chip chip-critical">Crítico</span>
-              </div>
-              <div class="status-row-track">
-                <div class="status-row-fill" style="width: 22%; background: var(--brand-error);"></div>
-              </div>
-              <span class="status-row-meta">1.8 pts • Falta 55%</span>
-            </div>
-          </div>
-
-          <!-- 3. Simulador Interactivo de Calificación Requerida (GradeSimulatorCard) -->
           <div class="grade-simulator-card" id="interactive-grade-simulator">
             <div class="simulator-header">
               <div class="sim-icon-box">
@@ -1221,13 +1127,11 @@
               </div>
             </div>
 
-            <!-- Banner de Estado Táctil (SimulatorStatus) -->
             <div class="sim-status-banner status-achievable" id="sim-status-banner">
               <svg class="sim-status-icon" id="sim-status-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-check"></use></svg>
               <span class="sim-status-text" id="sim-status-text">Meta Alcanzable • Necesitas 7.2 en lo restante</span>
             </div>
 
-            <!-- Fila de Estadísticas (Acumulado vs Requerido) -->
             <div class="sim-stats-row">
               <div class="sim-stat-box">
                 <span class="sim-stat-label">Acumulado</span>
@@ -1241,7 +1145,6 @@
               </div>
             </div>
 
-            <!-- Slider Interactivo de Meta Deseada -->
             <div class="sim-slider-container">
               <div class="sim-slider-header">
                 <label for="sim-target-slider" class="sim-slider-label">Nota Objetivo</label>
@@ -1255,71 +1158,36 @@
                 <span>10.0 (Máximo)</span>
               </div>
             </div>
-          </div>
 
-          <!-- 4. Alertas de Diagnóstico Temprano (AnalyticsEarlyWarnings) -->
-          <div class="analytics-alerts-panel">
-            <div class="alerts-header">
-              <span class="alerts-title">Alertas de Diagnóstico Temprano</span>
-              <span class="alerts-count-badge">2</span>
+            <div class="analytics-status-list analytics-compact-pills" role="list" aria-label="Resumen de diagnóstico">
+              <span class="status-chip chip-approved" role="listitem">Alertas de Diagnóstico Temprano</span>
+              <span class="status-chip chip-at-risk" role="listitem">Recomendaciones Tácticas</span>
             </div>
-            <div class="alerts-list">
-              <div class="alert-row">
-                <span class="alert-tag tag-critical">Crítico</span>
-                <div class="alert-body">
-                  <strong>Literatura Universal</strong>
-                  <span>Faltan 4.2 pts (55% restante)</span>
-                </div>
-              </div>
-              <div class="alert-row">
-                <span class="alert-tag tag-risk">En Riesgo</span>
-                <div class="alert-body">
-                  <strong>Química Orgánica</strong>
-                  <span>Faltan 3.1 pts (42% restante)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 5. Recomendaciones Tácticas (AnalyticsRecommendations) -->
-          <div class="analytics-tips-panel">
-            <div class="tips-header">
-              <span class="tips-title">Recomendaciones Tácticas</span>
-            </div>
-            <ul class="tips-list">
-              <li>En Química necesitas promediar 7.4 en el 42% restante para aprobar.</li>
-              <li>En Literatura la meta mínima ya no es alcanzable. Consulta opciones de recuperación.</li>
-            </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 9. MÓDULO 7: PERSONALIZACIÓN & DESCANSO VISUAL (ThemePreset.kt & BackgroundPreset.kt) -->
+    <!-- ACTO III: BIENESTAR, ALERTAS Y SOBERANÍA -->
+    <div class="story-chapter-banner" aria-label="Acto III: Bienestar, Alertas y Soberanía">
+      <span class="story-chapter-pill">Acto III &bull; Bienestar, Alertas y Soberanía</span>
+      <div class="story-chapter-line" aria-hidden="true"></div>
+    </div>
+
+    <!-- STORYSCROLLING CAPÍTULO 8: ESTUDIO DE TEMAS EN VIVO -->
     <section class="dynamic-feature-row row-reverse section-theme-studio" id="temas">
       <div class="feature-info">
+        <span class="feature-kicker">08 &bull; Estudio de Temas AAA</span>
         <h2 class="feature-title">
           Tus materias, tus colores.<br><span class="accent-ruby">Estudia sin fatiga visual.</span>
         </h2>
         <p class="feature-desc">
-          Elige entre 6 paletas de color y 6 lienzos de papel suave. Cambia entre modo claro y oscuro para leer cómodamente de día y de noche.
+          Prueba 6 paletas de acento y 6 lienzos de papel en modo claro u oscuro.
         </p>
-
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>6 paletas de acento para identificar tus materias y notas en un instante.</span>
-          </li>
-          <li>
-            <div class="bullet-icon"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Lienzos suaves como Pergamino y Lavanda que cuidan tu vista en repasos largos.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
         <div class="theme-studio-workbench" id="theme-studio-workbench" role="region" aria-label="Banco interactivo de temas y paletas">
-          <!-- Cabecera con Selector de Modo Claro / Oscuro -->
           <div class="studio-top-bar">
             <div class="studio-title-group">
               <div class="studio-badge-icon">
@@ -1343,7 +1211,6 @@
             </div>
           </div>
 
-          <!-- 1. Paleta de Acentos -->
           <div>
             <div class="studio-section-label">
               <span>1. Color de materias</span>
@@ -1405,7 +1272,6 @@
             </div>
           </div>
 
-          <!-- 2. Tono de Fondo / Lienzo de Papel -->
           <div>
             <div class="studio-section-label">
               <span>2. Tono de papel para lectura</span>
@@ -1438,7 +1304,6 @@
             </div>
           </div>
 
-          <!-- 3. Vista Previa en Vivo -->
           <div class="theme-live-preview-mini">
             <div class="preview-mini-left">
               <div class="preview-mini-avatar">
@@ -1455,32 +1320,19 @@
       </div>
     </section>
 
-    <!-- 10. MÓDULO 8: MOTOR DE NOTIFICACIONES PROACTIVAS (SettingsNotificationsSection.kt & NotificationSender.kt) -->
+    <!-- STORYSCROLLING CAPÍTULO 9: NOTIFICACIONES PROACTIVAS -->
     <section class="dynamic-feature-row section-notifications-engine" id="notificaciones">
       <div class="feature-info">
         <h2 class="feature-title">
           Notificaciones puntuales,<br><span class="accent-aqua">que acompañan sin abrumar.</span>
         </h2>
         <p class="feature-desc">
-          Recordatorios locales que respetan tu batería y tu descanso. Avisos antes de entrar a clase y alertas previas a cada examen importante.
+          Avisos locales antes de entrar al aula y recordatorios de evaluaciones sin gastar batería.
         </p>
-
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Avisos de clase (10, 15 o 30 min antes) con aula y acceso directo al apunte.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Alertas de exámenes con su porcentaje de impacto para organizar tu estudio.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Simulador Fiel a SettingsNotificationsSection.kt y NotificationSender.kt -->
         <div class="notifications-simulator-card" id="notifications-simulator-card" role="region" aria-label="Simulador interactivo del motor de notificaciones">
-          <!-- Escenario de Previsualización de Banner Android Heads-Up -->
           <div class="android-headsup-stage">
             <span class="stage-status-pill">PREVISUALIZACIÓN HEADS-UP ANDROID 14</span>
             <div class="android-notif-banner" id="live-android-notif-banner" role="region" aria-live="polite" aria-label="Vista previa de notificación de Android">
@@ -1507,9 +1359,7 @@
             </div>
           </div>
 
-          <!-- Controles de Canales y Anticipación (SettingsNotificationsSection.kt) -->
           <div class="notif-channels-list" role="tablist" aria-label="Canales de notificaciones de NotiFast">
-            <!-- Canal 1: Alertas de Clases -->
             <div class="notif-channel-row active-preview" data-notif-channel="class" role="tab" aria-selected="true" tabindex="0">
               <div class="channel-row-top">
                 <div class="channel-title-group">
@@ -1530,7 +1380,6 @@
               </div>
             </div>
 
-            <!-- Canal 2: Alertas de Evaluaciones -->
             <div class="notif-channel-row" data-notif-channel="exam" role="tab" aria-selected="false" tabindex="0">
               <div class="channel-row-top">
                 <div class="channel-title-group">
@@ -1551,7 +1400,6 @@
               </div>
             </div>
 
-            <!-- Canal 3: Resumen Matutino -->
             <div class="notif-channel-row" data-notif-channel="morning" role="tab" aria-selected="false" tabindex="0">
               <div class="channel-row-top">
                 <div class="channel-title-group">
@@ -1568,7 +1416,6 @@
             </div>
           </div>
 
-          <!-- Pie con Disparo de Notificación de Prueba (send_test_notification) -->
           <div class="notif-test-footer">
             <span class="notif-test-hint">Idéntico al botón verificador de Ajustes en la app</span>
             <button type="button" class="btn-trigger-notif" id="btn-test-notification">
@@ -1580,31 +1427,19 @@
       </div>
     </section>
 
-    <!-- 11. MÓDULO 9: COMPARTIR MATERIA P2P OFFLINE & BACKUP PRIVADO (SubjectPackageCodec, QrCodeGenerator & CloudHubSheet) -->
+    <!-- STORYSCROLLING CAPÍTULO 10: PACK P2P QR OFFLINE & BACKUP DRIVE -->
     <section class="dynamic-feature-row row-reverse section-nearby-share" id="compartir">
       <div class="feature-info">
         <h2 class="feature-title">
           Comparte materias por QR,<br><span class="accent-ruby">y respalda en tu Google Drive.</span>
         </h2>
         <p class="feature-desc">
-          Exporta una materia completa en un pack <code>.notifast</code> o muéstralo en un <strong>Código QR Offline</strong> en el aula. Y si cambias de teléfono, tu copia privada en <strong>Google Drive</strong> la restaura en segundos.
+          Pasa asignaturas en el aula mediante paquetes <code>.notifast</code> o QR sin internet, y guarda copia en tu Drive privado.
         </p>
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Pack con horarios, evaluaciones y apuntes: compártelo por WhatsApp, Telegram, Bluetooth o QR.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: #E0F2FE; color: #0369A1;"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Copia privada en Drive con estados claros: sincronizada, solo en el teléfono o con cambios.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Stack: Pack P2P + Cloud Hub (ShareSubjectSheet.kt & CloudHubSheet.kt) -->
         <div class="share-cloud-stack nearby-transfer-panel">
-          <!-- 1. Compartir Materia: Pack .notifast & Código QR Offline -->
           <div class="share-pack-card">
             <div class="share-card-header">
               <div class="share-header-left">
@@ -1614,18 +1449,6 @@
               <span class="pack-badge">Pack QR de Asignatura</span>
             </div>
 
-            <div class="share-subject-row">
-              <div class="share-subject-icon" style="background: #EFF6FF; color: #2563EB;" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
-              </div>
-              <div class="share-subject-text">
-                <strong>Cálculo Diferencial</strong>
-                <span>2 clases/sem • 3 evaluaciones</span>
-              </div>
-              <span class="pack-badge">.notifast</span>
-            </div>
-
-            <!-- Código QR Offline (QrCodeGenerator / ZXing) -->
             <div class="qr-preview-stage">
               <div class="qr-code-frame" aria-hidden="true">
                 <div class="qr-fake-code">
@@ -1638,58 +1461,43 @@
                 </div>
               </div>
               <div class="qr-preview-copy">
-                <span class="qr-preview-label">Código QR Offline</span>
-                <p class="qr-preview-desc">Pide a tu compañero que escanee este código desde NotiFast</p>
+                <span class="qr-preview-label">Código QR Offline &bull; Cálculo Diferencial</span>
+                <p class="qr-preview-desc">Escaneo instantáneo en el aula (2 clases/sem &bull; 3 eval.)</p>
+                <div class="share-notes-toggle">
+                  <span class="notif-switch-pill" aria-hidden="true"></span>
+                  <span>Incluir mis apuntes personales</span>
+                </div>
               </div>
             </div>
 
-            <!-- Opciones de Exportación Reales -->
-            <div class="share-options-list" role="list" aria-label="Opciones para compartir la materia">
+            <div class="share-options-list share-options-compact-grid" role="list" aria-label="Opciones para compartir la materia">
               <div class="share-option-row" role="listitem">
                 <div class="share-option-icon file">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-description"></use></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-description"></use></svg>
                 </div>
                 <div class="share-option-text">
                   <strong>Exportar Pack .notifast</strong>
-                  <span>WhatsApp, Drive o Bluetooth</span>
                 </div>
               </div>
               <div class="share-option-row" role="listitem">
                 <div class="share-option-icon qr">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
                 </div>
                 <div class="share-option-text">
                   <strong>Código QR Offline</strong>
-                  <span>Escaneo instantáneo en el aula</span>
-                </div>
-              </div>
-              <div class="share-option-row" role="listitem">
-                <div class="share-option-icon wa" style="background: rgba(21, 128, 61, 0.14); color: var(--brand-success);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-nearby"></use></svg>
-                </div>
-                <div class="share-option-text">
-                  <strong>WhatsApp &amp; Telegram</strong>
-                  <span>Apuntes estilizados con fotos reales adjuntas</span>
                 </div>
               </div>
               <div class="share-option-row" role="listitem">
                 <div class="share-option-icon md">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
                 </div>
                 <div class="share-option-text">
                   <strong>Copiar Resumen Markdown</strong>
-                  <span>Horarios y syllabus al portapapeles</span>
                 </div>
               </div>
             </div>
-
-            <div class="share-notes-toggle">
-              <span class="notif-switch-pill" aria-hidden="true"></span>
-              <span>Incluir mis apuntes personales</span>
-            </div>
           </div>
 
-          <!-- 2. Cloud Hub: Copia de Seguridad en Google Drive (Privado) -->
           <div class="cloud-backup-card">
             <div class="share-card-header">
               <div class="share-header-left">
@@ -1699,53 +1507,28 @@
               <span class="cloud-private-badge">Google Drive (Privado)</span>
             </div>
 
-            <div class="cloud-last-backup">
-              <span class="cloud-sync-dot" aria-hidden="true"></span>
-              <span>Última copia: hoy, 10:42 AM</span>
-            </div>
-
-            <!-- Estados por Materia (CloudStatusChip.kt) -->
-            <div class="cloud-status-list" role="list" aria-label="Estado de sincronización por materia">
+            <div class="cloud-status-list cloud-status-compact-strip" role="list" aria-label="Estado de sincronización por materia">
               <div class="cloud-status-row" role="listitem">
-                <div class="cloud-row-main">
-                  <strong>Cálculo Diferencial</strong>
-                  <div class="cloud-row-badges">
-                    <span class="cloud-mini-badge">12 ap.</span>
-                    <span class="cloud-mini-badge">2 hor.</span>
-                    <span class="cloud-mini-badge">3 eval.</span>
-                  </div>
-                </div>
+                <strong>Cálculo</strong>
                 <span class="cloud-status-chip chip-synced">Sincronizada</span>
               </div>
               <div class="cloud-status-row" role="listitem">
-                <div class="cloud-row-main">
-                  <strong>Física General</strong>
-                  <div class="cloud-row-badges">
-                    <span class="cloud-mini-badge">8 ap.</span>
-                    <span class="cloud-mini-badge">2 hor.</span>
-                  </div>
-                </div>
+                <strong>Física</strong>
                 <span class="cloud-status-chip chip-local">Solo en el teléfono</span>
               </div>
               <div class="cloud-status-row" role="listitem">
-                <div class="cloud-row-main">
-                  <strong>Química Orgánica</strong>
-                  <div class="cloud-row-badges">
-                    <span class="cloud-mini-badge">7 ap.</span>
-                    <span class="cloud-mini-badge">3 eval.</span>
-                  </div>
-                </div>
+                <strong>Química</strong>
                 <span class="cloud-status-chip chip-pending">Cambios sin subir</span>
               </div>
             </div>
 
             <div class="cloud-actions-row">
               <button type="button" class="cloud-action-btn primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
                 <span>Subir a la nube</span>
               </button>
               <button type="button" class="cloud-action-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-upload"></use></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-upload"></use></svg>
                 <span>Restaurar al teléfono</span>
               </button>
             </div>
@@ -1754,219 +1537,18 @@
       </div>
     </section>
 
-    <!-- 12. GALERÍA VISUAL Y TEMÁTICA DE MATERIAS (SubjectIconMapper & SubjectColorPickerBento) -->
-    <section class="subjects-gallery-section subjects-gallery" id="materias">
-      <div class="subjects-gallery-header">
-        <h2 class="section-title" style="font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 800;">
-          Cada materia con su color, icono y sección.
-        </h2>
-        <p class="section-desc" style="color: var(--text-secondary); margin-top: 8px;">
-          Paleta de 10 colores de estudio y 12 iconos temáticos. Muestra sección, promedio y docente sin abrir la materia.
-        </p>
-        <div class="subject-palette-strip" aria-label="Paleta cromática de estudio de NotiFast">
-          <span class="palette-swatch" style="background: #BF092F;" title="Ruby Crimson"></span>
-          <span class="palette-swatch" style="background: #3B9797;" title="Aqua Green"></span>
-          <span class="palette-swatch" style="background: #4338CA;" title="Studio Indigo"></span>
-          <span class="palette-swatch" style="background: #C2410C;" title="Terracotta"></span>
-          <span class="palette-swatch" style="background: #15803D;" title="Forest Sage"></span>
-          <span class="palette-swatch" style="background: #7E22CE;" title="Deep Purple"></span>
-          <span class="palette-swatch" style="background: #B45309;" title="Amber Gold"></span>
-          <span class="palette-swatch" style="background: #0369A1;" title="Slate Blue"></span>
-          <span class="palette-swatch" style="background: #047857;" title="Emerald"></span>
-          <span class="palette-swatch" style="background: #0F172A;" title="Dark Slate"></span>
-        </div>
-      </div>
-
-      <div class="subjects-grid">
-        <!-- 1. Cálculo -->
-        <article class="subject-feature-card card-calculus-detail" tabindex="0">
-          <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #EFF6FF; color: #2563EB;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-calculate"></use></svg>
-            </div>
-            <div class="subject-grade-pill" style="background: #EFF6FF; color: #1D4ED8;">
-              <span class="grade-pill-label">Promedio</span>
-              <span class="grade-pill-val">9.2</span>
-            </div>
-          </div>
-          <div class="subject-card-body">
-            <div class="subject-title-row">
-              <h3 class="subject-title">Cálculo Diferencial</h3>
-              <span class="subject-section-chip">Sec. 2</span>
-            </div>
-            <span class="subject-meta-stats">12 Apuntes • 3 Evaluaciones</span>
-            <p class="subject-description-text">
-              Límites, derivadas, integrales y optimización con fórmulas LaTeX en vivo.
-            </p>
-            <div class="subject-teacher-chip">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
-              <span>Prof. Ana Rodríguez</span>
-            </div>
-          </div>
-          <div class="subject-progress-block">
-            <div class="subject-progress-header">
-              <span>Avance Evaluaciones</span>
-              <span class="subj-progress-ratio">2 / 3 (67%)</span>
-            </div>
-            <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 67%; background: #2563EB;"></div>
-            </div>
-          </div>
-          <div class="subject-tags-strip">
-            <span class="subject-tag">#derivadas</span>
-            <span class="subject-tag">#integrales</span>
-            <span class="subject-tag">#latex</span>
-          </div>
-        </article>
-
-        <!-- 2. Física -->
-        <article class="subject-feature-card card-physics-detail" tabindex="0">
-          <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #F0FDFA; color: #0F766E;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-science"></use></svg>
-            </div>
-            <div class="subject-grade-pill" style="background: #F0FDFA; color: #0F766E;">
-              <span class="grade-pill-label">Promedio</span>
-              <span class="grade-pill-val">8.5</span>
-            </div>
-          </div>
-          <div class="subject-card-body">
-            <div class="subject-title-row">
-              <h3 class="subject-title">Física Mecánica</h3>
-              <span class="subject-section-chip">Sec. 19</span>
-            </div>
-            <span class="subject-meta-stats">8 Apuntes • 4 Evaluaciones</span>
-            <p class="subject-description-text">
-              Cinemática, leyes de Newton, energía y rotación con reportes de laboratorio.
-            </p>
-            <div class="subject-teacher-chip">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
-              <span>Prof. Luis Márquez</span>
-            </div>
-          </div>
-          <div class="subject-progress-block">
-            <div class="subject-progress-header">
-              <span>Avance Evaluaciones</span>
-              <span class="subj-progress-ratio">2 / 4 (50%)</span>
-            </div>
-            <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 50%; background: #0F766E;"></div>
-            </div>
-          </div>
-          <div class="subject-tags-strip">
-            <span class="subject-tag">#cinematica</span>
-            <span class="subject-tag">#newton</span>
-            <span class="subject-tag">#laboratorio</span>
-          </div>
-        </article>
-
-        <!-- 3. Literatura -->
-        <article class="subject-feature-card card-literature-detail" tabindex="0">
-          <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #FFFBEB; color: #92400E;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-book"></use></svg>
-            </div>
-            <div class="subject-grade-pill" style="background: #FFFBEB; color: #B45309;">
-              <span class="grade-pill-label">Promedio</span>
-              <span class="grade-pill-val">9.1</span>
-            </div>
-          </div>
-          <div class="subject-card-body">
-            <div class="subject-title-row">
-              <h3 class="subject-title">Literatura Universal</h3>
-              <span class="subject-section-chip">Sec. 1</span>
-            </div>
-            <span class="subject-meta-stats">5 Apuntes • 2 Ensayos</span>
-            <p class="subject-description-text">
-              Análisis de textos, corrientes narrativas y síntesis críticas organizadas.
-            </p>
-            <div class="subject-teacher-chip">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
-              <span>Prof. Carmen Díaz</span>
-            </div>
-          </div>
-          <div class="subject-progress-block">
-            <div class="subject-progress-header">
-              <span>Avance Evaluaciones</span>
-              <span class="subj-progress-ratio">2 / 2 (100%)</span>
-            </div>
-            <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 100%; background: #92400E;"></div>
-            </div>
-          </div>
-          <div class="subject-tags-strip">
-            <span class="subject-tag">#narrativa</span>
-            <span class="subject-tag">#critica</span>
-            <span class="subject-tag">#ensayos</span>
-          </div>
-        </article>
-
-        <!-- 4. Química Orgánica -->
-        <article class="subject-feature-card card-chemistry-detail" tabindex="0">
-          <div class="subject-card-top-row">
-            <div class="subject-hero-icon" style="background: #ECFDF5; color: #047857;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-biotech"></use></svg>
-            </div>
-            <div class="subject-grade-pill" style="background: #ECFDF5; color: #047857;">
-              <span class="grade-pill-label">Promedio</span>
-              <span class="grade-pill-val">8.8</span>
-            </div>
-          </div>
-          <div class="subject-card-body">
-            <div class="subject-title-row">
-              <h3 class="subject-title">Química Orgánica</h3>
-              <span class="subject-section-chip">Sec. 2</span>
-            </div>
-            <span class="subject-meta-stats">7 Apuntes • 3 Exámenes</span>
-            <p class="subject-description-text">
-              Estequiometría, síntesis molecular y equilibrios con fichas de consulta rápida.
-            </p>
-            <div class="subject-teacher-chip">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-school"></use></svg>
-              <span>Prof. Ana Rodríguez</span>
-            </div>
-          </div>
-          <div class="subject-progress-block">
-            <div class="subject-progress-header">
-              <span>Avance Evaluaciones</span>
-              <span class="subj-progress-ratio">1 / 3 (33%)</span>
-            </div>
-            <div class="subj-progress-track">
-              <div class="subj-progress-fill" style="width: 33%; background: #047857;"></div>
-            </div>
-          </div>
-          <div class="subject-tags-strip">
-            <span class="subject-tag">#moleculas</span>
-            <span class="subject-tag">#estequiometria</span>
-            <span class="subject-tag">#reacciones</span>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- 13. MÓDULO NUEVO: DIRECTORIO DE DOCENTES & CONTACTO DIRECTO (ProfessorDirectoryContent.kt & TeacherContactSection.kt) -->
-    <section class="dynamic-feature-row row-reverse section-teachers-directory" id="docentes">
+    <!-- STORYSCROLLING CAPÍTULO 11: DIRECTORIO DE DOCENTES & CONTACTO -->
+    <section class="dynamic-feature-row section-teachers-directory" id="docentes">
       <div class="feature-info">
         <h2 class="feature-title">
           Tu directorio de docentes,<br><span class="accent-aqua">con WhatsApp listo para escribir.</span>
         </h2>
         <p class="feature-desc">
-          Guarda a tus profesores con teléfono, correo y las materias que imparten. Un toque abre WhatsApp con el saludo académico ya redactado.
+          Un toque abre WhatsApp con el saludo académico redactado según la materia.
         </p>
-        <ul class="feature-bullets">
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Contacto directo: WhatsApp con saludo prellenado, llamada, SMS o correo.</span>
-          </li>
-          <li>
-            <div class="bullet-icon" style="background: var(--brand-secondary-light); color: var(--brand-secondary);"><svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span>Ficha con cubículo o notas, vinculada a las materias de cada docente.</span>
-          </li>
-        </ul>
       </div>
 
       <div class="feature-visual">
-        <!-- Directorio de Profesores & Ficha de Contacto (TeachersSubTab) -->
         <div class="teachers-directory-panel teachers-directory-card">
           <div class="teachers-card-header">
             <div class="teachers-header-left">
@@ -1976,7 +1558,6 @@
             <span class="teachers-search-pill">Buscar por nombre o materia…</span>
           </div>
 
-          <!-- Carrusel de Mini-Fichas (ProfessorMiniCard.kt) -->
           <div class="teachers-mini-carousel" role="list" aria-label="Docentes guardados">
             <div class="teacher-mini-chip teacher-mini-card active" role="listitem">
               <div class="teacher-mini-top">
@@ -2012,7 +1593,6 @@
             </div>
           </div>
 
-          <!-- Ficha del Docente (TeacherDetailBottomSheet.kt) -->
           <div class="teacher-detail-sheet">
             <div class="teacher-detail-top">
               <div class="teacher-detail-avatar" aria-hidden="true">AR</div>
@@ -2053,7 +1633,6 @@
               </button>
             </div>
 
-            <!-- Saludo de WhatsApp Prellenado (TeacherFormatters.buildWhatsAppMessage) -->
             <div class="wa-greeting-bubble">
               <div class="wa-greeting-label">Saludo automático en WhatsApp</div>
               <p class="wa-greeting-text">Hola Profesor/a Ana Rodríguez, le escribo con respecto a la materia Cálculo Diferencial.</p>
@@ -2063,146 +1642,9 @@
       </div>
     </section>
 
-    <!-- 14. Bento Grid Section: Superpoderes Académicos Reales de la App -->
-    <section class="bento-section">
-      <div class="bento-header">
-        <h2 class="section-title">Herramientas prácticas para tu vida académica.</h2>
-        <p class="section-desc">
-          Diseñado para el ritmo estudiantil: rapidez sin conexión, privacidad total y utilidades pensadas para el aula.
-        </p>
-      </div>
-
-      <div class="bento-grid">
-        <!-- Tarjeta 1: Editor de Apuntes OneNote-like & Fotos de Pizarra (8 cols) -->
-        <article class="bento-card bento-col-8">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-ruby">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-edit"></use></svg>
-            </div>
-            <h3 class="bento-card-title">Editor por Bloques OneNote-like &amp; Fotos de Pizarra</h3>
-            <p class="bento-card-desc">
-              Arquitectura modular por bloques: combina Markdown, fórmulas matemáticas LaTeX, notas de voz, listas interactivas y fotos de la pizarra con dibujo a mano alzada. Indexación instantánea para búsqueda global.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-calc">Bloques OneNote-like</span>
-            <span class="preview-pill pill-calc">Fórmulas LaTeX</span>
-            <span class="preview-pill pill-calc">Dibujo sobre Pizarra</span>
-            <span class="preview-pill pill-calc">Búsqueda Global</span>
-          </div>
-        </article>
-
-        <!-- Tarjeta 2: 100% Offline-First & Google Drive Privado (4 cols) -->
-        <article class="bento-card bento-col-4">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-aqua">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-cloud-drive"></use></svg>
-            </div>
-            <h3 class="bento-card-title">100% Offline-First &amp; Drive Privado</h3>
-            <p class="bento-card-desc">
-              Tus materias, apuntes y calificaciones residen en tu teléfono con persistencia Room v4 y respaldo incremental SHA-256 en tu propio Google Drive.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-sync">100% Offline-First</span>
-            <span class="preview-pill pill-sync">Diffing SHA-256</span>
-          </div>
-        </article>
-
-        <!-- Tarjeta 3: Blindaje UX Anti-Pérdida de Progreso (4 cols) -->
-        <article class="bento-card bento-col-4">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-sage">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-shield"></use></svg>
-            </div>
-            <h3 class="bento-card-title">Blindaje UX Anti-Pérdida de Progreso</h3>
-            <p class="bento-card-desc">
-              Jerarquía de botón Atrás de 3 niveles (Teclado &rarr; Diálogo de Descarte &rarr; Cierre), blindaje contra swipe/scrim accidental y salvaguarda de borradores en muerte de proceso.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-calc">Three-Tier Back</span>
-            <span class="preview-pill pill-calc">Swipe Shield</span>
-            <span class="preview-pill pill-calc">SavedStateHandle</span>
-          </div>
-        </article>
-
-        <!-- Tarjeta 4: Splash Screen Dual-Stage AAA (4 cols) -->
-        <article class="bento-card bento-col-4">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-amber">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-autoawesome"></use></svg>
-            </div>
-            <h3 class="bento-card-title">Splash Screen Adaptativa AAA</h3>
-            <p class="bento-card-desc">
-              Arranque instantáneo con transferencia fluida sin parpadeo (Zero-Flicker Handoff), calibrada con el tema y tono de papel que estés usando.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-bell">Zero-Flicker Handoff</span>
-            <span class="preview-pill pill-bell">Tema Sincronizado</span>
-          </div>
-        </article>
-
-        <!-- Tarjeta 5: Compartir Apuntes Enriquecidos (4 cols) -->
-        <article class="bento-card bento-col-4">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-aqua">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-qr"></use></svg>
-            </div>
-            <h3 class="bento-card-title">Compartir Apuntes &amp; Pack P2P</h3>
-            <p class="bento-card-desc">
-              Exportación enriquecida a WhatsApp y Telegram con formato limpio y adjuntos de fotos anotadas reales, más packs <code>.notifast</code> por QR Offline en el aula.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-sync">WhatsApp &amp; Telegram</span>
-            <span class="preview-pill pill-sync">Código QR Offline</span>
-          </div>
-        </article>
-
-        <!-- Tarjeta 6: Directorio de Profesores & WhatsApp Contextual (6 cols) -->
-        <article class="bento-card bento-col-6">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-amber">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-school"></use></svg>
-            </div>
-            <h3 class="bento-card-title">Directorio de Profesores &amp; Saludo Contextual</h3>
-            <p class="bento-card-desc">
-              Registra a tus docentes con su cubículo, horario de asesoría, correo y contacto directo por WhatsApp con saludo prellenado y materia seleccionada.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-bell">Contacto por WhatsApp</span>
-            <span class="preview-pill pill-bell">Horarios de Asesoría</span>
-            <span class="preview-pill pill-bell">Cubículo y Asignatura</span>
-          </div>
-        </article>
-
-        <!-- Tarjeta 7: Temas de Color & Modo Oscuro (6 cols) -->
-        <article class="bento-card bento-col-6">
-          <div>
-            <div class="bento-icon-wrapper icon-bg-ruby">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-palette"></use></svg>
-            </div>
-            <h3 class="bento-card-title">6 Paletas &amp; 6 Lienzos de Papel WCAG AAA</h3>
-            <p class="bento-card-desc">
-              6 paletas de color y 6 lienzos de papel suave con selector continuo Hex/HSL y contraste garantizado para estudiar de día o de noche sin fatiga visual.
-            </p>
-          </div>
-          <div class="bento-visual-preview">
-            <span class="preview-pill pill-calc">6 Paletas de Color</span>
-            <span class="preview-pill pill-calc">6 Lienzos de Papel</span>
-            <span class="preview-pill pill-calc">Contraste WCAG AAA</span>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Final CTA Section: Hub de Descarga -->
+    <!-- Final CTA Section: Hub de Descarga Simplificado -->
     <section class="final-cta-section" id="descargar">
       <div class="final-cta-card">
-        <!-- Decoración de Papel Táctil -->
         <div class="cta-glow cta-glow-ruby" aria-hidden="true"></div>
         <div class="cta-glow cta-glow-aqua" aria-hidden="true"></div>
         <div class="cta-grid-lines" aria-hidden="true"></div>
@@ -2211,16 +1653,11 @@
           <img src="assets/logo.png" alt="" aria-hidden="true" width="56" height="56">
         </div>
 
-        <p class="cta-eyebrow">
-          <span class="cta-eyebrow-dot" aria-hidden="true"></span>
-          APK oficial v1.0 RC • listo para instalar
-        </p>
-
         <h2 class="final-cta-title">
-          Empieza hoy tu nuevo semestre<br><span class="accent-ruby">con serenidad total.</span>
+          Empieza hoy tu semestre<br><span class="accent-ruby">con serenidad total.</span>
         </h2>
         <p class="final-cta-desc">
-          Descarga NotiFast gratis y transforma la sobrecarga académica en control: apuntes, promedios exactos, horarios y temas a tu medida.
+          100% gratuito, sin anuncios y sin conexión obligatoria.
         </p>
 
         <div class="cta-actions">
@@ -2243,6 +1680,17 @@
           </a>
         </div>
 
+        <div class="hero-tertiary-links cta-tertiary-links" aria-label="Enlaces adicionales">
+          <a href="/vistas/" class="hero-inline-link btn-hero-vistas" title="Mapa de 26 Pantallas de la App">
+            <svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-smartphone"></use></svg>
+            <span>Ver Vistas (26)</span>
+          </a>
+          <a href="/privacy" class="hero-inline-link btn-hero-privacy" title="Política de Privacidad">
+            <svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-shield"></use></svg>
+            <span>Política de Privacidad</span>
+          </a>
+        </div>
+
         <ul class="cta-trust-row" aria-label="Ventajas de NotiFast">
           <li>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#icon-check"></use></svg>
@@ -2261,8 +1709,6 @@
             <span>Android 8.0+</span>
           </li>
         </ul>
-
-        <p class="final-cta-meta">Instalación directa desde APK • Código abierto en GitHub • Sin cuentas obligatorias</p>
       </div>
     </section>
 

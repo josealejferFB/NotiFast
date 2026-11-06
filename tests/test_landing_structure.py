@@ -108,12 +108,16 @@ class TestLandingStructure(unittest.TestCase):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
         self.assertIn("hero-logo-stage", html)
-        self.assertIn("emblem-shield", html)
-        self.assertIn("emblem-logo-img", html)
+        self.assertIn("hero-short-frame", html)
+        self.assertIn("hero-short-iframe", html)
+        self.assertIn("BvFrJSQnDxo", html)
+        self.assertIn("notifast-background", html)
+        self.assertIn("aurora-ruby", html)
+        self.assertIn("aurora-aqua", html)
+        self.assertIn("doodle-layer", html)
         self.assertIn("hub-floating-radar", html)
-        # Verificar que se eliminó el simulador de smartphone
+        # Verificar que se eliminó el simulador antiguo y la sobrecarga cognitiva
         self.assertNotIn("hero-phone-frame", html)
-        # Verificar que se eliminó el hub orbital redundante y la sobrecarga cognitiva
         self.assertNotIn("magic-box-showcase", html)
         self.assertNotIn("notifast-core-hub", html)
         self.assertNotIn("section-origin-indicator", html)
@@ -122,15 +126,13 @@ class TestLandingStructure(unittest.TestCase):
     def test_bento_grid_and_cta_elements(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
-        self.assertIn("bento-grid", html)
         self.assertIn("btn-download-hero", html)
         self.assertIn("btn-download-cta", html)
         self.assertIn("download-toast", html)
         self.assertIn("Descargar APK", html)
 
-        # Hub de descarga final enriquecido
+        # Hub de descarga final simplificado y enriquecido
         self.assertIn("cta-logo-badge", html)
-        self.assertIn("cta-eyebrow", html)
         self.assertIn("cta-actions", html)
         self.assertIn("btn-cta-hero", html)
         self.assertIn("btn-cta-github", html)
@@ -260,22 +262,25 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".cloud-backup-card", css)
         self.assertIn(".qr-preview-stage", css)
 
-    def test_subjects_gallery_bento_alignment(self):
+    def test_dynamic_ruby_aqua_background_and_doodles(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
-        self.assertIn("subject-card-top-row", html)
-        self.assertIn("subject-grade-pill", html)
-        self.assertIn("subject-progress-block", html)
-        self.assertIn("subj-progress-track", html)
-        self.assertIn("subject-tags-strip", html)
-        self.assertIn("#derivadas", html)
-        self.assertIn("#newton", html)
+        self.assertIn("notifast-background", html)
+        self.assertIn("aurora-ruby", html)
+        self.assertIn("aurora-aqua", html)
+        self.assertIn("aurora-indigo", html)
+        for doodle_cls in [
+            "doodle-integral", "doodle-flask", "doodle-atom-tr", "doodle-cap",
+            "doodle-compass", "doodle-code", "doodle-pi", "doodle-calc",
+            "doodle-book", "doodle-lightbulb", "doodle-sigma", "doodle-atom-br"
+        ]:
+            self.assertIn(doodle_cls, html)
 
-        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
+        with open("landing/css/styles.css", "r", encoding="utf-8") as f:
             css = f.read()
-        self.assertIn("repeat(4, 1fr)", css)
-        self.assertIn(".subject-card-top-row", css)
-        self.assertIn(".subject-grade-pill", css)
+        self.assertIn(".notifast-background", css)
+        self.assertIn("@keyframes orbitRuby", css)
+        self.assertIn("@keyframes floatMotion", css)
 
     def test_showcase_hover_bounds_and_centering(self):
         with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
@@ -418,21 +423,16 @@ class TestLandingStructure(unittest.TestCase):
         self.assertIn(".board-photo-block", css)
         self.assertIn(".md-highlight", css)
 
-    def test_subjects_gallery_shows_color_section_and_teacher(self):
+    def test_storyscrolling_concise_structure_and_action_links(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:
             html = f.read()
-        self.assertIn('id="materias"', html)
-        self.assertIn("subject-palette-strip", html)
-        self.assertIn("subject-section-chip", html)
-        self.assertIn("subject-teacher-chip", html)
-        self.assertIn("Sec. 2", html)
-        self.assertIn("Paleta de 10 colores", html)
-
-        with open("landing/css/dynamic-showcase.css", "r", encoding="utf-8") as f:
-            css = f.read()
-        self.assertIn(".subject-palette-strip", css)
-        self.assertIn(".subject-section-chip", css)
-        self.assertIn(".subject-teacher-chip", css)
+        self.assertNotIn('<ul class="feature-bullets">', html)
+        self.assertNotIn('class="bento-section"', html)
+        self.assertNotIn('class="subjects-gallery-section"', html)
+        self.assertIn("btn-download-hero", html)
+        self.assertIn("btn-hero-docs", html)
+        self.assertIn("btn-hero-vistas", html)
+        self.assertIn("btn-hero-privacy", html)
 
     def test_teachers_directory_section_exists(self):
         with open("landing/index.html", "r", encoding="utf-8") as f:

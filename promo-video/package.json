@@ -1,0 +1,24 @@
+{
+  "name": "notifast-promo-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Video promocional vertical de NotiFast - 1080x1920, 30fps, 58s, sin audio",
+  "scripts": {
+    "start": "remotion studio",
+    "render": "remotion render NotiFastPromo out/notifast-promo-1080x1920.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --concurrency=4",
+    "still": "remotion still NotiFastPromo out/poster.jpg --frame=0",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.541",
+    "@remotion/transitions": "^4.0.541",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.541"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "typescript": "^7.0.2"
+  }
+}

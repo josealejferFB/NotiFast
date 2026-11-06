@@ -32,3 +32,8 @@ __pycache__/
 /release/
 /output/
 
+# Node / Video build artifacts
+node_modules/
+/promo-video/node_modules/
+/promo-video/out/
+

@@ -48,37 +48,13 @@
 
     if (toggleViewBtn && editorSheet) {
       let isPreview = true;
+      const initialPreviewHTML = editorSheet.innerHTML;
       toggleViewBtn.addEventListener('click', () => {
         isPreview = !isPreview;
         if (isPreview) {
           toggleViewBtn.textContent = 'Vista previa';
           toggleViewBtn.classList.add('active');
-          editorSheet.innerHTML = `
-            <div class="rendered-markdown-content">
-              <h4># Teorema de Lagrange</h4>
-              <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto <em>c</em> tal que:</p>
-              <div class="math-latex-card">
-                <code>f'(c) = [f(b) - f(a)] / (b - a)</code>
-              </div>
-              <div class="interactive-todo-list">
-                <label class="todo-item checked">
-                  <input type="checkbox" checked disabled>
-                  <span>Demostración con el Teorema de Rolle</span>
-                </label>
-                <label class="todo-item checked">
-                  <input type="checkbox" checked disabled>
-                  <span>Ejercicios resueltos de optimización de costos</span>
-                </label>
-                <label class="todo-item">
-                  <input type="checkbox" disabled>
-                  <span>Revisar guía para el examen del viernes</span>
-                </label>
-              </div>
-              <blockquote class="editor-quote-card">
-                "La recta secante es paralela a la recta tangente en el punto c."
-              </blockquote>
-            </div>
-          `;
+          editorSheet.innerHTML = initialPreviewHTML;
         } else {
           toggleViewBtn.textContent = 'Modo edición';
           toggleViewBtn.classList.remove('active');
@@ -86,9 +62,9 @@
             <div style="font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.6; color: var(--text-primary);">
               <p style="color: var(--brand-primary); font-weight: 700;"># Teorema de Lagrange</p>
               <p>Sea una función continua en [a, b] y diferenciable en (a, b). Existe un punto *c* tal que:</p>
-              <p style="color: #0F766E; background: #F0FDFA; padding: 4px 8px; border-radius: 4px;">$$ f'(c) = \\frac{f(b) - f(a)}{b - a} $$</p>
+              <p style="color: var(--brand-secondary); background: var(--brand-secondary-light); padding: 4px 8px; border-radius: var(--radius-sm);">$$ f'(c) = \\frac{f(b) - f(a)}{b - a} $$</p>
               <p>- [x] Demostración con el Teorema de Rolle<br>- [x] Ejercicios resueltos de optimización de costos<br>- [ ] Revisar guía para el examen del viernes</p>
-              <p style="color: #881337;">> "La recta secante es paralela a la recta tangente en el punto c."</p>
+              <p style="color: var(--brand-primary);">> "La recta secante es paralela a la recta tangente en el punto c."</p>
             </div>
           `;
         }
@@ -974,8 +950,13 @@
       const primaryColor = accentPalette.primary;
       const secondaryColor = accentPalette.secondary;
 
-      // Apply data-theme-mode attribute for Dark/Light tokens
+      // Apply data-theme-mode & data-theme attributes for Dark/Light tokens and dynamic background
       root.setAttribute('data-theme-mode', currentMode);
+      if (currentMode === 'dark') {
+        root.setAttribute('data-theme', 'dark');
+      } else {
+        root.removeAttribute('data-theme');
+      }
 
       // Update reactive CSS custom properties across the entire page
       root.style.setProperty('--brand-primary', primaryColor);
@@ -985,6 +966,9 @@
       root.style.setProperty('--brand-secondary', secondaryColor);
       root.style.setProperty('--brand-secondary-rgb', hexToRgbString(secondaryColor));
       root.style.setProperty('--brand-secondary-light', accentPalette.secondaryLight);
+
+      root.style.setProperty('--color-ruby', primaryColor);
+      root.style.setProperty('--color-aqua', secondaryColor);
 
       root.style.setProperty('--bg-canvas', canvasPalette.canvas);
       root.style.setProperty('--bg-surface', canvasPalette.surface);
@@ -1013,7 +997,7 @@
         previewSubEl.textContent = modeName + ' activo • Interfaz y apuntes sincronizados';
       }
       if (navModeLabel) {
-        navModeLabel.textContent = currentMode === 'dark' ? 'Modo Oscuro' : 'Modo Claro';
+        navModeLabel.textContent = currentMode === 'dark' ? 'Modo Claro' : 'Modo Oscuro';
       }
     }
 
@@ -1060,10 +1044,14 @@
       });
     });
 
-    // Header quick mode toggle
+    // Header quick mode toggle & global toggleTheme helper
+    window.toggleTheme = function () {
+      setMode(currentMode === 'light' ? 'dark' : 'light');
+    };
+
     if (navQuickModeBtn) {
       navQuickModeBtn.addEventListener('click', () => {
-        setMode(currentMode === 'light' ? 'dark' : 'light');
+        window.toggleTheme();
       });
     }
 

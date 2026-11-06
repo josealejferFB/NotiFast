@@ -47,11 +47,14 @@ class TestLandingE2E(unittest.TestCase):
             self.assertIn("<!DOCTYPE html>", body)
             self.assertIn("NotiFast", body)
             self.assertIn("hero-logo-stage", body)
+            self.assertIn("hero-short-iframe", body)
+            self.assertIn("BvFrJSQnDxo", body)
+            self.assertIn("notifast-background", body)
+            self.assertIn("aurora-ruby", body)
+            self.assertIn("doodle-layer", body)
             self.assertIn("section-notes-flow", body)
             self.assertIn("section-grades-lab", body)
             self.assertIn("section-schedule-radar", body)
-            self.assertIn("subjects-gallery", body)
-            self.assertIn("bento-grid", body)
             self.assertIn("download-toast", body)
 
     def test_get_docs_html(self):
